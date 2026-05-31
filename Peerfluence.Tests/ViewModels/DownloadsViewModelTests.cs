@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.Runtime.Serialization;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -12,6 +13,7 @@ using PeerSharp.Interfaces;
 
 namespace Peerfluence.Tests.ViewModels;
 
+[Collection("Messenger")]
 public class DownloadsViewModelTests
 {
     private readonly ITorrentService _torrentService;
@@ -26,6 +28,8 @@ public class DownloadsViewModelTests
 
     public DownloadsViewModelTests()
     {
+        WeakReferenceMessenger.Default.Reset();
+
         var store = Substitute.For<IAppSettingsStore>();
         var paths = new AppPaths();
         var settingsService = new AppSettingsService(paths, store, new FileSystem());

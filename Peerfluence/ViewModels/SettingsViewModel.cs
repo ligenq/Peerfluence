@@ -413,6 +413,18 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool IsUpdateServiceInstalled => _updateService.IsInstalled;
 
+    public bool IsDirectDownloadUpdateChannel => _updateService.Channel == UpdateChannel.DirectDownload;
+
+    public bool IsMicrosoftStoreUpdateChannel => _updateService.Channel == UpdateChannel.MicrosoftStore;
+
+    public bool CanCheckForUpdates => _updateService.CanCheckForUpdates;
+
+    public bool ShouldShowUpdateNotInstalled => IsDirectDownloadUpdateChannel && !_updateService.IsInstalled;
+
+    public string UpdateManagementMessage => IsMicrosoftStoreUpdateChannel
+        ? Properties.Resources.Settings_UpdatesManagedByMicrosoftStore
+        : Properties.Resources.Settings_UpdateNotInstalled;
+
     public ObservableCollection<PortMappingStatusViewModel> PortMappingStatuses { get; }
 
     private void LoadFromSettings()
@@ -594,9 +606,9 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private async Task CheckForUpdatesAsync()
     {
-        if (!_updateService.IsInstalled)
+        if (!_updateService.CanCheckForUpdates)
         {
-            StatusMessage = Properties.Resources.Settings_UpdateNotInstalled;
+            StatusMessage = UpdateManagementMessage;
             return;
         }
 
@@ -624,6 +636,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private void ApplyUpdateAndRestart()
     {
+        if (!_updateService.CanApplyUpdates)
+        {
+            StatusMessage = UpdateManagementMessage;
+            return;
+        }
+
         _updateService.ApplyUpdateAndRestart();
     }
 

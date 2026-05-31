@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Velopack;
+using VelopackSemanticVersion = Velopack.SemanticVersion;
 
 namespace Peerfluence.Tests.Services;
 
@@ -30,6 +31,18 @@ public class UpdateServiceTests
     public void IsUpdateAvailable_DefaultsFalse()
     {
         Assert.False(_sut.IsUpdateAvailable);
+    }
+
+    [Fact]
+    public void Channel_IsDirectDownload_ForVelopackUpdateService()
+    {
+        Assert.Equal(UpdateChannel.DirectDownload, _sut.Channel);
+    }
+
+    [Fact]
+    public void CanCheckForUpdates_ReturnsFalse_WhenVelopackIsNotInstalled()
+    {
+        Assert.False(_sut.CanCheckForUpdates);
     }
 
     [Fact]
@@ -150,12 +163,29 @@ public class UpdateServiceTests
         Assert.Null(sut.AvailableVersion);
     }
 
+    [Fact]
+    public async Task MicrosoftStoreUpdateService_DisablesSelfUpdates()
+    {
+        var logger = Substitute.For<ILogger<MicrosoftStoreUpdateService>>();
+        var sut = new MicrosoftStoreUpdateService(logger);
+
+        Assert.Equal(UpdateChannel.MicrosoftStore, sut.Channel);
+        Assert.True(sut.IsInstalled);
+        Assert.False(sut.CanCheckForUpdates);
+        Assert.False(sut.CanApplyUpdates);
+        Assert.False(await sut.CheckForUpdatesAsync());
+        Assert.False(await sut.DownloadUpdateAsync());
+
+        var exception = Record.Exception(() => sut.ApplyUpdateAndRestart());
+        Assert.Null(exception);
+    }
+
     private static UpdateInfo CreateUpdateInfo(string version)
     {
         return new UpdateInfo(
             new VelopackAsset
             {
-                Version = NuGet.Versioning.SemanticVersion.Parse(version),
+                Version = VelopackSemanticVersion.Parse(version),
                 FileName = "peerfluence.nupkg",
             },
             false,

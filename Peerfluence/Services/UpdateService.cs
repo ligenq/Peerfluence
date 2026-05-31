@@ -30,6 +30,8 @@ public sealed class UpdateService : IUpdateService
     public bool IsUpdateAvailable { get; private set; }
     public string? AvailableVersion { get; private set; }
 
+    public UpdateChannel Channel => UpdateChannel.DirectDownload;
+
     public bool IsInstalled
     {
         get
@@ -44,6 +46,10 @@ public sealed class UpdateService : IUpdateService
             }
         }
     }
+
+    public bool CanCheckForUpdates => IsInstalled;
+
+    public bool CanApplyUpdates => IsInstalled;
 
     public async Task<bool> CheckForUpdatesAsync()
     {

@@ -2634,6 +2634,12 @@ namespace Peerfluence.Properties {
             }
         }
         
+        public static string Settings_UpdatesManagedByMicrosoftStore {
+            get {
+                return ResourceManager.GetString("Settings_UpdatesManagedByMicrosoftStore", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Updates.
         /// </summary>

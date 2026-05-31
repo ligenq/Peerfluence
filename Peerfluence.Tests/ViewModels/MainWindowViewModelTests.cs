@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Peerfluence.Core;
 using Peerfluence.Core.Services;
@@ -8,6 +9,7 @@ using Peerfluence.ViewModels;
 
 namespace Peerfluence.Tests.ViewModels;
 
+[Collection("Messenger")]
 public class MainWindowViewModelTests
 {
     private readonly DetailsViewModel _detailsVm;
@@ -17,6 +19,8 @@ public class MainWindowViewModelTests
 
     public MainWindowViewModelTests()
     {
+        WeakReferenceMessenger.Default.Reset();
+
         _notificationService = Substitute.For<INotificationService>();
 
         var store = Substitute.For<IAppSettingsStore>();
