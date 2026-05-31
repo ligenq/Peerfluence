@@ -11,10 +11,9 @@ lifecycle, and PeerSharp for BitTorrent engine behavior.
 
 ## Status
 
-Peerfluence is actively being prepared for normal desktop distribution and Microsoft
-Store distribution. The core app, settings system, torrent controls, MCP integration,
-natural-language UI test harness, Velopack update path, and initial MSIX packaging path
-are in place.
+Peerfluence is actively being prepared for normal desktop distribution. The core app,
+settings system, torrent controls, MCP integration, natural-language UI test harness, and
+Velopack update path are in place.
 
 ## Main Capabilities
 
@@ -46,7 +45,6 @@ are in place.
 - Configure a completion action program/script that runs when a torrent finishes.
 - Customize theme variant, color palette, background style, and language.
 - Self-update through Velopack for direct-download builds.
-- Use Microsoft Store-managed updates for Store builds.
 - Expose a local MCP server for AI-assisted control and diagnostics.
 - Run a UI-agent mode for natural-language, AI-executable UI test cases.
 - Handle crashes with native platform dialogs and crash logs.
@@ -96,8 +94,7 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
   credentials, proxy peers, and proxy trackers.
 - Media player: external media player path.
 - Completion action: program/script, arguments, working directory, timeout, run hidden.
-- Updates: Velopack update URL for direct builds, or Microsoft Store-managed update
-  messaging for Store builds.
+- Updates: Velopack update URL and restart/apply controls for direct builds.
 - Appearance: system/light/dark theme, color theme, background style, language.
 
 Default data locations:
@@ -191,7 +188,6 @@ and a magnet link used by the test cases.
 Requirements:
 
 - Windows with .NET SDK 10.
-- Windows SDK if building MSIX packages.
 
 Run the app:
 
@@ -217,47 +213,9 @@ serially. Parallel build/test commands can occasionally collide on generated fil
 
 ## Distribution
 
-### Direct Downloads
-
 Direct-download builds use Velopack for installation and self-updates. The Settings
 Updates panel shows the update URL, update check, and restart/apply controls when the app
 is installed through Velopack.
-
-### Microsoft Store
-
-Microsoft Store builds compile with:
-
-```powershell
-/p:DistributionChannel=MicrosoftStore
-```
-
-That switch:
-
-- Defines `MICROSOFT_STORE`.
-- Compiles out `VelopackApp.Build().Run()`.
-- Registers `MicrosoftStoreUpdateService`.
-- Hides Velopack update controls in Settings.
-- Shows that updates are managed by Microsoft Store.
-
-Build a local unsigned MSIX:
-
-```powershell
-.\StorePackaging\build-msix.ps1 `
-  -PackageName "Peerfluence" `
-  -Publisher "CN=Your Partner Center Publisher" `
-  -PublisherDisplayName "Your Publisher Name"
-```
-
-The package is written to `artifacts\store\msix`.
-
-Partner Center supplies the final package identity values after the app name is reserved.
-Use those values for real Store submission builds. Local sideload testing requires a
-trusted signing certificate; Store submission packages are re-signed by Microsoft after
-certification.
-
-Before Store submission, run the Windows App Certification Kit and test install, launch,
-networking, downloads, notifications, settings persistence, and removal behavior on a
-clean Windows user profile.
 
 ## Project Layout
 
@@ -267,7 +225,6 @@ clean Windows user profile.
 - `Peerfluence.Tests`: unit tests.
 - `Peerfluence.HeadlessTests`: Avalonia/headless UI tests.
 - `Testing`: AI-executable UI test cases and fixtures.
-- `StorePackaging`: MSIX manifest template and packaging script.
 - `DebuggerApp`: local helper/debug harness.
 
 [PeerSharp](https://github.com/ligenq/PeerSharp) is consumed as a NuGet package by the
@@ -281,4 +238,3 @@ analysis.
   isolated location.
 - Public swarm tests can be inconclusive when peers, trackers, NAT, or firewall conditions
   are unfavorable.
-- Do not commit generated packages from `artifacts\store\msix`.
