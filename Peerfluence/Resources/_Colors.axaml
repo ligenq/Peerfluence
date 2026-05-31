@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<SolidColorBrush x:Key="ErrorColor" Color="#EF4444" />
+	<SolidColorBrush x:Key="SuccessColor" Color="#22C55E" />
+	<SolidColorBrush x:Key="WarningColor" Color="#F59E0B" />
+	<SolidColorBrush x:Key="InfoColor" Color="#3B82F6" />
+	<SolidColorBrush x:Key="DhtColor" Color="#6366F1" />
+	<SolidColorBrush x:Key="MissingColor" Color="#6B7280" />
+
+</ResourceDictionary>

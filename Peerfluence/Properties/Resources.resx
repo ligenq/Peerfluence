@@ -1,0 +1,1000 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App_Title" xml:space="preserve">
+    <value>Peerfluence</value>
+  </data>
+  <data name="App_Tagline" xml:space="preserve">
+    <value>BitTorrent workstation</value>
+  </data>
+  <data name="Nav_Downloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="Nav_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Downloads_Title" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="Downloads_TotalDown" xml:space="preserve">
+    <value>Total Down</value>
+  </data>
+  <data name="Downloads_TotalUp" xml:space="preserve">
+    <value>Total Up</value>
+  </data>
+  <data name="Downloads_Active" xml:space="preserve">
+    <value>Active Torrents</value>
+  </data>
+  <data name="Downloads_Peers" xml:space="preserve">
+    <value>Peers</value>
+  </data>
+  <data name="Downloads_AddTorrent" xml:space="preserve">
+    <value>Add Torrent</value>
+  </data>
+  <data name="Downloads_MagnetWatermark" xml:space="preserve">
+    <value>Paste magnet link</value>
+  </data>
+  <data name="Downloads_AddMagnet" xml:space="preserve">
+    <value>Add Magnet</value>
+  </data>
+  <data name="Downloads_PasteMagnet" xml:space="preserve">
+    <value>Paste Magnet</value>
+  </data>
+  <data name="Downloads_Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Downloads_Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Downloads_Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Downloads_OpenFolder" xml:space="preserve">
+    <value>Open Folder</value>
+  </data>
+  <data name="Downloads_CopyHash" xml:space="preserve">
+    <value>Copy Hash</value>
+  </data>
+  <data name="Downloads_CopyMagnet" xml:space="preserve">
+    <value>Copy Magnet Link</value>
+  </data>
+  <data name="Downloads_ForceRecheck" xml:space="preserve">
+    <value>Force Recheck</value>
+  </data>
+  <data name="Downloads_Grid_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Downloads_Grid_Progress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="Downloads_Grid_State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="Downloads_Grid_Down" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="Downloads_Grid_Up" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="Downloads_Grid_Peers" xml:space="preserve">
+    <value>Peers</value>
+  </data>
+  <data name="Downloads_FilePicker_Title" xml:space="preserve">
+    <value>Open Torrent</value>
+  </data>
+  <data name="Downloads_FilePicker_Filter" xml:space="preserve">
+    <value>Torrent files</value>
+  </data>
+  <data name="Details_Title" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Details_State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="Details_Peers" xml:space="preserve">
+    <value>Peers</value>
+  </data>
+  <data name="Details_Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Details_Downloaded" xml:space="preserve">
+    <value>Downloaded</value>
+  </data>
+  <data name="Details_Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="Details_DownloadLimit" xml:space="preserve">
+    <value>Download limit (B/s)</value>
+  </data>
+  <data name="Details_UploadLimit" xml:space="preserve">
+    <value>Upload limit (B/s)</value>
+  </data>
+  <data name="Details_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Details_Strategy" xml:space="preserve">
+    <value>Strategy</value>
+  </data>
+  <data name="Details_FilesTab" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="Details_TrackersTab" xml:space="preserve">
+    <value>Trackers</value>
+  </data>
+  <data name="Details_PeersTab" xml:space="preserve">
+    <value>Peers</value>
+  </data>
+  <data name="Details_ApplyFileSelection" xml:space="preserve">
+    <value>Apply File Selection</value>
+  </data>
+  <data name="Details_Grid_Selected" xml:space="preserve">
+    <value>Selected</value>
+  </data>
+  <data name="Details_Grid_Priority" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="Details_Grid_Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="Details_Grid_Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Details_Grid_Downloaded" xml:space="preserve">
+    <value>Downloaded</value>
+  </data>
+  <data name="Details_Grid_Progress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="Details_Trackers_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_Trackers_State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="Details_Trackers_Seeds" xml:space="preserve">
+    <value>Seeds</value>
+  </data>
+  <data name="Details_Trackers_Leeches" xml:space="preserve">
+    <value>Leeches</value>
+  </data>
+  <data name="Details_Trackers_LastError" xml:space="preserve">
+    <value>Last Error</value>
+  </data>
+  <data name="Details_Peers_Endpoint" xml:space="preserve">
+    <value>Endpoint</value>
+  </data>
+  <data name="Details_Peers_Client" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Details_Peers_Country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="Details_Peers_Down" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="Details_Peers_Up" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="Details_Peers_Progress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="Details_SelectTorrent" xml:space="preserve">
+    <value>Select a torrent</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_DownloadFolder" xml:space="preserve">
+    <value>Download folder</value>
+  </data>
+  <data name="Settings_SessionFolder" xml:space="preserve">
+    <value>Session data folder</value>
+  </data>
+  <data name="Settings_EnableSessionPersistence" xml:space="preserve">
+    <value>Enable session persistence</value>
+  </data>
+  <data name="Settings_EnableDht" xml:space="preserve">
+    <value>Enable DHT</value>
+  </data>
+  <data name="Settings_EnableNatPmp" xml:space="preserve">
+    <value>Enable NAT-PMP</value>
+  </data>
+  <data name="Settings_EnableUpnp" xml:space="preserve">
+    <value>Enable UPnP</value>
+  </data>
+  <data name="Settings_UseAutomaticListeningPort" xml:space="preserve">
+    <value>Use automatic listening port</value>
+  </data>
+  <data name="Settings_ListeningPort" xml:space="preserve">
+    <value>Listening port</value>
+  </data>
+  <data name="Settings_ListeningPortHint" xml:space="preserve">
+    <value>Peerfluence uses the same port for TCP and UDP. Automatic mode asks the OS for available ports when the engine starts.</value>
+  </data>
+  <data name="Settings_PortRestartHint" xml:space="preserve">
+    <value>Listening port changes apply the next time Peerfluence starts.</value>
+  </data>
+  <data name="Settings_Performance" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="Settings_DiskReadLimit" xml:space="preserve">
+    <value>Disk read limit (bytes/sec, 0 = unlimited)</value>
+  </data>
+  <data name="Settings_DiskWriteLimit" xml:space="preserve">
+    <value>Disk write limit (bytes/sec, 0 = unlimited)</value>
+  </data>
+  <data name="Settings_ThemeVariant" xml:space="preserve">
+    <value>Theme variant</value>
+  </data>
+  <data name="Settings_ThemeVariant_System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Settings_ThemeVariant_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_ColorTheme" xml:space="preserve">
+    <value>Color theme</value>
+  </data>
+  <data name="Settings_ColorTheme_Indigo" xml:space="preserve">
+    <value>Indigo</value>
+  </data>
+  <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
+    <value>Cobalt</value>
+  </data>
+  <data name="Settings_ColorTheme_Mint" xml:space="preserve">
+    <value>Mint</value>
+  </data>
+  <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
+    <value>Emerald</value>
+  </data>
+  <data name="Settings_ColorTheme_Rose" xml:space="preserve">
+    <value>Rose</value>
+  </data>
+  <data name="Settings_ColorTheme_Vibrant" xml:space="preserve">
+    <value>Vibrant</value>
+  </data>
+  <data name="Settings_ColorTheme_Amber" xml:space="preserve">
+    <value>Amber</value>
+  </data>
+  <data name="Settings_ColorTheme_Slate" xml:space="preserve">
+    <value>Slate</value>
+  </data>
+  <data name="Settings_ColorTheme_Solar" xml:space="preserve">
+    <value>Solar</value>
+  </data>
+  <data name="Settings_BackgroundStyle" xml:space="preserve">
+    <value>Background style</value>
+  </data>
+  <data name="Settings_BackgroundStyle_GradientSoft" xml:space="preserve">
+    <value>Soft gradient</value>
+  </data>
+  <data name="Settings_BackgroundStyle_Gradient" xml:space="preserve">
+    <value>Gradient</value>
+  </data>
+  <data name="Settings_BackgroundStyle_GradientDarker" xml:space="preserve">
+    <value>Dark gradient</value>
+  </data>
+  <data name="Settings_BackgroundStyle_Flat" xml:space="preserve">
+    <value>Flat</value>
+  </data>
+  <data name="Settings_BackgroundStyle_Bubble" xml:space="preserve">
+    <value>Bubbles</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Settings_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Status_AddingTorrent" xml:space="preserve">
+    <value>Adding torrent...</value>
+  </data>
+  <data name="Status_TorrentAdded" xml:space="preserve">
+    <value>Torrent added.</value>
+  </data>
+  <data name="Status_AddTorrentFailed" xml:space="preserve">
+    <value>Failed to add torrent: {0}</value>
+  </data>
+  <data name="Status_MagnetMissing" xml:space="preserve">
+    <value>Paste a magnet link into the field or copy one to the clipboard first.</value>
+  </data>
+  <data name="Status_AddingMagnet" xml:space="preserve">
+    <value>Adding magnet...</value>
+  </data>
+  <data name="Status_MagnetAdded" xml:space="preserve">
+    <value>Magnet added.</value>
+  </data>
+  <data name="Status_AddMagnetFailed" xml:space="preserve">
+    <value>Failed to add magnet: {0}</value>
+  </data>
+  <data name="Status_SettingsSaved" xml:space="preserve">
+    <value>Settings saved. Restart to apply engine changes.</value>
+  </data>
+  <data name="Status_SettingsSaveFailed" xml:space="preserve">
+    <value>Failed to save settings: {0}</value>
+  </data>
+  <data name="Status_SettingsReset" xml:space="preserve">
+    <value>Settings reset to last saved values.</value>
+  </data>
+  <data name="Status_TorrentReady" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Status_FetchingMetadata" xml:space="preserve">
+    <value>Fetching metadata</value>
+  </data>
+  <data name="Downloads_Grid_Eta" xml:space="preserve">
+    <value>ETA</value>
+  </data>
+  <data name="Eta_Seconds" xml:space="preserve">
+    <value>{0} seconds left</value>
+  </data>
+  <data name="Eta_Minutes" xml:space="preserve">
+    <value>{0} minutes left</value>
+  </data>
+  <data name="Eta_HoursMinutes" xml:space="preserve">
+    <value>{0}h {1}m left</value>
+  </data>
+  <data name="Eta_DaysHours" xml:space="preserve">
+    <value>{0}d {1}h left</value>
+  </data>
+  <data name="CreateTorrent_Title" xml:space="preserve">
+    <value>Create Torrent</value>
+  </data>
+  <data name="CreateTorrent_Source" xml:space="preserve">
+    <value>Source Path</value>
+  </data>
+  <data name="CreateTorrent_SourceWatermark" xml:space="preserve">
+    <value>Select a file or folder...</value>
+  </data>
+  <data name="CreateTorrent_Trackers" xml:space="preserve">
+    <value>Trackers (one per line)</value>
+  </data>
+  <data name="CreateTorrent_TrackersWatermark" xml:space="preserve">
+    <value>Enter tracker URLs, one per line...</value>
+  </data>
+  <data name="CreateTorrent_PieceSize" xml:space="preserve">
+    <value>Piece Size</value>
+  </data>
+  <data name="CreateTorrent_Private" xml:space="preserve">
+    <value>Private Torrent</value>
+  </data>
+  <data name="CreateTorrent_Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="CreateTorrent_Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreateTorrent_BrowseFile" xml:space="preserve">
+    <value>File...</value>
+  </data>
+  <data name="CreateTorrent_BrowseFolder" xml:space="preserve">
+    <value>Folder...</value>
+  </data>
+  <data name="CreateTorrent_SelectSourceFolder" xml:space="preserve">
+    <value>Select Source Folder</value>
+  </data>
+  <data name="CreateTorrent_SelectSourceFile" xml:space="preserve">
+    <value>Select Source File</value>
+  </data>
+  <data name="CreateTorrent_SaveTorrentFile" xml:space="preserve">
+    <value>Save Torrent File</value>
+  </data>
+  <data name="CreateTorrent_TorrentFileType" xml:space="preserve">
+    <value>Torrent File</value>
+  </data>
+  <data name="CreateTorrent_ErrorNoSource" xml:space="preserve">
+    <value>Please select a source file or folder.</value>
+  </data>
+  <data name="CreateTorrent_ErrorSourceNotFound" xml:space="preserve">
+    <value>The selected source path does not exist.</value>
+  </data>
+  <data name="CreateTorrent_ErrorNoFiles" xml:space="preserve">
+    <value>The selected folder does not contain any files.</value>
+  </data>
+  <data name="CreateTorrent_ErrorFailed" xml:space="preserve">
+    <value>Failed to create the torrent. Check the log for details.</value>
+  </data>
+  <data name="Details_RatioLimit" xml:space="preserve">
+    <value>Ratio limit</value>
+  </data>
+  <data name="Details_Hash" xml:space="preserve">
+    <value>Hash:</value>
+  </data>
+  <data name="Details_SeedTimeMinutes" xml:space="preserve">
+    <value>Seed time (min)</value>
+  </data>
+  <data name="Details_QueuePriority" xml:space="preserve">
+    <value>Queue priority</value>
+  </data>
+  <data name="Details_VerifyFiles" xml:space="preserve">
+    <value>Verify Files</value>
+  </data>
+  <data name="Details_Stream" xml:space="preserve">
+    <value>Stream</value>
+  </data>
+  <data name="Details_Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Details_RatioLimitWatermark" xml:space="preserve">
+    <value>e.g. 2.0</value>
+  </data>
+  <data name="Details_SeedTimeWatermark" xml:space="preserve">
+    <value>e.g. 60</value>
+  </data>
+  <data name="Details_QueuePriorityWatermark" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Details_Recheck_Verifying" xml:space="preserve">
+    <value>Verifying...</value>
+  </data>
+  <data name="Details_Recheck_Progress" xml:space="preserve">
+    <value>Checking piece {0} / {1} ({2} valid)</value>
+  </data>
+  <data name="Details_Recheck_Complete" xml:space="preserve">
+    <value>Complete — {0} valid pieces</value>
+  </data>
+  <data name="Details_Recheck_Failed" xml:space="preserve">
+    <value>Failed: {0}</value>
+  </data>
+  <data name="Details_StreamFailed" xml:space="preserve">
+    <value>Streaming failed</value>
+  </data>
+  <data name="Settings_QueueManagement" xml:space="preserve">
+    <value>Queue Management</value>
+  </data>
+  <data name="Settings_EnableQueueManagement" xml:space="preserve">
+    <value>Enable queue management</value>
+  </data>
+  <data name="Settings_MaxActiveDownloads" xml:space="preserve">
+    <value>Max active downloads</value>
+  </data>
+  <data name="Settings_MaxActiveSeeds" xml:space="preserve">
+    <value>Max active seeds</value>
+  </data>
+  <data name="Settings_IpBlocklist" xml:space="preserve">
+    <value>IP Blocklist</value>
+  </data>
+  <data name="Settings_EnableBlocklist" xml:space="preserve">
+    <value>Enable IP blocklist</value>
+  </data>
+  <data name="Settings_BlocklistFile" xml:space="preserve">
+    <value>Blocklist file</value>
+  </data>
+  <data name="Settings_BlocklistWatermark" xml:space="preserve">
+    <value>Path to blocklist file (.p2p, .txt, .dat)</value>
+  </data>
+  <data name="Settings_Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Settings_BlocklistPicker_Title" xml:space="preserve">
+    <value>Select Blocklist File</value>
+  </data>
+  <data name="Settings_BlocklistPicker_Filter" xml:space="preserve">
+    <value>Blocklist files</value>
+  </data>
+  <data name="Settings_BlocklistPicker_AllFiles" xml:space="preserve">
+    <value>All files</value>
+  </data>
+  <data name="Details_Trackers_AddWatermark" xml:space="preserve">
+    <value>Enter tracker URL</value>
+  </data>
+  <data name="Details_Trackers_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Details_Trackers_Announce" xml:space="preserve">
+    <value>Announce</value>
+  </data>
+  <data name="Details_PiecesTab" xml:space="preserve">
+    <value>Pieces</value>
+  </data>
+  <data name="Details_Pieces_Have" xml:space="preserve">
+    <value>Have</value>
+  </data>
+  <data name="Details_Pieces_HighAvail" xml:space="preserve">
+    <value>High availability</value>
+  </data>
+  <data name="Details_Pieces_Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="Details_Pieces_Missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="Settings_GeoIp" xml:space="preserve">
+    <value>GeoIP Database</value>
+  </data>
+  <data name="Settings_EnableGeoIp" xml:space="preserve">
+    <value>Enable GeoIP lookup</value>
+  </data>
+  <data name="Settings_GeoIpFile" xml:space="preserve">
+    <value>GeoIP database file</value>
+  </data>
+  <data name="Settings_GeoIpWatermark" xml:space="preserve">
+    <value>Path to GeoIP database (.mmdb)</value>
+  </data>
+  <data name="Settings_GeoIpPicker_Title" xml:space="preserve">
+    <value>Select GeoIP Database</value>
+  </data>
+  <data name="Settings_GeoIpPicker_Filter" xml:space="preserve">
+    <value>GeoIP databases</value>
+  </data>
+  <data name="Settings_MediaPlayer" xml:space="preserve">
+    <value>Media Player</value>
+  </data>
+  <data name="Settings_MediaPlayerPath" xml:space="preserve">
+    <value>Media player path</value>
+  </data>
+  <data name="Settings_MediaPlayerWatermark" xml:space="preserve">
+    <value>Path to executable (e.g. VLC)</value>
+  </data>
+  <data name="Settings_MediaPlayerPicker_Title" xml:space="preserve">
+    <value>Select Media Player</value>
+  </data>
+  <data name="Settings_MediaPlayerPicker_Filter" xml:space="preserve">
+    <value>Executable files</value>
+  </data>
+  <data name="Settings_Encryption" xml:space="preserve">
+    <value>Encryption</value>
+  </data>
+  <data name="Settings_EncryptionMode" xml:space="preserve">
+    <value>Encryption mode</value>
+  </data>
+  <data name="Settings_EncryptionMode_Allow" xml:space="preserve">
+    <value>Allow</value>
+  </data>
+  <data name="Settings_EncryptionMode_Require" xml:space="preserve">
+    <value>Require</value>
+  </data>
+  <data name="Settings_EncryptionMode_Refuse" xml:space="preserve">
+    <value>Refuse</value>
+  </data>
+  <data name="Settings_Proxy" xml:space="preserve">
+    <value>Proxy</value>
+  </data>
+  <data name="Settings_ProxyType" xml:space="preserve">
+    <value>Proxy type</value>
+  </data>
+  <data name="Settings_ProxyType_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Settings_ProxyType_Socks5" xml:space="preserve">
+    <value>SOCKS5</value>
+  </data>
+  <data name="Settings_ProxyType_Http" xml:space="preserve">
+    <value>HTTP</value>
+  </data>
+  <data name="Settings_ProxyHost" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="Settings_ProxyPort" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Settings_ProxyUsername" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Settings_ProxyPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Settings_ProxyPeers" xml:space="preserve">
+    <value>Proxy peer connections</value>
+  </data>
+  <data name="Settings_ProxyTrackers" xml:space="preserve">
+    <value>Proxy tracker connections</value>
+  </data>
+  <data name="CreateTorrent_WebSeeds" xml:space="preserve">
+    <value>Web Seeds (one URL per line)</value>
+  </data>
+  <data name="CreateTorrent_WebSeedsHint" xml:space="preserve">
+    <value>HTTP/HTTPS URLs for web seeding (BEP 19)</value>
+  </data>
+  <data name="Settings_PortMapping" xml:space="preserve">
+    <value>Port Mapping Status</value>
+  </data>
+  <data name="Settings_PortMapping_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Settings_PortMapping_Protocol" xml:space="preserve">
+    <value>Protocol</value>
+  </data>
+  <data name="Settings_PortMapping_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Settings_PortMapping_ExternalPort" xml:space="preserve">
+    <value>External Port: {0}</value>
+  </data>
+  <data name="Settings_PortMapping_NoMappings" xml:space="preserve">
+    <value>No port mappings available. Enable UPnP or NAT-PMP and refresh.</value>
+  </data>
+  <data name="Details_EndGameMode" xml:space="preserve">
+    <value>End Game</value>
+  </data>
+  <data name="Details_DiskReadLimit" xml:space="preserve">
+    <value>Disk read limit (B/s)</value>
+  </data>
+  <data name="Details_DiskWriteLimit" xml:space="preserve">
+    <value>Disk write limit (B/s)</value>
+  </data>
+  <data name="Details_SaveResumeData" xml:space="preserve">
+    <value>Save Resume Data</value>
+  </data>
+  <data name="Details_SaveResumeData_Title" xml:space="preserve">
+    <value>Save Resume Data</value>
+  </data>
+  <data name="Details_SaveResumeData_FileType" xml:space="preserve">
+    <value>Resume Data</value>
+  </data>
+  <data name="Details_SaveResumeData_Success" xml:space="preserve">
+    <value>Resume data saved.</value>
+  </data>
+  <data name="Details_SaveResumeData_Failed" xml:space="preserve">
+    <value>Failed to save resume data: {0}</value>
+  </data>
+  <data name="Details_ChangeDownloadPath" xml:space="preserve">
+    <value>Change Path</value>
+  </data>
+  <data name="Details_ChangeDownloadPath_Title" xml:space="preserve">
+    <value>Select New Download Path</value>
+  </data>
+  <data name="Details_ChangeDownloadPath_Success" xml:space="preserve">
+    <value>Download path changed.</value>
+  </data>
+  <data name="Details_ChangeDownloadPath_Failed" xml:space="preserve">
+    <value>Failed to change download path: {0}</value>
+  </data>
+  <data name="Settings_DownloadFolderPicker_Title" xml:space="preserve">
+    <value>Select Download Folder</value>
+  </data>
+  <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
+    <value>Select Session Data Folder</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
+    <value>Remove Torrent</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
+    <value>Remove "{0}" from the download list?</value>
+  </data>
+  <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
+    <value>Also delete files from disk</value>
+  </data>
+  <data name="Downloads_Remove_Option_RemoveOnly" xml:space="preserve">
+    <value>Remove torrent only</value>
+  </data>
+  <data name="Downloads_Remove_Option_DeleteFiles" xml:space="preserve">
+    <value>Remove and delete downloaded files</value>
+  </data>
+  <data name="Downloads_Remove_Option_DeleteMetadata" xml:space="preserve">
+    <value>Remove and delete torrent metadata</value>
+  </data>
+  <data name="Downloads_Remove_Option_DeleteAll" xml:space="preserve">
+    <value>Remove everything</value>
+  </data>
+  <data name="Downloads_Remove_RememberChoice" xml:space="preserve">
+    <value>Remember this choice and skip this dialog next time</value>
+  </data>
+  <data name="Downloads_EmptyTitle" xml:space="preserve">
+    <value>No torrents yet</value>
+  </data>
+  <data name="Downloads_EmptyBody" xml:space="preserve">
+    <value>Start by opening a .torrent file or paste a magnet link from your clipboard. Active transfers and details will appear here.</value>
+  </data>
+  <data name="Downloads_EmptyHint" xml:space="preserve">
+    <value>The magnet button adds a valid magnet link from the clipboard. If the clipboard does not contain one, Peerfluence asks you to paste it.</value>
+  </data>
+  <data name="AddTorrent_Destination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="AddTorrent_DownloadFolderWatermark" xml:space="preserve">
+    <value>Download folder</value>
+  </data>
+  <data name="AddTorrent_StartImmediately" xml:space="preserve">
+    <value>Start immediately</value>
+  </data>
+  <data name="AddTorrent_Limits" xml:space="preserve">
+    <value>Limits</value>
+  </data>
+  <data name="AddTorrent_DownloadLimitKib" xml:space="preserve">
+    <value>Download KiB/s</value>
+  </data>
+  <data name="AddTorrent_UploadLimitKib" xml:space="preserve">
+    <value>Upload KiB/s</value>
+  </data>
+  <data name="AddTorrent_GlobalLimitWatermark" xml:space="preserve">
+    <value>0 = global</value>
+  </data>
+  <data name="AddTorrent_UnlimitedWatermark" xml:space="preserve">
+    <value>0 = unlimited</value>
+  </data>
+  <data name="AddTorrent_SeedTimeLimitMinutes" xml:space="preserve">
+    <value>Seed time limit, minutes</value>
+  </data>
+  <data name="AddTorrent_IncludedTrackersWatermark" xml:space="preserve">
+    <value>Included trackers</value>
+  </data>
+  <data name="AddTorrent_AdditionalTrackersWatermark" xml:space="preserve">
+    <value>Additional tracker URLs, one per line</value>
+  </data>
+  <data name="AddTorrent_MetadataPendingTitle" xml:space="preserve">
+    <value>Files are available after metadata downloads</value>
+  </data>
+  <data name="AddTorrent_MetadataPendingBody" xml:space="preserve">
+    <value>The magnet link can still be added now. File selection and per-file priority can be adjusted from the torrent details once metadata is available.</value>
+  </data>
+  <data name="AddTorrent_MetadataPreviewUnavailable" xml:space="preserve">
+    <value>Metadata was not found yet. You can still add the magnet and Peerfluence will continue fetching it.</value>
+  </data>
+  <data name="AddTorrent_MagnetFallbackName" xml:space="preserve">
+    <value>Magnet link</value>
+  </data>
+  <data name="AddTorrent_Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="AddTorrent_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddTorrent_Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="AddTorrent_SkipThisStepNextTime" xml:space="preserve">
+    <value>Skip this step next time</value>
+  </data>
+  <data name="AddTorrent_Metadata" xml:space="preserve">
+    <value>Metadata</value>
+  </data>
+  <data name="AddTorrent_Hash" xml:space="preserve">
+    <value>Hash</value>
+  </data>
+  <data name="AddTorrent_PieceSize" xml:space="preserve">
+    <value>Piece size</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Common_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Settings_ShowAddTorrentOptions" xml:space="preserve">
+    <value>Show add torrent options before adding</value>
+  </data>
+  <data name="Settings_ShowRemoveTorrentOptions" xml:space="preserve">
+    <value>Confirm before removing torrents</value>
+  </data>
+  <data name="Settings_CompletionAction" xml:space="preserve">
+    <value>Completion Action</value>
+  </data>
+  <data name="Settings_CompletionActionEnabled" xml:space="preserve">
+    <value>Run a program when a torrent finishes</value>
+  </data>
+  <data name="Settings_CompletionActionProgram" xml:space="preserve">
+    <value>Program or script</value>
+  </data>
+  <data name="Settings_CompletionActionPickerTitle" xml:space="preserve">
+    <value>Select completion action</value>
+  </data>
+  <data name="Settings_CompletionActionPickerFilter" xml:space="preserve">
+    <value>Programs and scripts</value>
+  </data>
+  <data name="Settings_CompletionActionProgramWatermark" xml:space="preserve">
+    <value>Path to executable or script</value>
+  </data>
+  <data name="Settings_CompletionActionArguments" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
+    <value>Example: --path &quot;{downloadPath}&quot; --name &quot;{name}&quot;</value>
+  </data>
+  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
+    <value>Working directory</value>
+  </data>
+  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
+    <value>{downloadPath}</value>
+  </data>
+  <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
+    <value>Timeout (seconds)</value>
+  </data>
+  <data name="Settings_CompletionActionWindow" xml:space="preserve">
+    <value>Window</value>
+  </data>
+  <data name="Settings_CompletionActionRunHidden" xml:space="preserve">
+    <value>Run hidden</value>
+  </data>
+  <data name="Settings_CompletionActionTokens" xml:space="preserve">
+    <value>Available tokens: {name}, {hash}, {downloadPath}, {totalSize}</value>
+  </data>
+  <data name="Details_SettingsTab" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_StorageAndSession" xml:space="preserve">
+    <value>Storage &amp; Session</value>
+  </data>
+  <data name="Settings_NetworkAndConnectivity" xml:space="preserve">
+    <value>Network &amp; Connectivity</value>
+  </data>
+  <data name="Nav_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>About Peerfluence</value>
+  </data>
+  <data name="About_GitHub" xml:space="preserve">
+    <value>GitHub Repository</value>
+  </data>
+  <data name="About_Packages" xml:space="preserve">
+    <value>Third-party packages</value>
+  </data>
+  <data name="Settings_SecurityAndPrivacy" xml:space="preserve">
+    <value>Security &amp; Privacy</value>
+  </data>
+  <data name="Settings_Updates" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="Settings_UpdateUrl" xml:space="preserve">
+    <value>Update URL</value>
+  </data>
+  <data name="Settings_UpdateUrlWatermark" xml:space="preserve">
+    <value>https://example.com/releases</value>
+  </data>
+  <data name="Settings_CheckForUpdatesOnStartup" xml:space="preserve">
+    <value>Check for updates on startup</value>
+  </data>
+  <data name="Settings_CheckForUpdates" xml:space="preserve">
+    <value>Check now</value>
+  </data>
+  <data name="Status_UpdateAvailable" xml:space="preserve">
+    <value>Update available: {0}</value>
+  </data>
+  <data name="Status_NoUpdatesAvailable" xml:space="preserve">
+    <value>You are running the latest version.</value>
+  </data>
+  <data name="Status_UpdateCheckFailed" xml:space="preserve">
+    <value>Could not check for updates. Verify the update URL and try again.</value>
+  </data>
+  <data name="Status_DownloadingUpdate" xml:space="preserve">
+    <value>Downloading update...</value>
+  </data>
+  <data name="Status_UpdateReady" xml:space="preserve">
+    <value>Update ready — restart to apply.</value>
+  </data>
+  <data name="Settings_ApplyUpdateAndRestart" xml:space="preserve">
+    <value>Restart &amp; update</value>
+  </data>
+  <data name="Settings_UpdateNotInstalled" xml:space="preserve">
+    <value>Auto-update is not available in portable mode.</value>
+  </data>
+  <data name="TorrentState_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="TorrentState_Stopping" xml:space="preserve">
+    <value>Stopping</value>
+  </data>
+  <data name="TorrentState_Stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="TorrentState_CheckingFiles" xml:space="preserve">
+    <value>Checking files</value>
+  </data>
+  <data name="TorrentState_DownloadingMetadata" xml:space="preserve">
+    <value>Downloading metadata</value>
+  </data>
+  <data name="Notification_DownloadFinished" xml:space="preserve">
+    <value>Download finished</value>
+  </data>
+  <data name="Notification_TorrentInterrupted" xml:space="preserve">
+    <value>Torrent interrupted</value>
+  </data>
+  <data name="Notification_MetadataReady" xml:space="preserve">
+    <value>Metadata ready</value>
+  </data>
+  <data name="Notification_TorrentError" xml:space="preserve">
+    <value>Torrent error</value>
+  </data>
+  <data name="Notification_CompletionActionFailed" xml:space="preserve">
+    <value>Completion action failed</value>
+  </data>
+  <data name="Notification_CompletionActionFinished" xml:space="preserve">
+    <value>Completion action finished</value>
+  </data>
+  <data name="CompletionAction_ErrorNoProgram" xml:space="preserve">
+    <value>No completion action program is configured.</value>
+  </data>
+  <data name="CompletionAction_ErrorProgramNotFound" xml:space="preserve">
+    <value>Completion action program was not found: {0}</value>
+  </data>
+  <data name="CompletionAction_ErrorWorkingDirectoryNotFound" xml:space="preserve">
+    <value>Completion action working directory was not found: {0}</value>
+  </data>
+  <data name="CompletionAction_ErrorCouldNotStart" xml:space="preserve">
+    <value>Completion action could not be started.</value>
+  </data>
+  <data name="CompletionAction_ErrorTimedOut" xml:space="preserve">
+    <value>Completion action timed out after {0} seconds.</value>
+  </data>
+  <data name="CompletionAction_ExitCode" xml:space="preserve">
+    <value>{0}: exit code {1}</value>
+  </data>
+  <data name="ViewLocator_NotFound" xml:space="preserve">
+    <value>Not Found: {0}</value>
+  </data>
+  <data name="Crash_UnexpectedError" xml:space="preserve">
+    <value>Peerfluence encountered an unexpected error and needs to close.</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>Peerfluence - Fatal Error</value>
+  </data>
+  <data name="Crash_ReportSaved" xml:space="preserve">
+    <value>A crash report has been saved to:</value>
+  </data>
+  </root>

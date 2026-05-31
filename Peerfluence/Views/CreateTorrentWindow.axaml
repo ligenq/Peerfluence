@@ -1,0 +1,76 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:vm="using:Peerfluence.ViewModels"
+                 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+                 xmlns:m="using:Peerfluence.Markup"
+                 mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+                 x:Class="Peerfluence.Views.CreateTorrentWindow"
+                 x:DataType="vm:CreateTorrentViewModel"
+                 Title="{m:L CreateTorrent_Title}"
+                 Width="650" Height="750"
+                 WindowStartupLocation="CenterOwner"
+                 CanResize="False">
+
+    <suki:BusyArea IsBusy="{Binding IsCreating}">
+        <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <!-- Source -->
+                    <StackPanel Spacing="{StaticResource SpacingNormal}">
+                        <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
+                            <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}">
+                                <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            </Button>
+                            <Button Grid.Column="2" Command="{Binding BrowseSourceCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFolder}">
+                                <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Piece Size & Private -->
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingLarge}">
+                        <StackPanel Spacing="{StaticResource SpacingNormal}">
+                            <TextBlock Text="{m:L CreateTorrent_PieceSize}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ComboBox ItemsSource="{Binding PieceSizes}" SelectedIndex="{Binding SelectedPieceSizeIndex}" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" Content="{m:L CreateTorrent_Private}" IsChecked="{Binding IsPrivate}" VerticalAlignment="Bottom" Margin="{StaticResource XXSmallBottomMargin}"/>
+                    </Grid>
+                </StackPanel>
+            </suki:GlassCard>
+
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <!-- Trackers -->
+                    <StackPanel Spacing="{StaticResource SpacingNormal}">
+                        <TextBlock Text="{m:L CreateTorrent_Trackers}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBox Text="{Binding Trackers}" Height="120" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_TrackersWatermark}"/>
+                    </StackPanel>
+
+                    <!-- Web Seeds -->
+                    <StackPanel Spacing="{StaticResource SpacingNormal}">
+                        <TextBlock Text="{m:L CreateTorrent_WebSeeds}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBox Text="{Binding WebSeeds}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_WebSeedsHint}"/>
+                    </StackPanel>
+
+                    <!-- Comment -->
+                    <StackPanel Spacing="{StaticResource SpacingNormal}">
+                        <TextBlock Text="{m:L CreateTorrent_Comment}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBox Text="{Binding Comment, Mode=TwoWay}"/>
+                    </StackPanel>
+                </StackPanel>
+            </suki:GlassCard>
+            
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="{StaticResource ErrorColor}" TextWrapping="Wrap" FontSize="{StaticResource FontSizeNormal}"/>
+
+            <!-- Actions -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource NormalTopMargin}">
+                <Button Content="{m:L CreateTorrent_Create}" Classes="Flat" Command="{Binding CreateCommand}" Width="120"/>
+            </StackPanel>
+        </StackPanel>
+    </suki:BusyArea>
+</suki:SukiWindow>
