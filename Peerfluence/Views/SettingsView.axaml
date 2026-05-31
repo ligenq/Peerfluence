@@ -413,14 +413,20 @@
                         <TextBlock Text="{m:L Settings_Updates}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
                         <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}"/>
+                    <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}"/>
 
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}">
+                    <TextBlock Text="{m:L Settings_UpdatesManagedByMicrosoftStore}"
+                               Opacity="0.7"
+                               FontSize="{StaticResource FontSizeNormal}"
+                               TextWrapping="Wrap"
+                               IsVisible="{Binding IsMicrosoftStoreUpdateChannel}"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
                         <Button Command="{Binding CheckForUpdatesCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="CloudDownloadOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
@@ -435,7 +441,7 @@
                         </Button>
                     </StackPanel>
 
-                    <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="0.5" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding !IsUpdateServiceInstalled}"/>
+                    <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="0.5" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding ShouldShowUpdateNotInstalled}"/>
                 </StackPanel>
             </suki:GlassCard>
                     </StackPanel>

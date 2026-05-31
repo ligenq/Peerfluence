@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -7,6 +8,7 @@ using PeerSharp.Interfaces;
 
 namespace Peerfluence.Tests.ViewModels;
 
+[Collection("Messenger")]
 public class DetailsViewModelTests
 {
     private readonly TorrentSelectionService _selectionService = new(Substitute.For<IAppMessenger>());
@@ -18,6 +20,8 @@ public class DetailsViewModelTests
 
     public DetailsViewModelTests()
     {
+        WeakReferenceMessenger.Default.Reset();
+
         var store = Substitute.For<IAppSettingsStore>();
         var paths = new AppPaths();
         var settingsService = new AppSettingsService(paths, store, new FileSystem());

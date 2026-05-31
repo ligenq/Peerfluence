@@ -51,7 +51,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
         services.AddSingleton<ITorrentService, TorrentService>();
+#if MICROSOFT_STORE
+        services.AddSingleton<IUpdateService, MicrosoftStoreUpdateService>();
+#else
         services.AddSingleton<IUpdateService, UpdateService>();
+#endif
         return services;
     }
 

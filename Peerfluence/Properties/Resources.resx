@@ -934,6 +934,9 @@
   <data name="Settings_UpdateNotInstalled" xml:space="preserve">
     <value>Auto-update is not available in portable mode.</value>
   </data>
+  <data name="Settings_UpdatesManagedByMicrosoftStore" xml:space="preserve">
+    <value>Updates for this installation are managed by Microsoft Store.</value>
+  </data>
   <data name="TorrentState_Active" xml:space="preserve">
     <value>Active</value>
   </data>
