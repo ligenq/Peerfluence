@@ -1,0 +1,209 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:vm="using:Peerfluence.ViewModels"
+                 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+                 xmlns:m="using:Peerfluence.Markup"
+                 mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="760"
+                 x:Class="Peerfluence.Views.AddTorrentOptionsWindow"
+                 x:DataType="vm:AddTorrentOptionsViewModel"
+                 Title="{Binding Title}"
+                 Width="860" Height="760"
+                 MinWidth="760" MinHeight="640"
+                 WindowStartupLocation="CenterOwner">
+
+    <suki:BusyArea IsBusy="{Binding IsBusy}">
+        <Grid RowDefinitions="*, Auto" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="{StaticResource SpacingLarge}">
+                    <suki:GlassCard>
+                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
+                            <materialIcons:MaterialIcon Grid.RowSpan="2"
+                                                        Kind="DownloadBoxOutline"
+                                                        Width="42"
+                                                        Height="42"
+                                                        VerticalAlignment="Top"/>
+                            <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding SourceLabel}" Opacity="0.65" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <UniformGrid Grid.Row="1" Grid.Column="1" Columns="2" Margin="{StaticResource SmallTopMargin}">
+                                <StackPanel Spacing="{StaticResource SpacingXXSmall}">
+                                    <TextBlock Text="{m:L Details_Size}" Opacity="0.65"/>
+                                    <TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <StackPanel Spacing="{StaticResource SpacingXXSmall}">
+                                    <TextBlock Text="{m:L Details_FilesTab}" Opacity="0.65"/>
+                                    <TextBlock Text="{Binding FileCount}" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </UniformGrid>
+                        </Grid>
+                    </suki:GlassCard>
+
+                    <suki:GlassCard>
+                        <StackPanel Spacing="{StaticResource SpacingStandard}">
+                            <TextBlock Text="{m:L AddTorrent_Destination}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
+                                <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" PlaceholderText="{m:L AddTorrent_DownloadFolderWatermark}"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}">
+                                    <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                </Button>
+                            </Grid>
+                            <CheckBox Content="{m:L AddTorrent_StartImmediately}" IsChecked="{Binding StartImmediately}"/>
+                        </StackPanel>
+                    </suki:GlassCard>
+
+                    <suki:GlassCard IsVisible="{Binding IsMetadataPending}">
+                        <StackPanel Spacing="{StaticResource SpacingNormal}">
+                            <TextBlock Text="{m:L AddTorrent_MetadataPendingTitle}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{m:L AddTorrent_MetadataPendingBody}"
+                                       Opacity="0.7"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding MetadataStatusText}"
+                                       Opacity="0.7"
+                                       TextWrapping="Wrap"/>
+                            <ProgressBar IsIndeterminate="True"
+                                         IsVisible="{Binding IsFetchingMetadata}"
+                                         Height="4"/>
+                        </StackPanel>
+                    </suki:GlassCard>
+
+                    <suki:GlassCard IsVisible="{Binding HasFiles}">
+                        <Grid RowDefinitions="Auto, *" RowSpacing="{StaticResource SpacingStandard}">
+                            <TextBlock Text="{m:L Details_FilesTab}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                            <DataGrid Grid.Row="1"
+                                      ItemsSource="{Binding Files}"
+                                      AutoGenerateColumns="False"
+                                      CanUserReorderColumns="False"
+                                      CanUserResizeColumns="True"
+                                      CanUserSortColumns="True"
+                                      Height="240">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="vm:AddTorrentFileOptionViewModel">
+                                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}" Width="120" IsReadOnly="True"/>
+                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="vm:AddTorrentFileOptionViewModel">
+                                                <ComboBox ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding Priority, Mode=TwoWay}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </suki:GlassCard>
+
+                    <Expander Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch">
+                        <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource SmallTopMargin}">
+                            <suki:GlassCard>
+                                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                    <TextBlock Text="{m:L AddTorrent_Metadata}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                                    <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
+                                        <StackPanel Spacing="{StaticResource SpacingXXSmall}">
+                                            <TextBlock Text="{m:L AddTorrent_Hash}" Opacity="0.65"/>
+                                            <TextBlock Text="{Binding Hash}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXXSmall}">
+                                            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.65"/>
+                                            <TextBlock Text="{Binding VersionLabel}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXXSmall}">
+                                            <TextBlock Text="{m:L Details_PiecesTab}" Opacity="0.65"/>
+                                            <TextBlock Text="{Binding PieceCount}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXXSmall}">
+                                            <TextBlock Text="{m:L AddTorrent_PieceSize}" Opacity="0.65"/>
+                                            <TextBlock Text="{Binding PieceSizeBytes, Converter={StaticResource ByteSizeConverter}}"/>
+                                        </StackPanel>
+                                        <CheckBox Grid.Row="2"
+                                                  Grid.ColumnSpan="2"
+                                                  Content="{m:L CreateTorrent_Private}"
+                                                  IsChecked="{Binding IsPrivate}"
+                                                  IsEnabled="False"/>
+                                    </Grid>
+                                </StackPanel>
+                            </suki:GlassCard>
+
+                            <suki:GlassCard>
+                                <Grid ColumnDefinitions="*, *" ColumnSpacing="{StaticResource SpacingLarge}">
+                                    <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                        <TextBlock Text="{m:L AddTorrent_Limits}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                                        <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingNormal}">
+                                            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                                <TextBlock Text="{m:L AddTorrent_DownloadLimitKib}" Opacity="0.65"/>
+                                                <NumericUpDown Value="{Binding DownloadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                                <TextBlock Text="{m:L AddTorrent_UploadLimitKib}" Opacity="0.65"/>
+                                                <NumericUpDown Value="{Binding UploadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
+                                                <TextBlock Text="{m:L Details_QueuePriority}" Opacity="0.65"/>
+                                                <NumericUpDown Value="{Binding QueuePriority}" Increment="1"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                                <TextBlock Text="{m:L Details_RatioLimit}" Opacity="0.65"/>
+                                                <NumericUpDown Value="{Binding RatioLimit}" Minimum="0" Increment="0.25" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="{StaticResource SpacingXSmall}">
+                                                <TextBlock Text="{m:L AddTorrent_SeedTimeLimitMinutes}" Opacity="0.65"/>
+                                                <NumericUpDown Value="{Binding SeedTimeLimitMinutes}" Minimum="0" Increment="15" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingStandard}">
+                                        <TextBlock Text="{m:L Details_TrackersTab}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                                        <TextBox Text="{Binding ExistingTrackers}"
+                                                 IsReadOnly="True"
+                                                 IsVisible="{Binding HasExistingTrackers}"
+                                                 Height="82"
+                                                 AcceptsReturn="True"
+                                                 TextWrapping="Wrap"
+                                                 PlaceholderText="{m:L AddTorrent_IncludedTrackersWatermark}"/>
+                                        <TextBox Text="{Binding AdditionalTrackers, Mode=TwoWay}"
+                                                 Height="100"
+                                                 AcceptsReturn="True"
+                                                 TextWrapping="Wrap"
+                                                 PlaceholderText="{m:L AddTorrent_AdditionalTrackersWatermark}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </suki:GlassCard>
+                        </StackPanel>
+                    </Expander>
+
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               IsVisible="{Binding HasError}"
+                               Foreground="{StaticResource ErrorColor}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*, Auto"
+                  ColumnSpacing="{StaticResource SpacingStandard}"
+                  Margin="{StaticResource MediumTopMargin}">
+                <CheckBox Content="{m:L AddTorrent_SkipThisStepNextTime}"
+                          IsChecked="{Binding SkipThisStepNextTime}"
+                          VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="{StaticResource SpacingStandard}">
+                    <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" MinWidth="110"/>
+                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" MinWidth="130"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </suki:BusyArea>
+</suki:SukiWindow>

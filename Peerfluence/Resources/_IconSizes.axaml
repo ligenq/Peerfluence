@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+	<sys:Double x:Key="IconSizeMicro">12</sys:Double>
+	<sys:Double x:Key="IconSizeSmall">14</sys:Double>
+	<sys:Double x:Key="IconSizeNormal">16</sys:Double>
+	<sys:Double x:Key="IconSizeMedium">18</sys:Double>
+	<sys:Double x:Key="IconSizeLarge">20</sys:Double>
+	<sys:Double x:Key="IconSizeXLarge">22</sys:Double>
+
+</ResourceDictionary>

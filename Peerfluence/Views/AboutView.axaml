@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:m="using:Peerfluence.Markup"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Peerfluence.Views.AboutView"
+             x:DataType="vm:AboutViewModel">
+    <StackPanel Spacing="{StaticResource SpacingStandard}" MaxWidth="600">
+        <TextBlock Text="{m:L About_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"/>
+        <TextBlock Text="{m:L App_Tagline}" Opacity="0.7"/>
+
+        <Separator Background="{DynamicResource SukiBorderBrush}"/>
+
+        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+            <TextBlock Text="{m:L About_GitHub}" FontWeight="SemiBold"/>
+            <Button Command="{Binding OpenGitHubCommand}" Classes="Basic" Padding="0">
+                <TextBlock Text="{Binding GitHubUrl}" Foreground="{DynamicResource SukiPrimaryColor}" Cursor="Hand"/>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+            <TextBlock Text="{m:L About_Packages}" FontWeight="SemiBold"/>
+            <ItemsControl ItemsSource="{Binding Packages}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Margin="{StaticResource XXSmallBottomMargin}" Opacity="0.8"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

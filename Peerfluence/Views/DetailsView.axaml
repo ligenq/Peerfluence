@@ -1,0 +1,243 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:services="using:Peerfluence.Services"
+             xmlns:controls="using:Peerfluence.Controls"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:m="using:Peerfluence.Markup"
+             x:Class="Peerfluence.Views.DetailsView"
+             x:DataType="vm:DetailsViewModel">
+	<suki:BusyArea IsBusy="{Binding IsStreaming}">
+		<Grid RowDefinitions="Auto,*" Margin="{StaticResource StandardLeftTopRightBottomMargin}">
+			<!-- Header Info -->
+			<Grid ColumnDefinitions="*,Auto" Margin="{StaticResource NormalBottomMargin}">
+				<StackPanel Spacing="{StaticResource SpacingXSmall}">
+					<TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+					<ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="6" CornerRadius="{StaticResource CornerRadiusSmall}" Margin="{StaticResource MicroTopBottomMargin}"/>
+					<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}">
+						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+							<TextBlock Text="{m:L Details_State}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{Binding State}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+							<TextBlock Text="{m:L Details_Size}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+							<TextBlock Text="{m:L Details_Downloaded}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+							<TextBlock Text="{m:L Details_Peers}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{Binding ConnectedPeers}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+							<TextBlock Text="{m:L Details_Hash}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{Binding InfoHash}" FontSize="{StaticResource FontSizeTiny}" VerticalAlignment="Center"/>
+						</StackPanel>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+						<TextBlock Text="{m:L Details_Path}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+						<TextBlock Text="{Binding DownloadPath}" FontSize="{StaticResource FontSizeNormal}" TextTrimming="CharacterEllipsis"/>
+					</StackPanel>
+					<!-- Recheck progress -->
+					<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}" IsVisible="{Binding IsRechecking}">
+						<ProgressBar Minimum="0" Maximum="1" Value="{Binding RecheckProgress}" Height="4" Width="150" CornerRadius="{StaticResource CornerRadiusTiny}"/>
+						<TextBlock Text="{Binding RecheckStatus}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.7"/>
+					</StackPanel>
+				</StackPanel>
+
+				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource XSmallLeftMargin}">
+					<Button Command="{Binding ChangeDownloadPathCommand}" ToolTip.Tip="{m:L Details_ChangeDownloadPath}">
+						<materialIcons:MaterialIcon Kind="FolderMoveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+					</Button>
+					<Button Command="{Binding ForceRecheckCommand}" ToolTip.Tip="{m:L Details_VerifyFiles}">
+						<materialIcons:MaterialIcon Kind="ShieldCheckOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+					</Button>
+					<Button Command="{Binding SaveResumeDataCommand}" ToolTip.Tip="{m:L Details_SaveResumeData}">
+						<materialIcons:MaterialIcon Kind="ContentSaveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+					</Button>
+				</StackPanel>
+			</Grid>
+
+			<TabControl Grid.Row="1">
+				<!-- Files Tab -->
+				<TabItem Header="{m:L Details_FilesTab}">
+					<Grid RowDefinitions="*,Auto">
+						<DataGrid ItemsSource="{Binding Files}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  GridLinesVisibility="None">
+							<DataGrid.Columns>
+								<DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="50">
+									<DataGridTemplateColumn.CellTemplate>
+										<DataTemplate>
+											<CheckBox IsChecked="{Binding IsSelected}" HorizontalAlignment="Center"/>
+										</DataTemplate>
+									</DataGridTemplateColumn.CellTemplate>
+								</DataGridTemplateColumn>
+								<DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="200">
+									<DataGridTemplateColumn.CellTemplate>
+										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
+											<ComboBox ItemsSource="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).PriorityOptions}"
+                                                      SelectedItem="{Binding Priority}"
+                                                      HorizontalAlignment="Stretch" Padding="{StaticResource TinyLeftRightTopBottomMargin}"/>
+										</DataTemplate>
+									</DataGridTemplateColumn.CellTemplate>
+								</DataGridTemplateColumn>
+								<DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}" Width="100" IsReadOnly="True"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Downloaded}" Binding="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}}" Width="140" IsReadOnly="True"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Progress}" Binding="{Binding Progress, StringFormat='{}{0:P1}'}" Width="120" IsReadOnly="True"/>
+								<DataGridTemplateColumn Width="120">
+									<DataGridTemplateColumn.CellTemplate>
+										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
+											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).StreamFileCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding IsStreamable}"
+                                                    Classes="Flat"
+                                                    Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
+												<materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+											</Button>
+										</DataTemplate>
+									</DataGridTemplateColumn.CellTemplate>
+								</DataGridTemplateColumn>
+								<DataGridTextColumn Width="20"/>
+							</DataGrid.Columns>
+						</DataGrid>
+						<Button Grid.Row="1" Content="{m:L Details_ApplyFileSelection}"
+                                Command="{Binding ApplyFileSelectionCommand}"
+                                Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource XSmallTopMargin}"/>
+					</Grid>
+				</TabItem>
+
+				<!-- Trackers Tab -->
+				<TabItem Header="{m:L Details_TrackersTab}">
+					<Grid RowDefinitions="Auto,*">
+						<Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
+							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}"/>
+							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat">
+								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+							</Button>
+							<Button Grid.Column="2" Command="{Binding AnnounceCommand}">
+								<materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+							</Button>
+						</Grid>
+						<DataGrid Grid.Row="1" ItemsSource="{Binding Trackers}" AutoGenerateColumns="False" IsReadOnly="True">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="{m:L Details_Trackers_Url}" Binding="{Binding Url}" Width="*"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_State}" Binding="{Binding State}" Width="120"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_Seeds}" Binding="{Binding SeedCount}" Width="70"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_Leeches}" Binding="{Binding LeechCount}" Width="70"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_LastError}" Binding="{Binding LastError}" Width="*"/>
+								<DataGridTemplateColumn Width="40">
+									<DataGridTemplateColumn.CellTemplate>
+										<DataTemplate x:DataType="vm:TrackerStatusItemViewModel">
+											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveTrackerCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Classes="Flat" Padding="{StaticResource TinyLeftTopRightBottomMargin}">
+												<materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{StaticResource ErrorColor}"/>
+											</Button>
+										</DataTemplate>
+									</DataGridTemplateColumn.CellTemplate>
+								</DataGridTemplateColumn>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</TabItem>
+
+				<!-- Peers Tab -->
+				<TabItem Header="{m:L Details_PeersTab}">
+					<DataGrid ItemsSource="{Binding Peers}" AutoGenerateColumns="False" IsReadOnly="True">
+						<DataGrid.Columns>
+							<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*"/>
+							<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*"/>
+							<DataGridTextColumn Header="{m:L Details_Peers_Country}" Binding="{Binding Country}" Width="80"/>
+							<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
+							<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
+							<DataGridTextColumn Header="{m:L Details_Peers_Progress}" Binding="{Binding Progress, StringFormat='{}{0:P1}'}" Width="80"/>
+						</DataGrid.Columns>
+					</DataGrid>
+				</TabItem>
+
+				<!-- Pieces Tab -->
+				<TabItem Header="{m:L Details_PiecesTab}">
+					<StackPanel Spacing="{StaticResource SpacingMedium}">
+						<WrapPanel Orientation="Horizontal">
+							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
+								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource SuccessColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_Have}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
+								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource DhtColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_HighAvail}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
+								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource InfoColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_Available}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource MissingColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_Missing}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+							</StackPanel>
+						</WrapPanel>
+						<controls:PieceMapControl
+                            Bitfield="{Binding PieceBitfield}"
+                            Availability="{Binding PieceAvailability}"
+                            PieceCount="{Binding PieceCount}"
+                            MinHeight="150"
+                            HorizontalAlignment="Stretch"/>
+					</StackPanel>
+				</TabItem>
+
+				<!-- Settings Tab -->
+				<TabItem Header="{m:L Details_SettingsTab}">
+					<ScrollViewer>
+						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
+							<StackPanel Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_DownloadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
+							</StackPanel>
+							<StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_UploadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding UploadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
+							</StackPanel>
+
+							<StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_DiskReadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding DiskReadLimitBytesPerSecond}" Minimum="0" Increment="1048576"/>
+							</StackPanel>
+							<StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_DiskWriteLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding DiskWriteLimitBytesPerSecond}" Minimum="0" Increment="1048576"/>
+							</StackPanel>
+
+							<StackPanel Grid.Row="2" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_Strategy}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedItem="{Binding SelectedDownloadStrategy}" HorizontalAlignment="Stretch"/>
+							</StackPanel>
+							<StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_QueuePriority}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding QueuePriority}" Minimum="0" PlaceholderText="{m:L Details_QueuePriorityWatermark}"/>
+							</StackPanel>
+
+							<StackPanel Grid.Row="3" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_RatioLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBox Text="{Binding RatioLimit, Mode=TwoWay}" PlaceholderText="{m:L Details_RatioLimitWatermark}"/>
+							</StackPanel>
+							<StackPanel Grid.Row="3" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_SeedTimeMinutes}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}"/>
+							</StackPanel>
+
+							<Button Grid.Row="5" Grid.ColumnSpan="2" Content="{m:L Details_Apply}"
+                                    Command="{Binding ApplyTorrentSettingsCommand}"
+                                    Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}"/>
+						</Grid>
+					</ScrollViewer>
+				</TabItem>
+			</TabControl>
+		</Grid>
+	</suki:BusyArea>
+</UserControl>

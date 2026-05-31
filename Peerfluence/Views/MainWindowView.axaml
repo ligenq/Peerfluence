@@ -1,0 +1,59 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:vm="using:Peerfluence.ViewModels"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+                 xmlns:m="using:Peerfluence.Markup"
+                 mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
+                 x:Class="Peerfluence.Views.MainWindowView"
+                 x:Name="Root"
+                 x:DataType="vm:MainWindowViewModel"
+                 BackgroundStyle="GradientSoft"
+                 BackgroundTransitionsEnabled="True"
+                 Icon="/Assets/application-icon.ico"
+                 Title="{m:L App_Title}"
+                 TransparencyLevelHint="None">
+
+    <suki:SukiSideMenu ItemsSource="{Binding NavigationItems}"
+                       SelectedItem="{Binding SelectedNavigationItem}"
+                       UseCustomContent="True">
+        <suki:SukiSideMenu.HeaderContent>
+            <StackPanel Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource LargeLeftRightTopBottomMargin}">
+                <TextBlock Text="{m:L App_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource SukiPrimaryColor}" />
+                <TextBlock Text="{m:L App_Tagline}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource SukiLowText}"/>
+            </StackPanel>
+        </suki:SukiSideMenu.HeaderContent>
+        <suki:SukiSideMenu.ItemTemplate>
+            <DataTemplate x:DataType="vm:NavigationItem">
+                <suki:SukiSideMenuItem Header="{Binding Title}">
+                    <suki:SukiSideMenuItem.Icon>
+                        <materialIcons:MaterialIcon Kind="{Binding Icon}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}" />
+                    </suki:SukiSideMenuItem.Icon>
+                </suki:SukiSideMenuItem>
+            </DataTemplate>
+        </suki:SukiSideMenu.ItemTemplate>
+        <suki:SukiSideMenu.FooterContent>
+            <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                    <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                    <TextBlock Text="{Binding DownloadsViewModel.TotalDownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.8"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                    <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                    <TextBlock Text="{Binding DownloadsViewModel.TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.8"/>
+                </StackPanel>
+                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="0" Margin="0,4,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.5"/>
+                        <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.5"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </suki:SukiSideMenu.FooterContent>
+        <suki:SukiSideMenu.Content>
+            <ContentControl Content="{Binding CurrentPage}" Margin="{StaticResource MediumLeftTopRightBottomMargin}" />
+        </suki:SukiSideMenu.Content>
+    </suki:SukiSideMenu>
+</suki:SukiWindow>

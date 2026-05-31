@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="Peerfluence.Core/Peerfluence.Core.csproj" />
+  <Project Path="Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj" />
+  <Project Path="Peerfluence.Tests/Peerfluence.Tests.csproj" />
+  <Project Path="Peerfluence/Peerfluence.csproj" />
+</Solution>

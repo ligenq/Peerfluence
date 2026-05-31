@@ -1,0 +1,259 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:m="using:Peerfluence.Markup"
+             xmlns:views="using:Peerfluence.Views"
+             x:Class="Peerfluence.Views.DownloadsView"
+             x:DataType="vm:DownloadsViewModel">
+    <suki:BusyArea IsBusy="{Binding IsBusy}">
+        <Grid RowDefinitions="Auto,Auto,Auto,2*,8,2*">
+            <!-- Dashboard Header -->
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource MediumBottomMargin}">
+                <suki:GlassCard Width="200">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Download" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
+                            <TextBlock Text="{m:L Downloads_TotalDown}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalDownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    </StackPanel>
+                </suki:GlassCard>
+
+                <suki:GlassCard Width="200">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Upload" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
+                            <TextBlock Text="{m:L Downloads_TotalUp}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    </StackPanel>
+                </suki:GlassCard>
+
+                <suki:GlassCard Width="160">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="CheckboxMarkedCircleOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
+                            <TextBlock Text="{m:L Downloads_Active}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding ActiveTorrents}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    </StackPanel>
+                </suki:GlassCard>
+
+                <suki:GlassCard Width="160">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="AccountGroupOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
+                            <TextBlock Text="{m:L Downloads_Peers}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalPeers}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    </StackPanel>
+                </suki:GlassCard>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Action Bar -->
+        <suki:GlassCard Grid.Row="1" Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Left">
+                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_AddTorrent}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}">
+                        <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <Button Command="{Binding StartSelectedCommand}" ToolTip.Tip="{m:L Downloads_Start}">
+                        <materialIcons:MaterialIcon Kind="Play" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </Button>
+                    <Button Command="{Binding StopSelectedCommand}" ToolTip.Tip="{m:L Downloads_Stop}">
+                        <materialIcons:MaterialIcon Kind="Stop" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </Button>
+                    <Button Command="{Binding RemoveSelectedCommand}" ToolTip.Tip="{m:L Downloads_Remove}" Foreground="{StaticResource ErrorColor}">
+                        <materialIcons:MaterialIcon Kind="Delete" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </Button>
+
+                    <Separator Width="1" Height="24" Background="{DynamicResource SukiBorderBrush}" Margin="{StaticResource XXSmallLeftRightMargin}"/>
+
+                    <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}">
+                        <materialIcons:MaterialIcon Kind="File" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </suki:GlassCard>
+
+        <suki:InfoBar x:Name="DownloadsStatusInfoBar"
+                      Grid.Row="2"
+                      IsVisible="{Binding HasStatusMessage}"
+                      IsClosable="True"
+                      Message="{Binding StatusMessage}"
+                      Margin="{StaticResource StandardBottomMargin}" />
+
+        <!-- Torrent List -->
+        <suki:GlassCard x:Name="TorrentTableCard"
+                        Grid.Row="3"
+                        Padding="{StaticResource ZeroThickness}"
+                        IsVisible="{Binding HasTorrents}">
+            <DataGrid x:Name="TorrentDataGrid"
+                      ItemsSource="{Binding Torrents}"
+                      SelectedItem="{Binding SelectedTorrent, Mode=TwoWay}"
+                      SelectionChanged="TorrentDataGrid_OnSelectionChanged"
+                      PointerPressed="TorrentDataGrid_OnPointerPressed"
+                      SelectionMode="Single"
+                      AutoGenerateColumns="False"
+                      HeadersVisibility="Column"
+                      IsReadOnly="True"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="True"
+                      GridLinesVisibility="None"
+                      BorderThickness="0">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{m:L Downloads_Start}" Command="{Binding StartSelectedCommand}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="Play" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="{m:L Downloads_Stop}" Command="{Binding StopSelectedCommand}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="Stop" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="{m:L Downloads_OpenFolder}" Command="{Binding OpenFolderCommand}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="FolderOpen" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="{m:L Downloads_ForceRecheck}" Command="{Binding ForceRecheckCommand}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="FileFind" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="{m:L Downloads_CopyHash}" Command="{Binding CopyHashCommand}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="ContentCopy" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="{m:L Downloads_CopyMagnet}" Command="{Binding CopyMagnetCommand}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="Magnet" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="{m:L Downloads_Remove}" Command="{Binding RemoveSelectedCommand}" Foreground="{StaticResource ErrorColor}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="Delete" Foreground="{StaticResource ErrorColor}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Name}" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalLeftRightMargin}">
+                                    <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}" Opacity="0.6"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Progress}" Width="150">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="{StaticResource NormalLeftRightMargin}" Spacing="{StaticResource SpacingTiny}">
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="6" CornerRadius="{StaticResource CornerRadiusSmall}" />
+                                    <TextBlock Text="{Binding ProgressPercent, StringFormat='{}{0:F1}%'}" FontSize="{StaticResource FontSizeTiny}" HorizontalAlignment="Right" Opacity="0.7"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_State}" Binding="{Binding State}" Width="100"/>
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Eta}" Binding="{Binding Eta}" Width="100"/>
+
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Down}" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
+                                    <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                                    <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Up}" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
+                                    <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                                    <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}" Binding="{Binding ConnectedPeers}" Width="80"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </suki:GlassCard>
+
+        <suki:GlassCard x:Name="EmptyStateCard"
+                        Grid.Row="3"
+                        Grid.RowSpan="3"
+                        IsVisible="{Binding HasNoTorrents}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        MaxWidth="720"
+                        Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
+            <StackPanel Spacing="{StaticResource SpacingLarge}">
+                <StackPanel Spacing="{StaticResource SpacingSmall}">
+                    <materialIcons:MaterialIcon Kind="DownloadCircleOutline"
+                                                Width="{StaticResource IconSizeXLarge}"
+                                                Height="{StaticResource IconSizeXLarge}"
+                                                Foreground="{DynamicResource SukiPrimaryColor}" />
+                    <TextBlock Text="{m:L Downloads_EmptyTitle}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold" />
+                    <TextBlock Text="{m:L Downloads_EmptyBody}" Opacity="0.7" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}">
+                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_AddTorrent}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding AddMagnetCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="ClipboardArrowDownOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </suki:GlassCard>
+
+        <!-- Detail Pane (Resizable) -->
+        <GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" Background="Transparent"
+                      IsVisible="{Binding SelectedTorrent, Converter={StaticResource NullToBoolConverter}}" />
+        <suki:GlassCard Grid.Row="5"
+                        IsVisible="{Binding SelectedTorrent, Converter={StaticResource NullToBoolConverter}}"
+                        Margin="{StaticResource ZeroThickness}"
+                        Padding="{StaticResource ZeroThickness}">
+            <ContentControl Content="{Binding SelectedTorrentDetailViewModel}" />
+        </suki:GlassCard>
+    </Grid>
+    </suki:BusyArea>
+</UserControl>

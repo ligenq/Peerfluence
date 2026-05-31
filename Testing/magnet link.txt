@@ -1,0 +1,1 @@
+magnet:?xt=urn:btih:FBNCNMAI4HXPVNMJKBUGWZNL6PCALLD3&dn=2026-04-21-raspios-trixie-arm64-full.img.xz&xl=2029265332&tr=http%3A%2F%2Ftracker.raspberrypi.org%3A6969%2Fannounce

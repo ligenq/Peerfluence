@@ -1,0 +1,48 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Peerfluence",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Peerfluence",
+            "program": "${workspaceFolder}/Peerfluence/bin/Debug/net10.0/Peerfluence.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Peerfluence",
+            "env": {
+                "PEERFLUENCE_DISABLE_X11_IME": "1"
+            },
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Peerfluence MCP Proxy",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Peerfluence",
+            "program": "${workspaceFolder}/Peerfluence/bin/Debug/net10.0/Peerfluence.dll",
+            "args": [
+                "--mcp"
+            ],
+            "cwd": "${workspaceFolder}/Peerfluence",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "VisualDebugger",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build VisualDebugger",
+            "program": "${workspaceFolder}/VisualDebugger/bin/Debug/net10.0/VisualDebugger.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/VisualDebugger",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}

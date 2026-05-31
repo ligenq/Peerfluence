@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+	<sys:Double x:Key="SpacingTiny">2</sys:Double>
+	<sys:Double x:Key="SpacingSmall">4</sys:Double>
+	<sys:Double x:Key="SpacingXSmall">5</sys:Double>
+	<sys:Double x:Key="SpacingSmallPlus">6</sys:Double>
+	<sys:Double x:Key="SpacingNormal">8</sys:Double>
+	<sys:Double x:Key="SpacingMedium">10</sys:Double>
+	<sys:Double x:Key="SpacingStandard">15</sys:Double>
+	<sys:Double x:Key="SpacingLarge">20</sys:Double>
+
+</ResourceDictionary>

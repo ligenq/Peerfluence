@@ -1,0 +1,69 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<!--Extra Large size margins (40)-->
+	<Thickness x:Key="XLargeBottomMargin">0,0,0,40</Thickness>
+
+	<!--Large size margins (30)-->
+	<Thickness x:Key="LargeLeftTopRightBottomMargin">30,30,30,30</Thickness>
+	<Thickness x:Key="LargeLeftRightTopBottomMargin">20,30,20,30</Thickness>
+
+	<!--Medium-Large size margins (25)-->
+	<Thickness x:Key="MLargeLeftTopRightBottomMargin">25,25,25,25</Thickness>
+
+	<!--Medium size margins (20)-->
+	<Thickness x:Key="MediumLeftMargin">20,0,0,0</Thickness>
+	<Thickness x:Key="MediumLeftTopRightMargin">20,20,20,0</Thickness>
+	<Thickness x:Key="MediumTopMargin">0,20,0,0</Thickness>
+	<Thickness x:Key="MediumLeftRightMargin">20,0,20,0</Thickness>
+	<Thickness x:Key="MediumBottomMargin">0,0,0,20</Thickness>
+	<Thickness x:Key="MediumRightMargin">0,0,20,0</Thickness>
+	<Thickness x:Key="MediumLeftTopRightBottomMargin">20,20,20,20</Thickness>
+
+	<!--Standard size margins (15)-->
+	<Thickness x:Key="StandardLeftTopRightBottomMargin">15,15,15,15</Thickness>
+	<Thickness x:Key="StandardBottomMargin">0,0,0,15</Thickness>
+	<Thickness x:Key="StandardRightMargin">0,0,15,0</Thickness>
+	<Thickness x:Key="StandardLeftTopBottomMargin">15,0,15,15</Thickness>
+
+	<!--Small size margins (12)-->
+	<Thickness x:Key="SmallLeftMargin">12,0,0,0</Thickness>
+	<Thickness x:Key="SmallLeftTopMargin">12,12,0,0</Thickness>
+	<Thickness x:Key="SmallLeftRightMargin">12,0,12,0</Thickness>
+	<Thickness x:Key="SmallTopMargin">0,12,0,0</Thickness>
+	<Thickness x:Key="SmallRightMargin">0,0,12,0</Thickness>
+	<Thickness x:Key="SmallTopBottomMargin">0,12,0,12</Thickness>
+	<Thickness x:Key="SmallLeftTopRightBottomMargin">12,12,12,12</Thickness>
+
+	<!--Normal size margins (10)-->
+	<Thickness x:Key="NormalLeftRightMargin">10,0,10,0</Thickness>
+	<Thickness x:Key="NormalBottomMargin">0,0,0,10</Thickness>
+	<Thickness x:Key="NormalTopMargin">0,10,0,0</Thickness>
+	<Thickness x:Key="NormalRightMargin">0,0,10,0</Thickness>
+	<Thickness x:Key="NormalLeftTopRightBottomMargin">10,10,10,10</Thickness>
+
+	<!--Extra Small size margins (8)-->
+	<Thickness x:Key="XSmallLeftMargin">8,0,0,0</Thickness>
+	<Thickness x:Key="XSmallTopMargin">0,8,0,0</Thickness>
+	<Thickness x:Key="XSmallLeftTopRightBottomMargin">8,8,8,8</Thickness>
+	<Thickness x:Key="XSmallLeftRightMargin">8,0,8,0</Thickness>
+
+	<!--Extra Extra Small size margins (5)-->
+	<Thickness x:Key="XXSmallLeftRightMargin">5,0,5,0</Thickness>
+	<Thickness x:Key="XXSmallTopMargin">0,5,0,0</Thickness>
+	<Thickness x:Key="XXSmallBottomMargin">0,0,0,5</Thickness>
+	<Thickness x:Key="XXSmallLeftTopRightBottomMargin">5,5,5,5</Thickness>
+
+	<!--Tiny size margins (4)-->
+	<Thickness x:Key="TinyTopMargin">0,4,0,0</Thickness>
+	<Thickness x:Key="TinyLeftTopRightBottomMargin">4,4,4,4</Thickness>
+	<Thickness x:Key="TinyLeftRightTopBottomMargin">4,2,4,2</Thickness>
+
+	<!--Micro size margins (2)-->
+	<Thickness x:Key="MicroTopBottomMargin">0,2,0,2</Thickness>
+	<Thickness x:Key="MicroLeftTopRightBottomMargin">2,2,2,2</Thickness>
+
+	<!--Zero margin-->
+	<Thickness x:Key="ZeroThickness">0,0,0,0</Thickness>
+
+</ResourceDictionary>
