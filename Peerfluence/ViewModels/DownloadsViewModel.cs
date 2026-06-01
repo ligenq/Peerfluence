@@ -76,6 +76,10 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckSelectedAsync, CanForceRecheckSelected);
 
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
+        WeakReferenceMessenger.Default.Register<ActivationRequestedMessage>(this, (_, msg) =>
+        {
+            _ = Dispatcher.UIThread.InvokeAsync(async () => await HandleActivationAsync(msg.Arguments));
+        });
 
         LoadExistingTorrents();
 
@@ -232,6 +236,46 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
         }
     }
 
+    public async Task AddMagnetUriAsync(string magnet)
+    {
+        if (!TryNormalizeMagnetLink(magnet, out magnet, out var error))
+        {
+            SetStatusMessage(string.Format(Resources.Status_AddMagnetFailed, error));
+            return;
+        }
+
+        try
+        {
+            var wasAdded = await _addTorrentDialogService.ShowMagnetAsync(magnet);
+            if (wasAdded)
+            {
+                SetStatusMessage(Resources.Status_MagnetAdded, autoClear: true);
+                MagnetLink = string.Empty;
+            }
+        }
+        catch (Exception ex)
+        {
+            SetStatusMessage(string.Format(Resources.Status_AddMagnetFailed, ex.Message));
+        }
+    }
+
+    private async Task HandleActivationAsync(IReadOnlyList<string> arguments)
+    {
+        foreach (var argument in arguments)
+        {
+            if (argument.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase))
+            {
+                await AddMagnetUriAsync(argument);
+                continue;
+            }
+
+            if (string.Equals(Path.GetExtension(argument), ".torrent", StringComparison.OrdinalIgnoreCase))
+            {
+                await AddTorrentFileAsync(argument);
+            }
+        }
+    }
+
     private bool CanStartSelected()
     {
         return SelectedTorrent is { Torrent.State: TorrentState.Stopped };
@@ -336,19 +380,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
             return;
         }
 
-        try
-        {
-            var wasAdded = await _addTorrentDialogService.ShowMagnetAsync(magnet);
-            if (wasAdded)
-            {
-                SetStatusMessage(Resources.Status_MagnetAdded, autoClear: true);
-                MagnetLink = string.Empty;
-            }
-        }
-        catch (Exception ex)
-        {
-            SetStatusMessage(string.Format(Resources.Status_AddMagnetFailed, ex.Message));
-        }
+        await AddMagnetUriAsync(magnet);
     }
 
     private void SetStatusMessage(string message, bool autoClear = false)

@@ -56,6 +56,7 @@ public static class ServiceCollectionExtensions
 #else
         services.AddSingleton<IUpdateService, UpdateService>();
 #endif
+        services.AddSingleton<IWindowsAssociationService, WindowsAssociationService>();
         return services;
     }
 

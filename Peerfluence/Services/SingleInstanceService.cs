@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
@@ -68,13 +71,17 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         Task.Run(() => ListenForActivationAsync(_listenerCts.Token));
     }
 
-    public void SignalExistingInstance()
+    public void SignalExistingInstance(IReadOnlyList<string>? arguments = null)
     {
         try
         {
             using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
             client.Connect(1000);
-            client.WriteByte(1);
+            using var writer = new StreamWriter(client);
+            foreach (var argument in arguments ?? Array.Empty<string>())
+            {
+                writer.WriteLine(Convert.ToBase64String(Encoding.UTF8.GetBytes(argument)));
+            }
         }
         catch (Exception ex)
         {
@@ -122,7 +129,8 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 
                 await server.WaitForConnectionAsync(ct);
                 _logger.LogInformation("Activation signal received from another instance.");
-                WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage());
+                var arguments = await ReadActivationArgumentsAsync(server, ct);
+                WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage(arguments));
             }
             catch (OperationCanceledException)
             {
@@ -133,6 +141,29 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
                 _logger.LogWarning(ex, "Error in single-instance listener");
             }
         }
+    }
+
+    private static async Task<IReadOnlyList<string>> ReadActivationArgumentsAsync(Stream stream, CancellationToken ct)
+    {
+        using var reader = new StreamReader(stream);
+        var arguments = new List<string>();
+        while (await reader.ReadLineAsync(ct) is { } line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            try
+            {
+                arguments.Add(Encoding.UTF8.GetString(Convert.FromBase64String(line)));
+            }
+            catch (FormatException)
+            {
+            }
+        }
+
+        return arguments;
     }
 }
 

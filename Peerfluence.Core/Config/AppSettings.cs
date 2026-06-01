@@ -22,6 +22,10 @@ public sealed class AppSettings
 
     public bool ShowRemoveTorrentOptions { get; set; } = true;
 
+    public bool AssociateTorrentFiles { get; set; }
+
+    public bool AssociateMagnetLinks { get; set; }
+
     public string DefaultRemoveTorrentAction { get; set; } = "RemoveOnly";
 
     public string Language { get; set; } = "en-US";

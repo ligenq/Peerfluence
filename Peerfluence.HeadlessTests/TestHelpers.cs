@@ -99,6 +99,7 @@ internal static class TestHelpers
         var topLevelService = Substitute.For<ITopLevelService>();
         var engineService = Substitute.For<ITorrentEngineService>();
         var updateService = Substitute.For<IUpdateService>();
+        var windowsAssociationService = Substitute.For<IWindowsAssociationService>();
 
         return new SettingsViewModel(
             settingsService,
@@ -106,7 +107,8 @@ internal static class TestHelpers
             localizationService,
             topLevelService,
             engineService,
-            updateService);
+            updateService,
+            windowsAssociationService);
     }
 
     public static CreateTorrentViewModel CreateCreateTorrentViewModel()

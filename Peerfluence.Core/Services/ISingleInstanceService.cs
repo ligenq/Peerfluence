@@ -8,5 +8,5 @@ public interface ISingleInstanceService
 
     void StartListening();
 
-    void SignalExistingInstance();
+    void SignalExistingInstance(IReadOnlyList<string>? arguments = null);
 }

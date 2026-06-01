@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Velopack;
+using Velopack.Sources;
 
 namespace Peerfluence.Services;
 
@@ -129,7 +130,7 @@ public sealed class UpdateService : IUpdateService
 
     private IUpdateManagerAdapter GetUpdateManager()
     {
-        var updateUrl = _settingsService.Current.Update.UpdateUrl;
+        var updateUrl = NormalizeUpdateUrl(_settingsService.Current.Update.UpdateUrl);
         if (_updateManager != null && string.Equals(_updateManagerUrl, updateUrl, StringComparison.Ordinal))
         {
             return _updateManager;
@@ -138,6 +139,42 @@ public sealed class UpdateService : IUpdateService
         _updateManager = _updateManagerFactory(updateUrl);
         _updateManagerUrl = updateUrl;
         return _updateManager;
+    }
+
+    internal static string NormalizeUpdateUrl(string updateUrl)
+    {
+        var trimmed = updateUrl.Trim();
+        if (!TryGetGithubRepositoryUrl(trimmed, out var repositoryUrl))
+        {
+            return trimmed;
+        }
+
+        return repositoryUrl;
+    }
+
+    private static bool TryGetGithubRepositoryUrl(string updateUrl, out string repositoryUrl)
+    {
+        repositoryUrl = string.Empty;
+        if (!Uri.TryCreate(updateUrl, UriKind.Absolute, out var uri) ||
+            !string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var segments = uri.AbsolutePath
+            .Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (segments.Length < 2)
+        {
+            return false;
+        }
+
+        repositoryUrl = $"https://github.com/{segments[0]}/{segments[1]}";
+        return true;
+    }
+
+    internal static bool IsGithubRepositoryUrl(string updateUrl)
+    {
+        return TryGetGithubRepositoryUrl(updateUrl, out _);
     }
 
     internal interface IUpdateManagerAdapter
@@ -157,7 +194,9 @@ public sealed class UpdateService : IUpdateService
 
         public VelopackUpdateManagerAdapter(string updateUrl)
         {
-            _updateManager = new UpdateManager(updateUrl);
+            _updateManager = IsGithubRepositoryUrl(updateUrl)
+                ? new UpdateManager(new GithubSource(updateUrl, accessToken: null, prerelease: false, downloader: null))
+                : new UpdateManager(updateUrl);
         }
 
         public bool IsInstalled => _updateManager.IsInstalled;

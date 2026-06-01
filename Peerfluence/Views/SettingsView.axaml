@@ -125,6 +125,21 @@
                     <ToggleSwitch IsChecked="{Binding ShowRemoveTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowRemoveTorrentOptions}"/>
                 </StackPanel>
             </suki:GlassCard>
+            <suki:GlassCard IsVisible="{Binding CanManageWindowsAssociations}">
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                        <materialIcons:MaterialIcon Kind="LinkVariant" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <TextBlock Text="{m:L Settings_WindowsAssociations}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <ToggleSwitch IsChecked="{Binding AssociateTorrentFiles, Mode=TwoWay}" Content="{m:L Settings_AssociateTorrentFiles}"/>
+                    <ToggleSwitch IsChecked="{Binding AssociateMagnetLinks, Mode=TwoWay}" Content="{m:L Settings_AssociateMagnetLinks}"/>
+                    <TextBlock Text="{m:L Settings_WindowsAssociationsHint}"
+                               Opacity="0.55"
+                               FontSize="{StaticResource FontSizeSmall}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </suki:GlassCard>
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">

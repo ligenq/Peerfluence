@@ -81,7 +81,7 @@ public class AppSettingsTests
     {
         var settings = new AppSettings();
 
-        Assert.Equal(string.Empty, settings.Update.UpdateUrl);
+        Assert.Equal(UpdateSettings.DefaultUpdateUrl, settings.Update.UpdateUrl);
         Assert.True(settings.Update.CheckForUpdatesOnStartup);
     }
 
@@ -138,6 +138,8 @@ public class AppSettingsTests
         settings.CompletionAction.TimeoutSeconds = 60;
         settings.CompletionAction.RunHidden = false;
         settings.ShowRemoveTorrentOptions = false;
+        settings.AssociateTorrentFiles = true;
+        settings.AssociateMagnetLinks = true;
         settings.DefaultRemoveTorrentAction = "DeleteAll";
 
         Assert.Equal("/downloads", settings.Storage.DownloadPath);
@@ -149,6 +151,8 @@ public class AppSettingsTests
         Assert.True(settings.CompletionAction.Enabled);
         Assert.Equal("/bin/tool", settings.CompletionAction.ProgramPath);
         Assert.False(settings.ShowRemoveTorrentOptions);
+        Assert.True(settings.AssociateTorrentFiles);
+        Assert.True(settings.AssociateMagnetLinks);
         Assert.Equal("DeleteAll", settings.DefaultRemoveTorrentAction);
     }
 }
