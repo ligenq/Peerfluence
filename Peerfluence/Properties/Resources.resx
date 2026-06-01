@@ -832,6 +832,18 @@
   <data name="Settings_ShowRemoveTorrentOptions" xml:space="preserve">
     <value>Confirm before removing torrents</value>
   </data>
+  <data name="Settings_WindowsAssociations" xml:space="preserve">
+    <value>Windows associations</value>
+  </data>
+  <data name="Settings_AssociateTorrentFiles" xml:space="preserve">
+    <value>Open .torrent files with Peerfluence</value>
+  </data>
+  <data name="Settings_AssociateMagnetLinks" xml:space="preserve">
+    <value>Open magnet links with Peerfluence</value>
+  </data>
+  <data name="Settings_WindowsAssociationsHint" xml:space="preserve">
+    <value>Associations are registered for the current Windows user. If Windows keeps another default app, choose Peerfluence from Windows Default Apps.</value>
+  </data>
   <data name="Settings_CompletionAction" xml:space="preserve">
     <value>Completion Action</value>
   </data>
@@ -905,7 +917,7 @@
     <value>Update URL</value>
   </data>
   <data name="Settings_UpdateUrlWatermark" xml:space="preserve">
-    <value>https://example.com/releases</value>
+    <value>https://github.com/ligenq/Peerfluence</value>
   </data>
   <data name="Settings_CheckForUpdatesOnStartup" xml:space="preserve">
     <value>Check for updates on startup</value>

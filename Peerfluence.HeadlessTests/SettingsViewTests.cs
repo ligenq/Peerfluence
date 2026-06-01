@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using Peerfluence.Core.Config;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
@@ -123,7 +124,7 @@ public class SettingsViewTests
 
         resetButton.Command!.Execute(null);
 
-        Assert.Equal(string.Empty, vm.UpdateUrl);
+        Assert.Equal(UpdateSettings.DefaultUpdateUrl, vm.UpdateUrl);
     }
 
     [AvaloniaFact]

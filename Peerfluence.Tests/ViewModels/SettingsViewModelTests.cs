@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -12,6 +13,7 @@ public class SettingsViewModelTests
     private readonly LocalizationService _localizationService = new();
     private readonly ITopLevelService _topLevelService = Substitute.For<ITopLevelService>();
     private readonly ITorrentEngineService _engineService;
+    private readonly IWindowsAssociationService _windowsAssociationService = Substitute.For<IWindowsAssociationService>();
     private readonly SettingsViewModel _sut;
 
     public SettingsViewModelTests()
@@ -32,7 +34,8 @@ public class SettingsViewModelTests
             _localizationService,
             _topLevelService,
             _engineService,
-            updateService);
+            updateService,
+            _windowsAssociationService);
     }
 
     [Fact]
@@ -45,6 +48,8 @@ public class SettingsViewModelTests
         Assert.Equal(_settingsService.Current.Network.ListeningPort, _sut.ListeningPort);
         Assert.Equal(_settingsService.Current.Storage.EnableSessionPersistence, _sut.EnableSessionPersistence);
         Assert.Equal(_settingsService.Current.ShowRemoveTorrentOptions, _sut.ShowRemoveTorrentOptions);
+        Assert.Equal(_settingsService.Current.AssociateTorrentFiles, _sut.AssociateTorrentFiles);
+        Assert.Equal(_settingsService.Current.AssociateMagnetLinks, _sut.AssociateMagnetLinks);
         Assert.Equal(_settingsService.Current.CompletionAction.Enabled, _sut.CompletionActionEnabled);
         Assert.Equal(_settingsService.Current.CompletionAction.WorkingDirectoryTemplate, _sut.CompletionActionWorkingDirectoryTemplate);
     }
@@ -213,7 +218,7 @@ public class SettingsViewModelTests
         _sut.ResetDefaultsCommand.Execute(null);
 
         Assert.NotEqual(_settingsService.Current.Storage.DownloadPath, _sut.DownloadPath);
-        Assert.Equal(string.Empty, _sut.UpdateUrl);
+        Assert.Equal(UpdateSettings.DefaultUpdateUrl, _sut.UpdateUrl);
         Assert.True(_sut.EnableDht);
         Assert.False(_sut.UseAutomaticListeningPort);
         Assert.Equal(55125, _sut.ListeningPort);
@@ -239,6 +244,8 @@ public class SettingsViewModelTests
         _sut.UseAutomaticListeningPort = true;
         _sut.ListeningPort = 51413;
         _sut.ShowRemoveTorrentOptions = false;
+        _sut.AssociateTorrentFiles = true;
+        _sut.AssociateMagnetLinks = true;
         _sut.MaxActiveDownloads = 10;
         _sut.CompletionActionEnabled = true;
         _sut.CompletionActionProgramPath = "/bin/tool";
@@ -252,11 +259,14 @@ public class SettingsViewModelTests
         Assert.True(_settingsService.Current.Network.UseAutomaticListeningPort);
         Assert.Equal(51413, _settingsService.Current.Network.ListeningPort);
         Assert.False(_settingsService.Current.ShowRemoveTorrentOptions);
+        Assert.True(_settingsService.Current.AssociateTorrentFiles);
+        Assert.True(_settingsService.Current.AssociateMagnetLinks);
         Assert.Equal(10, _settingsService.Current.Queue.MaxActiveDownloads);
         Assert.True(_settingsService.Current.CompletionAction.Enabled);
         Assert.Equal("/bin/tool", _settingsService.Current.CompletionAction.ProgramPath);
         Assert.Equal("--path {downloadPath}", _settingsService.Current.CompletionAction.ArgumentsTemplate);
         Assert.Equal(60, _settingsService.Current.CompletionAction.TimeoutSeconds);
         Assert.Equal(Properties.Resources.Status_SettingsSaved, _sut.StatusMessage);
+        _windowsAssociationService.Received(1).ApplyAssociations(true, true);
     }
 }

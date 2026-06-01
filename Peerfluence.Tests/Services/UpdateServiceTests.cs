@@ -102,6 +102,16 @@ public class UpdateServiceTests
         Assert.Equal(new[] { "https://updates.example/v1", "https://updates.example/v2" }, createdUrls);
     }
 
+    [Theory]
+    [InlineData("https://github.com/ligenq/Peerfluence", "https://github.com/ligenq/Peerfluence")]
+    [InlineData("https://github.com/ligenq/Peerfluence/releases", "https://github.com/ligenq/Peerfluence")]
+    [InlineData(" https://github.com/ligenq/Peerfluence/releases/latest ", "https://github.com/ligenq/Peerfluence")]
+    [InlineData("https://updates.example/peerfluence", "https://updates.example/peerfluence")]
+    public void NormalizeUpdateUrl_UsesGithubRepositoryUrl_ForGithubReleasePages(string input, string expected)
+    {
+        Assert.Equal(expected, UpdateService.NormalizeUpdateUrl(input));
+    }
+
     [Fact]
     public async Task CheckForUpdatesAsync_SetsAvailabilityAndVersion_WhenUpdateExists()
     {

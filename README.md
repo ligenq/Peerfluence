@@ -18,6 +18,7 @@ Velopack update path are in place.
 ## Main Capabilities
 
 - Add torrents from `.torrent` files, magnet links, or the clipboard.
+- Optionally associate `.torrent` files and `magnet:` links with Peerfluence on Windows.
 - Preview add-torrent options before adding, including torrent name, size, files,
   destination, limits, trackers, and metadata.
 - Fetch magnet metadata in the background so magnet links can show the same details as
@@ -61,6 +62,11 @@ time limits, private flag, and trackers.
 
 For magnet links, Peerfluence starts metadata discovery in the background. The dialog can
 initially show pending metadata and then update once the network returns torrent metadata.
+
+On Windows, Settings can register Peerfluence as the per-user handler for `.torrent`
+files and `magnet:` links. Launch arguments are forwarded to the running instance, so
+double-clicking a torrent file or opening a browser magnet link adds it to the existing
+Peerfluence window.
 
 ### Removing Torrents
 
@@ -217,6 +223,21 @@ Direct-download builds use Velopack for installation and self-updates. The Setti
 Updates panel shows the update URL, update check, and restart/apply controls when the app
 is installed through Velopack.
 
+Build a Velopack release:
+
+```powershell
+.\ReleasePackaging\build-velopack.ps1 -Version 1.0.0
+```
+
+The script publishes the app, creates the Velopack release, and writes artifacts to
+`artifacts\velopack\releases\win-x64`. Upload the full contents of that directory to a
+GitHub release on [ligenq/Peerfluence](https://github.com/ligenq/Peerfluence). Users
+download `Peerfluence.Desktop-win-Setup.exe`; the remaining files are used by the
+auto-update feed. The default update URL is `https://github.com/ligenq/Peerfluence`.
+
+See `ReleasePackaging\README.md` for MSI generation, release notes, update hosting, and
+optional signing details.
+
 ## Project Layout
 
 - `Peerfluence`: Avalonia UI, app startup, services, MCP server, notifications, dialogs.
@@ -225,6 +246,7 @@ is installed through Velopack.
 - `Peerfluence.Tests`: unit tests.
 - `Peerfluence.HeadlessTests`: Avalonia/headless UI tests.
 - `Testing`: AI-executable UI test cases and fixtures.
+- `ReleasePackaging`: Velopack release packaging script and instructions.
 - `DebuggerApp`: local helper/debug harness.
 
 [PeerSharp](https://github.com/ligenq/PeerSharp) is consumed as a NuGet package by the

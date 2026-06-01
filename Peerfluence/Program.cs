@@ -36,6 +36,7 @@ internal sealed class Program
         var profilePath = GetOptionValue(args, "--profile", "--ui-agent-profile");
         var appPaths = new AppPaths(profilePath);
         var avaloniaArgs = StripPeerfluenceArgs(args);
+        var activationArgs = GetActivationArguments(avaloniaArgs);
 
         try
         {
@@ -62,7 +63,7 @@ internal sealed class Program
             var runtimeOptions = host.Services.GetRequiredService<IMcpRuntimeOptions>();
             if (!runtimeOptions.SkipSingleInstanceLock && !singleInstance.TryAcquireSingleInstanceLock())
             {
-                singleInstance.SignalExistingInstance();
+                singleInstance.SignalExistingInstance(activationArgs);
                 return;
             }
 
@@ -174,6 +175,15 @@ internal sealed class Program
         }
 
         return result.ToArray();
+    }
+
+    private static string[] GetActivationArguments(string[] args)
+    {
+        return args
+            .Where(arg =>
+                arg.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(Path.GetExtension(arg), ".torrent", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
     }
 
     public static AppBuilder BuildAvaloniaApp() => BuildAvaloniaApp(null!);

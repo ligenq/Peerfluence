@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -75,6 +76,17 @@ public class App : Application
 
         var singleInstance = _services.GetRequiredService<ISingleInstanceService>();
         singleInstance.StartListening();
+
+        var startupArguments = desktop.Args?
+            .Where(arg =>
+                arg.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(System.IO.Path.GetExtension(arg), ".torrent", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        if (startupArguments?.Length > 0)
+        {
+            Dispatcher.UIThread.Post(() =>
+                WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage(startupArguments)));
+        }
 
         base.OnFrameworkInitializationCompleted();
     }

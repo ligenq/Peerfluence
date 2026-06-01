@@ -16,6 +16,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private readonly ITopLevelService _topLevelService;
     private readonly ITorrentEngineService _engineService;
     private readonly IUpdateService _updateService;
+    private readonly IWindowsAssociationService _windowsAssociationService;
 
     public SettingsViewModel(
         IAppSettingsService settingsService,
@@ -23,7 +24,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         ILocalizationService localizationService,
         ITopLevelService topLevelService,
         ITorrentEngineService engineService,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        IWindowsAssociationService windowsAssociationService)
     {
         _settingsService = settingsService;
         _themeService = themeService;
@@ -31,6 +33,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         _topLevelService = topLevelService;
         _engineService = engineService;
         _updateService = updateService;
+        _windowsAssociationService = windowsAssociationService;
 
         PortMappingStatuses = new ObservableCollection<PortMappingStatusViewModel>();
 
@@ -85,6 +88,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         get;
         set => SetProperty(ref field, value);
     } = true;
+
+    public bool AssociateTorrentFiles
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public bool AssociateMagnetLinks
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public bool CanManageWindowsAssociations => _windowsAssociationService.IsSupported;
 
     // Network
     public bool EnableDht
@@ -437,6 +454,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableSessionPersistence = settings.Storage.EnableSessionPersistence;
         ShowAddTorrentOptions = settings.ShowAddTorrentOptions;
         ShowRemoveTorrentOptions = settings.ShowRemoveTorrentOptions;
+        AssociateTorrentFiles = _windowsAssociationService.IsSupported
+            ? _windowsAssociationService.IsTorrentFileAssociated
+            : settings.AssociateTorrentFiles;
+        AssociateMagnetLinks = _windowsAssociationService.IsSupported
+            ? _windowsAssociationService.IsMagnetLinkAssociated
+            : settings.AssociateMagnetLinks;
 
         // Network
         EnableDht = settings.Network.EnableDht;
@@ -498,6 +521,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Storage.EnableSessionPersistence = EnableSessionPersistence;
             settings.ShowAddTorrentOptions = ShowAddTorrentOptions;
             settings.ShowRemoveTorrentOptions = ShowRemoveTorrentOptions;
+            settings.AssociateTorrentFiles = AssociateTorrentFiles;
+            settings.AssociateMagnetLinks = AssociateMagnetLinks;
 
             // Network
             settings.Network.EnableDht = EnableDht;
@@ -547,6 +572,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Update.CheckForUpdatesOnStartup = CheckForUpdatesOnStartup;
 
             await _settingsService.SaveAsync(default);
+            _windowsAssociationService.ApplyAssociations(AssociateTorrentFiles, AssociateMagnetLinks);
             _themeService.Apply(settings.Theme);
             _localizationService.Apply(settings.Language);
             StatusMessage = Properties.Resources.Status_SettingsSaved;
@@ -566,6 +592,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableSessionPersistence = defaults.Storage.EnableSessionPersistence;
         ShowAddTorrentOptions = defaults.ShowAddTorrentOptions;
         ShowRemoveTorrentOptions = defaults.ShowRemoveTorrentOptions;
+        AssociateTorrentFiles = defaults.AssociateTorrentFiles;
+        AssociateMagnetLinks = defaults.AssociateMagnetLinks;
         EnableDht = defaults.Network.EnableDht;
         EnableNatPmp = defaults.Network.EnableNatPmp;
         EnableUpnp = defaults.Network.EnableUpnp;
