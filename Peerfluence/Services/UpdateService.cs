@@ -1,8 +1,11 @@
 using System;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Velopack;
+using Velopack.Locators;
+using Velopack.Logging;
 using Velopack.Sources;
 
 namespace Peerfluence.Services;
@@ -12,6 +15,7 @@ public sealed class UpdateService : IUpdateService
     private readonly ILogger<UpdateService> _logger;
     private readonly IAppSettingsService _settingsService;
     private readonly Func<string, IUpdateManagerAdapter> _updateManagerFactory;
+    private readonly SemaphoreSlim _updateLock = new(1, 1);
     private IUpdateManagerAdapter? _updateManager;
     private string? _updateManagerUrl;
     private UpdateInfo? _downloadedUpdate;
@@ -60,6 +64,7 @@ public sealed class UpdateService : IUpdateService
             return false;
         }
 
+        await _updateLock.WaitAsync();
         try
         {
             var mgr = GetUpdateManager();
@@ -72,13 +77,22 @@ public sealed class UpdateService : IUpdateService
                 return true;
             }
 
+            IsUpdateAvailable = false;
+            AvailableVersion = null;
+            _downloadedUpdate = null;
             _logger.LogDebug("No updates available");
             return false;
         }
         catch (Exception ex)
         {
+            IsUpdateAvailable = false;
+            AvailableVersion = null;
             _logger.LogWarning(ex, "Failed to check for updates");
             return false;
+        }
+        finally
+        {
+            _updateLock.Release();
         }
     }
 
@@ -89,6 +103,7 @@ public sealed class UpdateService : IUpdateService
             return false;
         }
 
+        await _updateLock.WaitAsync(cancellationToken);
         try
         {
             var mgr = GetUpdateManager();
@@ -107,6 +122,10 @@ public sealed class UpdateService : IUpdateService
         {
             _logger.LogWarning(ex, "Failed to download update");
             return false;
+        }
+        finally
+        {
+            _updateLock.Release();
         }
     }
 
@@ -194,9 +213,24 @@ public sealed class UpdateService : IUpdateService
 
         public VelopackUpdateManagerAdapter(string updateUrl)
         {
+            var locator = CreateLocator();
             _updateManager = IsGithubRepositoryUrl(updateUrl)
-                ? new UpdateManager(new GithubSource(updateUrl, accessToken: null, prerelease: false, downloader: null))
-                : new UpdateManager(updateUrl);
+                ? new UpdateManager(new GithubSource(updateUrl, accessToken: null, prerelease: false, downloader: null), options: null, locator)
+                : new UpdateManager(updateUrl, options: null, locator);
+        }
+
+        private static IVelopackLocator? CreateLocator()
+        {
+            return OperatingSystem.IsWindows()
+                ? CreateWindowsLocator()
+                : null;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static IVelopackLocator CreateWindowsLocator()
+        {
+            var logger = new NullVelopackLogger();
+            return new WindowsVelopackLocator(new DefaultProcessImpl(logger), logger);
         }
 
         public bool IsInstalled => _updateManager.IsInstalled;

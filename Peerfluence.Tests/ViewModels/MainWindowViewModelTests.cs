@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Peerfluence.Core;
+using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -15,6 +16,8 @@ public class MainWindowViewModelTests
     private readonly DetailsViewModel _detailsVm;
     private readonly SettingsViewModel _settingsVm;
     private readonly INotificationService _notificationService;
+    private readonly IAppSettingsService _settingsService;
+    private readonly IUpdateService _updateService;
     private readonly MainWindowViewModel _sut;
 
     public MainWindowViewModelTests()
@@ -26,19 +29,19 @@ public class MainWindowViewModelTests
         var store = Substitute.For<IAppSettingsStore>();
         var paths = new AppPaths();
         var fileSystem = new FileSystem();
-        var settingsService = new AppSettingsService(paths, store, fileSystem);
+        _settingsService = new AppSettingsService(paths, store, fileSystem);
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(settingsService, loggerFactory);
+        var engineService = new TorrentEngineService(_settingsService, loggerFactory);
         var torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>());
         var selectionService = new TorrentSelectionService(Substitute.For<IAppMessenger>());
         var topLevelService = Substitute.For<ITopLevelService>();
         var localizationService = new LocalizationService();
         var themeService = new ThemeService();
 
-        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, settingsService);
+        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService);
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
-        var updateService = new UpdateService(updateLogger, settingsService);
-        _settingsVm = new SettingsViewModel(settingsService, themeService, localizationService, topLevelService, engineService, updateService, Substitute.For<IWindowsAssociationService>());
+        _updateService = new UpdateService(updateLogger, _settingsService);
+        _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>());
 
         // Create an uninitialized DownloadsViewModel to avoid DispatcherTimer in its constructor
 #pragma warning disable SYSLIB0050
@@ -48,7 +51,7 @@ public class MainWindowViewModelTests
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 
         var features = new IFeatureViewModel[] { downloadsVm, _settingsVm };
-        _sut = new MainWindowViewModel(features, aboutVm, _notificationService);
+        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService);
     }
 
     [Fact]
@@ -92,5 +95,45 @@ public class MainWindowViewModelTests
     public void DialogManager_IsNotNull()
     {
         Assert.NotNull(_sut.DialogManager);
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesOnStartupAsync_DoesNothing_WhenSettingDisabled()
+    {
+        var settings = Substitute.For<IAppSettingsService>();
+        settings.Current.Returns(new AppSettings { Update = { CheckForUpdatesOnStartup = false } });
+        var updateService = Substitute.For<IUpdateService>();
+        updateService.CanCheckForUpdates.Returns(true);
+
+        var sut = new MainWindowViewModel(
+            Array.Empty<IFeatureViewModel>(),
+            new AboutViewModel(NullLogger<AboutViewModel>.Instance),
+            _notificationService,
+            settings,
+            updateService);
+
+        await sut.CheckForUpdatesOnStartupAsync();
+
+        await updateService.DidNotReceive().CheckForUpdatesAsync();
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesOnStartupAsync_DoesNothing_WhenUpdatesCannotBeChecked()
+    {
+        var settings = Substitute.For<IAppSettingsService>();
+        settings.Current.Returns(new AppSettings { Update = { CheckForUpdatesOnStartup = true } });
+        var updateService = Substitute.For<IUpdateService>();
+        updateService.CanCheckForUpdates.Returns(false);
+
+        var sut = new MainWindowViewModel(
+            Array.Empty<IFeatureViewModel>(),
+            new AboutViewModel(NullLogger<AboutViewModel>.Instance),
+            _notificationService,
+            settings,
+            updateService);
+
+        await sut.CheckForUpdatesOnStartupAsync();
+
+        await updateService.DidNotReceive().CheckForUpdatesAsync();
     }
 }

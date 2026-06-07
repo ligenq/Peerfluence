@@ -19,6 +19,13 @@
             </Button>
         </StackPanel>
 
+        <Expander Header="{m:L About_LegalNotice}">
+            <TextBlock Text="{m:L About_LegalNoticeText}"
+                       TextWrapping="Wrap"
+                       Opacity="0.8"
+                       Margin="{StaticResource SmallTopMargin}"/>
+        </Expander>
+
         <StackPanel Spacing="{StaticResource SpacingXSmall}">
             <TextBlock Text="{m:L About_Packages}" FontWeight="SemiBold"/>
             <ItemsControl ItemsSource="{Binding Packages}">
