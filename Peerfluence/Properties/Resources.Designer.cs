@@ -70,6 +70,28 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Legal Notice.
+        /// </summary>
+        public static string About_LegalNotice {
+            get {
+                return ResourceManager.GetString("About_LegalNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peerfluence is free and open-source software.
+        ///
+        ///Peerfluence is provided &quot;as is&quot;, without warranty of any kind. To the fullest extent permitted by law, the author(s), contributors, and copyright holders are not liable for any damages, data loss, network issues, legal claims, downloaded content, shared content, or other consequences arising from the installation or use of the application.
+        ///
+        ///You are solely responsible for how you use Peerfluence, including ensuring that any content you download, upload, seed, share, or distribute complies with appli [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string About_LegalNoticeText {
+            get {
+                return ResourceManager.GetString("About_LegalNoticeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Third-party packages.
         /// </summary>
         public static string About_Packages {
@@ -318,6 +340,15 @@ namespace Peerfluence.Properties {
         public static string Common_Close {
             get {
                 return ResourceManager.GetString("Common_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Later.
+        /// </summary>
+        public static string Common_Later {
+            get {
+                return ResourceManager.GetString("Common_Later", resourceCulture);
             }
         }
         
@@ -2826,6 +2857,42 @@ namespace Peerfluence.Properties {
         public static string Status_UpdateReady {
             get {
                 return ResourceManager.GetString("Status_UpdateReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install update.
+        /// </summary>
+        public static string UpdatePrompt_Install {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new version is available. Install it now and restart Peerfluence?.
+        /// </summary>
+        public static string UpdatePrompt_Message {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peerfluence {0} is available.
+        /// </summary>
+        public static string UpdatePrompt_Title {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Peerfluence update is available.
+        /// </summary>
+        public static string UpdatePrompt_Title_Generic {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Title_Generic", resourceCulture);
             }
         }
         

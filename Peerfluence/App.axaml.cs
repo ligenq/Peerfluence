@@ -88,6 +88,8 @@ public class App : Application
                 WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage(startupArguments)));
         }
 
+        Dispatcher.UIThread.Post(async () => await viewModel.CheckForUpdatesOnStartupAsync());
+
         base.OnFrameworkInitializationCompleted();
     }
 }

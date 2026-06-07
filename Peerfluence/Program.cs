@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Logging;
+using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
 #if !MICROSOFT_STORE
 using Velopack;
@@ -22,7 +23,13 @@ internal sealed class Program
     public static async Task Main(string[] args)
     {
 #if !MICROSOFT_STORE
-        VelopackApp.Build().Run();
+        var velopackApp = VelopackApp.Build();
+        if (OperatingSystem.IsWindows())
+        {
+            velopackApp.OnBeforeUninstallFastCallback(_ => UninstallCleanup.Run());
+        }
+
+        velopackApp.Run();
 #endif
         CrashHandler.Register();
 

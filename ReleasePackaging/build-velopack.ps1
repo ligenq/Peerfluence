@@ -8,6 +8,8 @@ param(
     [string]$PackAuthors = "ligenq",
     [string]$Channel = "win",
     [string]$ReleaseNotes,
+    [string]$InstallerLicense = (Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")) "ReleasePackaging\InstallerNotice.md"),
+    [string]$InstallerSplash = (Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")) "ReleasePackaging\InstallerSplash.png"),
     [switch]$CleanReleaseOutput,
     [switch]$CreateTestCertificate,
     [switch]$TrustTestCertificate,
@@ -155,6 +157,19 @@ if ($ReleaseNotes) {
     $packArgs += @("--releaseNotes", $resolvedReleaseNotes)
 }
 
+if ($InstallerLicense -and $Msi) {
+    $resolvedInstallerLicense = Resolve-Path $InstallerLicense
+    $packArgs += @("--instLicense", $resolvedInstallerLicense)
+}
+elseif ($InstallerLicense) {
+    Write-Host "Note: Velopack Setup.exe is a one-click installer and does not show installer notice/license pages. Use -Msi to include the notice in the MSI wizard."
+}
+
+if ($InstallerSplash) {
+    $resolvedInstallerSplash = Resolve-Path $InstallerSplash
+    $packArgs += @("--splashImage", $resolvedInstallerSplash)
+}
+
 if ($Msi) {
     $packArgs += "--msi"
 }
@@ -171,6 +186,17 @@ if ($SignTemplate) {
 
 if ($LASTEXITCODE -ne 0) {
     throw "vpk pack failed with exit code $LASTEXITCODE."
+}
+
+if (-not $Msi) {
+    foreach ($staleMsi in Get-ChildItem -LiteralPath $releaseDir -Filter "*.msi" -ErrorAction SilentlyContinue) {
+        try {
+            Remove-Item -LiteralPath $staleMsi.FullName -Force
+        }
+        catch {
+            Write-Warning "Could not remove stale MSI artifact '$($staleMsi.Name)': $($_.Exception.Message)"
+        }
+    }
 }
 
 Write-Host "Created Velopack release in $releaseDir"

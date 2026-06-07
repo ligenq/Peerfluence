@@ -820,6 +820,9 @@
   <data name="Common_Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="Common_Later" xml:space="preserve">
+    <value>Later</value>
+  </data>
   <data name="Common_OK" xml:space="preserve">
     <value>OK</value>
   </data>
@@ -907,6 +910,12 @@
   <data name="About_Packages" xml:space="preserve">
     <value>Third-party packages</value>
   </data>
+  <data name="About_LegalNotice" xml:space="preserve">
+    <value>Legal Notice</value>
+  </data>
+  <data name="About_LegalNoticeText" xml:space="preserve">
+    <value>Peerfluence is free and open-source software.&#x0a;&#x0a;Peerfluence is provided &quot;as is&quot;, without warranty of any kind. To the fullest extent permitted by law, the author(s), contributors, and copyright holders are not liable for any damages, data loss, network issues, legal claims, downloaded content, shared content, or other consequences arising from the installation or use of the application.&#x0a;&#x0a;You are solely responsible for how you use Peerfluence, including ensuring that any content you download, upload, seed, share, or distribute complies with applicable laws, rights, licenses, and permissions. The author(s), contributors, and copyright holders are not responsible for your use of the application or for any third-party content accessed through it.&#x0a;&#x0a;Peerfluence is licensed under the MIT License. By installing or using Peerfluence, you acknowledge and accept this notice.</value>
+  </data>
   <data name="Settings_SecurityAndPrivacy" xml:space="preserve">
     <value>Security &amp; Privacy</value>
   </data>
@@ -948,6 +957,18 @@
   </data>
   <data name="Settings_UpdatesManagedByMicrosoftStore" xml:space="preserve">
     <value>Updates for this installation are managed by Microsoft Store.</value>
+  </data>
+  <data name="UpdatePrompt_Title" xml:space="preserve">
+    <value>Peerfluence {0} is available</value>
+  </data>
+  <data name="UpdatePrompt_Title_Generic" xml:space="preserve">
+    <value>A Peerfluence update is available</value>
+  </data>
+  <data name="UpdatePrompt_Message" xml:space="preserve">
+    <value>A new version is available. Install it now and restart Peerfluence?</value>
+  </data>
+  <data name="UpdatePrompt_Install" xml:space="preserve">
+    <value>Install update</value>
   </data>
   <data name="TorrentState_Active" xml:space="preserve">
     <value>Active</value>
