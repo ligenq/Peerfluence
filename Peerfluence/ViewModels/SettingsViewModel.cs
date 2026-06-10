@@ -432,15 +432,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool IsDirectDownloadUpdateChannel => _updateService.Channel == UpdateChannel.DirectDownload;
 
-    public bool IsMicrosoftStoreUpdateChannel => _updateService.Channel == UpdateChannel.MicrosoftStore;
-
     public bool CanCheckForUpdates => _updateService.CanCheckForUpdates;
 
-    public bool ShouldShowUpdateNotInstalled => IsDirectDownloadUpdateChannel && !_updateService.IsInstalled;
+    public bool ShouldShowUpdateNotInstalled => !_updateService.IsInstalled;
 
-    public string UpdateManagementMessage => IsMicrosoftStoreUpdateChannel
-        ? Properties.Resources.Settings_UpdatesManagedByMicrosoftStore
-        : Properties.Resources.Settings_UpdateNotInstalled;
+    public string UpdateManagementMessage => Properties.Resources.Settings_UpdateNotInstalled;
 
     public ObservableCollection<PortMappingStatusViewModel> PortMappingStatuses { get; }
 

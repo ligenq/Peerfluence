@@ -22,10 +22,6 @@
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(DistributionChannel)' == 'MicrosoftStore'">
-		<DefineConstants>$(DefineConstants);MICROSOFT_STORE</DefineConstants>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\**" />
 	</ItemGroup>

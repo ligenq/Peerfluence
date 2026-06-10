@@ -11,9 +11,7 @@ using Microsoft.Extensions.Logging;
 using Peerfluence.Logging;
 using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
-#if !MICROSOFT_STORE
 using Velopack;
-#endif
 
 namespace Peerfluence;
 
@@ -22,7 +20,6 @@ internal sealed class Program
     [STAThread]
     public static async Task Main(string[] args)
     {
-#if !MICROSOFT_STORE
         var velopackApp = VelopackApp.Build();
         if (OperatingSystem.IsWindows())
         {
@@ -30,7 +27,6 @@ internal sealed class Program
         }
 
         velopackApp.Run();
-#endif
         CrashHandler.Register();
 
         if (args.Contains("--mcp"))

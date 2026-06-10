@@ -955,9 +955,6 @@
   <data name="Settings_UpdateNotInstalled" xml:space="preserve">
     <value>Auto-update is not available in portable mode.</value>
   </data>
-  <data name="Settings_UpdatesManagedByMicrosoftStore" xml:space="preserve">
-    <value>Updates for this installation are managed by Microsoft Store.</value>
-  </data>
   <data name="UpdatePrompt_Title" xml:space="preserve">
     <value>Peerfluence {0} is available</value>
   </data>

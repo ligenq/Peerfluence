@@ -13,6 +13,8 @@ internal static class UninstallCleanup
     private const string MagnetProtocol = "magnet";
     private const string MagnetProgId = "Peerfluence.Magnet";
     private const string ApplicationRegistryName = "Peerfluence.exe";
+    private const string TorrentUserChoiceSubKey = @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.torrent\UserChoice";
+    private const string MagnetUserChoiceSubKey = @"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\magnet\UserChoice";
 
     public static void Run()
     {
@@ -78,6 +80,8 @@ internal static class UninstallCleanup
     {
         ClearClassDefaultIfMatches(TorrentExtension, TorrentProgId);
         ClearClassDefaultIfMatches(MagnetProtocol, MagnetProgId);
+        DeleteUserChoiceIfMatches(TorrentUserChoiceSubKey, TorrentProgId);
+        DeleteUserChoiceIfMatches(MagnetUserChoiceSubKey, MagnetProgId);
 
         DeleteCurrentUserClassesSubKeyTree(TorrentProgId);
         DeleteCurrentUserClassesSubKeyTree(MagnetProgId);
@@ -113,6 +117,34 @@ internal static class UninstallCleanup
         catch
         {
             // Best-effort registry cleanup.
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void DeleteUserChoiceIfMatches(string subKey, string expectedProgId)
+    {
+        try
+        {
+            using var userChoice = Registry.CurrentUser.OpenSubKey(subKey);
+            if (!string.Equals(userChoice?.GetValue("ProgId") as string, expectedProgId, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var lastSeparator = subKey.LastIndexOf('\\');
+            if (lastSeparator < 0)
+            {
+                return;
+            }
+
+            var parentSubKey = subKey[..lastSeparator];
+            var keyName = subKey[(lastSeparator + 1)..];
+            using var parent = Registry.CurrentUser.OpenSubKey(parentSubKey, writable: true);
+            parent?.DeleteSubKeyTree(keyName, throwOnMissingSubKey: false);
+        }
+        catch
+        {
+            // Best-effort registry cleanup. Windows may protect UserChoice keys.
         }
     }
 }

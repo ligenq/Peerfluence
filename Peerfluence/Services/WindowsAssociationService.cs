@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 
@@ -48,7 +49,7 @@ public sealed class WindowsAssociationService : IWindowsAssociationService
             return;
         }
 
-        var executablePath = Environment.ProcessPath;
+        var executablePath = GetAssociationExecutablePath();
         if (string.IsNullOrWhiteSpace(executablePath))
         {
             return;
@@ -131,5 +132,36 @@ public sealed class WindowsAssociationService : IWindowsAssociationService
     private static string CreateIconReference(string executablePath)
     {
         return $"{Quote(executablePath)},0";
+    }
+
+    private static string? GetAssociationExecutablePath()
+    {
+        return ResolveAssociationExecutablePath(Environment.ProcessPath);
+    }
+
+    internal static string? ResolveAssociationExecutablePath(string? executablePath)
+    {
+        if (string.IsNullOrWhiteSpace(executablePath))
+        {
+            return null;
+        }
+
+        var executableDirectory = Path.GetDirectoryName(executablePath);
+        if (string.IsNullOrWhiteSpace(executableDirectory))
+        {
+            return executablePath;
+        }
+
+        var directory = new DirectoryInfo(executableDirectory);
+        if (!string.Equals(directory.Name, "current", StringComparison.OrdinalIgnoreCase) ||
+            directory.Parent is null)
+        {
+            return executablePath;
+        }
+
+        var stableExecutablePath = Path.Combine(directory.Parent.FullName, Path.GetFileName(executablePath));
+        return File.Exists(stableExecutablePath)
+            ? stableExecutablePath
+            : executablePath;
     }
 }
