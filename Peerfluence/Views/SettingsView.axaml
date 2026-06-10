@@ -435,12 +435,6 @@
 
                     <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}"/>
 
-                    <TextBlock Text="{m:L Settings_UpdatesManagedByMicrosoftStore}"
-                               Opacity="0.7"
-                               FontSize="{StaticResource FontSizeNormal}"
-                               TextWrapping="Wrap"
-                               IsVisible="{Binding IsMicrosoftStoreUpdateChannel}"/>
-
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
                         <Button Command="{Binding CheckForUpdatesCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">

@@ -88,6 +88,7 @@ function New-TestSigningCertificate {
 }
 
 Assert-Version $Version
+$binaryVersion = ($Version -split "-", 2)[0]
 
 if (-not (Get-Command vpk -ErrorAction SilentlyContinue)) {
     throw "Could not find 'vpk' on PATH. Install the Velopack CLI with: dotnet tool install -g vpk"
@@ -135,6 +136,10 @@ dotnet publish $projectPath `
     --self-contained true `
     --output $publishDir `
     /p:UseSharedCompilation=false `
+    /p:Version=$Version `
+    /p:PackageVersion=$Version `
+    /p:AssemblyVersion=$binaryVersion `
+    /p:FileVersion=$binaryVersion `
     /p:PublishSingleFile=true `
     /p:IncludeNativeLibrariesForSelfExtract=true
 

@@ -173,23 +173,6 @@ public class UpdateServiceTests
         Assert.Null(sut.AvailableVersion);
     }
 
-    [Fact]
-    public async Task MicrosoftStoreUpdateService_DisablesSelfUpdates()
-    {
-        var logger = Substitute.For<ILogger<MicrosoftStoreUpdateService>>();
-        var sut = new MicrosoftStoreUpdateService(logger);
-
-        Assert.Equal(UpdateChannel.MicrosoftStore, sut.Channel);
-        Assert.True(sut.IsInstalled);
-        Assert.False(sut.CanCheckForUpdates);
-        Assert.False(sut.CanApplyUpdates);
-        Assert.False(await sut.CheckForUpdatesAsync());
-        Assert.False(await sut.DownloadUpdateAsync());
-
-        var exception = Record.Exception(() => sut.ApplyUpdateAndRestart());
-        Assert.Null(exception);
-    }
-
     private static UpdateInfo CreateUpdateInfo(string version)
     {
         return new UpdateInfo(
