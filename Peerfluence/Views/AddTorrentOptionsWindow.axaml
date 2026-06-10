@@ -94,7 +94,13 @@
                                     <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="vm:AddTorrentFileOptionViewModel">
-                                                <ComboBox ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding Priority, Mode=TwoWay}"/>
+                                                <ComboBox ItemsSource="{Binding PriorityOptions}" SelectedValue="{Binding Priority, Mode=TwoWay}" SelectedValueBinding="{Binding Value}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding DisplayName}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>

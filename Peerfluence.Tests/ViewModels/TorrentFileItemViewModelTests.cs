@@ -69,9 +69,9 @@ public class TorrentFileItemViewModelTests
     public void PriorityOptions_ContainsAllValues()
     {
         var options = TorrentFileItemViewModel.PriorityOptions;
-        Assert.Contains(Priority.DoNotDownload, options);
-        Assert.Contains(Priority.Low, options);
-        Assert.Contains(Priority.Normal, options);
-        Assert.Contains(Priority.High, options);
+        Assert.Contains(options, option => option.Value == Priority.DoNotDownload && option.DisplayName == "Do not download");
+        Assert.Contains(options, option => option.Value == Priority.Low && option.DisplayName == "Low");
+        Assert.Contains(options, option => option.Value == Priority.Normal && option.DisplayName == "Normal");
+        Assert.Contains(options, option => option.Value == Priority.High && option.DisplayName == "High");
     }
 }

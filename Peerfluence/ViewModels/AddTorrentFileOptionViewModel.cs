@@ -1,12 +1,10 @@
-using System;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Peerfluence.ViewModels;
 
 public sealed class AddTorrentFileOptionViewModel : ObservableObject
 {
-    private static readonly Priority[] PriorityChoices = Enum.GetValues<Priority>();
-
     public AddTorrentFileOptionViewModel(int index, string path, long sizeBytes)
     {
         Index = index;
@@ -20,7 +18,7 @@ public sealed class AddTorrentFileOptionViewModel : ObservableObject
 
     public long SizeBytes { get; }
 
-    public static Priority[] PriorityOptions => PriorityChoices;
+    public static IReadOnlyList<EnumDisplayOption<Priority>> PriorityOptions => ViewModels.PriorityOptions.Localized;
 
     public bool IsSelected
     {

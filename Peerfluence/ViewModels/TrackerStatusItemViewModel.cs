@@ -5,6 +5,8 @@ namespace Peerfluence.ViewModels;
 
 public sealed class TrackerStatusItemViewModel : ObservableObject
 {
+    private TrackerStatusType _status;
+
     public TrackerStatusItemViewModel(TrackerStatus status)
     {
         Url = status.Url;
@@ -13,12 +15,18 @@ public sealed class TrackerStatusItemViewModel : ObservableObject
 
     public void UpdateFrom(TrackerStatus status)
     {
-        State = status.Status.ToString();
+        _status = status.Status;
+        State = PriorityOptions.GetTrackerStatusDisplayName(_status);
         LastAnnounce = status.LastAnnounce;
         NextAnnounce = status.NextAnnounce;
         SeedCount = status.SeedCount;
         LeechCount = status.LeechCount;
         LastError = status.LastError ?? string.Empty;
+    }
+
+    public void RefreshLocalizedText()
+    {
+        State = PriorityOptions.GetTrackerStatusDisplayName(_status);
     }
 
     public string Url { get; }

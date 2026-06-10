@@ -353,7 +353,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IReadOnlyList<string> ThemeVariants { get; } = new[] { "System", "Light", "Dark" };
 
-    public IReadOnlyList<SettingsOption> ThemeVariantOptions { get; } = new[]
+    public IReadOnlyList<SettingsOption> ThemeVariantOptions => new[]
     {
         new SettingsOption("System", Properties.Resources.Settings_ThemeVariant_System),
         new SettingsOption("Light", Properties.Resources.Settings_ThemeVariant_Light),
@@ -362,7 +362,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IReadOnlyList<string> ColorThemes { get; } = new[] { "Indigo", "Cobalt", "Mint", "Emerald", "Rose", "Vibrant", "Amber", "Slate", "Solar" };
 
-    public IReadOnlyList<SettingsOption> ColorThemeOptions { get; } = new[]
+    public IReadOnlyList<SettingsOption> ColorThemeOptions => new[]
     {
         new SettingsOption("Indigo", Properties.Resources.Settings_ColorTheme_Indigo),
         new SettingsOption("Cobalt", Properties.Resources.Settings_ColorTheme_Cobalt),
@@ -377,7 +377,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IReadOnlyList<string> BackgroundStyles { get; } = new[] { "GradientSoft", "Gradient", "GradientDarker", "Flat", "Bubble" };
 
-    public IReadOnlyList<SettingsOption> BackgroundStyleOptions { get; } = new[]
+    public IReadOnlyList<SettingsOption> BackgroundStyleOptions => new[]
     {
         new SettingsOption("GradientSoft", Properties.Resources.Settings_BackgroundStyle_GradientSoft),
         new SettingsOption("Gradient", Properties.Resources.Settings_BackgroundStyle_Gradient),
@@ -386,11 +386,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
     };
 
-    public IReadOnlyList<string> Languages { get; } = new[] { "en-US" };
+    public IReadOnlyList<string> Languages { get; } = new[] { "en-US", "sv-SE" };
 
     public IReadOnlyList<string> EncryptionModes { get; } = new[] { "Allow", "Require", "Refuse" };
 
-    public IReadOnlyList<SettingsOption> EncryptionModeOptions { get; } = new[]
+    public IReadOnlyList<SettingsOption> EncryptionModeOptions => new[]
     {
         new SettingsOption("Allow", Properties.Resources.Settings_EncryptionMode_Allow),
         new SettingsOption("Require", Properties.Resources.Settings_EncryptionMode_Require),
@@ -399,7 +399,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IReadOnlyList<string> ProxyTypes { get; } = new[] { "None", "Socks5", "Http" };
 
-    public IReadOnlyList<SettingsOption> ProxyTypeOptions { get; } = new[]
+    public IReadOnlyList<SettingsOption> ProxyTypeOptions => new[]
     {
         new SettingsOption("None", Properties.Resources.Settings_ProxyType_None),
         new SettingsOption("Socks5", Properties.Resources.Settings_ProxyType_Socks5),
@@ -571,6 +571,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             _windowsAssociationService.ApplyAssociations(AssociateTorrentFiles, AssociateMagnetLinks);
             _themeService.Apply(settings.Theme);
             _localizationService.Apply(settings.Language);
+            NotifyLocalizedOptionsChanged();
             StatusMessage = Properties.Resources.Status_SettingsSaved;
         }
         catch (Exception ex)
@@ -667,6 +668,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         }
 
         _updateService.ApplyUpdateAndRestart();
+    }
+
+    private void NotifyLocalizedOptionsChanged()
+    {
+        OnPropertyChanged(nameof(ThemeVariantOptions));
+        OnPropertyChanged(nameof(ColorThemeOptions));
+        OnPropertyChanged(nameof(BackgroundStyleOptions));
+        OnPropertyChanged(nameof(EncryptionModeOptions));
+        OnPropertyChanged(nameof(ProxyTypeOptions));
+        OnPropertyChanged(nameof(UpdateManagementMessage));
+        foreach (var status in PortMappingStatuses)
+        {
+            status.RefreshLocalizedText();
+        }
     }
 
     private async Task BrowseBlocklistAsync()

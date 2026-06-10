@@ -40,6 +40,6 @@ public class TrackerStatusItemViewModelTests
         var sut = new TrackerStatusItemViewModel(status);
 
         Assert.Equal("Connection timed out", sut.LastError);
-        Assert.Equal("NotWorking", sut.State);
+        Assert.Equal("Not working", sut.State);
     }
 }

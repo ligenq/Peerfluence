@@ -64,8 +64,6 @@ public sealed class DetailsViewModel : ViewModelBase
         Trackers = new ObservableCollection<TrackerStatusItemViewModel>();
         Peers = new ObservableCollection<PeerInfoItemViewModel>();
 
-        DownloadStrategies = Enum.GetValues<DownloadStrategy>();
-        PriorityOptions = Enum.GetValues<Priority>();
         ApplyTorrentSettingsCommand = new AsyncRelayCommand(ApplyTorrentSettingsAsync, () => _selectionService.SelectedTorrent != null);
         ApplyFileSelectionCommand = new AsyncRelayCommand(ApplyFileSelectionAsync, () => _selectionService.SelectedTorrent != null);
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckAsync, CanForceRecheck);
@@ -80,7 +78,7 @@ public sealed class DetailsViewModel : ViewModelBase
 
         WeakReferenceMessenger.Default.Register<TorrentSelectionChangedMessage>(this, (_, msg) => OnSelectionChanged(msg));
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
-        WeakReferenceMessenger.Default.Register<LanguageChangedMessage>(this, (_, _) => UpdateEmptyStateText());
+        WeakReferenceMessenger.Default.Register<LanguageChangedMessage>(this, (_, _) => OnLanguageChanged());
         UpdateEmptyStateText();
 
         _refreshChannel = Channel.CreateBounded<ITorrent>(new BoundedChannelOptions(1)
@@ -98,9 +96,9 @@ public sealed class DetailsViewModel : ViewModelBase
 
     public ObservableCollection<PeerInfoItemViewModel> Peers { get; }
 
-    public DownloadStrategy[] DownloadStrategies { get; }
+    public IReadOnlyList<EnumDisplayOption<DownloadStrategy>> DownloadStrategies => PriorityOptions.DownloadStrategies;
 
-    public Priority[] PriorityOptions { get; }
+    public IReadOnlyList<EnumDisplayOption<Priority>> PriorityChoices => PriorityOptions.Localized;
 
     public string Name
     {
@@ -584,6 +582,17 @@ public sealed class DetailsViewModel : ViewModelBase
         if (_selectionService.SelectedTorrent == null)
         {
             Name = Properties.Resources.Details_SelectTorrent;
+        }
+    }
+
+    private void OnLanguageChanged()
+    {
+        UpdateEmptyStateText();
+        OnPropertyChanged(nameof(DownloadStrategies));
+        OnPropertyChanged(nameof(PriorityChoices));
+        foreach (var tracker in Trackers)
+        {
+            tracker.RefreshLocalizedText();
         }
     }
 
