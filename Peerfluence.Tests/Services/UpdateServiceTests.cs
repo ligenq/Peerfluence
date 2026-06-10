@@ -46,6 +46,42 @@ public class UpdateServiceTests
     }
 
     [Fact]
+    public void VelopackInstallDetector_ReturnsFalse_ForDevLayout()
+    {
+        var executablePath = Path.Combine("C:", "repos", "Peerfluence", "bin", "Debug", "Peerfluence.exe");
+
+        Assert.False(UpdateService.VelopackInstallDetector.LooksInstalled(executablePath));
+    }
+
+    [Fact]
+    public void VelopackInstallDetector_ReturnsTrue_ForWindowsInstalledLayout()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        var root = Path.Combine(Path.GetTempPath(), $"peerfluence-velopack-layout-{Guid.NewGuid():N}");
+        try
+        {
+            var current = Path.Combine(root, "current");
+            var packages = Path.Combine(root, "packages");
+            Directory.CreateDirectory(current);
+            Directory.CreateDirectory(packages);
+            File.WriteAllText(Path.Combine(root, "Update.exe"), string.Empty);
+
+            Assert.True(UpdateService.VelopackInstallDetector.LooksInstalled(Path.Combine(current, "Peerfluence.exe")));
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public void AvailableVersion_DefaultsNull()
     {
         Assert.Null(_sut.AvailableVersion);

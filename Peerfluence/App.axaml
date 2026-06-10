@@ -32,6 +32,7 @@
   
     <Application.Styles>
         <suki:SukiTheme ThemeColor="Blue" />
+        <StyleInclude Source="avares://Peerfluence/Resources/SukiSeparatorFix.axaml" />
         <materialIcons:MaterialIconStyles />
 
 

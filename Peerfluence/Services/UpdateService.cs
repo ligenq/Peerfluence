@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,21 +16,27 @@ public sealed class UpdateService : IUpdateService
     private readonly ILogger<UpdateService> _logger;
     private readonly IAppSettingsService _settingsService;
     private readonly Func<string, IUpdateManagerAdapter> _updateManagerFactory;
+    private readonly bool _requireVelopackInstallLayout;
     private readonly SemaphoreSlim _updateLock = new(1, 1);
     private IUpdateManagerAdapter? _updateManager;
     private string? _updateManagerUrl;
     private UpdateInfo? _downloadedUpdate;
 
     public UpdateService(ILogger<UpdateService> logger, IAppSettingsService settingsService)
-        : this(logger, settingsService, static updateUrl => new VelopackUpdateManagerAdapter(updateUrl))
+        : this(logger, settingsService, static updateUrl => new VelopackUpdateManagerAdapter(updateUrl), requireVelopackInstallLayout: true)
     {
     }
 
-    internal UpdateService(ILogger<UpdateService> logger, IAppSettingsService settingsService, Func<string, IUpdateManagerAdapter> updateManagerFactory)
+    internal UpdateService(
+        ILogger<UpdateService> logger,
+        IAppSettingsService settingsService,
+        Func<string, IUpdateManagerAdapter> updateManagerFactory,
+        bool requireVelopackInstallLayout = false)
     {
         _logger = logger;
         _settingsService = settingsService;
         _updateManagerFactory = updateManagerFactory;
+        _requireVelopackInstallLayout = requireVelopackInstallLayout;
     }
 
     public bool IsUpdateAvailable { get; private set; }
@@ -41,6 +48,12 @@ public sealed class UpdateService : IUpdateService
     {
         get
         {
+            if (_requireVelopackInstallLayout &&
+                !VelopackInstallDetector.LooksInstalled(Environment.ProcessPath))
+            {
+                return false;
+            }
+
             try
             {
                 return GetUpdateManager().IsInstalled;
@@ -248,6 +261,34 @@ public sealed class UpdateService : IUpdateService
         public void ApplyUpdatesAndRestart(VelopackAsset? asset, string[]? restartArgs)
         {
             _updateManager.ApplyUpdatesAndRestart(asset, restartArgs);
+        }
+    }
+
+    internal static class VelopackInstallDetector
+    {
+        public static bool LooksInstalled(string? executablePath)
+        {
+            if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(executablePath))
+            {
+                return false;
+            }
+
+            var executableDirectory = Path.GetDirectoryName(executablePath);
+            if (string.IsNullOrWhiteSpace(executableDirectory))
+            {
+                return false;
+            }
+
+            var directory = new DirectoryInfo(executableDirectory);
+            if (!string.Equals(directory.Name, "current", StringComparison.OrdinalIgnoreCase) ||
+                directory.Parent is null)
+            {
+                return false;
+            }
+
+            var rootDirectory = directory.Parent.FullName;
+            return File.Exists(Path.Combine(rootDirectory, "Update.exe")) &&
+                Directory.Exists(Path.Combine(rootDirectory, "packages"));
         }
     }
 }
