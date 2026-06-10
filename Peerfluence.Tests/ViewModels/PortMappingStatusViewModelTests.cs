@@ -49,7 +49,7 @@ public class PortMappingStatusViewModelTests
     }
 
     [Fact]
-    public void DisplayText_ShowsResultName_WhenFailedWithNoError()
+    public void DisplayText_ShowsResultDisplayName_WhenFailedWithNoError()
     {
         var status = new PortMappingStatus("NAT-PMP", PortMappingResult.Failed, null, null);
         var sut = new PortMappingStatusViewModel(status);
@@ -58,7 +58,7 @@ public class PortMappingStatusViewModelTests
     }
 
     [Fact]
-    public void DisplayText_ShowsResultName_WhenPending()
+    public void DisplayText_ShowsResultDisplayName_WhenPending()
     {
         var status = new PortMappingStatus("UPnP", PortMappingResult.Pending);
         var sut = new PortMappingStatusViewModel(status);
@@ -67,16 +67,16 @@ public class PortMappingStatusViewModelTests
     }
 
     [Fact]
-    public void DisplayText_ShowsResultName_WhenNotAttempted()
+    public void DisplayText_ShowsResultDisplayName_WhenNotAttempted()
     {
         var status = new PortMappingStatus("UPnP", PortMappingResult.NotAttempted);
         var sut = new PortMappingStatusViewModel(status);
 
-        Assert.Equal("NotAttempted", sut.DisplayText);
+        Assert.Equal("Not attempted", sut.DisplayText);
     }
 
     [Fact]
-    public void DisplayText_ShowsResultName_WhenSuccessWithNoPort()
+    public void DisplayText_ShowsResultDisplayName_WhenSuccessWithNoPort()
     {
         var status = new PortMappingStatus("UPnP", PortMappingResult.Success, null, null);
         var sut = new PortMappingStatusViewModel(status);

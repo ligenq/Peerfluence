@@ -20,7 +20,6 @@ public sealed class AboutViewModel : ViewModelBase
         {
             "Avalonia (MIT)",
             "CommunityToolkit.Mvvm (MIT)",
-            "Lamar (Apache 2.0)",
             "Material.Icons.Avalonia (MIT)",
             "Microsoft.Extensions.Hosting (MIT)",
             "ModelContextProtocol (MIT)",

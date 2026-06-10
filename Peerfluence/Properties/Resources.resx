@@ -175,6 +175,15 @@
   <data name="Details_Strategy" xml:space="preserve">
     <value>Strategy</value>
   </data>
+  <data name="DownloadStrategy_RarestFirst" xml:space="preserve">
+    <value>Rarest first</value>
+  </data>
+  <data name="DownloadStrategy_Sequential" xml:space="preserve">
+    <value>Sequential</value>
+  </data>
+  <data name="DownloadStrategy_Streaming" xml:space="preserve">
+    <value>Streaming</value>
+  </data>
   <data name="Details_FilesTab" xml:space="preserve">
     <value>Files</value>
   </data>
@@ -192,6 +201,18 @@
   </data>
   <data name="Details_Grid_Priority" xml:space="preserve">
     <value>Priority</value>
+  </data>
+  <data name="Priority_DoNotDownload" xml:space="preserve">
+    <value>Do not download</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>High</value>
   </data>
   <data name="Details_Grid_Path" xml:space="preserve">
     <value>Path</value>
@@ -219,6 +240,18 @@
   </data>
   <data name="Details_Trackers_LastError" xml:space="preserve">
     <value>Last Error</value>
+  </data>
+  <data name="TrackerStatus_Working" xml:space="preserve">
+    <value>Working</value>
+  </data>
+  <data name="TrackerStatus_NotWorking" xml:space="preserve">
+    <value>Not working</value>
+  </data>
+  <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
+    <value>Circuit open</value>
+  </data>
+  <data name="TrackerStatus_Unknown" xml:space="preserve">
+    <value>Unknown</value>
   </data>
   <data name="Details_Peers_Endpoint" xml:space="preserve">
     <value>Endpoint</value>
@@ -672,6 +705,18 @@
   </data>
   <data name="Settings_PortMapping_NoMappings" xml:space="preserve">
     <value>No port mappings available. Enable UPnP or NAT-PMP and refresh.</value>
+  </data>
+  <data name="PortMappingResult_NotAttempted" xml:space="preserve">
+    <value>Not attempted</value>
+  </data>
+  <data name="PortMappingResult_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="PortMappingResult_Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="PortMappingResult_Failed" xml:space="preserve">
+    <value>Failed</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
     <value>End Game</value>

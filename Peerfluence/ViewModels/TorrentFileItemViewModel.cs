@@ -1,11 +1,10 @@
-using System;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Peerfluence.ViewModels;
 
 public sealed class TorrentFileItemViewModel : ObservableObject
 {
-    private static readonly Priority[] PriorityChoices = Enum.GetValues<Priority>();
     private bool _lastServerSelected;
     private Priority _lastServerPriority;
 
@@ -88,7 +87,7 @@ public sealed class TorrentFileItemViewModel : ObservableObject
         private set => SetProperty(ref field, value);
     }
 
-    public static Priority[] PriorityOptions => PriorityChoices;
+    public static IReadOnlyList<EnumDisplayOption<Priority>> PriorityOptions => ViewModels.PriorityOptions.Localized;
 
     public bool IsSelected
     {

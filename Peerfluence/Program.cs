@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Logging;
-using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
 using Velopack;
 

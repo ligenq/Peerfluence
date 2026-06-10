@@ -127,6 +127,8 @@ internal static class TestHelpers
         settingsVm ??= CreateSettingsViewModel();
         aboutVm ??= new AboutViewModel(Substitute.For<ILogger<AboutViewModel>>());
         var notificationService = Substitute.For<INotificationService>();
+        var settingsService = new AppSettingsService(new AppPaths(), Substitute.For<IAppSettingsStore>(), new FileSystem());
+        var updateService = Substitute.For<IUpdateService>();
 
         var features = new List<IFeatureViewModel>();
         if (downloadsVm is IFeatureViewModel df) features.Add(df);
@@ -135,6 +137,8 @@ internal static class TestHelpers
         return new MainWindowViewModel(
             features,
             aboutVm,
-            notificationService);
+            notificationService,
+            settingsService,
+            updateService);
     }
 }

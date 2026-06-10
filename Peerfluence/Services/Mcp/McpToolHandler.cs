@@ -183,7 +183,7 @@ public class McpToolHandler : IMcpToolHandler
                 return ToolError("UI window not available.", "ui_unavailable");
             }
 
-            var bitmap = await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            var bitmap = await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var width = topLevel.Bounds.Width;

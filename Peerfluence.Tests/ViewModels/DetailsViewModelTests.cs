@@ -81,14 +81,20 @@ public class DetailsViewModelTests
     public void DownloadStrategies_ContainsAllValues()
     {
         var expected = Enum.GetValues<DownloadStrategy>();
-        Assert.Equal(expected, _sut.DownloadStrategies);
+        Assert.Equal(expected, _sut.DownloadStrategies.Select(option => option.Value));
+        Assert.Contains(_sut.DownloadStrategies, option =>
+            option.Value == DownloadStrategy.RarestFirst &&
+            option.DisplayName == "Rarest first");
     }
 
     [Fact]
     public void PriorityOptions_ContainsAllValues()
     {
         var expected = Enum.GetValues<Priority>();
-        Assert.Equal(expected, _sut.PriorityOptions);
+        Assert.Equal(expected, _sut.PriorityChoices.Select(option => option.Value));
+        Assert.Contains(_sut.PriorityChoices, option =>
+            option.Value == Priority.DoNotDownload &&
+            option.DisplayName == "Do not download");
     }
 
     [Fact]

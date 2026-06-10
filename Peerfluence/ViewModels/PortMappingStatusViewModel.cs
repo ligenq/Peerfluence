@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Peerfluence.ViewModels;
 
-public sealed class PortMappingStatusViewModel
+public sealed class PortMappingStatusViewModel : ObservableObject
 {
     public PortMappingStatusViewModel(PortMappingStatus status)
     {
@@ -30,8 +32,13 @@ public sealed class PortMappingStatusViewModel
     {
         PortMappingResult.Success => ExternalPort.HasValue
             ? string.Format(Properties.Resources.Settings_PortMapping_ExternalPort, ExternalPort.Value)
-            : Result.ToString(),
-        PortMappingResult.Failed => ErrorMessage ?? Result.ToString(),
-        _ => Result.ToString()
+            : PriorityOptions.GetPortMappingResultDisplayName(Result),
+        PortMappingResult.Failed => ErrorMessage ?? PriorityOptions.GetPortMappingResultDisplayName(Result),
+        _ => PriorityOptions.GetPortMappingResultDisplayName(Result)
     };
+
+    public void RefreshLocalizedText()
+    {
+        OnPropertyChanged(nameof(DisplayText));
+    }
 }

@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using System.Globalization;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
@@ -91,6 +92,23 @@ public class SettingsViewModelTests
         Assert.Contains("None", _sut.ProxyTypes);
         Assert.Contains("Socks5", _sut.ProxyTypes);
         Assert.Contains("Http", _sut.ProxyTypes);
+    }
+
+    [Fact]
+    public void Languages_ContainsSwedish()
+    {
+        Assert.Contains("en-US", _sut.Languages);
+        Assert.Contains("sv-SE", _sut.Languages);
+    }
+
+    [Fact]
+    public void SwedishResources_AreAvailable()
+    {
+        var value = Properties.Resources.ResourceManager.GetString(
+            nameof(Properties.Resources.Settings_Language),
+            CultureInfo.GetCultureInfo("sv-SE"));
+
+        Assert.Equal("Språk", value);
     }
 
     [Fact]

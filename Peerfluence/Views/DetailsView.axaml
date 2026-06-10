@@ -80,9 +80,16 @@
 								<DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="200">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
-											<ComboBox ItemsSource="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).PriorityOptions}"
-                                                      SelectedItem="{Binding Priority}"
-                                                      HorizontalAlignment="Stretch" Padding="{StaticResource TinyLeftRightTopBottomMargin}"/>
+											<ComboBox ItemsSource="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).PriorityChoices}"
+                                                      SelectedValue="{Binding Priority, Mode=TwoWay}"
+                                                      SelectedValueBinding="{Binding Value}"
+                                                      HorizontalAlignment="Stretch" Padding="{StaticResource TinyLeftRightTopBottomMargin}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding DisplayName}"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
@@ -215,7 +222,13 @@
 
 							<StackPanel Grid.Row="2" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_Strategy}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedItem="{Binding SelectedDownloadStrategy}" HorizontalAlignment="Stretch"/>
+								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding DisplayName}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
 							</StackPanel>
 							<StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_QueuePriority}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
