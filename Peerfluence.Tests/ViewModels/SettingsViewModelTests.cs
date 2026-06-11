@@ -95,20 +95,37 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public void Languages_ContainsSwedish()
+    public void Languages_ContainsSupportedCultures()
     {
         Assert.Contains("en-US", _sut.Languages);
         Assert.Contains("sv-SE", _sut.Languages);
+        Assert.Contains("es-ES", _sut.Languages);
+        Assert.Contains("de-DE", _sut.Languages);
+        Assert.Contains("fr-FR", _sut.Languages);
+        Assert.Contains("pl-PL", _sut.Languages);
+        Assert.Contains("it-IT", _sut.Languages);
+        Assert.Contains("pt-PT", _sut.Languages);
+        Assert.Contains("ru-RU", _sut.Languages);
+        Assert.Contains("uk-UA", _sut.Languages);
     }
 
-    [Fact]
-    public void SwedishResources_AreAvailable()
+    [Theory]
+    [InlineData("sv-SE", "Språk")]
+    [InlineData("es-ES", "Idioma")]
+    [InlineData("de-DE", "Sprache")]
+    [InlineData("fr-FR", "Langue")]
+    [InlineData("pl-PL", "Język")]
+    [InlineData("it-IT", "Lingua")]
+    [InlineData("pt-PT", "Idioma")]
+    [InlineData("ru-RU", "Язык")]
+    [InlineData("uk-UA", "Мова")]
+    public void LocalizedResources_AreAvailable(string cultureName, string expected)
     {
         var value = Properties.Resources.ResourceManager.GetString(
             nameof(Properties.Resources.Settings_Language),
-            CultureInfo.GetCultureInfo("sv-SE"));
+            CultureInfo.GetCultureInfo(cultureName));
 
-        Assert.Equal("Språk", value);
+        Assert.Equal(expected, value);
     }
 
     [Fact]
