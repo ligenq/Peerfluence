@@ -386,7 +386,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
     };
 
-    public IReadOnlyList<string> Languages { get; } = new[] { "en-US", "sv-SE" };
+    public IReadOnlyList<string> Languages { get; } = new[] { "en-US", "sv-SE", "es-ES", "de-DE", "fr-FR", "pl-PL", "it-IT", "pt-PT", "ru-RU", "uk-UA" };
 
     public IReadOnlyList<string> EncryptionModes { get; } = new[] { "Allow", "Require", "Refuse" };
 

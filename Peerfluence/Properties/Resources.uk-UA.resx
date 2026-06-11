@@ -1,0 +1,1084 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App_Title" xml:space="preserve">
+    <value>Peerfluence</value>
+  </data>
+  <data name="App_Tagline" xml:space="preserve">
+    <value>Робоча станція BitTorrent</value>
+  </data>
+  <data name="Nav_Downloads" xml:space="preserve">
+    <value>Завантаження</value>
+  </data>
+  <data name="Nav_Details" xml:space="preserve">
+    <value>Подробиці</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="Downloads_Title" xml:space="preserve">
+    <value>Завантаження</value>
+  </data>
+  <data name="Downloads_TotalDown" xml:space="preserve">
+    <value>Total Down</value>
+  </data>
+  <data name="Downloads_TotalUp" xml:space="preserve">
+    <value>Total Up</value>
+  </data>
+  <data name="Downloads_Active" xml:space="preserve">
+    <value>Активні торренти</value>
+  </data>
+  <data name="Downloads_Peers" xml:space="preserve">
+    <value>Однолітки</value>
+  </data>
+  <data name="Downloads_AddTorrent" xml:space="preserve">
+    <value>Додати torrent</value>
+  </data>
+  <data name="Downloads_MagnetWatermark" xml:space="preserve">
+    <value>Вставте магнітне посилання</value>
+  </data>
+  <data name="Downloads_AddMagnet" xml:space="preserve">
+    <value>Додати magnet</value>
+  </data>
+  <data name="Downloads_PasteMagnet" xml:space="preserve">
+    <value>Вставити magnet</value>
+  </data>
+  <data name="Downloads_Start" xml:space="preserve">
+    <value>Почніть</value>
+  </data>
+  <data name="Downloads_Stop" xml:space="preserve">
+    <value>СТІЙ</value>
+  </data>
+  <data name="Downloads_Remove" xml:space="preserve">
+    <value>видалити</value>
+  </data>
+  <data name="Downloads_OpenFolder" xml:space="preserve">
+    <value>Відкрити папку</value>
+  </data>
+  <data name="Downloads_CopyHash" xml:space="preserve">
+    <value>Копіювати hash</value>
+  </data>
+  <data name="Downloads_CopyMagnet" xml:space="preserve">
+    <value>Копіювати magnet-посилання</value>
+  </data>
+  <data name="Downloads_ForceRecheck" xml:space="preserve">
+    <value>Примусово перевірити ще раз</value>
+  </data>
+  <data name="Downloads_Grid_Name" xml:space="preserve">
+    <value>Ім'я</value>
+  </data>
+  <data name="Downloads_Grid_Progress" xml:space="preserve">
+    <value>Прогрес</value>
+  </data>
+  <data name="Downloads_Grid_State" xml:space="preserve">
+    <value>Держава</value>
+  </data>
+  <data name="Downloads_Grid_Down" xml:space="preserve">
+    <value>вниз</value>
+  </data>
+  <data name="Downloads_Grid_Up" xml:space="preserve">
+    <value>Вгору</value>
+  </data>
+  <data name="Downloads_Grid_Peers" xml:space="preserve">
+    <value>Однолітки</value>
+  </data>
+  <data name="Downloads_FilePicker_Title" xml:space="preserve">
+    <value>Відкрийте Торрент</value>
+  </data>
+  <data name="Downloads_FilePicker_Filter" xml:space="preserve">
+    <value>Торрент файли</value>
+  </data>
+  <data name="Details_Title" xml:space="preserve">
+    <value>Подробиці</value>
+  </data>
+  <data name="Details_State" xml:space="preserve">
+    <value>Держава</value>
+  </data>
+  <data name="Details_Peers" xml:space="preserve">
+    <value>Однолітки</value>
+  </data>
+  <data name="Details_Size" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
+  <data name="Details_Downloaded" xml:space="preserve">
+    <value>Завантажено</value>
+  </data>
+  <data name="Details_Path" xml:space="preserve">
+    <value>шлях</value>
+  </data>
+  <data name="Details_DownloadLimit" xml:space="preserve">
+    <value>Ліміт завантаження (B/s)</value>
+  </data>
+  <data name="Details_UploadLimit" xml:space="preserve">
+    <value>Ліміт завантаження (B/s)</value>
+  </data>
+  <data name="Details_Apply" xml:space="preserve">
+    <value>Застосувати</value>
+  </data>
+  <data name="Details_Strategy" xml:space="preserve">
+    <value>Стратегія</value>
+  </data>
+  <data name="DownloadStrategy_RarestFirst" xml:space="preserve">
+    <value>Спочатку найрідкісніші частини</value>
+  </data>
+  <data name="DownloadStrategy_Sequential" xml:space="preserve">
+    <value>Послідовно</value>
+  </data>
+  <data name="DownloadStrategy_Streaming" xml:space="preserve">
+    <value>Streaming</value>
+  </data>
+  <data name="Details_FilesTab" xml:space="preserve">
+    <value>Файли</value>
+  </data>
+  <data name="Details_TrackersTab" xml:space="preserve">
+    <value>Трекери</value>
+  </data>
+  <data name="Details_PeersTab" xml:space="preserve">
+    <value>Однолітки</value>
+  </data>
+  <data name="Details_ApplyFileSelection" xml:space="preserve">
+    <value>Застосувати вибір файлу</value>
+  </data>
+  <data name="Details_Grid_Selected" xml:space="preserve">
+    <value>Вибране</value>
+  </data>
+  <data name="Details_Grid_Priority" xml:space="preserve">
+    <value>Пріоритет</value>
+  </data>
+  <data name="Priority_DoNotDownload" xml:space="preserve">
+    <value>Не завантажувати</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Низький</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>нормальний</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>Високий</value>
+  </data>
+  <data name="Details_Grid_Path" xml:space="preserve">
+    <value>шлях</value>
+  </data>
+  <data name="Details_Grid_Size" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
+  <data name="Details_Grid_Downloaded" xml:space="preserve">
+    <value>Завантажено</value>
+  </data>
+  <data name="Details_Grid_Progress" xml:space="preserve">
+    <value>Прогрес</value>
+  </data>
+  <data name="Details_Trackers_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_Trackers_State" xml:space="preserve">
+    <value>Держава</value>
+  </data>
+  <data name="Details_Trackers_Seeds" xml:space="preserve">
+    <value>Насіння</value>
+  </data>
+  <data name="Details_Trackers_Leeches" xml:space="preserve">
+    <value>П'явки</value>
+  </data>
+  <data name="Details_Trackers_LastError" xml:space="preserve">
+    <value>Остання помилка</value>
+  </data>
+  <data name="TrackerStatus_Working" xml:space="preserve">
+    <value>Працює</value>
+  </data>
+  <data name="TrackerStatus_NotWorking" xml:space="preserve">
+    <value>не працює</value>
+  </data>
+  <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
+    <value>Ланцюг розімкнено</value>
+  </data>
+  <data name="TrackerStatus_Unknown" xml:space="preserve">
+    <value>Невідомий</value>
+  </data>
+  <data name="Details_Peers_Endpoint" xml:space="preserve">
+    <value>Кінцева точка</value>
+  </data>
+  <data name="Details_Peers_Client" xml:space="preserve">
+    <value>Клієнт</value>
+  </data>
+  <data name="Details_Peers_Country" xml:space="preserve">
+    <value>Країна</value>
+  </data>
+  <data name="Details_Peers_Down" xml:space="preserve">
+    <value>вниз</value>
+  </data>
+  <data name="Details_Peers_Up" xml:space="preserve">
+    <value>Вгору</value>
+  </data>
+  <data name="Details_Peers_Progress" xml:space="preserve">
+    <value>Прогрес</value>
+  </data>
+  <data name="Details_SelectTorrent" xml:space="preserve">
+    <value>Виберіть торрент</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="Settings_DownloadFolder" xml:space="preserve">
+    <value>Завантажити папку</value>
+  </data>
+  <data name="Settings_SessionFolder" xml:space="preserve">
+    <value>Папка даних сеансу</value>
+  </data>
+  <data name="Settings_EnableSessionPersistence" xml:space="preserve">
+    <value>Увімкнути постійність сеансу</value>
+  </data>
+  <data name="Settings_EnableDht" xml:space="preserve">
+    <value>Увімкнути DHT</value>
+  </data>
+  <data name="Settings_EnableNatPmp" xml:space="preserve">
+    <value>Увімкнути NAT-PMP</value>
+  </data>
+  <data name="Settings_EnableUpnp" xml:space="preserve">
+    <value>Увімкнути UPnP</value>
+  </data>
+  <data name="Settings_UseAutomaticListeningPort" xml:space="preserve">
+    <value>Використовуйте порт автоматичного прослуховування</value>
+  </data>
+  <data name="Settings_ListeningPort" xml:space="preserve">
+    <value>Порт прослуховування</value>
+  </data>
+  <data name="Settings_ListeningPortHint" xml:space="preserve">
+    <value>Peerfluence використовує той самий порт для TCP і UDP. В автоматичному режимі під час запуску рушія програма запитує в операційної системи доступні порти.</value>
+  </data>
+  <data name="Settings_PortRestartHint" xml:space="preserve">
+    <value>Зміни порту прослуховування буде застосовано під час наступного запуску Peerfluence.</value>
+  </data>
+  <data name="Settings_Performance" xml:space="preserve">
+    <value>Продуктивність</value>
+  </data>
+  <data name="Settings_DiskReadLimit" xml:space="preserve">
+    <value>Ліміт читання диска (bytes/sec, 0 = необмежений)</value>
+  </data>
+  <data name="Settings_DiskWriteLimit" xml:space="preserve">
+    <value>Ліміт запису на диск (bytes/sec, 0 = необмежений)</value>
+  </data>
+  <data name="Settings_ThemeVariant" xml:space="preserve">
+    <value>Тематичний варіант</value>
+  </data>
+  <data name="Settings_ThemeVariant_System" xml:space="preserve">
+    <value>система</value>
+  </data>
+  <data name="Settings_ThemeVariant_Light" xml:space="preserve">
+    <value>світло</value>
+  </data>
+  <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
+    <value>Темний</value>
+  </data>
+  <data name="Settings_ColorTheme" xml:space="preserve">
+    <value>Кольорова тема</value>
+  </data>
+  <data name="Settings_ColorTheme_Indigo" xml:space="preserve">
+    <value>Індиго</value>
+  </data>
+  <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
+    <value>Кобальт</value>
+  </data>
+  <data name="Settings_ColorTheme_Mint" xml:space="preserve">
+    <value>Монетний двір</value>
+  </data>
+  <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
+    <value>Смарагдовий</value>
+  </data>
+  <data name="Settings_ColorTheme_Rose" xml:space="preserve">
+    <value>Роза</value>
+  </data>
+  <data name="Settings_ColorTheme_Vibrant" xml:space="preserve">
+    <value>Яскравий</value>
+  </data>
+  <data name="Settings_ColorTheme_Amber" xml:space="preserve">
+    <value>Бурштин</value>
+  </data>
+  <data name="Settings_ColorTheme_Slate" xml:space="preserve">
+    <value>Шифер</value>
+  </data>
+  <data name="Settings_ColorTheme_Solar" xml:space="preserve">
+    <value>Сонячна</value>
+  </data>
+  <data name="Settings_BackgroundStyle" xml:space="preserve">
+    <value>Стиль фону</value>
+  </data>
+  <data name="Settings_BackgroundStyle_GradientSoft" xml:space="preserve">
+    <value>М'який градієнт</value>
+  </data>
+  <data name="Settings_BackgroundStyle_Gradient" xml:space="preserve">
+    <value>градієнт</value>
+  </data>
+  <data name="Settings_BackgroundStyle_GradientDarker" xml:space="preserve">
+    <value>Темний градієнт</value>
+  </data>
+  <data name="Settings_BackgroundStyle_Flat" xml:space="preserve">
+    <value>Плоский</value>
+  </data>
+  <data name="Settings_BackgroundStyle_Bubble" xml:space="preserve">
+    <value>Бульбашки</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="Settings_Save" xml:space="preserve">
+    <value>зберегти</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Скинути</value>
+  </data>
+  <data name="Status_AddingTorrent" xml:space="preserve">
+    <value>Додавання торрента...</value>
+  </data>
+  <data name="Status_TorrentAdded" xml:space="preserve">
+    <value>Торрент додано.</value>
+  </data>
+  <data name="Status_AddTorrentFailed" xml:space="preserve">
+    <value>Не вдалося додати торрент: {0}</value>
+  </data>
+  <data name="Status_MagnetMissing" xml:space="preserve">
+    <value>Вставте магнітне посилання в поле або спочатку скопіюйте його в буфер обміну.</value>
+  </data>
+  <data name="Status_AddingMagnet" xml:space="preserve">
+    <value>Додавання магніту...</value>
+  </data>
+  <data name="Status_MagnetAdded" xml:space="preserve">
+    <value>Додано магніт.</value>
+  </data>
+  <data name="Status_AddMagnetFailed" xml:space="preserve">
+    <value>Не вдалося додати магніт: {0}</value>
+  </data>
+  <data name="Status_SettingsSaved" xml:space="preserve">
+    <value>Налаштування збережено. Перезапустіть Peerfluence, щоб переконатися, що зміни набули повної чинності.</value>
+  </data>
+  <data name="Status_SettingsSaveFailed" xml:space="preserve">
+    <value>Не вдалося зберегти налаштування: {0}</value>
+  </data>
+  <data name="Status_SettingsReset" xml:space="preserve">
+    <value>Налаштування скинуто до останніх збережених значень.</value>
+  </data>
+  <data name="Status_TorrentReady" xml:space="preserve">
+    <value>Готовий</value>
+  </data>
+  <data name="Status_FetchingMetadata" xml:space="preserve">
+    <value>Отримання метаданих</value>
+  </data>
+  <data name="Downloads_Grid_Eta" xml:space="preserve">
+    <value>ETA</value>
+  </data>
+  <data name="Eta_Seconds" xml:space="preserve">
+    <value>Залишилося {0} секунд</value>
+  </data>
+  <data name="Eta_Minutes" xml:space="preserve">
+    <value>Залишилося {0} хвилин</value>
+  </data>
+  <data name="Eta_HoursMinutes" xml:space="preserve">
+    <value>{0}h {1}m вліво</value>
+  </data>
+  <data name="Eta_DaysHours" xml:space="preserve">
+    <value>{0}d {1}h вліво</value>
+  </data>
+  <data name="CreateTorrent_Title" xml:space="preserve">
+    <value>Створити торрент</value>
+  </data>
+  <data name="CreateTorrent_Source" xml:space="preserve">
+    <value>Вихідний шлях</value>
+  </data>
+  <data name="CreateTorrent_SourceWatermark" xml:space="preserve">
+    <value>Виберіть файл або папку...</value>
+  </data>
+  <data name="CreateTorrent_Trackers" xml:space="preserve">
+    <value>Трекери (по одному на рядок)</value>
+  </data>
+  <data name="CreateTorrent_TrackersWatermark" xml:space="preserve">
+    <value>Введіть трекер URLs, по одному на рядок...</value>
+  </data>
+  <data name="CreateTorrent_PieceSize" xml:space="preserve">
+    <value>Розмір шматка</value>
+  </data>
+  <data name="CreateTorrent_Private" xml:space="preserve">
+    <value>Приватний торрент</value>
+  </data>
+  <data name="CreateTorrent_Comment" xml:space="preserve">
+    <value>коментар</value>
+  </data>
+  <data name="CreateTorrent_Create" xml:space="preserve">
+    <value>Створити</value>
+  </data>
+  <data name="CreateTorrent_BrowseFile" xml:space="preserve">
+    <value>Файл...</value>
+  </data>
+  <data name="CreateTorrent_BrowseFolder" xml:space="preserve">
+    <value>Папка...</value>
+  </data>
+  <data name="CreateTorrent_SelectSourceFolder" xml:space="preserve">
+    <value>Виберіть вихідну папку</value>
+  </data>
+  <data name="CreateTorrent_SelectSourceFile" xml:space="preserve">
+    <value>Виберіть вихідний файл</value>
+  </data>
+  <data name="CreateTorrent_SaveTorrentFile" xml:space="preserve">
+    <value>Зберегти торрент-файл</value>
+  </data>
+  <data name="CreateTorrent_TorrentFileType" xml:space="preserve">
+    <value>Торрент файл</value>
+  </data>
+  <data name="CreateTorrent_ErrorNoSource" xml:space="preserve">
+    <value>Виберіть вихідний файл або папку.</value>
+  </data>
+  <data name="CreateTorrent_ErrorSourceNotFound" xml:space="preserve">
+    <value>Вибраний вихідний шлях не існує.</value>
+  </data>
+  <data name="CreateTorrent_ErrorNoFiles" xml:space="preserve">
+    <value>Вибрана папка не містить файлів.</value>
+  </data>
+  <data name="CreateTorrent_ErrorFailed" xml:space="preserve">
+    <value>Не вдалося створити торрент. Подробиці перевірте в журналі.</value>
+  </data>
+  <data name="Details_RatioLimit" xml:space="preserve">
+    <value>Ліміт співвідношення</value>
+  </data>
+  <data name="Details_Hash" xml:space="preserve">
+    <value>Хеш:</value>
+  </data>
+  <data name="Details_SeedTimeMinutes" xml:space="preserve">
+    <value>Час посіву (хв)</value>
+  </data>
+  <data name="Details_QueuePriority" xml:space="preserve">
+    <value>Пріоритет черги</value>
+  </data>
+  <data name="Details_VerifyFiles" xml:space="preserve">
+    <value>Перевірте файли</value>
+  </data>
+  <data name="Details_Stream" xml:space="preserve">
+    <value>Потік</value>
+  </data>
+  <data name="Details_Play" xml:space="preserve">
+    <value>грати</value>
+  </data>
+  <data name="Details_RatioLimitWatermark" xml:space="preserve">
+    <value>напр. 2.0</value>
+  </data>
+  <data name="Details_SeedTimeWatermark" xml:space="preserve">
+    <value>напр. 60</value>
+  </data>
+  <data name="Details_QueuePriorityWatermark" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="Details_Recheck_Verifying" xml:space="preserve">
+    <value>Перевірка...</value>
+  </data>
+  <data name="Details_Recheck_Progress" xml:space="preserve">
+    <value>Контрольна частина {0} / {1} (дійсний {2})</value>
+  </data>
+  <data name="Details_Recheck_Complete" xml:space="preserve">
+    <value>Повне — дійсні частини {0}</value>
+  </data>
+  <data name="Details_Recheck_Failed" xml:space="preserve">
+    <value>Помилка: {0}</value>
+  </data>
+  <data name="Details_StreamFailed" xml:space="preserve">
+    <value>Потокове передавання не вдалося</value>
+  </data>
+  <data name="Settings_QueueManagement" xml:space="preserve">
+    <value>Управління чергами</value>
+  </data>
+  <data name="Settings_EnableQueueManagement" xml:space="preserve">
+    <value>Увімкнути керування чергою</value>
+  </data>
+  <data name="Settings_MaxActiveDownloads" xml:space="preserve">
+    <value>Максимум активних завантажень</value>
+  </data>
+  <data name="Settings_MaxActiveSeeds" xml:space="preserve">
+    <value>Максимально активне насіння</value>
+  </data>
+  <data name="Settings_IpBlocklist" xml:space="preserve">
+    <value>Чорний список IP-адрес</value>
+  </data>
+  <data name="Settings_EnableBlocklist" xml:space="preserve">
+    <value>Увімкнути список заблокованих IP-адрес</value>
+  </data>
+  <data name="Settings_BlocklistFile" xml:space="preserve">
+    <value>Файл чорного списку</value>
+  </data>
+  <data name="Settings_BlocklistWatermark" xml:space="preserve">
+    <value>Шлях до файлу списку блокувань (.p2p, .txt, .dat)</value>
+  </data>
+  <data name="Settings_Browse" xml:space="preserve">
+    <value>переглядати</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>Зовнішній вигляд</value>
+  </data>
+  <data name="Settings_BlocklistPicker_Title" xml:space="preserve">
+    <value>Виберіть Файл чорного списку</value>
+  </data>
+  <data name="Settings_BlocklistPicker_Filter" xml:space="preserve">
+    <value>Чорний список файлів</value>
+  </data>
+  <data name="Settings_BlocklistPicker_AllFiles" xml:space="preserve">
+    <value>Всі файли</value>
+  </data>
+  <data name="Details_Trackers_AddWatermark" xml:space="preserve">
+    <value>Введіть трекер URL</value>
+  </data>
+  <data name="Details_Trackers_Add" xml:space="preserve">
+    <value>додати</value>
+  </data>
+  <data name="Details_Trackers_Announce" xml:space="preserve">
+    <value>Оголосити</value>
+  </data>
+  <data name="Details_PiecesTab" xml:space="preserve">
+    <value>штук</value>
+  </data>
+  <data name="Details_Pieces_Have" xml:space="preserve">
+    <value>мати</value>
+  </data>
+  <data name="Details_Pieces_HighAvail" xml:space="preserve">
+    <value>Висока доступність</value>
+  </data>
+  <data name="Details_Pieces_Available" xml:space="preserve">
+    <value>в наявності</value>
+  </data>
+  <data name="Details_Pieces_Missing" xml:space="preserve">
+    <value>пропав</value>
+  </data>
+  <data name="Settings_GeoIp" xml:space="preserve">
+    <value>База даних GeoIP</value>
+  </data>
+  <data name="Settings_EnableGeoIp" xml:space="preserve">
+    <value>Увімкнути пошук GeoIP</value>
+  </data>
+  <data name="Settings_GeoIpFile" xml:space="preserve">
+    <value>Файл бази даних GeoIP</value>
+  </data>
+  <data name="Settings_GeoIpWatermark" xml:space="preserve">
+    <value>Шлях до бази даних GeoIP (.mmdb)</value>
+  </data>
+  <data name="Settings_GeoIpPicker_Title" xml:space="preserve">
+    <value>Виберіть базу даних GeoIP</value>
+  </data>
+  <data name="Settings_GeoIpPicker_Filter" xml:space="preserve">
+    <value>Бази даних GeoIP</value>
+  </data>
+  <data name="Settings_MediaPlayer" xml:space="preserve">
+    <value>Медіаплеєр</value>
+  </data>
+  <data name="Settings_MediaPlayerPath" xml:space="preserve">
+    <value>Шлях медіаплеєра</value>
+  </data>
+  <data name="Settings_MediaPlayerWatermark" xml:space="preserve">
+    <value>Шлях до виконуваного файлу (наприклад, VLC)</value>
+  </data>
+  <data name="Settings_MediaPlayerPicker_Title" xml:space="preserve">
+    <value>Виберіть Media Player</value>
+  </data>
+  <data name="Settings_MediaPlayerPicker_Filter" xml:space="preserve">
+    <value>Виконувані файли</value>
+  </data>
+  <data name="Settings_Encryption" xml:space="preserve">
+    <value>Шифрування</value>
+  </data>
+  <data name="Settings_EncryptionMode" xml:space="preserve">
+    <value>Режим шифрування</value>
+  </data>
+  <data name="Settings_EncryptionMode_Allow" xml:space="preserve">
+    <value>Дозволити</value>
+  </data>
+  <data name="Settings_EncryptionMode_Require" xml:space="preserve">
+    <value>Вимагати</value>
+  </data>
+  <data name="Settings_EncryptionMode_Refuse" xml:space="preserve">
+    <value>Відмовитися</value>
+  </data>
+  <data name="Settings_Proxy" xml:space="preserve">
+    <value>Проксі</value>
+  </data>
+  <data name="Settings_ProxyType" xml:space="preserve">
+    <value>Тип проксі</value>
+  </data>
+  <data name="Settings_ProxyType_None" xml:space="preserve">
+    <value>Жодного</value>
+  </data>
+  <data name="Settings_ProxyType_Socks5" xml:space="preserve">
+    <value>SOCKS5</value>
+  </data>
+  <data name="Settings_ProxyType_Http" xml:space="preserve">
+    <value>HTTP</value>
+  </data>
+  <data name="Settings_ProxyHost" xml:space="preserve">
+    <value>Хост</value>
+  </data>
+  <data name="Settings_ProxyPort" xml:space="preserve">
+    <value>Порт</value>
+  </data>
+  <data name="Settings_ProxyUsername" xml:space="preserve">
+    <value>Ім'я користувача</value>
+  </data>
+  <data name="Settings_ProxyPassword" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="Settings_ProxyPeers" xml:space="preserve">
+    <value>Однорангові з'єднання проксі</value>
+  </data>
+  <data name="Settings_ProxyTrackers" xml:space="preserve">
+    <value>Підключення проксі-трекера</value>
+  </data>
+  <data name="CreateTorrent_WebSeeds" xml:space="preserve">
+    <value>Web Seeds (один URL на рядок)</value>
+  </data>
+  <data name="CreateTorrent_WebSeedsHint" xml:space="preserve">
+    <value>HTTP/HTTPS URLs для веб-посадки (BEP 19)</value>
+  </data>
+  <data name="Settings_PortMapping" xml:space="preserve">
+    <value>Статус зіставлення портів</value>
+  </data>
+  <data name="Settings_PortMapping_Refresh" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="Settings_PortMapping_Protocol" xml:space="preserve">
+    <value>Протокол</value>
+  </data>
+  <data name="Settings_PortMapping_Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Settings_PortMapping_ExternalPort" xml:space="preserve">
+    <value>Зовнішній порт: {0}</value>
+  </data>
+  <data name="Settings_PortMapping_NoMappings" xml:space="preserve">
+    <value>Немає доступних карт портів. Увімкніть UPnP або NAT-PMP і оновіть.</value>
+  </data>
+  <data name="PortMappingResult_NotAttempted" xml:space="preserve">
+    <value>Не намагався</value>
+  </data>
+  <data name="PortMappingResult_Pending" xml:space="preserve">
+    <value>В очікуванні</value>
+  </data>
+  <data name="PortMappingResult_Success" xml:space="preserve">
+    <value>Успіх</value>
+  </data>
+  <data name="PortMappingResult_Failed" xml:space="preserve">
+    <value>Не вдалося</value>
+  </data>
+  <data name="Details_EndGameMode" xml:space="preserve">
+    <value>Кінець гри</value>
+  </data>
+  <data name="Details_DiskReadLimit" xml:space="preserve">
+    <value>Ліміт читання диска (B/s)</value>
+  </data>
+  <data name="Details_DiskWriteLimit" xml:space="preserve">
+    <value>Ліміт запису на диск (B/s)</value>
+  </data>
+  <data name="Details_SaveResumeData" xml:space="preserve">
+    <value>Зберегти дані резюме</value>
+  </data>
+  <data name="Details_SaveResumeData_Title" xml:space="preserve">
+    <value>Зберегти дані резюме</value>
+  </data>
+  <data name="Details_SaveResumeData_FileType" xml:space="preserve">
+    <value>Дані резюме</value>
+  </data>
+  <data name="Details_SaveResumeData_Success" xml:space="preserve">
+    <value>Дані відновлення збережено.</value>
+  </data>
+  <data name="Details_SaveResumeData_Failed" xml:space="preserve">
+    <value>Не вдалося зберегти дані резюме: {0}</value>
+  </data>
+  <data name="Details_ChangeDownloadPath" xml:space="preserve">
+    <value>Змінити шлях</value>
+  </data>
+  <data name="Details_ChangeDownloadPath_Title" xml:space="preserve">
+    <value>Виберіть Новий шлях завантаження</value>
+  </data>
+  <data name="Details_ChangeDownloadPath_Success" xml:space="preserve">
+    <value>Шлях завантаження змінено.</value>
+  </data>
+  <data name="Details_ChangeDownloadPath_Failed" xml:space="preserve">
+    <value>Не вдалося змінити шлях завантаження: {0}</value>
+  </data>
+  <data name="Settings_DownloadFolderPicker_Title" xml:space="preserve">
+    <value>Виберіть Завантажити папку</value>
+  </data>
+  <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
+    <value>Виберіть папку даних сеансу</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
+    <value>Видалити торрент</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
+    <value>Видалити "{0}" зі списку завантажень?</value>
+  </data>
+  <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
+    <value>Також видалити файли з диска</value>
+  </data>
+  <data name="Downloads_Remove_Option_RemoveOnly" xml:space="preserve">
+    <value>Видалити тільки торрент</value>
+  </data>
+  <data name="Downloads_Remove_Option_DeleteFiles" xml:space="preserve">
+    <value>Видалення та видалення завантажених файлів</value>
+  </data>
+  <data name="Downloads_Remove_Option_DeleteMetadata" xml:space="preserve">
+    <value>Видалення та видалення метаданих торрента</value>
+  </data>
+  <data name="Downloads_Remove_Option_DeleteAll" xml:space="preserve">
+    <value>Видалити все</value>
+  </data>
+  <data name="Downloads_Remove_RememberChoice" xml:space="preserve">
+    <value>Запам'ятайте цей вибір і пропустіть це діалогове вікно наступного разу</value>
+  </data>
+  <data name="Downloads_EmptyTitle" xml:space="preserve">
+    <value>Торрентів ще немає</value>
+  </data>
+  <data name="Downloads_EmptyBody" xml:space="preserve">
+    <value>Почніть із відкриття файлу .torrent або вставте магнітне посилання з буфера обміну. Тут з'являться активні перекази та деталі.</value>
+  </data>
+  <data name="Downloads_EmptyHint" xml:space="preserve">
+    <value>Кнопка магніту додає дійсне магнітне посилання з буфера обміну. Якщо буфер обміну не містить його, Peerfluence попросить вас вставити його.</value>
+  </data>
+  <data name="AddTorrent_Destination" xml:space="preserve">
+    <value>Пункт призначення</value>
+  </data>
+  <data name="AddTorrent_DownloadFolderWatermark" xml:space="preserve">
+    <value>Завантажити папку</value>
+  </data>
+  <data name="AddTorrent_StartImmediately" xml:space="preserve">
+    <value>Почніть негайно</value>
+  </data>
+  <data name="AddTorrent_Limits" xml:space="preserve">
+    <value>Межі</value>
+  </data>
+  <data name="AddTorrent_DownloadLimitKib" xml:space="preserve">
+    <value>Завантажити KiB/s</value>
+  </data>
+  <data name="AddTorrent_UploadLimitKib" xml:space="preserve">
+    <value>Завантажте KiB/s</value>
+  </data>
+  <data name="AddTorrent_GlobalLimitWatermark" xml:space="preserve">
+    <value>0 = глобальний</value>
+  </data>
+  <data name="AddTorrent_UnlimitedWatermark" xml:space="preserve">
+    <value>0 = необмежений</value>
+  </data>
+  <data name="AddTorrent_SeedTimeLimitMinutes" xml:space="preserve">
+    <value>Ліміт часу посіву, хв</value>
+  </data>
+  <data name="AddTorrent_IncludedTrackersWatermark" xml:space="preserve">
+    <value>Включені трекери</value>
+  </data>
+  <data name="AddTorrent_AdditionalTrackersWatermark" xml:space="preserve">
+    <value>Додатковий трекер URLs, по одному на рядок</value>
+  </data>
+  <data name="AddTorrent_MetadataPendingTitle" xml:space="preserve">
+    <value>Файли доступні після завантаження метаданих</value>
+  </data>
+  <data name="AddTorrent_MetadataPendingBody" xml:space="preserve">
+    <value>Магнітне посилання можна додати зараз. Вибір файлів і пріоритет кожного файлу можна налаштувати в деталях торрента, коли метадані стануть доступними.</value>
+  </data>
+  <data name="AddTorrent_MetadataPreviewUnavailable" xml:space="preserve">
+    <value>Метадані ще не знайдено. Ви все ще можете додати магніт, і Peerfluence продовжить його отримувати.</value>
+  </data>
+  <data name="AddTorrent_MagnetFallbackName" xml:space="preserve">
+    <value>Магнітне посилання</value>
+  </data>
+  <data name="AddTorrent_Version" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="AddTorrent_Add" xml:space="preserve">
+    <value>додати</value>
+  </data>
+  <data name="AddTorrent_Advanced" xml:space="preserve">
+    <value>Просунутий</value>
+  </data>
+  <data name="AddTorrent_SkipThisStepNextTime" xml:space="preserve">
+    <value>Наступного разу пропустіть цей крок</value>
+  </data>
+  <data name="AddTorrent_Metadata" xml:space="preserve">
+    <value>Метадані</value>
+  </data>
+  <data name="AddTorrent_Hash" xml:space="preserve">
+    <value>Хеш</value>
+  </data>
+  <data name="AddTorrent_PieceSize" xml:space="preserve">
+    <value>Розмір шматка</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="Common_Later" xml:space="preserve">
+    <value>Пізніше</value>
+  </data>
+  <data name="Common_OK" xml:space="preserve">
+    <value>добре</value>
+  </data>
+  <data name="Common_Unknown" xml:space="preserve">
+    <value>Невідомий</value>
+  </data>
+  <data name="Settings_ShowAddTorrentOptions" xml:space="preserve">
+    <value>Показати параметри додавання торрента перед додаванням</value>
+  </data>
+  <data name="Settings_ShowRemoveTorrentOptions" xml:space="preserve">
+    <value>Підтвердьте перед видаленням торрентів</value>
+  </data>
+  <data name="Settings_WindowsAssociations" xml:space="preserve">
+    <value>Windows асоціації</value>
+  </data>
+  <data name="Settings_AssociateTorrentFiles" xml:space="preserve">
+    <value>Відкривайте файли .torrent за допомогою Peerfluence</value>
+  </data>
+  <data name="Settings_AssociateMagnetLinks" xml:space="preserve">
+    <value>Відкрийте магнітні посилання за допомогою Peerfluence</value>
+  </data>
+  <data name="Settings_WindowsAssociationsHint" xml:space="preserve">
+    <value>Асоціації зареєстровані для поточного користувача Windows. Якщо Windows зберігає іншу програму за замовчуванням, виберіть Peerfluence із програм Windows за замовчуванням.</value>
+  </data>
+  <data name="Settings_CompletionAction" xml:space="preserve">
+    <value>Завершення дії</value>
+  </data>
+  <data name="Settings_CompletionActionEnabled" xml:space="preserve">
+    <value>Запустіть програму, коли торрент закінчиться</value>
+  </data>
+  <data name="Settings_CompletionActionProgram" xml:space="preserve">
+    <value>Програма або скрипт</value>
+  </data>
+  <data name="Settings_CompletionActionPickerTitle" xml:space="preserve">
+    <value>Виберіть дію завершення</value>
+  </data>
+  <data name="Settings_CompletionActionPickerFilter" xml:space="preserve">
+    <value>Програми та скрипти</value>
+  </data>
+  <data name="Settings_CompletionActionProgramWatermark" xml:space="preserve">
+    <value>Шлях до виконуваного файлу або сценарію</value>
+  </data>
+  <data name="Settings_CompletionActionArguments" xml:space="preserve">
+    <value>Аргументи</value>
+  </data>
+  <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
+    <value>Приклад: --path "{downloadPath}" --name "{name}"</value>
+  </data>
+  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
+    <value>Робочий каталог</value>
+  </data>
+  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
+    <value>{downloadPath}</value>
+  </data>
+  <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
+    <value>Час очікування (секунди)</value>
+  </data>
+  <data name="Settings_CompletionActionWindow" xml:space="preserve">
+    <value>Вікно</value>
+  </data>
+  <data name="Settings_CompletionActionRunHidden" xml:space="preserve">
+    <value>Бігти приховано</value>
+  </data>
+  <data name="Settings_CompletionActionTokens" xml:space="preserve">
+    <value>Доступні токени: {name}, {hash}, {downloadPath}, {totalSize}</value>
+  </data>
+  <data name="Details_SettingsTab" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="Settings_StorageAndSession" xml:space="preserve">
+    <value>Зберігання та сеанс</value>
+  </data>
+  <data name="Settings_NetworkAndConnectivity" xml:space="preserve">
+    <value>Мережа та підключення</value>
+  </data>
+  <data name="Nav_About" xml:space="preserve">
+    <value>Про програму</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>Про Peerfluence</value>
+  </data>
+  <data name="About_GitHub" xml:space="preserve">
+    <value>Репозиторій GitHub</value>
+  </data>
+  <data name="About_Packages" xml:space="preserve">
+    <value>Сторонні пакети</value>
+  </data>
+  <data name="About_LegalNotice" xml:space="preserve">
+    <value>Правове повідомлення</value>
+  </data>
+  <data name="About_LegalNoticeText" xml:space="preserve">
+    <value>Peerfluence — це вільне програмне забезпечення з відкритим кодом.
+
+Peerfluence надається «як є», без будь-яких гарантій. У максимально дозволеному законом обсязі автори, учасники проєкту та власники авторських прав не несуть відповідальності за будь-які збитки, втрату даних, проблеми з мережею, юридичні претензії, завантажений контент, поширений контент або інші наслідки, що виникають у результаті встановлення чи використання програми.
+
+Ви несете одноосібну відповідальність за те, як використовуєте Peerfluence, зокрема за забезпечення того, що будь-який контент, який ви завантажуєте, надсилаєте, роздаєте, поширюєте або розповсюджуєте, відповідає чинним законам, правам, ліцензіям і дозволам. Автори, учасники проєкту та власники авторських прав не несуть відповідальності за ваше використання програми або за будь-який сторонній контент, до якого ви отримуєте доступ через неї.
+
+Peerfluence поширюється за MIT License. Установлюючи або використовуючи Peerfluence, ви підтверджуєте та приймаєте це повідомлення.</value>
+  </data>
+  <data name="Settings_SecurityAndPrivacy" xml:space="preserve">
+    <value>Безпека та конфіденційність</value>
+  </data>
+  <data name="Settings_Updates" xml:space="preserve">
+    <value>Оновлення</value>
+  </data>
+  <data name="Settings_UpdateUrl" xml:space="preserve">
+    <value>Оновити URL</value>
+  </data>
+  <data name="Settings_UpdateUrlWatermark" xml:space="preserve">
+    <value>https://github.com/ligenq/Peerfluence</value>
+  </data>
+  <data name="Settings_CheckForUpdatesOnStartup" xml:space="preserve">
+    <value>Перевірте наявність оновлень під час запуску</value>
+  </data>
+  <data name="Settings_CheckForUpdates" xml:space="preserve">
+    <value>Перевірити оновлення</value>
+  </data>
+  <data name="Status_UpdateAvailable" xml:space="preserve">
+    <value>Доступне оновлення: {0}</value>
+  </data>
+  <data name="Status_NoUpdatesAvailable" xml:space="preserve">
+    <value>Ви використовуєте останню версію.</value>
+  </data>
+  <data name="Status_UpdateCheckFailed" xml:space="preserve">
+    <value>Не вдалося перевірити наявність оновлень. Перевірте оновлення URL і повторіть спробу.</value>
+  </data>
+  <data name="Status_DownloadingUpdate" xml:space="preserve">
+    <value>Завантаження оновлення...</value>
+  </data>
+  <data name="Status_UpdateReady" xml:space="preserve">
+    <value>Оновлення готове; перезапустіть програму, щоб застосувати його.</value>
+  </data>
+  <data name="Settings_ApplyUpdateAndRestart" xml:space="preserve">
+    <value>Перезапустити й оновити</value>
+  </data>
+  <data name="Settings_UpdateNotInstalled" xml:space="preserve">
+    <value>Автоматичне оновлення недоступне в портативному режимі.</value>
+  </data>
+  <data name="UpdatePrompt_Title" xml:space="preserve">
+    <value>Peerfluence {0} доступний</value>
+  </data>
+  <data name="UpdatePrompt_Title_Generic" xml:space="preserve">
+    <value>Доступне оновлення Peerfluence</value>
+  </data>
+  <data name="UpdatePrompt_Message" xml:space="preserve">
+    <value>Доступна нова версія. Установити зараз і перезапустити Peerfluence?</value>
+  </data>
+  <data name="UpdatePrompt_Install" xml:space="preserve">
+    <value>Установити оновлення</value>
+  </data>
+  <data name="TorrentState_Active" xml:space="preserve">
+    <value>Активний</value>
+  </data>
+  <data name="TorrentState_Stopping" xml:space="preserve">
+    <value>Зупинка</value>
+  </data>
+  <data name="TorrentState_Stopped" xml:space="preserve">
+    <value>Зупинився</value>
+  </data>
+  <data name="TorrentState_CheckingFiles" xml:space="preserve">
+    <value>Перевірка файлів</value>
+  </data>
+  <data name="TorrentState_DownloadingMetadata" xml:space="preserve">
+    <value>Завантаження метаданих</value>
+  </data>
+  <data name="Notification_DownloadFinished" xml:space="preserve">
+    <value>Завантаження завершено</value>
+  </data>
+  <data name="Notification_TorrentInterrupted" xml:space="preserve">
+    <value>Торрент перервано</value>
+  </data>
+  <data name="Notification_MetadataReady" xml:space="preserve">
+    <value>Готові метадані</value>
+  </data>
+  <data name="Notification_TorrentError" xml:space="preserve">
+    <value>Помилка торрента</value>
+  </data>
+  <data name="Notification_CompletionActionFailed" xml:space="preserve">
+    <value>Не вдалося виконати дію</value>
+  </data>
+  <data name="Notification_CompletionActionFinished" xml:space="preserve">
+    <value>Дію завершення завершено</value>
+  </data>
+  <data name="CompletionAction_ErrorNoProgram" xml:space="preserve">
+    <value>Програма завершення дій не налаштована.</value>
+  </data>
+  <data name="CompletionAction_ErrorProgramNotFound" xml:space="preserve">
+    <value>Програма завершення дії не знайдена: {0}</value>
+  </data>
+  <data name="CompletionAction_ErrorWorkingDirectoryNotFound" xml:space="preserve">
+    <value>Робочий каталог дій завершення не знайдено: {0}</value>
+  </data>
+  <data name="CompletionAction_ErrorCouldNotStart" xml:space="preserve">
+    <value>Не вдалося розпочати дію завершення.</value>
+  </data>
+  <data name="CompletionAction_ErrorTimedOut" xml:space="preserve">
+    <value>Час очікування завершення минув через {0} секунд.</value>
+  </data>
+  <data name="CompletionAction_ExitCode" xml:space="preserve">
+    <value>{0}: код виходу {1}</value>
+  </data>
+  <data name="ViewLocator_NotFound" xml:space="preserve">
+    <value>Не знайдено: {0}</value>
+  </data>
+  <data name="Crash_UnexpectedError" xml:space="preserve">
+    <value>Peerfluence зіткнувся з неочікуваною помилкою, тому його потрібно закрити.</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>Peerfluence - Фатальна помилка</value>
+  </data>
+  <data name="Crash_ReportSaved" xml:space="preserve">
+    <value>Звіт про збій було збережено в:</value>
+  </data>
+  </root>
