@@ -200,13 +200,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         {
             Title = Resources.Downloads_FilePicker_Title,
             AllowMultiple = false,
-            FileTypeFilter = new[]
-            {
+            FileTypeFilter =
+            [
                 new FilePickerFileType(Resources.Downloads_FilePicker_Filter)
                 {
-                    Patterns = new[] { "*.torrent" }
+                    Patterns = ["*.torrent"]
                 }
-            }
+            ]
         });
 
         var file = files.FirstOrDefault();

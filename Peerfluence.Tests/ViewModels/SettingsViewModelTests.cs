@@ -124,6 +124,21 @@ public class SettingsViewModelTests
         Assert.Contains(_sut.LanguageOptions, option => option.Value == "uk-UA" && option.DisplayName == "Українська (uk-UA)");
     }
 
+    [Fact]
+    public void LanguageOptions_AreSortedByCultureCode()
+    {
+        var values = _sut.LanguageOptions.Select(option => option.Value).ToArray();
+
+        Assert.Equal(values.OrderBy(value => value, StringComparer.Ordinal).ToArray(), values);
+    }
+
+    [Fact]
+    public void ApplicationVersion_IsAvailable()
+    {
+        Assert.False(string.IsNullOrWhiteSpace(_sut.ApplicationVersion));
+        Assert.Matches(@"^\d+\.\d+\.\d+$", _sut.ApplicationVersion);
+    }
+
     [Theory]
     [InlineData("sv-SE", "Språk")]
     [InlineData("es-ES", "Idioma")]

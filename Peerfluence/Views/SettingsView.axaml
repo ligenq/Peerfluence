@@ -434,6 +434,11 @@
                         <TextBlock Text="{m:L Settings_Updates}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding ApplicationVersion}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                    </StackPanel>
+
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
                         <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}"/>

@@ -41,7 +41,7 @@ public sealed class DownloadsAlertFlowTests : IDisposable
     {
         var torrent = CreateTorrent("Stats Torrent", started: true, dataLeft: 1000);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
         torrentService.GetStats().Returns(new EngineStats());
 
         var vm = CreateRuntimeViewModel(torrentService);
@@ -74,7 +74,7 @@ public sealed class DownloadsAlertFlowTests : IDisposable
     {
         var torrent = CreateTorrent("Removed Torrent", started: false);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
         torrentService.GetStats().Returns(new EngineStats());
 
         var vm = CreateRuntimeViewModel(torrentService);

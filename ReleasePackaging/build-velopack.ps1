@@ -98,7 +98,10 @@ function Remove-PackageSymbols {
         return
     }
 
-    $symbolFiles = Get-ChildItem -LiteralPath $Directory -Recurse -File -Include "*.pdb", "*.dbg", "*.dSYM" -ErrorAction SilentlyContinue
+    $symbolExtensions = @(".pdb", ".dbg", ".dSYM")
+    $symbolFiles = Get-ChildItem -LiteralPath $Directory -Recurse -File -ErrorAction SilentlyContinue |
+        Where-Object { $symbolExtensions -contains $_.Extension }
+
     foreach ($symbolFile in $symbolFiles) {
         Remove-Item -LiteralPath $symbolFile.FullName -Force
     }
@@ -107,6 +110,27 @@ function Remove-PackageSymbols {
         $totalBytes = ($symbolFiles | Measure-Object Length -Sum).Sum
         Write-Host ("Removed {0} symbol file(s) from package input ({1:N0} bytes)." -f $symbolFiles.Count, $totalBytes)
     }
+}
+
+function Assert-PublishedMainExecutable {
+    param([Parameter(Mandatory)][string]$ExePath)
+
+    if (Test-Path -LiteralPath $ExePath) {
+        return
+    }
+
+    $publishDirectory = Split-Path -Parent $ExePath
+    $publishedFiles = Get-ChildItem -LiteralPath $publishDirectory -Recurse -File -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty FullName
+
+    $fileList = if ($publishedFiles) {
+        $publishedFiles -join [Environment]::NewLine
+    }
+    else {
+        "(no files found)"
+    }
+
+    throw "Published app executable '$ExePath' does not exist. Published files:$([Environment]::NewLine)$fileList"
 }
 
 function Invoke-PublishedSmokeTest {
@@ -213,8 +237,11 @@ dotnet publish $projectPath `
     /p:PublishSingleFile=true `
     /p:IncludeNativeLibrariesForSelfExtract=true
 
+$mainExePath = Join-Path $publishDir "Peerfluence.exe"
+Assert-PublishedMainExecutable -ExePath $mainExePath
 Remove-PackageSymbols -Directory $publishDir
-Invoke-PublishedSmokeTest -ExePath (Join-Path $publishDir "Peerfluence.exe") -Seconds $SmokeTestSeconds
+Assert-PublishedMainExecutable -ExePath $mainExePath
+Invoke-PublishedSmokeTest -ExePath $mainExePath -Seconds $SmokeTestSeconds
 
 $packArgs = @(
     "pack",

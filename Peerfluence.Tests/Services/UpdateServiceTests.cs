@@ -117,11 +117,11 @@ public class UpdateServiceTests
         var settingsService = new AppSettingsService(paths, store, new FileSystem());
 
         var createdUrls = new List<string>();
-        var adapters = new Queue<FakeUpdateManagerAdapter>(new[]
-        {
+        var adapters = new Queue<FakeUpdateManagerAdapter>(
+        [
             new FakeUpdateManagerAdapter(isInstalled: true),
             new FakeUpdateManagerAdapter(isInstalled: true)
-        });
+        ]);
 
         var sut = new UpdateService(logger, settingsService, updateUrl =>
         {
@@ -182,7 +182,7 @@ public class UpdateServiceTests
         var sut = new UpdateService(logger, settingsService, _ => adapter);
 
         var downloadResult = await sut.DownloadUpdateAsync();
-        sut.ApplyUpdateAndRestart(new[] { "--restart" });
+        sut.ApplyUpdateAndRestart(["--restart"]);
 
         Assert.True(downloadResult);
         Assert.Same(updateInfo, adapter.DownloadedUpdate);

@@ -267,7 +267,7 @@ public class DownloadsViewTests
         torrent.HasMetadata.Returns(true);
 
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
         torrentService.GetStats().Returns(new EngineStats());
 
         var vm = CreateRuntimeViewModel(torrentService);

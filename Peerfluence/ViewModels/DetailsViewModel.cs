@@ -843,13 +843,13 @@ public sealed class DetailsViewModel : ViewModelBase
                 Title = Properties.Resources.Details_SaveResumeData_Title,
                 DefaultExtension = "resume",
                 SuggestedFileName = $"{torrent.Name}.resume",
-                FileTypeChoices = new[]
-                {
+                FileTypeChoices =
+                [
                     new FilePickerFileType(Properties.Resources.Details_SaveResumeData_FileType)
                     {
-                        Patterns = new[] { "*.resume" }
+                        Patterns = ["*.resume"]
                     }
-                }
+                ]
             });
 
             if (file == null) return;

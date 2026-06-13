@@ -63,7 +63,7 @@ public sealed class TorrentServiceTests
         torrent.Name.Returns("Ubuntu ISO");
         torrent.Files.Returns(files);
         torrent.Started.Returns(true);
-        engine.GetTorrents().Returns(new[] { torrent });
+        engine.GetTorrents().Returns([torrent]);
 
         var movedPath = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         torrent.SetDownloadPathAsync(Arg.Any<string>())

@@ -342,6 +342,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     }
 
+    public string ApplicationVersion => ApplicationVersionInfo.Version;
+
     public string StatusMessage
     {
         get;
@@ -356,7 +358,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
-    public IReadOnlyList<string> ThemeVariants { get; } = new[] { "System", "Light", "Dark" };
+    public IReadOnlyList<string> ThemeVariants { get; } = ["System", "Light", "Dark"];
 
     public IReadOnlyList<SettingsOption> ThemeVariantOptions
     {
@@ -364,7 +366,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         private set => SetProperty(ref _themeVariantOptions, value);
     }
 
-    public IReadOnlyList<string> ColorThemes { get; } = new[] { "Indigo", "Cobalt", "Mint", "Emerald", "Rose", "Vibrant", "Amber", "Slate", "Solar" };
+    public IReadOnlyList<string> ColorThemes { get; } = ["Indigo", "Cobalt", "Mint", "Emerald", "Rose", "Vibrant", "Amber", "Slate", "Solar"];
 
     public IReadOnlyList<SettingsOption> ColorThemeOptions
     {
@@ -372,7 +374,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         private set => SetProperty(ref _colorThemeOptions, value);
     }
 
-    public IReadOnlyList<string> BackgroundStyles { get; } = new[] { "GradientSoft", "Gradient", "GradientDarker", "Flat", "Bubble" };
+    public IReadOnlyList<string> BackgroundStyles { get; } = ["GradientSoft", "Gradient", "GradientDarker", "Flat", "Bubble"];
 
     public IReadOnlyList<SettingsOption> BackgroundStyleOptions
     {
@@ -380,23 +382,23 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         private set => SetProperty(ref _backgroundStyleOptions, value);
     }
 
-    public IReadOnlyList<SettingsOption> LanguageOptions { get; } = new[]
-    {
-        new SettingsOption("en-US", "English (en-US)"),
-        new SettingsOption("sv-SE", "Svenska (sv-SE)"),
-        new SettingsOption("es-ES", "Español (es-ES)"),
+    public IReadOnlyList<SettingsOption> LanguageOptions { get; } =
+    [
         new SettingsOption("de-DE", "Deutsch (de-DE)"),
+        new SettingsOption("en-US", "English (en-US)"),
+        new SettingsOption("es-ES", "Español (es-ES)"),
         new SettingsOption("fr-FR", "Français (fr-FR)"),
-        new SettingsOption("pl-PL", "Polski (pl-PL)"),
         new SettingsOption("it-IT", "Italiano (it-IT)"),
+        new SettingsOption("pl-PL", "Polski (pl-PL)"),
         new SettingsOption("pt-PT", "Português (pt-PT)"),
         new SettingsOption("ru-RU", "Русский (ru-RU)"),
+        new SettingsOption("sv-SE", "Svenska (sv-SE)"),
         new SettingsOption("uk-UA", "Українська (uk-UA)")
-    };
+    ];
 
     public IReadOnlyList<string> Languages => LanguageOptions.Select(option => option.Value).ToArray();
 
-    public IReadOnlyList<string> EncryptionModes { get; } = new[] { "Allow", "Require", "Refuse" };
+    public IReadOnlyList<string> EncryptionModes { get; } = ["Allow", "Require", "Refuse"];
 
     public IReadOnlyList<SettingsOption> EncryptionModeOptions
     {
@@ -404,7 +406,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         private set => SetProperty(ref _encryptionModeOptions, value);
     }
 
-    public IReadOnlyList<string> ProxyTypes { get; } = new[] { "None", "Socks5", "Http" };
+    public IReadOnlyList<string> ProxyTypes { get; } = ["None", "Socks5", "Http"];
 
     public IReadOnlyList<SettingsOption> ProxyTypeOptions
     {
@@ -709,18 +711,18 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private static IReadOnlyList<SettingsOption> CreateThemeVariantOptions()
     {
-        return new[]
-        {
+        return
+        [
             new SettingsOption("System", Properties.Resources.Settings_ThemeVariant_System),
             new SettingsOption("Light", Properties.Resources.Settings_ThemeVariant_Light),
             new SettingsOption("Dark", Properties.Resources.Settings_ThemeVariant_Dark)
-        };
+        ];
     }
 
     private static IReadOnlyList<SettingsOption> CreateColorThemeOptions()
     {
-        return new[]
-        {
+        return
+        [
             new SettingsOption("Indigo", Properties.Resources.Settings_ColorTheme_Indigo),
             new SettingsOption("Cobalt", Properties.Resources.Settings_ColorTheme_Cobalt),
             new SettingsOption("Mint", Properties.Resources.Settings_ColorTheme_Mint),
@@ -730,39 +732,39 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             new SettingsOption("Amber", Properties.Resources.Settings_ColorTheme_Amber),
             new SettingsOption("Slate", Properties.Resources.Settings_ColorTheme_Slate),
             new SettingsOption("Solar", Properties.Resources.Settings_ColorTheme_Solar)
-        };
+        ];
     }
 
     private static IReadOnlyList<SettingsOption> CreateBackgroundStyleOptions()
     {
-        return new[]
-        {
+        return
+        [
             new SettingsOption("GradientSoft", Properties.Resources.Settings_BackgroundStyle_GradientSoft),
             new SettingsOption("Gradient", Properties.Resources.Settings_BackgroundStyle_Gradient),
             new SettingsOption("GradientDarker", Properties.Resources.Settings_BackgroundStyle_GradientDarker),
             new SettingsOption("Flat", Properties.Resources.Settings_BackgroundStyle_Flat),
             new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
-        };
+        ];
     }
 
     private static IReadOnlyList<SettingsOption> CreateEncryptionModeOptions()
     {
-        return new[]
-        {
+        return
+        [
             new SettingsOption("Allow", Properties.Resources.Settings_EncryptionMode_Allow),
             new SettingsOption("Require", Properties.Resources.Settings_EncryptionMode_Require),
             new SettingsOption("Refuse", Properties.Resources.Settings_EncryptionMode_Refuse)
-        };
+        ];
     }
 
     private static IReadOnlyList<SettingsOption> CreateProxyTypeOptions()
     {
-        return new[]
-        {
+        return
+        [
             new SettingsOption("None", Properties.Resources.Settings_ProxyType_None),
             new SettingsOption("Socks5", Properties.Resources.Settings_ProxyType_Socks5),
             new SettingsOption("Http", Properties.Resources.Settings_ProxyType_Http)
-        };
+        ];
     }
 
     private async Task BrowseBlocklistAsync()
@@ -773,17 +775,17 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         {
             Title = Properties.Resources.Settings_BlocklistPicker_Title,
             AllowMultiple = false,
-            FileTypeFilter = new[]
-            {
+            FileTypeFilter =
+            [
                 new FilePickerFileType(Properties.Resources.Settings_BlocklistPicker_Filter)
                 {
-                    Patterns = new[] { "*.txt", "*.p2p", "*.dat", "*.gz" }
+                    Patterns = ["*.txt", "*.p2p", "*.dat", "*.gz"]
                 },
                 new FilePickerFileType(Properties.Resources.Settings_BlocklistPicker_AllFiles)
                 {
-                    Patterns = new[] { "*" }
+                    Patterns = ["*"]
                 }
-            }
+            ]
         });
 
         var file = files.FirstOrDefault();
@@ -818,17 +820,17 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         {
             Title = Properties.Resources.Settings_GeoIpPicker_Title,
             AllowMultiple = false,
-            FileTypeFilter = new[]
-            {
+            FileTypeFilter =
+            [
                 new FilePickerFileType(Properties.Resources.Settings_GeoIpPicker_Filter)
                 {
-                    Patterns = new[] { "*.mmdb", "*.dat", "*.csv" }
+                    Patterns = ["*.mmdb", "*.dat", "*.csv"]
                 },
                 new FilePickerFileType(Properties.Resources.Settings_BlocklistPicker_AllFiles)
                 {
-                    Patterns = new[] { "*" }
+                    Patterns = ["*"]
                 }
-            }
+            ]
         });
 
         var file = files.FirstOrDefault();
@@ -847,20 +849,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             {
                 new FilePickerFileType(Properties.Resources.Settings_MediaPlayerPicker_Filter)
                 {
-                    Patterns = new[] { "*.exe", "*.bat", "*.cmd" }
+                    Patterns = ["*.exe", "*.bat", "*.cmd"]
                 },
                 new FilePickerFileType(Properties.Resources.Settings_BlocklistPicker_AllFiles)
                 {
-                    Patterns = new[] { "*" }
+                    Patterns = ["*"]
                 }
             }
-            : new[]
-            {
+            :
+            [
                 new FilePickerFileType(Properties.Resources.Settings_BlocklistPicker_AllFiles)
                 {
-                    Patterns = new[] { "*" }
+                    Patterns = ["*"]
                 }
-            };
+            ];
 
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
@@ -885,20 +887,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             {
                 new FilePickerFileType(Properties.Resources.Settings_CompletionActionPickerFilter)
                 {
-                    Patterns = new[] { "*.exe", "*.bat", "*.cmd", "*.ps1" }
+                    Patterns = ["*.exe", "*.bat", "*.cmd", "*.ps1"]
                 },
                 new FilePickerFileType(Properties.Resources.Settings_BlocklistPicker_AllFiles)
                 {
-                    Patterns = new[] { "*" }
+                    Patterns = ["*"]
                 }
             }
-            : new[]
-            {
+            :
+            [
                 new FilePickerFileType(Properties.Resources.Settings_CompletionActionPickerFilter)
                 {
-                    Patterns = new[] { "*.sh", "*" }
+                    Patterns = ["*.sh", "*"]
                 }
-            };
+            ];
 
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {

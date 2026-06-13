@@ -38,7 +38,7 @@ public class AddTorrentOptionsViewModelTests
         Assert.Equal(7, options.QueuePriority);
         Assert.Equal(1.5f, options.RatioLimit);
         Assert.Equal(TimeSpan.FromMinutes(45), options.SeedTimeLimit);
-        Assert.Equal(new[] { "udp://tracker.example:80", "https://tracker.two/announce" }, options.AdditionalTrackers);
+        Assert.Equal(["udp://tracker.example:80", "https://tracker.two/announce"], options.AdditionalTrackers);
         Assert.Collection(
             options.FileSelections!,
             file =>
@@ -95,12 +95,11 @@ public class AddTorrentOptionsViewModelTests
             12,
             16384,
             IsPrivate: false,
-            new[]
-            {
+            [
                 new MagnetMetadataPreviewFile(0, "a.bin", 100),
                 new MagnetMetadataPreviewFile(1, "b.bin", 200)
-            },
-            new[] { "udp://tracker.example:80", "https://tracker.two/announce" });
+            ],
+            ["udp://tracker.example:80", "https://tracker.two/announce"]);
 
         Assert.True(sut.IsMetadataPending);
 
