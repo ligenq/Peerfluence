@@ -10,6 +10,36 @@ namespace Peerfluence.Tests.Services;
 public sealed class TorrentServiceTests
 {
     [Fact]
+    public void GetStats_ReturnsEmptyStats_WhenEngineIsUnavailable()
+    {
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(_ => throw new InvalidOperationException("Torrent engine is not initialized."));
+        var messenger = Substitute.For<IAppMessenger>();
+        var sut = new TorrentService(engineService, messenger);
+
+        var stats = sut.GetStats();
+
+        Assert.Equal(0, stats.DownloadSpeed);
+        Assert.Equal(0, stats.UploadSpeed);
+    }
+
+    [Fact]
+    public void GetStats_ReturnsEmptyStats_WhenEngineHasBeenDisposed()
+    {
+        var engine = Substitute.For<IClientEngine>();
+        engine.GetStats().Returns(_ => throw new ObjectDisposedException("PeerSharp.Internals.ClientEngine"));
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+        var messenger = Substitute.For<IAppMessenger>();
+        var sut = new TorrentService(engineService, messenger);
+
+        var stats = sut.GetStats();
+
+        Assert.Equal(0, stats.DownloadSpeed);
+        Assert.Equal(0, stats.UploadSpeed);
+    }
+
+    [Fact]
     public async Task PublishAlert_MetadataInitialized_MovesTorrentIntoUniqueSubfolder_AndRestartsIfNeeded()
     {
         var defaultRoot = Path.Combine(Path.GetTempPath(), "peerfluence-default-root");

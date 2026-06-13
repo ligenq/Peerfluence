@@ -32,9 +32,29 @@ public sealed class TorrentAlertsHostedServiceTests
         torrentService.Received(1).PublishAlert(alert);
     }
 
+    [Fact]
+    public async Task StopAsync_IgnoresAlertStreamCancellationDuringShutdown()
+    {
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetAlertsAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => CancelWhenStopped(callInfo.ArgAt<CancellationToken>(1)));
+
+        var sut = new TorrentAlertsHostedService(torrentService);
+
+        await sut.StartAsync(TestContext.Current.CancellationToken);
+
+        await sut.StopAsync(TestContext.Current.CancellationToken);
+    }
+
     private static async IAsyncEnumerable<Alert> StreamAlerts(Alert alert, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
         yield return alert;
         await Task.Delay(Timeout.Infinite, cancellationToken);
+    }
+
+    private static async IAsyncEnumerable<Alert> CancelWhenStopped([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await Task.Delay(Timeout.Infinite, cancellationToken);
+        yield break;
     }
 }

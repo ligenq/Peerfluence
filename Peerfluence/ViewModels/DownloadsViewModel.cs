@@ -24,7 +24,7 @@ using Peerfluence.Properties;
 namespace Peerfluence.ViewModels;
 
 [SingletonService]
-public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
+public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisposable
 {
     private static readonly TimeSpan StatusAutoClearDelay = TimeSpan.FromSeconds(4);
     private readonly Dictionary<string, TorrentListItemViewModel> _torrentLookup = new();
@@ -40,6 +40,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
     private readonly Task _alertTask;
     private readonly Task _statsTask;
     private CancellationTokenSource? _statusAutoClearCts;
+    private bool _disposed;
 
     public DownloadsViewModel(
         ITorrentService torrentService,
@@ -311,6 +312,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
             }
         }
         catch (OperationCanceledException) { }
+        catch (InvalidOperationException) when (ct.IsCancellationRequested) { }
+        catch (ObjectDisposedException) when (ct.IsCancellationRequested) { }
     }
 
     private void ApplyStats(EngineStats stats)
@@ -976,6 +979,22 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel
     {
         OnPropertyChanged(nameof(HasTorrents));
         OnPropertyChanged(nameof(HasNoTorrents));
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        Torrents.CollectionChanged -= OnTorrentsCollectionChanged;
+        CancelStatusAutoClear();
+        _alertChannel.Writer.TryComplete();
+        _loopCts.Cancel();
+        _loopCts.Dispose();
     }
 
     internal enum RemoveTorrentAction

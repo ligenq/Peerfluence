@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Peerfluence.Core.Config;
 using PeerSharp.Clients;
 using PeerSharp.Config;
 using PeerSharp.Interfaces;
@@ -29,7 +30,8 @@ public sealed class TorrentEngineService : ITorrentEngineService
 
     public ValueTask DisposeAsync()
     {
-        return _engine?.DisposeAsync() ?? ValueTask.CompletedTask;
+        var engine = Interlocked.Exchange(ref _engine, null);
+        return engine?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
 
     private IClientEngine CreateEngine()
@@ -80,14 +82,14 @@ public sealed class TorrentEngineService : ITorrentEngineService
         return ClientEngineFactory.Create(options);
     }
 
-    private static ushort GetListeningPort(Peerfluence.Core.Config.NetworkSettings settings)
+    private static ushort GetListeningPort(NetworkSettings settings)
     {
         return settings.UseAutomaticListeningPort
             ? (ushort)0
             : (ushort)Math.Clamp(settings.ListeningPort, 1, 65535);
     }
 
-    private static PeerSharp.Config.ProxySettings CreateProxySettings(Peerfluence.Core.Config.ProxySettings proxy)
+    private static PeerSharp.Config.ProxySettings CreateProxySettings(Config.ProxySettings proxy)
     {
         var proxySettings = new PeerSharp.Config.ProxySettings
         {
