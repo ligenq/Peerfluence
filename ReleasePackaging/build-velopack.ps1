@@ -11,6 +11,9 @@ param(
     [string]$InstallerLicense = (Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")) "ReleasePackaging\InstallerNotice.md"),
     [string]$InstallerSplash = (Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")) "ReleasePackaging\InstallerSplash.png"),
     [switch]$CleanReleaseOutput,
+    [switch]$IncludeSymbols,
+    [switch]$SkipSmokeTest,
+    [int]$SmokeTestSeconds = 8,
     [switch]$CreateTestCertificate,
     [switch]$TrustTestCertificate,
     [string]$TestCertificateSubject = "CN=ligenq",
@@ -87,6 +90,73 @@ function New-TestSigningCertificate {
     }
 }
 
+function Remove-PackageSymbols {
+    param([Parameter(Mandatory)][string]$Directory)
+
+    if ($IncludeSymbols) {
+        Write-Host "Keeping symbol files in package input because -IncludeSymbols was specified."
+        return
+    }
+
+    $symbolFiles = Get-ChildItem -LiteralPath $Directory -Recurse -File -Include "*.pdb", "*.dbg", "*.dSYM" -ErrorAction SilentlyContinue
+    foreach ($symbolFile in $symbolFiles) {
+        Remove-Item -LiteralPath $symbolFile.FullName -Force
+    }
+
+    if ($symbolFiles.Count -gt 0) {
+        $totalBytes = ($symbolFiles | Measure-Object Length -Sum).Sum
+        Write-Host ("Removed {0} symbol file(s) from package input ({1:N0} bytes)." -f $symbolFiles.Count, $totalBytes)
+    }
+}
+
+function Invoke-PublishedSmokeTest {
+    param(
+        [Parameter(Mandatory)][string]$ExePath,
+        [Parameter(Mandatory)][int]$Seconds
+    )
+
+    if ($SkipSmokeTest) {
+        Write-Host "Skipping published app smoke test because -SkipSmokeTest was specified."
+        return
+    }
+
+    if (-not (Test-Path -LiteralPath $ExePath)) {
+        throw "Published app smoke test failed because '$ExePath' does not exist."
+    }
+
+    $profilePath = Join-Path $artifactsRoot ("smoke-test-profile\" + [guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path $profilePath -Force | Out-Null
+
+    Write-Host "Running published app smoke test for $Seconds second(s)..."
+    $process = Start-Process -FilePath $ExePath -ArgumentList @("--profile", $profilePath) -PassThru -WindowStyle Hidden
+    try {
+        if ($process.WaitForExit($Seconds * 1000)) {
+            if ($process.ExitCode -ne 0) {
+                throw "Published app smoke test failed. Process exited early with code $($process.ExitCode)."
+            }
+
+            throw "Published app smoke test failed. Process exited before the $Seconds second observation window completed."
+        }
+
+        Write-Host "Published app smoke test passed."
+    }
+    finally {
+        if (-not $process.HasExited) {
+            try {
+                $process.CloseMainWindow() | Out-Null
+                if (-not $process.WaitForExit(3000)) {
+                    Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+                }
+            }
+            catch {
+                Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        Remove-Item -LiteralPath $profilePath -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
 Assert-Version $Version
 $binaryVersion = ($Version -split "-", 2)[0]
 
@@ -142,6 +212,9 @@ dotnet publish $projectPath `
     /p:FileVersion=$binaryVersion `
     /p:PublishSingleFile=true `
     /p:IncludeNativeLibrariesForSelfExtract=true
+
+Remove-PackageSymbols -Directory $publishDir
+Invoke-PublishedSmokeTest -ExePath (Join-Path $publishDir "Peerfluence.exe") -Seconds $SmokeTestSeconds
 
 $packArgs = @(
     "pack",

@@ -15,6 +15,10 @@ public class FileLoggerProviderTests : IDisposable
     public void Dispose()
     {
         try { File.Delete(_logPath); } catch { }
+        foreach (var path in Directory.EnumerateFiles(Path.GetDirectoryName(_logPath)!, $"{Path.GetFileNameWithoutExtension(_logPath)}.*.log"))
+        {
+            try { File.Delete(path); } catch { }
+        }
     }
 
     [Fact]
@@ -69,7 +73,7 @@ public class FileLoggerProviderTests : IDisposable
     }
 
     [Fact]
-    public void Logger_OverwritesPreviousLogOnNewSession()
+    public void Logger_ArchivesPreviousLogOnNewSession()
     {
         // First session
         using (var provider = new FileLoggerProvider(_logPath))
@@ -78,7 +82,7 @@ public class FileLoggerProviderTests : IDisposable
             logger.LogInformation("first session message");
         }
 
-        // Second session — should overwrite
+        // Second session archives the previous active log and starts a fresh one.
         using (var provider = new FileLoggerProvider(_logPath))
         {
             var logger = provider.CreateLogger("Session2");
@@ -88,6 +92,30 @@ public class FileLoggerProviderTests : IDisposable
         var content = File.ReadAllText(_logPath);
         Assert.DoesNotContain("first session message", content);
         Assert.Contains("second session message", content);
+
+        var archivePath = Assert.Single(Directory.EnumerateFiles(
+            Path.GetDirectoryName(_logPath)!,
+            $"{Path.GetFileNameWithoutExtension(_logPath)}.*.log"));
+        var archiveContent = File.ReadAllText(archivePath);
+        Assert.Contains("first session message", archiveContent);
+    }
+
+    [Fact]
+    public void Logger_RetainsOnlyRecentArchives()
+    {
+        for (var i = 0; i < 7; i++)
+        {
+            using var provider = new FileLoggerProvider(_logPath);
+            var logger = provider.CreateLogger($"Session{i}");
+            logger.LogInformation("session {Index}", i);
+            Thread.Sleep(5);
+        }
+
+        var archives = Directory.EnumerateFiles(
+            Path.GetDirectoryName(_logPath)!,
+            $"{Path.GetFileNameWithoutExtension(_logPath)}.*.log");
+
+        Assert.Equal(5, archives.Count());
     }
 
     [Fact]

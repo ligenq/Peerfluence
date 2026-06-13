@@ -40,6 +40,7 @@ public sealed class JsonAppSettingsStore : IAppSettingsStore
         }
         catch (JsonException)
         {
+            PreserveInvalidSettingsFile();
             return null;
         }
     }
@@ -55,5 +56,32 @@ public sealed class JsonAppSettingsStore : IAppSettingsStore
             AppSettingsJsonContext.Default.AppSettings,
             cancellationToken).ConfigureAwait(false);
     }
-}
 
+    private void PreserveInvalidSettingsFile()
+    {
+        var path = _paths.SettingsFilePath;
+        if (!_fileSystem.File.Exists(path))
+        {
+            return;
+        }
+
+        var directory = _fileSystem.Path.GetDirectoryName(path);
+        var fileName = _fileSystem.Path.GetFileNameWithoutExtension(path);
+        var extension = _fileSystem.Path.GetExtension(path);
+        var timestamp = DateTimeOffset.Now.ToString("yyyyMMdd-HHmmss-fff");
+        var backupPath = _fileSystem.Path.Combine(
+            directory ?? string.Empty,
+            $"{fileName}.invalid-{timestamp}{extension}");
+
+        try
+        {
+            _fileSystem.File.Copy(path, backupPath, overwrite: false);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
+}
