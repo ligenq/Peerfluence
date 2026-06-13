@@ -24,7 +24,7 @@ From the repo root:
 .\ReleasePackaging\build-velopack.ps1 -Version 1.0.0
 ```
 
-The script publishes Peerfluence for `win-x64`, then runs `vpk pack`.
+The script publishes Peerfluence for `win-x64`, removes symbol files from the package input, runs a short smoke test against the published executable, then runs `vpk pack`.
 
 Output is written to:
 
@@ -86,6 +86,18 @@ Generate an MSI bootstrapper as well:
 ```
 
 Choose the MSI if a pre-install notice/license page must be shown. Choose the one-click setup exe when the priority is a fast, Chrome-like installation experience.
+
+Keep PDB/debug symbol files in the package input:
+
+```powershell
+.\ReleasePackaging\build-velopack.ps1 -Version 1.0.1 -IncludeSymbols
+```
+
+Skip the published executable smoke test, for example in a non-interactive build environment:
+
+```powershell
+.\ReleasePackaging\build-velopack.ps1 -Version 1.0.1 -SkipSmokeTest
+```
 
 ## Signing
 

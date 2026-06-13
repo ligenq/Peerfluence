@@ -28,10 +28,4 @@
     <ProjectReference Include="..\Peerfluence.Core\Peerfluence.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="SukiUI">
-      <HintPath>..\Libraries\SukiUI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
