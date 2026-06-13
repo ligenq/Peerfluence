@@ -43,8 +43,8 @@ public class PieceMapControlTests
     {
         var control = new PieceMapControl
         {
-            Bitfield = new byte[] { 0xFF, 0x0F },
-            Availability = new int[] { 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0 },
+            Bitfield = [0xFF, 0x0F],
+            Availability = [3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0],
             PieceCount = 16,
             Width = 200,
             Height = 50
@@ -78,7 +78,7 @@ public class PieceMapControlTests
     {
         var control = new PieceMapControl
         {
-            Bitfield = new byte[] { 0xFF },
+            Bitfield = [0xFF],
             PieceCount = 0,
             Width = 200,
             Height = 50

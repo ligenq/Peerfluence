@@ -120,7 +120,7 @@ public class McpToolHandlerTests
         torrent.Hash.Returns(infoHash);
         torrent.State.Returns(TorrentState.Active, TorrentState.Stopped);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var handler = new McpToolHandler(
             torrentService,
@@ -147,7 +147,7 @@ public class McpToolHandlerTests
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var handler = new McpToolHandler(
             torrentService,
@@ -170,7 +170,7 @@ public class McpToolHandlerTests
         torrent.Hash.Returns(infoHash);
         torrent.State.Returns(TorrentState.Active);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var handler = new McpToolHandler(
             torrentService,
@@ -193,7 +193,7 @@ public class McpToolHandlerTests
         torrent.Hash.Returns(infoHash);
         torrent.State.Returns(TorrentState.Stopped);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var handler = new McpToolHandler(
             torrentService,
@@ -234,7 +234,7 @@ public class McpToolHandlerTests
         torrent.FileCount.Returns(3);
 
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var handler = new McpToolHandler(
             torrentService,
@@ -266,10 +266,10 @@ public class McpToolHandlerTests
 
         var peerCollection = Substitute.For<IPeers>();
         peerCollection.GetConnectedPeers().Returns(peers);
-        peerCollection.GetPieceAvailability().Returns(new[] { 0, 1, 1 });
+        peerCollection.GetPieceAvailability().Returns([0, 1, 1]);
 
         var trackers = Substitute.For<ITrackers>();
-        trackers.GetTrackers().Returns(new[] { tracker });
+        trackers.GetTrackers().Returns([tracker]);
 
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
@@ -280,7 +280,7 @@ public class McpToolHandlerTests
         torrent.Trackers.Returns(trackers);
 
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var handler = new McpToolHandler(
             torrentService,

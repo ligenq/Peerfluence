@@ -397,7 +397,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     private static IReadOnlyList<string> ParseTrackers(string value)
     {
         return value
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
     }

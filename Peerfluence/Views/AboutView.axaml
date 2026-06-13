@@ -9,6 +9,10 @@
     <StackPanel Spacing="{StaticResource SpacingStandard}" MaxWidth="600">
         <TextBlock Text="{m:L About_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"/>
         <TextBlock Text="{m:L App_Tagline}" Opacity="0.7"/>
+        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.7"/>
+            <TextBlock Text="{Binding ApplicationVersion}" Opacity="0.7"/>
+        </StackPanel>
 
         <Separator Background="{DynamicResource SukiBorderBrush}"/>
 

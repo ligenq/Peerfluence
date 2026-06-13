@@ -100,7 +100,7 @@ public sealed class TorrentCompletionActionHostedServiceTests
     {
         var result = CompletionActionRunner.SplitArguments("--path \"C:\\Downloads\\Ubuntu ISO\" --flag");
 
-        Assert.Equal(new[] { "--path", "C:\\Downloads\\Ubuntu ISO", "--flag" }, result);
+        Assert.Equal(["--path", "C:\\Downloads\\Ubuntu ISO", "--flag"], result);
     }
 
     private static ITorrent CreateTorrent(string name)
@@ -109,13 +109,13 @@ public sealed class TorrentCompletionActionHostedServiceTests
         var files = Substitute.For<IFiles>();
         files.DownloadPath.Returns("C:\\Downloads\\Ubuntu");
         torrent.Name.Returns(name);
-        torrent.Hash.Returns(new InfoHash(new byte[]
-        {
+        torrent.Hash.Returns(new InfoHash(
+        [
             1, 2, 3, 4, 5,
             6, 7, 8, 9, 10,
             11, 12, 13, 14, 15,
             16, 17, 18, 19, 20
-        }));
+        ]));
         torrent.Files.Returns(files);
         torrent.TotalSize.Returns(1234);
         return torrent;

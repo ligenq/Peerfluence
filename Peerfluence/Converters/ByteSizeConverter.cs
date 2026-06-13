@@ -67,7 +67,7 @@ public sealed class ByteSizeConverter : IValueConverter
 
     private static string FormatBytes(double bytes)
     {
-        string[] units = new[] { "B", "KB", "MB", "GB", "TB" };
+        string[] units = ["B", "KB", "MB", "GB", "TB"];
         var unitIndex = 0;
         var absBytes = Math.Abs(bytes);
 

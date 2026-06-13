@@ -59,7 +59,7 @@ public partial class CreateTorrentViewModel : ViewModelBase
     };
 
     private readonly uint[] _pieceSizeValues =
-    {
+    [
         256 * 1024,
         512 * 1024,
         1024 * 1024,
@@ -67,7 +67,7 @@ public partial class CreateTorrentViewModel : ViewModelBase
         4 * 1024 * 1024,
         8 * 1024 * 1024,
         16 * 1024 * 1024
-    };
+    ];
 
     [RelayCommand]
     private async Task BrowseSource()
@@ -122,13 +122,13 @@ public partial class CreateTorrentViewModel : ViewModelBase
         {
             Title = Properties.Resources.CreateTorrent_SaveTorrentFile,
             DefaultExtension = "torrent",
-            FileTypeChoices = new[]
-            {
+            FileTypeChoices =
+            [
                 new FilePickerFileType(Properties.Resources.CreateTorrent_TorrentFileType)
                 {
-                    Patterns = new[] { "*.torrent" }
+                    Patterns = ["*.torrent"]
                 }
-            }
+            ]
         });
 
         if (file == null) return;
@@ -161,7 +161,7 @@ public partial class CreateTorrentViewModel : ViewModelBase
             }
 
             var trackers = Trackers
-                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
                 .Select(tracker => tracker.Trim())
                 .Where(tracker => tracker.Length > 0)
                 .ToArray();
@@ -171,7 +171,7 @@ public partial class CreateTorrentViewModel : ViewModelBase
             }
 
             var webSeeds = WebSeeds
-                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
                 .Select(url => url.Trim())
                 .Where(url => url.Length > 0)
                 .ToArray();

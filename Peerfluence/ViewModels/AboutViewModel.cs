@@ -31,6 +31,8 @@ public sealed class AboutViewModel : ViewModelBase
 
     public string GitHubUrl => RepositoryUrl;
 
+    public string ApplicationVersion => ApplicationVersionInfo.Version;
+
     public IRelayCommand OpenGitHubCommand { get; }
 
     private void OpenGitHub()

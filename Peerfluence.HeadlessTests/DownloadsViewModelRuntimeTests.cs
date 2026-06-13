@@ -18,7 +18,7 @@ public sealed class DownloadsViewModelRuntimeTests
         torrent.HashV2.Returns(new PeerSharp.Core.InfoHash(new byte[32]));
 
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
         torrentService.GetStats().Returns(new EngineStats());
 
         var vm = CreateViewModel(torrentService);

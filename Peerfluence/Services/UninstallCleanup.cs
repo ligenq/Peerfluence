@@ -24,12 +24,12 @@ internal static class UninstallCleanup
 
     internal static IReadOnlyList<string> GetTraceDirectories()
     {
-        return new[]
-        {
+        return
+        [
             Path.Combine(GetSpecialFolder(Environment.SpecialFolder.LocalApplicationData), "Peerfluence"),
             Path.Combine(GetSpecialFolder(Environment.SpecialFolder.ApplicationData), "Peerfluence"),
             Path.Combine(Path.GetTempPath(), "Peerfluence")
-        };
+        ];
     }
 
     internal static void DeleteDirectories(IEnumerable<string> directories)

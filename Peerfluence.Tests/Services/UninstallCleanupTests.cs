@@ -44,7 +44,7 @@ public sealed class UninstallCleanupTests : IDisposable
         File.WriteAllText(Path.Combine(roamingTrace, "crash.log"), "crash");
         File.WriteAllText(Path.Combine(downloadDirectory, "download.bin"), "download");
 
-        UninstallCleanup.DeleteDirectories(new[] { localTrace, roamingTrace });
+        UninstallCleanup.DeleteDirectories([localTrace, roamingTrace]);
 
         Assert.False(Directory.Exists(localTrace));
         Assert.False(Directory.Exists(roamingTrace));

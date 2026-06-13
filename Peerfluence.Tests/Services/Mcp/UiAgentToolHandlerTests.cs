@@ -14,7 +14,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.25f, TorrentState.Active);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var selectionService = Substitute.For<ITorrentSelectionService>();
         selectionService.SelectedTorrent.Returns(torrent);
@@ -38,7 +38,7 @@ public sealed class UiAgentToolHandlerTests
     public async Task LoadTorrentFileAsync_LoadsTorrentAndSelectsIt()
     {
         var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.torrent");
-        await File.WriteAllBytesAsync(tempPath, new byte[] { 1, 2, 3 }, TestContext.Current.CancellationToken);
+        await File.WriteAllBytesAsync(tempPath, [1, 2, 3], TestContext.Current.CancellationToken);
 
         try
         {
@@ -75,7 +75,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.5f, TorrentState.Active);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var selectionService = Substitute.For<ITorrentSelectionService>();
         var sut = new UiAgentToolHandler(
@@ -96,7 +96,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.5f, TorrentState.Stopped);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var selectionService = Substitute.For<ITorrentSelectionService>();
         var sut = new UiAgentToolHandler(
@@ -117,7 +117,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.5f, TorrentState.Active);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var selectionService = Substitute.For<ITorrentSelectionService>();
         var sut = new UiAgentToolHandler(
@@ -138,7 +138,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.12f, TorrentState.Stopped);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var sut = new UiAgentToolHandler(
             torrentService,
@@ -187,7 +187,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.12f, TorrentState.Active);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
 
         var sut = new UiAgentToolHandler(
             torrentService,
@@ -211,7 +211,7 @@ public sealed class UiAgentToolHandlerTests
     {
         var torrent = CreateTorrent("Ubuntu", 0.5f, TorrentState.Stopped);
         var torrentService = Substitute.For<ITorrentService>();
-        torrentService.GetTorrents().Returns(new[] { torrent });
+        torrentService.GetTorrents().Returns([torrent]);
         var selectionService = Substitute.For<ITorrentSelectionService>();
 
         var sut = new UiAgentToolHandler(
