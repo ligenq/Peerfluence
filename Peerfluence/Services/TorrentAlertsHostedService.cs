@@ -60,9 +60,15 @@ public sealed class TorrentAlertsHostedService : IHostedService
 
     private async Task MonitorAlertsAsync(CancellationToken cancellationToken)
     {
-        await foreach (var alert in _torrentService.GetAlertsAsync(cancellationToken: cancellationToken).ConfigureAwait(false))
+        try
         {
-            _torrentService.PublishAlert(alert);
+            await foreach (var alert in _torrentService.GetAlertsAsync(cancellationToken: cancellationToken).ConfigureAwait(false))
+            {
+                _torrentService.PublishAlert(alert);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
         }
     }
 }

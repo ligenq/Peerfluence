@@ -23,7 +23,18 @@ public sealed class TorrentService : ITorrentService
 
     public EngineStats GetStats()
     {
-        return _engineService.Engine.GetStats();
+        try
+        {
+            return _engineService.Engine.GetStats();
+        }
+        catch (ObjectDisposedException)
+        {
+            return new EngineStats();
+        }
+        catch (InvalidOperationException)
+        {
+            return new EngineStats();
+        }
     }
 
     public async Task<ITorrent> AddMagnetAsync(string magnetUri, AddTorrentOptions? options = null, CancellationToken cancellationToken = default)

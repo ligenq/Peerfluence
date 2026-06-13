@@ -13,11 +13,11 @@ namespace Peerfluence.Services;
 
 public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 {
-    private const string MutexId = @"Global\Peerfluence-2C7F3A9D-5B8E-4F1A-9C3D-7E6F8A2B4C5D";
+    private const string LockId = @"Global\Peerfluence-2C7F3A9D-5B8E-4F1A-9C3D-7E6F8A2B4C5D";
     private const string PipeName = "Peerfluence-SingleInstance-2C7F3A9D";
 
     private readonly ILogger<SingleInstanceService> _logger;
-    private Mutex? _mutex;
+    private Semaphore? _semaphore;
     private bool _hasHandle;
     private CancellationTokenSource? _listenerCts;
 
@@ -28,24 +28,15 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 
     public bool TryAcquireSingleInstanceLock()
     {
-        if (_mutex != null)
+        if (_semaphore != null)
         {
             return _hasHandle;
         }
 
         try
         {
-            _mutex = new Mutex(false, MutexId);
-
-            try
-            {
-                _hasHandle = _mutex.WaitOne(0, false);
-            }
-            catch (AbandonedMutexException)
-            {
-                _hasHandle = true;
-                _logger.LogWarning("SingleInstance mutex was abandoned by a previous instance.");
-            }
+            _semaphore = new Semaphore(1, 1, LockId);
+            _hasHandle = _semaphore.WaitOne(0);
 
             if (_hasHandle)
             {
@@ -95,11 +86,11 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         _listenerCts?.Dispose();
         _listenerCts = null;
 
-        if (_hasHandle && _mutex != null)
+        if (_hasHandle && _semaphore != null)
         {
             try
             {
-                _mutex.ReleaseMutex();
+                _semaphore.Release();
                 _hasHandle = false;
                 _logger.LogInformation("Single instance lock released.");
             }
@@ -113,8 +104,8 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
     public void Dispose()
     {
         ReleaseLock();
-        _mutex?.Dispose();
-        _mutex = null;
+        _semaphore?.Dispose();
+        _semaphore = null;
     }
 
     private async Task ListenForActivationAsync(CancellationToken ct)

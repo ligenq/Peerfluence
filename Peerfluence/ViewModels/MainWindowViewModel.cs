@@ -16,7 +16,7 @@ using SukiUI.Toasts;
 namespace Peerfluence.ViewModels;
 
 [SingletonService]
-public sealed class MainWindowViewModel : ViewModelBase
+public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IAppSettingsService _settingsService;
     private readonly IUpdateService _updateService;
@@ -24,6 +24,7 @@ public sealed class MainWindowViewModel : ViewModelBase
     private readonly AboutViewModel _aboutViewModel;
     private readonly List<NavigationItem> _featureItems = new();
     private bool _startupUpdateCheckStarted;
+    private bool _disposed;
 
     public MainWindowViewModel(
         IEnumerable<IFeatureViewModel> features,
@@ -202,5 +203,17 @@ public sealed class MainWindowViewModel : ViewModelBase
             .TryShowAsync();
 
         return result.Task.IsCompletedSuccessfully && result.Task.Result;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        DownloadsViewModel?.Dispose();
     }
 }
