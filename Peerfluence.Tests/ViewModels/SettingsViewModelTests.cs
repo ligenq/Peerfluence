@@ -109,6 +109,21 @@ public class SettingsViewModelTests
         Assert.Contains("uk-UA", _sut.Languages);
     }
 
+    [Fact]
+    public void LanguageOptions_DisplayNativeNamesWithCultureCodes()
+    {
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "en-US" && option.DisplayName == "English (en-US)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "sv-SE" && option.DisplayName == "Svenska (sv-SE)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "es-ES" && option.DisplayName == "Español (es-ES)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "de-DE" && option.DisplayName == "Deutsch (de-DE)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "fr-FR" && option.DisplayName == "Français (fr-FR)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "pl-PL" && option.DisplayName == "Polski (pl-PL)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "it-IT" && option.DisplayName == "Italiano (it-IT)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "pt-PT" && option.DisplayName == "Português (pt-PT)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "ru-RU" && option.DisplayName == "Русский (ru-RU)");
+        Assert.Contains(_sut.LanguageOptions, option => option.Value == "uk-UA" && option.DisplayName == "Українська (uk-UA)");
+    }
+
     [Theory]
     [InlineData("sv-SE", "Språk")]
     [InlineData("es-ES", "Idioma")]
@@ -303,5 +318,32 @@ public class SettingsViewModelTests
         Assert.Equal(60, _settingsService.Current.CompletionAction.TimeoutSeconds);
         Assert.Equal(Properties.Resources.Status_SettingsSaved, _sut.StatusMessage);
         _windowsAssociationService.Received(1).ApplyAssociations(true, true);
+    }
+
+    [Fact]
+    public async Task SaveCommand_WhenLanguageChanges_PreservesOptionSelections()
+    {
+        try
+        {
+            _sut.SelectedThemeVariant = "Dark";
+            _sut.SelectedColorTheme = "Emerald";
+            _sut.SelectedBackgroundStyle = "Flat";
+            _sut.SelectedEncryptionMode = "Require";
+            _sut.SelectedProxyType = "Socks5";
+            _sut.SelectedLanguage = "sv-SE";
+
+            await _sut.SaveCommand.ExecuteAsync(null);
+
+            Assert.Equal("Dark", _sut.SelectedThemeVariant);
+            Assert.Equal("Emerald", _sut.SelectedColorTheme);
+            Assert.Equal("Flat", _sut.SelectedBackgroundStyle);
+            Assert.Equal("Require", _sut.SelectedEncryptionMode);
+            Assert.Equal("Socks5", _sut.SelectedProxyType);
+            Assert.Equal("sv-SE", _sut.SelectedLanguage);
+        }
+        finally
+        {
+            _localizationService.Apply("en-US");
+        }
     }
 }
