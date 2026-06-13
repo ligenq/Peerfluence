@@ -17,6 +17,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private readonly ITorrentEngineService _engineService;
     private readonly IUpdateService _updateService;
     private readonly IWindowsAssociationService _windowsAssociationService;
+    private IReadOnlyList<SettingsOption> _themeVariantOptions = CreateThemeVariantOptions();
+    private IReadOnlyList<SettingsOption> _colorThemeOptions = CreateColorThemeOptions();
+    private IReadOnlyList<SettingsOption> _backgroundStyleOptions = CreateBackgroundStyleOptions();
+    private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
+    private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
 
     public SettingsViewModel(
         IAppSettingsService settingsService,
@@ -353,58 +358,59 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IReadOnlyList<string> ThemeVariants { get; } = new[] { "System", "Light", "Dark" };
 
-    public IReadOnlyList<SettingsOption> ThemeVariantOptions => new[]
+    public IReadOnlyList<SettingsOption> ThemeVariantOptions
     {
-        new SettingsOption("System", Properties.Resources.Settings_ThemeVariant_System),
-        new SettingsOption("Light", Properties.Resources.Settings_ThemeVariant_Light),
-        new SettingsOption("Dark", Properties.Resources.Settings_ThemeVariant_Dark)
-    };
+        get => _themeVariantOptions;
+        private set => SetProperty(ref _themeVariantOptions, value);
+    }
 
     public IReadOnlyList<string> ColorThemes { get; } = new[] { "Indigo", "Cobalt", "Mint", "Emerald", "Rose", "Vibrant", "Amber", "Slate", "Solar" };
 
-    public IReadOnlyList<SettingsOption> ColorThemeOptions => new[]
+    public IReadOnlyList<SettingsOption> ColorThemeOptions
     {
-        new SettingsOption("Indigo", Properties.Resources.Settings_ColorTheme_Indigo),
-        new SettingsOption("Cobalt", Properties.Resources.Settings_ColorTheme_Cobalt),
-        new SettingsOption("Mint", Properties.Resources.Settings_ColorTheme_Mint),
-        new SettingsOption("Emerald", Properties.Resources.Settings_ColorTheme_Emerald),
-        new SettingsOption("Rose", Properties.Resources.Settings_ColorTheme_Rose),
-        new SettingsOption("Vibrant", Properties.Resources.Settings_ColorTheme_Vibrant),
-        new SettingsOption("Amber", Properties.Resources.Settings_ColorTheme_Amber),
-        new SettingsOption("Slate", Properties.Resources.Settings_ColorTheme_Slate),
-        new SettingsOption("Solar", Properties.Resources.Settings_ColorTheme_Solar)
-    };
+        get => _colorThemeOptions;
+        private set => SetProperty(ref _colorThemeOptions, value);
+    }
 
     public IReadOnlyList<string> BackgroundStyles { get; } = new[] { "GradientSoft", "Gradient", "GradientDarker", "Flat", "Bubble" };
 
-    public IReadOnlyList<SettingsOption> BackgroundStyleOptions => new[]
+    public IReadOnlyList<SettingsOption> BackgroundStyleOptions
     {
-        new SettingsOption("GradientSoft", Properties.Resources.Settings_BackgroundStyle_GradientSoft),
-        new SettingsOption("Gradient", Properties.Resources.Settings_BackgroundStyle_Gradient),
-        new SettingsOption("GradientDarker", Properties.Resources.Settings_BackgroundStyle_GradientDarker),
-        new SettingsOption("Flat", Properties.Resources.Settings_BackgroundStyle_Flat),
-        new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
+        get => _backgroundStyleOptions;
+        private set => SetProperty(ref _backgroundStyleOptions, value);
+    }
+
+    public IReadOnlyList<SettingsOption> LanguageOptions { get; } = new[]
+    {
+        new SettingsOption("en-US", "English (en-US)"),
+        new SettingsOption("sv-SE", "Svenska (sv-SE)"),
+        new SettingsOption("es-ES", "Español (es-ES)"),
+        new SettingsOption("de-DE", "Deutsch (de-DE)"),
+        new SettingsOption("fr-FR", "Français (fr-FR)"),
+        new SettingsOption("pl-PL", "Polski (pl-PL)"),
+        new SettingsOption("it-IT", "Italiano (it-IT)"),
+        new SettingsOption("pt-PT", "Português (pt-PT)"),
+        new SettingsOption("ru-RU", "Русский (ru-RU)"),
+        new SettingsOption("uk-UA", "Українська (uk-UA)")
     };
 
-    public IReadOnlyList<string> Languages { get; } = new[] { "en-US", "sv-SE", "es-ES", "de-DE", "fr-FR", "pl-PL", "it-IT", "pt-PT", "ru-RU", "uk-UA" };
+    public IReadOnlyList<string> Languages => LanguageOptions.Select(option => option.Value).ToArray();
 
     public IReadOnlyList<string> EncryptionModes { get; } = new[] { "Allow", "Require", "Refuse" };
 
-    public IReadOnlyList<SettingsOption> EncryptionModeOptions => new[]
+    public IReadOnlyList<SettingsOption> EncryptionModeOptions
     {
-        new SettingsOption("Allow", Properties.Resources.Settings_EncryptionMode_Allow),
-        new SettingsOption("Require", Properties.Resources.Settings_EncryptionMode_Require),
-        new SettingsOption("Refuse", Properties.Resources.Settings_EncryptionMode_Refuse)
-    };
+        get => _encryptionModeOptions;
+        private set => SetProperty(ref _encryptionModeOptions, value);
+    }
 
     public IReadOnlyList<string> ProxyTypes { get; } = new[] { "None", "Socks5", "Http" };
 
-    public IReadOnlyList<SettingsOption> ProxyTypeOptions => new[]
+    public IReadOnlyList<SettingsOption> ProxyTypeOptions
     {
-        new SettingsOption("None", Properties.Resources.Settings_ProxyType_None),
-        new SettingsOption("Socks5", Properties.Resources.Settings_ProxyType_Socks5),
-        new SettingsOption("Http", Properties.Resources.Settings_ProxyType_Http)
-    };
+        get => _proxyTypeOptions;
+        private set => SetProperty(ref _proxyTypeOptions, value);
+    }
 
     public IAsyncRelayCommand SaveCommand { get; }
 
@@ -672,16 +678,91 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private void NotifyLocalizedOptionsChanged()
     {
-        OnPropertyChanged(nameof(ThemeVariantOptions));
-        OnPropertyChanged(nameof(ColorThemeOptions));
-        OnPropertyChanged(nameof(BackgroundStyleOptions));
-        OnPropertyChanged(nameof(EncryptionModeOptions));
-        OnPropertyChanged(nameof(ProxyTypeOptions));
+        var selectedThemeVariant = SelectedThemeVariant;
+        var selectedColorTheme = SelectedColorTheme;
+        var selectedBackgroundStyle = SelectedBackgroundStyle;
+        var selectedEncryptionMode = SelectedEncryptionMode;
+        var selectedProxyType = SelectedProxyType;
+
+        ThemeVariantOptions = CreateThemeVariantOptions();
+        ColorThemeOptions = CreateColorThemeOptions();
+        BackgroundStyleOptions = CreateBackgroundStyleOptions();
+        EncryptionModeOptions = CreateEncryptionModeOptions();
+        ProxyTypeOptions = CreateProxyTypeOptions();
+
+        SelectedThemeVariant = selectedThemeVariant;
+        SelectedColorTheme = selectedColorTheme;
+        SelectedBackgroundStyle = selectedBackgroundStyle;
+        SelectedEncryptionMode = selectedEncryptionMode;
+        SelectedProxyType = selectedProxyType;
+        OnPropertyChanged(nameof(SelectedThemeVariant));
+        OnPropertyChanged(nameof(SelectedColorTheme));
+        OnPropertyChanged(nameof(SelectedBackgroundStyle));
+        OnPropertyChanged(nameof(SelectedEncryptionMode));
+        OnPropertyChanged(nameof(SelectedProxyType));
         OnPropertyChanged(nameof(UpdateManagementMessage));
         foreach (var status in PortMappingStatuses)
         {
             status.RefreshLocalizedText();
         }
+    }
+
+    private static IReadOnlyList<SettingsOption> CreateThemeVariantOptions()
+    {
+        return new[]
+        {
+            new SettingsOption("System", Properties.Resources.Settings_ThemeVariant_System),
+            new SettingsOption("Light", Properties.Resources.Settings_ThemeVariant_Light),
+            new SettingsOption("Dark", Properties.Resources.Settings_ThemeVariant_Dark)
+        };
+    }
+
+    private static IReadOnlyList<SettingsOption> CreateColorThemeOptions()
+    {
+        return new[]
+        {
+            new SettingsOption("Indigo", Properties.Resources.Settings_ColorTheme_Indigo),
+            new SettingsOption("Cobalt", Properties.Resources.Settings_ColorTheme_Cobalt),
+            new SettingsOption("Mint", Properties.Resources.Settings_ColorTheme_Mint),
+            new SettingsOption("Emerald", Properties.Resources.Settings_ColorTheme_Emerald),
+            new SettingsOption("Rose", Properties.Resources.Settings_ColorTheme_Rose),
+            new SettingsOption("Vibrant", Properties.Resources.Settings_ColorTheme_Vibrant),
+            new SettingsOption("Amber", Properties.Resources.Settings_ColorTheme_Amber),
+            new SettingsOption("Slate", Properties.Resources.Settings_ColorTheme_Slate),
+            new SettingsOption("Solar", Properties.Resources.Settings_ColorTheme_Solar)
+        };
+    }
+
+    private static IReadOnlyList<SettingsOption> CreateBackgroundStyleOptions()
+    {
+        return new[]
+        {
+            new SettingsOption("GradientSoft", Properties.Resources.Settings_BackgroundStyle_GradientSoft),
+            new SettingsOption("Gradient", Properties.Resources.Settings_BackgroundStyle_Gradient),
+            new SettingsOption("GradientDarker", Properties.Resources.Settings_BackgroundStyle_GradientDarker),
+            new SettingsOption("Flat", Properties.Resources.Settings_BackgroundStyle_Flat),
+            new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
+        };
+    }
+
+    private static IReadOnlyList<SettingsOption> CreateEncryptionModeOptions()
+    {
+        return new[]
+        {
+            new SettingsOption("Allow", Properties.Resources.Settings_EncryptionMode_Allow),
+            new SettingsOption("Require", Properties.Resources.Settings_EncryptionMode_Require),
+            new SettingsOption("Refuse", Properties.Resources.Settings_EncryptionMode_Refuse)
+        };
+    }
+
+    private static IReadOnlyList<SettingsOption> CreateProxyTypeOptions()
+    {
+        return new[]
+        {
+            new SettingsOption("None", Properties.Resources.Settings_ProxyType_None),
+            new SettingsOption("Socks5", Properties.Resources.Settings_ProxyType_Socks5),
+            new SettingsOption("Http", Properties.Resources.Settings_ProxyType_Http)
+        };
     }
 
     private async Task BrowseBlocklistAsync()
