@@ -13,11 +13,18 @@ namespace Peerfluence.Services;
 
 public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 {
-    private const string LockId = @"Global\Peerfluence-2C7F3A9D-5B8E-4F1A-9C3D-7E6F8A2B4C5D";
     private const string PipeName = "Peerfluence-SingleInstance-2C7F3A9D";
 
+    // A machine-wide lock file. Holding an exclusive handle to it marks this
+    // process as the single instance. FileShare.None maps to native exclusive
+    // locking on Windows and an advisory flock() on Unix, and the OS releases the
+    // lock automatically if the process dies — so there is no stale-lock problem.
+    private static readonly string LockFilePath = Path.Combine(
+        Path.GetTempPath(),
+        "Peerfluence-2C7F3A9D-5B8E-4F1A-9C3D-7E6F8A2B4C5D.lock");
+
     private readonly ILogger<SingleInstanceService> _logger;
-    private Semaphore? _semaphore;
+    private FileStream? _lockFile;
     private bool _hasHandle;
     private CancellationTokenSource? _listenerCts;
 
@@ -28,31 +35,38 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 
     public bool TryAcquireSingleInstanceLock()
     {
-        if (_semaphore != null)
+        if (_lockFile != null)
         {
             return _hasHandle;
         }
 
         try
         {
-            _semaphore = new Semaphore(1, 1, LockId);
-            _hasHandle = _semaphore.WaitOne(0);
-
-            if (_hasHandle)
-            {
-                _logger.LogInformation("Single instance lock acquired.");
-            }
-            else
-            {
-                _logger.LogInformation("Another instance is already running. Single instance lock failed.");
-            }
-
-            return _hasHandle;
+            _lockFile = new FileStream(
+                LockFilePath,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite,
+                FileShare.None);
+            _hasHandle = true;
+            _logger.LogInformation("Single instance lock acquired.");
+            return true;
+        }
+        catch (IOException)
+        {
+            // The lock file is held exclusively by another instance.
+            _hasHandle = false;
+            _logger.LogInformation("Another instance is already running. Single instance lock failed.");
+            return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking for single instance.");
-            return false;
+            // The locking mechanism itself is unavailable (e.g. a permissions
+            // problem on the lock file). We cannot tell whether another instance is
+            // running, so fail open and launch as the sole instance rather than
+            // silently refusing to start.
+            _hasHandle = false;
+            _logger.LogError(ex, "Error checking for single instance. Proceeding as sole instance.");
+            return true;
         }
     }
 
@@ -86,11 +100,12 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         _listenerCts?.Dispose();
         _listenerCts = null;
 
-        if (_hasHandle && _semaphore != null)
+        if (_hasHandle && _lockFile != null)
         {
             try
             {
-                _semaphore.Release();
+                _lockFile.Dispose();
+                _lockFile = null;
                 _hasHandle = false;
                 _logger.LogInformation("Single instance lock released.");
             }
@@ -104,8 +119,8 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
     public void Dispose()
     {
         ReleaseLock();
-        _semaphore?.Dispose();
-        _semaphore = null;
+        _lockFile?.Dispose();
+        _lockFile = null;
     }
 
     private async Task ListenForActivationAsync(CancellationToken ct)
