@@ -12,7 +12,7 @@
                  x:DataType="vm:MainWindowViewModel"
                  BackgroundStyle="GradientSoft"
                  BackgroundTransitionsEnabled="True"
-                 Icon="/Assets/application-icon.ico"
+                 Icon="/Assets/application-icon.png"
                  Title="{m:L App_Title}"
                  TransparencyLevelHint="None">
 

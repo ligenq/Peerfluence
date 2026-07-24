@@ -1,4 +1,30 @@
-# Velopack release packaging
+# Release packaging
+
+## Linux
+
+Linux packaging uses one AppDir staging layout to avoid duplicating application files
+between formats. On an x64 Linux host, run:
+
+```bash
+./ReleasePackaging/build-linux.sh --version 1.0.0 --rid linux-x64
+```
+
+The script creates a self-contained single-file publish and produces:
+
+- `Peerfluence-1.0.0-linux-x64.tar.gz`, a portable AppDir archive;
+- `Peerfluence-1.0.0-linux-x64.deb`, a Debian/Ubuntu package;
+- optionally, `Peerfluence-1.0.0-linux-x64.AppImage` when `--appimage` is passed and
+  `appimagetool` is already available on `PATH`.
+
+Use `linux-arm64` to create ARM64 packages. The Debian package installs the application
+under `/opt/peerfluence`, exposes `/usr/bin/peerfluence`, and installs its desktop entry,
+AppStream metadata, and icon. The desktop entry declares `.torrent` and `magnet:` support;
+the desktop environment may still ask the user before making Peerfluence the default.
+
+`appimagetool` is deliberately not downloaded by the script. CI or release builders can
+pin and verify their preferred AppImageKit build, put it on `PATH`, and pass `--appimage`.
+
+## Windows
 
 Peerfluence uses Velopack for direct-download installation and updates.
 

@@ -8,6 +8,7 @@
             "args": [
                 "build",
                 "${workspaceFolder}/Peerfluence/Peerfluence.csproj",
+                "/property:UseLocalPeerSharp=true",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],

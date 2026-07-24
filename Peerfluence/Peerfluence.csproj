@@ -3,17 +3,20 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<AssemblyName>Peerfluence</AssemblyName>
 		<Version>1.0.0</Version>
-		<ApplicationIcon>Assets\application-icon.ico</ApplicationIcon>
 		<PublishAot>true</PublishAot>
 		<IsTrimmable>true</IsTrimmable>
 		<TrimMode>link</TrimMode>
 		<StackTraceSupport>true</StackTraceSupport>
 		<InvariantGlobalization>false</InvariantGlobalization>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<ApplicationIcon>Assets\application-icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(PublishProfile)' != ''">
@@ -28,6 +31,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Peerfluence.Core\Peerfluence.Core.csproj" />
+		<ProjectReference Include="..\..\PeerSharp\src\PeerSharp\PeerSharp.csproj"
+		                  Condition="'$(UseLocalPeerSharp)' == 'true' and Exists('..\..\PeerSharp\src\PeerSharp\PeerSharp.csproj')" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -46,7 +51,8 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
 		<PackageReference Include="ModelContextProtocol" Version="1.4.1" />
-		<PackageReference Include="PeerSharp" Version="2.1.0" />
+		<PackageReference Include="PeerSharp" Version="2.1.0"
+		                  Condition="'$(UseLocalPeerSharp)' != 'true' or !Exists('..\..\PeerSharp\src\PeerSharp\PeerSharp.csproj')" />
 		<PackageReference Include="Velopack" Version="1.2.0" />
 	</ItemGroup>
 

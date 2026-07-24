@@ -7,4 +7,8 @@ public interface ITorrentEngineService : IAsyncDisposable
     IClientEngine Engine { get; }
 
     Task InitializeAsync(CancellationToken cancellationToken);
+
+    Task LoadOptionalDataAsync(CancellationToken cancellationToken);
+
+    Task ShutdownAsync(CancellationToken cancellationToken);
 }

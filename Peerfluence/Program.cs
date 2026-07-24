@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Logging;
+using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
 using Velopack;
 
@@ -19,6 +20,7 @@ internal sealed class Program
     [STAThread]
     public static async Task Main(string[] args)
     {
+        var startupTracker = new StartupTracker();
         var velopackApp = VelopackApp.Build();
         if (OperatingSystem.IsWindows())
         {
@@ -56,6 +58,7 @@ internal sealed class Program
                 EnableUiAgentTools = uiAgentMode,
                 SkipSingleInstanceLock = uiAgentMode
             }, appPaths);
+            builder.Services.AddSingleton(startupTracker);
 
             // 4. Build Host
             using var host = builder.Build();
@@ -71,6 +74,9 @@ internal sealed class Program
 
             // 6. Start Host (Background services, etc.)
             await host.StartAsync();
+            host.Services
+                .GetRequiredService<ILogger<Program>>()
+                .LogInformation("Application host started in {ElapsedMs} ms", startupTracker.ElapsedMilliseconds);
 
             // 7. Run Avalonia App (This is a blocking call)
             var appBuilder = BuildAvaloniaApp(host.Services);
@@ -81,7 +87,7 @@ internal sealed class Program
             // StartWithClassicDesktopLifetime returns, so any await that captures it
             // would deadlock.
             SynchronizationContext.SetSynchronizationContext(null);
-            await host.StopAsync(TimeSpan.FromSeconds(5));
+            await host.StopAsync(TimeSpan.FromSeconds(3));
         }
         catch (Exception ex)
         {
@@ -107,12 +113,14 @@ internal sealed class Program
 
     private static async Task RunMcpProxyAsync(string? profilePath)
     {
-        await using var pipe = new System.IO.Pipes.NamedPipeClientStream(".", "PeerfluenceMcpPipe", System.IO.Pipes.PipeDirection.InOut, System.IO.Pipes.PipeOptions.Asynchronous);
+        var appPaths = new AppPaths(profilePath);
+        var pipeName = ProfileIpcNames.GetMcpPipeName(appPaths);
+        await using var pipe = new System.IO.Pipes.NamedPipeClientStream(".", pipeName, System.IO.Pipes.PipeDirection.InOut, System.IO.Pipes.PipeOptions.Asynchronous);
         try
         {
             await pipe.ConnectAsync(5000);
         }
-        catch (TimeoutException)
+        catch (Exception ex) when (ex is TimeoutException or IOException or System.Net.Sockets.SocketException)
         {
             Console.Error.WriteLine("Failed to connect to Peerfluence MCP server. Is Peerfluence running?");
             return;
@@ -121,7 +129,7 @@ internal sealed class Program
         await using var stdIn = Console.OpenStandardInput();
         await using var stdOut = Console.OpenStandardOutput();
 
-        var tokenPath = McpServerHostedService.GetTokenPath(new AppPaths(profilePath));
+        var tokenPath = McpServerHostedService.GetTokenPath(appPaths);
         if (!File.Exists(tokenPath))
         {
             Console.Error.WriteLine("Failed to find Peerfluence MCP token. Is MCP enabled and is Peerfluence running?");

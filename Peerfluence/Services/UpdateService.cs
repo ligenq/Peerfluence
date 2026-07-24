@@ -48,7 +48,10 @@ public sealed class UpdateService : IUpdateService
     {
         get
         {
-            if (_requireVelopackInstallLayout &&
+            // The explicit layout check protects Windows development builds from
+            // Velopack false positives. Other platforms use Velopack's native
+            // locator because their installed layouts are package-format specific.
+            if (_requireVelopackInstallLayout && OperatingSystem.IsWindows() &&
                 !VelopackInstallDetector.LooksInstalled(Environment.ProcessPath))
             {
                 return false;
@@ -268,7 +271,7 @@ public sealed class UpdateService : IUpdateService
     {
         public static bool LooksInstalled(string? executablePath)
         {
-            if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(executablePath))
+            if (string.IsNullOrWhiteSpace(executablePath))
             {
                 return false;
             }
@@ -292,4 +295,3 @@ public sealed class UpdateService : IUpdateService
         }
     }
 }
-

@@ -293,45 +293,63 @@ internal sealed class CompletionActionRunner : ICompletionActionRunner
         }
 
         var current = new StringBuilder();
-        var inQuotes = false;
+        char? quote = null;
+        var argumentStarted = false;
         for (var i = 0; i < arguments.Length; i++)
         {
             var c = arguments[i];
-            if (c == '\\' && i + 1 < arguments.Length && arguments[i + 1] == '"')
+            if (c == '\\' && i + 1 < arguments.Length &&
+                (arguments[i + 1] == '"' || arguments[i + 1] == '\''))
             {
-                current.Append('"');
+                current.Append(arguments[i + 1]);
+                argumentStarted = true;
                 i++;
                 continue;
             }
 
-            if (c == '"')
+            if (c is '"' or '\'')
             {
-                inQuotes = !inQuotes;
+                if (quote == null)
+                {
+                    quote = c;
+                    argumentStarted = true;
+                    continue;
+                }
+
+                if (quote == c)
+                {
+                    quote = null;
+                    continue;
+                }
+
+                current.Append(c);
                 continue;
             }
 
-            if (char.IsWhiteSpace(c) && !inQuotes)
+            if (char.IsWhiteSpace(c) && quote == null)
             {
-                AddCurrentArgument(result, current);
+                AddCurrentArgument(result, current, ref argumentStarted);
                 continue;
             }
 
             current.Append(c);
+            argumentStarted = true;
         }
 
-        AddCurrentArgument(result, current);
+        AddCurrentArgument(result, current, ref argumentStarted);
         return result;
     }
 
-    private static void AddCurrentArgument(ICollection<string> arguments, StringBuilder current)
+    private static void AddCurrentArgument(ICollection<string> arguments, StringBuilder current, ref bool argumentStarted)
     {
-        if (current.Length == 0)
+        if (!argumentStarted)
         {
             return;
         }
 
         arguments.Add(current.ToString());
         current.Clear();
+        argumentStarted = false;
     }
 
     private static void TryKill(Process process)

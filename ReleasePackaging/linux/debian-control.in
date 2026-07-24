@@ -1,0 +1,13 @@
+Package: peerfluence
+Version: @VERSION@
+Section: net
+Priority: optional
+Architecture: @ARCH@
+Installed-Size: @SIZE@
+Maintainer: ligenq <noreply@github.com>
+Depends: libx11-6, libice6, libsm6, libfontconfig1
+Homepage: https://github.com/ligenq/Peerfluence
+Description: Desktop BitTorrent client
+ Peerfluence is an Avalonia desktop BitTorrent client with torrent, magnet-link,
+ queue, streaming, and local automation support.
+

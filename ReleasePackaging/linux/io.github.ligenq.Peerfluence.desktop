@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Peerfluence
+Comment=Download and manage BitTorrent transfers
+Exec=peerfluence %U
+Icon=io.github.ligenq.Peerfluence
+Terminal=false
+Categories=Network;FileTransfer;P2P;
+MimeType=application/x-bittorrent;x-scheme-handler/magnet;
+StartupNotify=true
+StartupWMClass=Peerfluence
+

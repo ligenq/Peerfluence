@@ -103,6 +103,15 @@ public sealed class TorrentCompletionActionHostedServiceTests
         Assert.Equal(["--path", "C:\\Downloads\\Ubuntu ISO", "--flag"], result);
     }
 
+    [Theory]
+    [InlineData("--name 'Ubuntu ISO'", new[] { "--name", "Ubuntu ISO" })]
+    [InlineData("--empty \"\" tail", new[] { "--empty", "", "tail" })]
+    [InlineData("--value one\\\"two", new[] { "--value", "one\"two" })]
+    public void SplitArguments_HandlesPortableQuoting(string input, string[] expected)
+    {
+        Assert.Equal(expected, CompletionActionRunner.SplitArguments(input));
+    }
+
     private static ITorrent CreateTorrent(string name)
     {
         var torrent = Substitute.For<ITorrent>();

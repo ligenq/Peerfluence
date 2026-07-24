@@ -13,24 +13,22 @@ namespace Peerfluence.Services;
 
 public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 {
-    private const string PipeName = "Peerfluence-SingleInstance-2C7F3A9D";
-
-    // A machine-wide lock file. Holding an exclusive handle to it marks this
+    // A profile-scoped lock file. Holding an exclusive handle to it marks this
     // process as the single instance. FileShare.None maps to native exclusive
     // locking on Windows and an advisory flock() on Unix, and the OS releases the
     // lock automatically if the process dies — so there is no stale-lock problem.
-    private static readonly string LockFilePath = Path.Combine(
-        Path.GetTempPath(),
-        "Peerfluence-2C7F3A9D-5B8E-4F1A-9C3D-7E6F8A2B4C5D.lock");
-
     private readonly ILogger<SingleInstanceService> _logger;
+    private readonly string _pipeName;
+    private readonly string _lockFilePath;
     private FileStream? _lockFile;
     private bool _hasHandle;
     private CancellationTokenSource? _listenerCts;
 
-    public SingleInstanceService(ILogger<SingleInstanceService> logger)
+    public SingleInstanceService(ILogger<SingleInstanceService> logger, IAppPaths appPaths)
     {
         _logger = logger;
+        _pipeName = ProfileIpcNames.GetSingleInstancePipeName(appPaths);
+        _lockFilePath = ProfileIpcNames.GetLockFilePath(appPaths);
     }
 
     public bool TryAcquireSingleInstanceLock()
@@ -43,7 +41,7 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         try
         {
             _lockFile = new FileStream(
-                LockFilePath,
+                _lockFilePath,
                 FileMode.OpenOrCreate,
                 FileAccess.ReadWrite,
                 FileShare.None);
@@ -80,7 +78,7 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
     {
         try
         {
-            using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
+            using var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.Out);
             client.Connect(1000);
             using var writer = new StreamWriter(client);
             foreach (var argument in arguments ?? Array.Empty<string>())
@@ -130,7 +128,7 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
             try
             {
                 await using var server = new NamedPipeServerStream(
-                    PipeName, PipeDirection.In, 1,
+                    _pipeName, PipeDirection.In, 1,
                     PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
                 await server.WaitForConnectionAsync(ct);
@@ -172,4 +170,3 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         return arguments;
     }
 }
-

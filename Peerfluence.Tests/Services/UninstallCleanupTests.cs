@@ -17,12 +17,12 @@ public sealed class UninstallCleanupTests : IDisposable
     {
         var directories = UninstallCleanup.GetTraceDirectories();
 
-        Assert.Contains(directories, path => path.EndsWith(
-            Path.Combine("AppData", "Local", "Peerfluence"),
-            StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(directories, path => path.EndsWith(
-            Path.Combine("AppData", "Roaming", "Peerfluence"),
-            StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Peerfluence"), directories);
+        Assert.Contains(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Peerfluence"), directories);
         Assert.Contains(directories, path => path.EndsWith("Peerfluence", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(directories, path => path.Contains(
             Path.Combine("Downloads", "Peerfluence"),

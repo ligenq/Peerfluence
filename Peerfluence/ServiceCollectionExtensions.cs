@@ -101,10 +101,12 @@ public static class ServiceCollectionExtensions
     {
         // Registered in startup order
         services.AddHostedService<AppSettingsHostedService>();
-        services.AddHostedService<TorrentEngineHostedService>();
-        services.AddHostedService<TorrentAlertsHostedService>();
+        // Consumers subscribe before the engine restores torrents so no lifecycle
+        // notifications can race their registration.
         services.AddHostedService<TorrentNotificationHostedService>();
         services.AddHostedService<TorrentCompletionActionHostedService>();
+        services.AddHostedService<TorrentEngineHostedService>();
+        services.AddHostedService<TorrentAlertsHostedService>();
         services.AddHostedService<McpServerHostedService>();
         return services;
     }

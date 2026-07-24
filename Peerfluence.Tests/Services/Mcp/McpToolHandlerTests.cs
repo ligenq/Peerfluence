@@ -68,9 +68,10 @@ public class McpToolHandlerTests
             settingsService,
             Substitute.For<IHostApplicationLifetime>());
 
-        var result = await handler.UpdateSettingsAsync("""
+        var downloadPath = Path.Combine(Path.GetTempPath(), $"peerfluence-mcp-{Guid.NewGuid():N}");
+        var result = await handler.UpdateSettingsAsync($$"""
             {
-              "storage": { "downloadPath": "/nested/downloads" },
+              "storage": { "downloadPath": "{{downloadPath.Replace("\\", "\\\\", StringComparison.Ordinal)}}" },
               "network": { "enableDht": false },
               "update": { "updateUrl": "https://updates.example/feed" }
             }
@@ -78,7 +79,7 @@ public class McpToolHandlerTests
 
         Assert.False(result.IsError);
         Assert.Contains("Settings updated successfully", Text(result));
-        Assert.Equal("/nested/downloads", settingsService.Current.Storage.DownloadPath);
+        Assert.Equal(downloadPath, settingsService.Current.Storage.DownloadPath);
         Assert.False(settingsService.Current.Network.EnableDht);
         Assert.Equal("https://updates.example/feed", settingsService.Current.Update.UpdateUrl);
     }

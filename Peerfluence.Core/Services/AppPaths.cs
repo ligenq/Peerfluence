@@ -51,7 +51,55 @@ public sealed class AppPaths : IAppPaths
             return Path.Combine(appDataDirectory, "Downloads");
         }
 
-        return Path.Combine(userProfile, "Downloads", "Peerfluence");
+        var downloadsDirectory = OperatingSystem.IsLinux()
+            ? GetLinuxDownloadsDirectory(userProfile)
+            : Path.Combine(userProfile, "Downloads");
+
+        return Path.Combine(downloadsDirectory, "Peerfluence");
+    }
+
+    private static string GetLinuxDownloadsDirectory(string userProfile)
+    {
+        var configuredDirectory = Environment.GetEnvironmentVariable("XDG_DOWNLOAD_DIR");
+        if (string.IsNullOrWhiteSpace(configuredDirectory))
+        {
+            configuredDirectory = ReadXdgDownloadsDirectory(userProfile);
+        }
+
+        if (string.IsNullOrWhiteSpace(configuredDirectory))
+        {
+            return Path.Combine(userProfile, "Downloads");
+        }
+
+        var expanded = configuredDirectory
+            .Trim()
+            .Trim('"')
+            .Replace("$HOME", userProfile, StringComparison.Ordinal);
+        return Path.IsPathRooted(expanded)
+            ? Path.GetFullPath(expanded)
+            : Path.GetFullPath(expanded, userProfile);
+    }
+
+    private static string? ReadXdgDownloadsDirectory(string userProfile)
+    {
+        try
+        {
+            var configHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+            var configPath = string.IsNullOrWhiteSpace(configHome)
+                ? Path.Combine(userProfile, ".config", "user-dirs.dirs")
+                : Path.Combine(configHome, "user-dirs.dirs");
+
+            return File.ReadLines(configPath)
+                .FirstOrDefault(line => line.StartsWith("XDG_DOWNLOAD_DIR=", StringComparison.Ordinal))?
+                ["XDG_DOWNLOAD_DIR=".Length..];
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return null;
+        }
     }
 }
-

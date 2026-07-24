@@ -1,0 +1,104 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and test artifacts without creating a GitHub release"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' Peerfluence/Peerfluence.csproj | head -1)
+          test -n "$VERSION" || { echo "::error::Could not read project version"; exit 1; }
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Verify release ref and tag
+        if: ${{ !inputs.dry_run }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          test "$GITHUB_REF" = "refs/heads/main" || { echo "::error::Releases must run from main"; exit 1; }
+          git fetch --tags --quiet
+          ! git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null || { echo "::error::Tag v$VERSION already exists"; exit 1; }
+
+  test:
+    needs: prepare
+    uses: ./.github/workflows/ci.yml
+
+  linux:
+    needs: [prepare, test]
+    strategy:
+      fail-fast: false
+      matrix:
+        rid: [linux-x64, linux-arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build Linux packages
+        run: ./ReleasePackaging/build-linux.sh --version "${{ needs.prepare.outputs.version }}" --rid "${{ matrix.rid }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Peerfluence-${{ needs.prepare.outputs.version }}-${{ matrix.rid }}
+          path: |
+            artifacts/linux/${{ matrix.rid }}/*.tar.gz
+            artifacts/linux/${{ matrix.rid }}/*.deb
+
+  windows:
+    needs: [prepare, test]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+      - name: Build Windows release
+        shell: pwsh
+        run: ./ReleasePackaging/build-velopack.ps1 -Version "${{ needs.prepare.outputs.version }}" -CleanReleaseOutput
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Peerfluence-${{ needs.prepare.outputs.version }}-win-x64
+          path: artifacts/velopack/releases/win-x64/*
+
+  publish:
+    if: ${{ !inputs.dry_run }}
+    needs: [prepare, linux, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          pattern: Peerfluence-${{ needs.prepare.outputs.version }}-*
+          merge-multiple: true
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: gh release create "v$VERSION" release-artifacts/* --title "v$VERSION" --generate-notes --target "${{ github.sha }}"
+
