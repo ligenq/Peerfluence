@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.ligenq.Peerfluence</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Peerfluence</name>
+  <summary>Download and manage BitTorrent transfers</summary>
+  <description>
+    <p>Peerfluence is a desktop BitTorrent client with torrent, magnet-link, queue, streaming, and automation support.</p>
+  </description>
+  <launchable type="desktop-id">io.github.ligenq.Peerfluence.desktop</launchable>
+  <url type="homepage">https://github.com/ligenq/Peerfluence</url>
+  <url type="bugtracker">https://github.com/ligenq/Peerfluence/issues</url>
+  <provides>
+    <binary>peerfluence</binary>
+  </provides>
+  <content_rating type="oars-1.1" />
+</component>

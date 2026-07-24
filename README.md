@@ -1,6 +1,7 @@
 # Peerfluence
 
-Peerfluence is a Windows-first Avalonia desktop client for BitTorrent, built on top of
+Peerfluence is a cross-platform Avalonia desktop client for BitTorrent, with its current
+installer and desktop-association integration focused on Windows. It is built on top of
 [PeerSharp](https://github.com/ligenq/PeerSharp). It focuses on giving a local user full
 control over torrent downloads while also exposing a local MCP interface that can be used
 by AI agents for diagnostics, automation, and repeatable UI testing.
@@ -103,7 +104,8 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 - Updates: Velopack update URL and restart/apply controls for direct builds.
 - Appearance: system/light/dark theme, color theme, background style, language.
 
-Default data locations:
+Default data locations use the operating system's application-data and Downloads folders.
+On Linux, the configured XDG Downloads directory is honored. Typical Windows locations are:
 
 - Settings: `%LocalAppData%\Peerfluence\settings.json`
 - Session data: `%LocalAppData%\Peerfluence\Session`
@@ -193,35 +195,54 @@ and a magnet link used by the test cases.
 
 Requirements:
 
-- Windows with .NET SDK 10.
+- Windows, Linux, or macOS with .NET SDK 10.
 
 Run the app:
 
-```powershell
-dotnet run --project Peerfluence\Peerfluence.csproj
+```shell
+dotnet run --project Peerfluence/Peerfluence.csproj
 ```
 
 Run with an isolated profile:
 
-```powershell
-dotnet run --project Peerfluence\Peerfluence.csproj -- --profile C:\temp\peerfluence-profile
+```shell
+dotnet run --project Peerfluence/Peerfluence.csproj -- --profile /path/to/peerfluence-profile
 ```
 
 Run tests:
 
-```powershell
-dotnet test Peerfluence.Tests\Peerfluence.Tests.csproj
-dotnet test Peerfluence.HeadlessTests\Peerfluence.HeadlessTests.csproj
+```shell
+dotnet test Peerfluence.Tests/Peerfluence.Tests.csproj
+dotnet test Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
 ```
+
+Create a self-contained portable build by selecting a runtime identifier:
+
+```shell
+dotnet publish Peerfluence/Peerfluence.csproj -c Release -r linux-x64 --self-contained
+```
+
+Supported publish targets include `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`,
+`osx-x64`, and `osx-arm64`. Native AOT publishing must be performed on the target OS (or
+in a matching CI runner with the required native toolchain). Linux and macOS output is
+currently a portable application directory rather than a registered desktop installer.
 
 If a Windows build fails with file-lock errors in `bin` or `obj`, rerun the command
 serially. Parallel build/test commands can occasionally collide on generated files.
 
 ## Distribution
 
-Direct-download builds use Velopack for installation and self-updates. The Settings
+Windows direct-download builds use Velopack for installation and self-updates. The Settings
 Updates panel shows the update URL, update check, and restart/apply controls when the app
 is installed through Velopack.
+
+Linux releases provide portable AppDir archives and Debian packages for x64 and ARM64.
+The Debian package registers the application launcher, `.torrent` MIME handler, and
+`magnet:` URL handler. Build one locally with:
+
+```shell
+./ReleasePackaging/build-linux.sh --version 1.0.0 --rid linux-x64
+```
 
 Build a Velopack release:
 
@@ -235,8 +256,9 @@ GitHub release on [ligenq/Peerfluence](https://github.com/ligenq/Peerfluence). U
 download `Peerfluence.Desktop-win-Setup.exe`; the remaining files are used by the
 auto-update feed. The default update URL is `https://github.com/ligenq/Peerfluence`.
 
-See `ReleasePackaging\README.md` for MSI generation, release notes, update hosting, and
-optional signing details.
+See `ReleasePackaging/README.md` for Linux formats, AppImage generation, MSI generation,
+release notes, update hosting, and optional signing details. GitHub Actions workflows run
+the unit/headless test suite on Windows and Linux and can create a combined GitHub release.
 
 ## Project Layout
 

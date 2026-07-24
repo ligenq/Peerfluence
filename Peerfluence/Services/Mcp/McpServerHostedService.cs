@@ -71,7 +71,7 @@ public class McpServerHostedService : BackgroundService
             {
                 try
                 {
-                    await using var pipeServer = CreatePipeServer();
+                    await using var pipeServer = CreatePipeServer(_appPaths);
 
                     _logger.LogInformation("Waiting for MCP proxy connection...");
 
@@ -240,8 +240,9 @@ public class McpServerHostedService : BackgroundService
         }
     }
 
-    private static NamedPipeServerStream CreatePipeServer()
+    private static NamedPipeServerStream CreatePipeServer(IAppPaths appPaths)
     {
+        var pipeName = ProfileIpcNames.GetMcpPipeName(appPaths);
         if (OperatingSystem.IsWindows())
         {
             var security = new PipeSecurity();
@@ -251,7 +252,7 @@ public class McpServerHostedService : BackgroundService
                 AccessControlType.Allow));
 
             return NamedPipeServerStreamAcl.Create(
-                "PeerfluenceMcpPipe",
+                pipeName,
                 PipeDirection.InOut,
                 1,
                 PipeTransmissionMode.Byte,
@@ -262,7 +263,7 @@ public class McpServerHostedService : BackgroundService
         }
 
         return new NamedPipeServerStream(
-            "PeerfluenceMcpPipe",
+            pipeName,
             PipeDirection.InOut,
             1,
             PipeTransmissionMode.Byte,

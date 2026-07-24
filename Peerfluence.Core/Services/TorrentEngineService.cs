@@ -10,28 +10,90 @@ public sealed class TorrentEngineService : ITorrentEngineService
 {
     private readonly IAppSettingsService _settingsService;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ILogger<TorrentEngineService> _logger;
     private IClientEngine? _engine;
+    private Task? _shutdownTask;
 
     public TorrentEngineService(IAppSettingsService settingsService, ILoggerFactory loggerFactory)
     {
         _settingsService = settingsService;
         _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<TorrentEngineService>();
     }
 
     public IClientEngine Engine => _engine ?? throw new InvalidOperationException("Torrent engine is not initialized.");
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         _engine ??= CreateEngine();
-        await _engine.InitializeAsync(cancellationToken);
-        await LoadBlocklistAsync(cancellationToken);
-        await LoadGeoIpAsync(cancellationToken);
+        await _engine.InitializeAsync(cancellationToken).ConfigureAwait(false);
+        var engineElapsedMs = stopwatch.ElapsedMilliseconds;
+        await LoadBlocklistAsync(cancellationToken).ConfigureAwait(false);
+        _logger.LogInformation(
+            "Torrent engine initialized in {ElapsedMs} ms with {TorrentCount} restored torrents (blocklist: {BlocklistElapsedMs} ms)",
+            stopwatch.ElapsedMilliseconds,
+            _engine.GetTorrents().Count,
+            stopwatch.ElapsedMilliseconds - engineElapsedMs);
+    }
+
+    public async Task LoadOptionalDataAsync(CancellationToken cancellationToken)
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        await LoadGeoIpAsync(cancellationToken).ConfigureAwait(false);
+        _logger.LogInformation(
+            "Optional GeoIP data loaded after startup in {ElapsedMs} ms",
+            stopwatch.ElapsedMilliseconds);
     }
 
     public ValueTask DisposeAsync()
     {
+        if (_shutdownTask != null)
+        {
+            // ShutdownAsync already initiated disposal. In particular, do not
+            // synchronously re-wait after the host's shutdown deadline elapsed.
+            return ValueTask.CompletedTask;
+        }
+
         var engine = Interlocked.Exchange(ref _engine, null);
         return engine?.DisposeAsync() ?? ValueTask.CompletedTask;
+    }
+
+    public async Task ShutdownAsync(CancellationToken cancellationToken)
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var engine = Interlocked.Exchange(ref _engine, null);
+        if (engine != null)
+        {
+            _shutdownTask = engine.DisposeAsync().AsTask();
+            _ = ObserveLateShutdownFailureAsync(_shutdownTask);
+        }
+
+        if (_shutdownTask != null)
+        {
+            try
+            {
+                await _shutdownTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Torrent engine shutdown completed in {ElapsedMs} ms", stopwatch.ElapsedMilliseconds);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning("Torrent engine shutdown exceeded its deadline after {ElapsedMs} ms; disposal continues in the background", stopwatch.ElapsedMilliseconds);
+                throw;
+            }
+        }
+    }
+
+    private async Task ObserveLateShutdownFailureAsync(Task shutdownTask)
+    {
+        try
+        {
+            await shutdownTask.ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Torrent engine disposal failed");
+        }
     }
 
     private IClientEngine CreateEngine()
@@ -136,9 +198,13 @@ public sealed class TorrentEngineService : ITorrentEngineService
             await using var stream = File.OpenRead(settings.BlocklistPath);
             await Engine.LoadBlocklistAsync(stream, cancellationToken);
         }
-        catch
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // Blocklist loading is best-effort
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Blocklist failed to load from {BlocklistPath}", settings.BlocklistPath);
         }
     }
 
@@ -160,10 +226,13 @@ public sealed class TorrentEngineService : ITorrentEngineService
             await using var stream = File.OpenRead(settings.GeoIpPath);
             await Engine.LoadGeoIpAsync(stream, cancellationToken);
         }
-        catch
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // GeoIP loading is best-effort
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "GeoIP data failed to load from {GeoIpPath}", settings.GeoIpPath);
         }
     }
 }
-

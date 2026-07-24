@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -149,41 +150,50 @@ internal static class CrashHandler
 
     private static void ShowMacOsDialog(string message)
     {
-        var escaped = message.Replace("\\", "\\\\").Replace("\"", "\\\"");
-        var escapedTitle = Resources.Crash_Title.Replace("\\", "\\\\").Replace("\"", "\\\"");
-        Process.Start(new ProcessStartInfo
+        const string script = "on run argv\n" +
+            "display dialog (item 1 of argv) with title (item 2 of argv) buttons {(item 3 of argv)} default button (item 3 of argv) with icon stop\n" +
+            "end run";
+        var startInfo = new ProcessStartInfo
         {
             FileName = "osascript",
-            Arguments = $"-e 'display dialog \"{escaped}\" with title \"{escapedTitle}\" buttons {{\"{Resources.Common_OK}\"}} default button \"{Resources.Common_OK}\" with icon stop'",
             UseShellExecute = false,
             CreateNoWindow = true
-        })?.WaitForExit(10_000);
+        };
+        startInfo.ArgumentList.Add("-e");
+        startInfo.ArgumentList.Add(script);
+        startInfo.ArgumentList.Add("--");
+        startInfo.ArgumentList.Add(message);
+        startInfo.ArgumentList.Add(Resources.Crash_Title);
+        startInfo.ArgumentList.Add(Resources.Common_OK);
+        Process.Start(startInfo)?.WaitForExit(10_000);
     }
 
     private static void ShowLinuxDialog(string message)
     {
-        var escaped = message.Replace("\\", "\\\\").Replace("\"", "\\\"");
-        var escapedTitle = Resources.Crash_Title.Replace("\\", "\\\\").Replace("\"", "\\\"");
-
         // Try zenity first (GTK), then kdialog (KDE).
-        var started = TryStartProcess("zenity", $"--error --title=\"{escapedTitle}\" --text=\"{escaped}\" --width=400")
-                   || TryStartProcess("kdialog", $"--error \"{escaped}\" --title \"{escapedTitle}\"");
+        var started = TryStartProcess("zenity", ["--error", $"--title={Resources.Crash_Title}", $"--text={message}", "--width=400"])
+                   || TryStartProcess("kdialog", ["--error", message, "--title", Resources.Crash_Title]);
 
         // If neither is available, stderr output from the caller is the fallback.
         _ = started;
     }
 
-    private static bool TryStartProcess(string fileName, string arguments)
+    private static bool TryStartProcess(string fileName, IReadOnlyList<string> arguments)
     {
         try
         {
-            var process = Process.Start(new ProcessStartInfo
+            var startInfo = new ProcessStartInfo
             {
                 FileName = fileName,
-                Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true
-            });
+            };
+            foreach (var argument in arguments)
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            var process = Process.Start(startInfo);
 
             process?.WaitForExit(10_000);
             return process != null;

@@ -59,6 +59,7 @@ public sealed class AppSettingsServiceTests : IDisposable
         Assert.True(Directory.Exists(paths.SessionDirectory));
 
         await store.Received(1).SaveAsync(Arg.Is<AppSettings>(settings =>
+            settings != null &&
             settings.Storage.DownloadPath == paths.DefaultDownloadDirectory &&
             settings.Storage.SessionPath == paths.SessionDirectory &&
             settings.Language == "en-US" &&
@@ -67,6 +68,39 @@ public sealed class AppSettingsServiceTests : IDisposable
             settings.Network.MaxDiskReadSpeedBytesPerSecond == 0 &&
             settings.Network.MaxDiskWriteSpeedBytesPerSecond == 0),
             Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task LoadAsync_WhenSettingsAreAlreadyValid_DoesNotRewriteSettings()
+    {
+        var paths = CreatePaths();
+        var store = Substitute.For<IAppSettingsStore>();
+        var loaded = new AppSettings
+        {
+            Storage =
+            {
+                DownloadPath = paths.DefaultDownloadDirectory,
+                SessionPath = paths.SessionDirectory,
+            },
+            Theme =
+            {
+                ThemeVariant = "System",
+                ColorTheme = "Indigo",
+                BackgroundStyle = "GradientSoft",
+            },
+            Language = "en-US",
+            DefaultRemoveTorrentAction = "RemoveOnly",
+        };
+        loaded.Network.ListeningPort = 55125;
+        loaded.CompletionAction.TimeoutSeconds = 300;
+        loaded.CompletionAction.WorkingDirectoryTemplate = "{downloadPath}";
+        loaded.Mcp.MaxTorrentPayloadBytes = 10 * 1024 * 1024;
+        store.LoadAsync(Arg.Any<CancellationToken>()).Returns(loaded);
+        var sut = new AppSettingsService(paths, store, new FileSystem());
+
+        await sut.LoadAsync(TestContext.Current.CancellationToken);
+
+        await store.DidNotReceive().SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

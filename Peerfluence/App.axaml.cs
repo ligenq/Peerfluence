@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -7,7 +9,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Messaging;
+using Peerfluence.Services;
 using Peerfluence.ViewModels;
 
 namespace Peerfluence;
@@ -15,6 +19,7 @@ namespace Peerfluence;
 public class App : Application
 {
     private readonly IServiceProvider? _services;
+    private readonly CancellationTokenSource _optionalStartupCts = new();
 
     public App()
     {
@@ -58,6 +63,39 @@ public class App : Application
         var viewModel = _services.GetRequiredService<MainWindowViewModel>();
         var mainWindow = (Window)DataTemplates[0].Build(viewModel)!;
         desktop.MainWindow = mainWindow;
+
+        // GeoIP data can be large and is not required to construct a usable
+        // window. Start it only after Avalonia has shown the window. The blocklist
+        // remains part of engine startup so it is active before user interaction.
+        mainWindow.Opened += OnMainWindowOpened;
+
+        async void OnMainWindowOpened(object? sender, EventArgs args)
+        {
+            mainWindow.Opened -= OnMainWindowOpened;
+            _services
+                .GetRequiredService<ILogger<App>>()
+                .LogInformation(
+                    "Main window opened in {ElapsedMs} ms",
+                    _services.GetRequiredService<StartupTracker>().ElapsedMilliseconds);
+            try
+            {
+                var engineService = _services.GetRequiredService<ITorrentEngineService>();
+                await Task.Run(
+                    () => engineService.LoadOptionalDataAsync(_optionalStartupCts.Token),
+                    _optionalStartupCts.Token);
+            }
+            catch (OperationCanceledException) when (_optionalStartupCts.IsCancellationRequested)
+            {
+            }
+            catch (Exception ex)
+            {
+                _services
+                    .GetRequiredService<ILogger<App>>()
+                    .LogWarning(ex, "Optional torrent data failed to load after startup");
+            }
+        }
+
+        desktop.Exit += (_, _) => _optionalStartupCts.Cancel();
 
         // Register Top-Level for Dialogs
         _services

@@ -304,7 +304,8 @@ public class SettingsViewModelTests
     [Fact]
     public async Task SaveCommand_PersistsSettingsAndShowsMessage()
     {
-        _sut.DownloadPath = "/test/path";
+        var downloadPath = Path.Combine(Path.GetTempPath(), $"peerfluence-settings-{Guid.NewGuid():N}");
+        _sut.DownloadPath = downloadPath;
         _sut.EnableDht = true;
         _sut.UseAutomaticListeningPort = true;
         _sut.ListeningPort = 51413;
@@ -319,7 +320,7 @@ public class SettingsViewModelTests
 
         await _sut.SaveCommand.ExecuteAsync(null);
 
-        Assert.Equal("/test/path", _settingsService.Current.Storage.DownloadPath);
+        Assert.Equal(downloadPath, _settingsService.Current.Storage.DownloadPath);
         Assert.True(_settingsService.Current.Network.EnableDht);
         Assert.True(_settingsService.Current.Network.UseAutomaticListeningPort);
         Assert.Equal(51413, _settingsService.Current.Network.ListeningPort);

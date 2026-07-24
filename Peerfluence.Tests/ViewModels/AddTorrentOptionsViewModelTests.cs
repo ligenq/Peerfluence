@@ -114,7 +114,7 @@ public class AddTorrentOptionsViewModelTests
         Assert.Equal(16384, sut.PieceSizeBytes);
         Assert.True(sut.HasFiles);
         Assert.False(sut.IsMetadataPending);
-        Assert.Equal("udp://tracker.example:80\r\nhttps://tracker.two/announce", sut.ExistingTrackers);
+        Assert.Equal($"udp://tracker.example:80{Environment.NewLine}https://tracker.two/announce", sut.ExistingTrackers);
         Assert.Collection(
             sut.Files,
             file =>
