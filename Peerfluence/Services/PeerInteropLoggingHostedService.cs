@@ -161,6 +161,7 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
                         "[interop] connected to {Client} at {EndPoint} on '{Torrent}' ({Transport}, {Encryption}, peer progress {Progress:P0})",
                         peer.ClientName,
                         peer.EndPoint,
+                        torrent.Name,
                         peer.IsUtp ? "uTP" : "TCP",
                         peer.IsEncrypted ? "encrypted" : "plaintext",
                         peer.Progress);
