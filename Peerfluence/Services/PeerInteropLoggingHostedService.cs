@@ -47,6 +47,7 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
 
     private CancellationTokenSource? _cts;
     private Task? _monitorTask;
+    private long _torrentUploadedTotal;
     private string _clientFilter = DefaultClientFilter;
     private DateTimeOffset _nextSummary;
 
@@ -142,8 +143,17 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
 
     private void Poll()
     {
+        long uploadedAcrossTorrents = 0;
+
         foreach (var torrent in _torrentService.GetTorrents())
         {
+            // The engine's own running total, which unlike the per-peer counters below survives a peer
+            // disconnecting. Sampling connected peers cannot see a transfer that started and finished
+            // between two polls, and reporting that as "nobody received anything" is worse than saying
+            // nothing - it reads as a serving failure. Observed for real: 512 KiB went to a Transmission
+            // peer that unchoked, transferred and hung up inside one two-second interval.
+            uploadedAcrossTorrents += torrent.FileTransfer.Uploaded;
+
             foreach (var peer in torrent.Peers.GetConnectedPeers())
             {
                 if (!peer.ClientName.StartsWith(_clientFilter, StringComparison.OrdinalIgnoreCase))
@@ -201,6 +211,8 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
                 totals.Update(peer);
             }
         }
+
+        _torrentUploadedTotal = uploadedAcrossTorrents;
     }
 
     /// <summary>
@@ -249,11 +261,27 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
         // neither will a peer that hung up before exchanging piece state.
         if (wantedOurs > 0 && served == 0)
         {
-            _logger.LogWarning(
-                "[interop] {WantedOurs} {ClientFilter} peer(s) asked us for data and none received a byte. " +
-                "That is the case worth reporting - they requested and we did not deliver.",
-                wantedOurs,
-                _clientFilter);
+            if (_torrentUploadedTotal > 0)
+            {
+                // The engine served somebody, so this is a gap in what polling can see rather than a
+                // refusal to upload: a peer that transferred and disconnected between two polls leaves
+                // no trace in the per-peer counters, which only exist while it is still connected.
+                _logger.LogInformation(
+                    "[interop] {WantedOurs} {ClientFilter} peer(s) asked us for data and no transfer to them was " +
+                    "sampled, but the engine has uploaded {TotalUp} overall. Peers that disconnect between polls " +
+                    "are invisible here, so treat this as unmeasured rather than as a failure to serve.",
+                    wantedOurs,
+                    _clientFilter,
+                    Describe(_torrentUploadedTotal));
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "[interop] {WantedOurs} {ClientFilter} peer(s) asked us for data and none received a byte, " +
+                    "and the engine has uploaded nothing at all. They requested and we did not deliver.",
+                    wantedOurs,
+                    _clientFilter);
+            }
         }
     }
 
