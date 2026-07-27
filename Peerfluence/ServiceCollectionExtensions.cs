@@ -110,6 +110,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<McpServerHostedService>();
         // Opt-in diagnostic; does nothing unless PEERFLUENCE_INTEROP_LOG is set.
         services.AddHostedService<PeerInteropLoggingHostedService>();
+        // Opt-in diagnostic; does nothing unless PEERFLUENCE_EXCEPTION_STATS is set.
+        services.AddHostedService<ExceptionRateDiagnosticHostedService>();
         return services;
     }
 
