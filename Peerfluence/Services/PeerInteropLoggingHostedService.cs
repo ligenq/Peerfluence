@@ -60,10 +60,10 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
     {
         // Off unless asked for. This is a diagnostic aid, and a line per peer per two seconds is not
         // something an ordinary run should be paying for.
-        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnabledVariable)))
-        {
-            return Task.CompletedTask;
-        }
+        //if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnabledVariable)))
+        //{
+        //    return Task.CompletedTask;
+        //}
 
         var configured = Environment.GetEnvironmentVariable(ClientFilterVariable);
         if (!string.IsNullOrWhiteSpace(configured))
@@ -221,28 +221,38 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
         int served = _seen.Values.Count(static t => t.Uploaded > 0);
         int received = _seen.Values.Count(static t => t.Downloaded > 0);
         int wantedOurs = _seen.Values.Count(static t => t.EverInterestedInUs);
-        int incomplete = _seen.Values.Count(static t => !t.IsSeed);
+
+        // Only peers that actually told us they were short of pieces. Counting the silent ones here is
+        // what turned a swarm of seeds into an apparent failure to upload.
+        int incomplete = _seen.Values.Count(static t => t.ReportedItsPieces && !t.IsSeed);
+        int silent = _seen.Values.Count(static t => !t.ReportedItsPieces);
+        int seeds = _seen.Values.Count(static t => t.IsSeed);
         long totalUp = _seen.Values.Sum(static t => t.Uploaded);
         long totalDown = _seen.Values.Sum(static t => t.Downloaded);
 
         _logger.LogInformation(
-            "[interop] {ClientFilter} summary: {Count} peer(s) met, {Incomplete} incomplete, {WantedOurs} asked us for data, " +
-            "{Served} received data from us ({TotalUp}), {Received} sent us data ({TotalDown})",
+            "[interop] {ClientFilter} summary: {Count} peer(s) met - {Seeds} seed(s), {Incomplete} incomplete, " +
+            "{Silent} never said what they hold. {WantedOurs} asked us for data, {Served} received data from us " +
+            "({TotalUp}), {Received} sent us data ({TotalDown})",
             _clientFilter,
             _seen.Count,
+            seeds,
             incomplete,
+            silent,
             wantedOurs,
             served,
             Describe(totalUp),
             received,
             Describe(totalDown));
 
-        if (incomplete > 0 && served == 0)
+        // Only a real finding when a peer both needed data and asked for it. A seed will never ask, and
+        // neither will a peer that hung up before exchanging piece state.
+        if (wantedOurs > 0 && served == 0)
         {
             _logger.LogWarning(
-                "[interop] {Incomplete} incomplete {ClientFilter} peer(s) connected and none received a byte from us. " +
-                "That is the case worth reporting - it means we advertised data and never delivered it.",
-                incomplete,
+                "[interop] {WantedOurs} {ClientFilter} peer(s) asked us for data and none received a byte. " +
+                "That is the case worth reporting - they requested and we did not deliver.",
+                wantedOurs,
                 _clientFilter);
         }
     }
@@ -272,12 +282,21 @@ public sealed class PeerInteropLoggingHostedService : IHostedService
         /// </summary>
         public bool IsSeed { get; private set; }
 
+        /// <summary>
+        /// Whether the peer ever told us what it holds. Without this a peer that said nothing is
+        /// indistinguishable from one that holds nothing, since both report zero progress - and on a
+        /// mature swarm most connections end before the peer gets round to saying anything, which made
+        /// an ordinary run look like hundreds of peers we were refusing to serve.
+        /// </summary>
+        public bool ReportedItsPieces { get; private set; }
+
         public void Update(PeerInfo peer)
         {
             Uploaded = Math.Max(Uploaded, peer.Uploaded);
             Downloaded = Math.Max(Downloaded, peer.Downloaded);
             EverInterestedInUs |= peer.PeerInterested;
-            IsSeed |= peer.Progress >= 1.0f;
+            ReportedItsPieces |= peer.HasReportedPieces;
+            IsSeed |= peer.HasReportedPieces && peer.Progress >= 1.0f;
         }
     }
 }
