@@ -31,8 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Peerfluence.Core\Peerfluence.Core.csproj" />
-		<ProjectReference Include="..\..\PeerSharp\src\PeerSharp\PeerSharp.csproj"
-		                  Condition="'$(UseLocalPeerSharp)' == 'true' and Exists('..\..\PeerSharp\src\PeerSharp\PeerSharp.csproj')" />
+		<ProjectReference Include="$(LocalPeerSharpProject)" Condition="'$(UseLocalPeerSharp)' == 'true'" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -51,8 +50,7 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
 		<PackageReference Include="ModelContextProtocol" Version="1.4.1" />
-		<PackageReference Include="PeerSharp" Version="2.1.0"
-		                  Condition="'$(UseLocalPeerSharp)' != 'true' or !Exists('..\..\PeerSharp\src\PeerSharp\PeerSharp.csproj')" />
+		<PackageReference Include="PeerSharp" Version="$(PeerSharpPackageVersion)" Condition="'$(UseLocalPeerSharp)' != 'true'" />
 		<PackageReference Include="Velopack" Version="1.2.0" />
 	</ItemGroup>
 
