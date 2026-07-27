@@ -1,0 +1,42 @@
+<Project>
+
+  <!--
+    Use a PeerSharp checked out next to this repo when there is one, and the published package
+    otherwise. Set UseLocalPeerSharp explicitly to override the detection in either direction:
+
+      dotnet build -p:UseLocalPeerSharp=false   always use the NuGet package
+      dotnet build -p:UseLocalPeerSharp=true    fail loudly if the local checkout is missing
+
+    Every project has to agree. Referencing the project from one and the package from another puts
+    two PeerSharp assemblies in the same build, which either fails to resolve or - worse - silently
+    binds part of the app to the published version while you are trying to test local changes.
+  -->
+  <PropertyGroup>
+    <LocalPeerSharpProject>$(MSBuildThisFileDirectory)..\PeerSharp\src\PeerSharp\PeerSharp.csproj</LocalPeerSharpProject>
+    <LocalPeerSharpProject Condition="Exists('$(LocalPeerSharpProject)')">$([System.IO.Path]::GetFullPath('$(LocalPeerSharpProject)'))</LocalPeerSharpProject>
+
+    <UseLocalPeerSharp Condition="'$(UseLocalPeerSharp)' == '' and Exists('$(LocalPeerSharpProject)')">true</UseLocalPeerSharp>
+    <UseLocalPeerSharp Condition="'$(UseLocalPeerSharp)' == ''">false</UseLocalPeerSharp>
+
+    <!-- Kept in one place so the projects do not drift to different package versions. -->
+    <PeerSharpPackageVersion>2.1.0</PeerSharpPackageVersion>
+  </PropertyGroup>
+
+  <Target Name="ReportPeerSharpSource"
+          BeforeTargets="Build"
+          Condition="'$(MSBuildProjectName)' == 'Peerfluence'">
+    <Message Importance="high"
+             Condition="'$(UseLocalPeerSharp)' == 'true'"
+             Text="PeerSharp: local build from $(LocalPeerSharpProject)" />
+    <Message Importance="high"
+             Condition="'$(UseLocalPeerSharp)' != 'true'"
+             Text="PeerSharp: NuGet package $(PeerSharpPackageVersion)" />
+  </Target>
+
+  <!-- Asked for the local build but it is not there: say so rather than quietly using the package. -->
+  <Target Name="ValidateLocalPeerSharp" BeforeTargets="Build">
+    <Error Condition="'$(UseLocalPeerSharp)' == 'true' and !Exists('$(LocalPeerSharpProject)')"
+           Text="UseLocalPeerSharp is true but no PeerSharp checkout was found at $(LocalPeerSharpProject)." />
+  </Target>
+
+</Project>

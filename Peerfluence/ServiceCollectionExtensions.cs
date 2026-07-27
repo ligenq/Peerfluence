@@ -108,6 +108,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<TorrentEngineHostedService>();
         services.AddHostedService<TorrentAlertsHostedService>();
         services.AddHostedService<McpServerHostedService>();
+        // Opt-in diagnostic; does nothing unless PEERFLUENCE_INTEROP_LOG is set.
+        services.AddHostedService<PeerInteropLoggingHostedService>();
         return services;
     }
 
