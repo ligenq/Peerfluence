@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
     <PackageReference Include="System.IO.Abstractions" Version="22.2.0" />
-    <PackageReference Include="PeerSharp" Version="$(PeerSharpPackageVersion)" Condition="'$(UseLocalPeerSharp)' != 'true'" />
-    <ProjectReference Include="$(LocalPeerSharpProject)" Condition="'$(UseLocalPeerSharp)' == 'true'" />
+    <PackageReference Include="PeerSharp" Version="$(PeerSharpPackageVersion)" />
   </ItemGroup>
 </Project>
