@@ -77,13 +77,13 @@
     <value>Transferências</value>
   </data>
   <data name="Downloads_TotalDown" xml:space="preserve">
-    <value>Total para baixo</value>
+    <value>Total transferido</value>
   </data>
   <data name="Downloads_TotalUp" xml:space="preserve">
-    <value>Total acima</value>
+    <value>Total enviado</value>
   </data>
   <data name="Downloads_Active" xml:space="preserve">
-    <value>Torrentes ativos</value>
+    <value>Torrents ativos</value>
   </data>
   <data name="Downloads_Peers" xml:space="preserve">
     <value>Pares</value>
@@ -92,7 +92,7 @@
     <value>Adicionar torrent</value>
   </data>
   <data name="Downloads_MagnetWatermark" xml:space="preserve">
-    <value>Colar link magnético</value>
+    <value>Colar ligação magnet</value>
   </data>
   <data name="Downloads_AddMagnet" xml:space="preserve">
     <value>Adicionar magnet</value>
@@ -101,7 +101,7 @@
     <value>Colar magnet</value>
   </data>
   <data name="Downloads_Start" xml:space="preserve">
-    <value>Começar</value>
+    <value>Iniciar</value>
   </data>
   <data name="Downloads_Stop" xml:space="preserve">
     <value>Parar</value>
@@ -131,10 +131,10 @@
     <value>Estado</value>
   </data>
   <data name="Downloads_Grid_Down" xml:space="preserve">
-    <value>Abaixo</value>
+    <value>DL</value>
   </data>
   <data name="Downloads_Grid_Up" xml:space="preserve">
-    <value>Acima</value>
+    <value>UL</value>
   </data>
   <data name="Downloads_Grid_Peers" xml:space="preserve">
     <value>Pares</value>
@@ -143,7 +143,7 @@
     <value>Abrir torrent</value>
   </data>
   <data name="Downloads_FilePicker_Filter" xml:space="preserve">
-    <value>Arquivos torrent</value>
+    <value>Ficheiros torrent</value>
   </data>
   <data name="Details_Title" xml:space="preserve">
     <value>Detalhes</value>
@@ -185,7 +185,7 @@
     <value>Streaming</value>
   </data>
   <data name="Details_FilesTab" xml:space="preserve">
-    <value>Arquivos</value>
+    <value>Ficheiros</value>
   </data>
   <data name="Details_TrackersTab" xml:space="preserve">
     <value>Rastreadores</value>
@@ -233,10 +233,10 @@
     <value>Estado</value>
   </data>
   <data name="Details_Trackers_Seeds" xml:space="preserve">
-    <value>Sementes</value>
+    <value>Seeders</value>
   </data>
   <data name="Details_Trackers_Leeches" xml:space="preserve">
-    <value>Sanguessugas</value>
+    <value>Leechers</value>
   </data>
   <data name="Details_Trackers_LastError" xml:space="preserve">
     <value>Último erro</value>
@@ -249,6 +249,9 @@
   </data>
   <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
     <value>Circuito aberto</value>
+  </data>
+  <data name="TrackerStatus_Disabled" xml:space="preserve">
+    <value>Desativado pelo rastreador</value>
   </data>
   <data name="TrackerStatus_Unknown" xml:space="preserve">
     <value>Desconhecido</value>
@@ -263,10 +266,10 @@
     <value>País</value>
   </data>
   <data name="Details_Peers_Down" xml:space="preserve">
-    <value>Abaixo</value>
+    <value>DL</value>
   </data>
   <data name="Details_Peers_Up" xml:space="preserve">
-    <value>Acima</value>
+    <value>UL</value>
   </data>
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Progresso</value>
@@ -278,7 +281,7 @@
     <value>Configurações</value>
   </data>
   <data name="Settings_DownloadFolder" xml:space="preserve">
-    <value>Baixar pasta</value>
+    <value>Pasta de transferências</value>
   </data>
   <data name="Settings_SessionFolder" xml:space="preserve">
     <value>Pasta de dados da sessão</value>
@@ -288,6 +291,12 @@
   </data>
   <data name="Settings_EnableDht" xml:space="preserve">
     <value>Habilitar DHT</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSampling" xml:space="preserve">
+    <value>Responder a pedidos de amostragem de torrents</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
+    <value>Permite que outros nós DHT perguntem para que torrents conhece pares, que é como os índices de pesquisa descobrem torrents. A mesma informação já pode ser obtida perguntando quem tem um torrent específico, pelo que desativar isto esconde pouco. Requer DHT.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Habilitar NAT-PMP</value>
@@ -323,7 +332,7 @@
     <value>Sistema</value>
   </data>
   <data name="Settings_ThemeVariant_Light" xml:space="preserve">
-    <value>Luz</value>
+    <value>Claro</value>
   </data>
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
     <value>Escuro</value>
@@ -380,7 +389,7 @@
     <value>Idioma</value>
   </data>
   <data name="Settings_Save" xml:space="preserve">
-    <value>Salvar</value>
+    <value>Guardar</value>
   </data>
   <data name="Settings_Reset" xml:space="preserve">
     <value>Reiniciar</value>
@@ -398,10 +407,10 @@
     <value>Cole um link magnético no campo ou copie um para a área de transferência primeiro.</value>
   </data>
   <data name="Status_AddingMagnet" xml:space="preserve">
-    <value>Adicionando ímã...</value>
+    <value>A adicionar magnet...</value>
   </data>
   <data name="Status_MagnetAdded" xml:space="preserve">
-    <value>Ímã adicionado.</value>
+    <value>Magnet adicionado.</value>
   </data>
   <data name="Status_AddMagnetFailed" xml:space="preserve">
     <value>Falha ao adicionar ímã: {0}</value>
@@ -416,13 +425,13 @@
     <value>As configurações são redefinidas para os últimos valores salvos.</value>
   </data>
   <data name="Status_TorrentReady" xml:space="preserve">
-    <value>Preparar</value>
+    <value>Pronto</value>
   </data>
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Buscando metadados</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
-    <value>HEC</value>
+    <value>Tempo rest.</value>
   </data>
   <data name="Eta_Seconds" xml:space="preserve">
     <value>{0} segundos restantes</value>
@@ -431,10 +440,10 @@
     <value>{0} minutos restantes</value>
   </data>
   <data name="Eta_HoursMinutes" xml:space="preserve">
-    <value>{0}h {1}m esquerda</value>
+    <value>Faltam {0} h {1} min</value>
   </data>
   <data name="Eta_DaysHours" xml:space="preserve">
-    <value>{0}d {1}h esquerda</value>
+    <value>Faltam {0} d {1} h</value>
   </data>
   <data name="CreateTorrent_Title" xml:space="preserve">
     <value>Criar torrent</value>
@@ -455,7 +464,7 @@
     <value>Tamanho da peça</value>
   </data>
   <data name="CreateTorrent_Private" xml:space="preserve">
-    <value>Torrente Privada</value>
+    <value>Torrent privado</value>
   </data>
   <data name="CreateTorrent_Comment" xml:space="preserve">
     <value>Comentário</value>
@@ -464,7 +473,7 @@
     <value>Criar</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
-    <value>Arquivo...</value>
+    <value>Ficheiro...</value>
   </data>
   <data name="CreateTorrent_BrowseFolder" xml:space="preserve">
     <value>Pasta...</value>
@@ -476,10 +485,10 @@
     <value>Selecione o arquivo de origem</value>
   </data>
   <data name="CreateTorrent_SaveTorrentFile" xml:space="preserve">
-    <value>Salvar arquivo torrent</value>
+    <value>Guardar ficheiro torrent</value>
   </data>
   <data name="CreateTorrent_TorrentFileType" xml:space="preserve">
-    <value>Arquivo torrent</value>
+    <value>Ficheiro torrent</value>
   </data>
   <data name="CreateTorrent_ErrorNoSource" xml:space="preserve">
     <value>Selecione um arquivo ou pasta de origem.</value>
@@ -500,19 +509,19 @@
     <value>Hash:</value>
   </data>
   <data name="Details_SeedTimeMinutes" xml:space="preserve">
-    <value>Tempo de sementeira (min)</value>
+    <value>Tempo de seed (min)</value>
   </data>
   <data name="Details_QueuePriority" xml:space="preserve">
     <value>Prioridade da fila</value>
   </data>
   <data name="Details_VerifyFiles" xml:space="preserve">
-    <value>Verificar arquivos</value>
+    <value>Verificar ficheiros</value>
   </data>
   <data name="Details_Stream" xml:space="preserve">
-    <value>Fluxo</value>
+    <value>Transmitir</value>
   </data>
   <data name="Details_Play" xml:space="preserve">
-    <value>Jogar</value>
+    <value>Reproduzir</value>
   </data>
   <data name="Details_RatioLimitWatermark" xml:space="preserve">
     <value>por exemplo 2,0</value>
@@ -548,7 +557,7 @@
     <value>Máximo de downloads ativos</value>
   </data>
   <data name="Settings_MaxActiveSeeds" xml:space="preserve">
-    <value>Máximo de sementes ativas</value>
+    <value>Máx. de seeds ativos</value>
   </data>
   <data name="Settings_IpBlocklist" xml:space="preserve">
     <value>Lista de bloqueio de IP</value>
@@ -575,10 +584,10 @@
     <value>Arquivos da lista de bloqueio</value>
   </data>
   <data name="Settings_BlocklistPicker_AllFiles" xml:space="preserve">
-    <value>Todos os arquivos</value>
+    <value>Todos os ficheiros</value>
   </data>
   <data name="Details_Trackers_AddWatermark" xml:space="preserve">
-    <value>Insira o rastreador URL</value>
+    <value>Introduza o URL do rastreador</value>
   </data>
   <data name="Details_Trackers_Add" xml:space="preserve">
     <value>Adicionar</value>
@@ -590,7 +599,7 @@
     <value>Peças</value>
   </data>
   <data name="Details_Pieces_Have" xml:space="preserve">
-    <value>Ter</value>
+    <value>Obtidas</value>
   </data>
   <data name="Details_Pieces_HighAvail" xml:space="preserve">
     <value>Alta disponibilidade</value>
@@ -599,7 +608,7 @@
     <value>Disponível</value>
   </data>
   <data name="Details_Pieces_Missing" xml:space="preserve">
-    <value>Ausente</value>
+    <value>Ausentes</value>
   </data>
   <data name="Settings_GeoIp" xml:space="preserve">
     <value>Banco de dados GeoIP</value>
@@ -632,7 +641,7 @@
     <value>Selecione o reprodutor de mídia</value>
   </data>
   <data name="Settings_MediaPlayerPicker_Filter" xml:space="preserve">
-    <value>Arquivos executáveis</value>
+    <value>Ficheiros executáveis</value>
   </data>
   <data name="Settings_Encryption" xml:space="preserve">
     <value>Criptografia</value>
@@ -650,7 +659,7 @@
     <value>Recusar</value>
   </data>
   <data name="Settings_Proxy" xml:space="preserve">
-    <value>Procuração</value>
+    <value>Proxy</value>
   </data>
   <data name="Settings_ProxyType" xml:space="preserve">
     <value>Tipo de proxy</value>
@@ -665,7 +674,7 @@
     <value>HTTP</value>
   </data>
   <data name="Settings_ProxyHost" xml:space="preserve">
-    <value>Hospedar</value>
+    <value>Anfitrião</value>
   </data>
   <data name="Settings_ProxyPort" xml:space="preserve">
     <value>Porta</value>
@@ -716,10 +725,10 @@
     <value>Sucesso</value>
   </data>
   <data name="PortMappingResult_Failed" xml:space="preserve">
-    <value>Fracassado</value>
+    <value>Falhou</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
-    <value>Fim do jogo</value>
+    <value>Modo final</value>
   </data>
   <data name="Details_DiskReadLimit" xml:space="preserve">
     <value>Limite de leitura de disco (B/s)</value>
@@ -728,16 +737,16 @@
     <value>Limite de gravação em disco (B/s)</value>
   </data>
   <data name="Details_SaveResumeData" xml:space="preserve">
-    <value>Salvar dados de currículo</value>
+    <value>Guardar dados de retoma</value>
   </data>
   <data name="Details_SaveResumeData_Title" xml:space="preserve">
-    <value>Salvar dados de currículo</value>
+    <value>Guardar dados de retoma</value>
   </data>
   <data name="Details_SaveResumeData_FileType" xml:space="preserve">
-    <value>Retomar dados</value>
+    <value>Dados de retoma</value>
   </data>
   <data name="Details_SaveResumeData_Success" xml:space="preserve">
-    <value>Retomar dados salvos.</value>
+    <value>Dados de retoma guardados.</value>
   </data>
   <data name="Details_SaveResumeData_Failed" xml:space="preserve">
     <value>Falha ao salvar dados de currículo: {0}</value>
@@ -755,13 +764,13 @@
     <value>Falha ao alterar o caminho de download: {0}</value>
   </data>
   <data name="Settings_DownloadFolderPicker_Title" xml:space="preserve">
-    <value>Selecione a pasta de download</value>
+    <value>Selecione a pasta de transferências</value>
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Selecione a pasta de dados da sessão</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
-    <value>Remover Torrente</value>
+    <value>Remover torrent</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
     <value>Remover "{0}" da lista de downloads?</value>
@@ -797,7 +806,7 @@
     <value>Destino</value>
   </data>
   <data name="AddTorrent_DownloadFolderWatermark" xml:space="preserve">
-    <value>Baixar pasta</value>
+    <value>Pasta de transferências</value>
   </data>
   <data name="AddTorrent_StartImmediately" xml:space="preserve">
     <value>Comece imediatamente</value>
@@ -836,7 +845,7 @@
     <value>Os metadados ainda não foram encontrados. Você ainda pode adicionar o ímã e Peerfluence continuará buscando-o.</value>
   </data>
   <data name="AddTorrent_MagnetFallbackName" xml:space="preserve">
-    <value>Elo magnético</value>
+    <value>Ligação magnet</value>
   </data>
   <data name="AddTorrent_Version" xml:space="preserve">
     <value>Versão</value>
@@ -1025,10 +1034,10 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
     <value>Parando</value>
   </data>
   <data name="TorrentState_Stopped" xml:space="preserve">
-    <value>Parou</value>
+    <value>Parado</value>
   </data>
   <data name="TorrentState_CheckingFiles" xml:space="preserve">
-    <value>Verificando arquivos</value>
+    <value>A verificar ficheiros</value>
   </data>
   <data name="TorrentState_DownloadingMetadata" xml:space="preserve">
     <value>Baixando metadados</value>
@@ -1037,7 +1046,7 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
     <value>Download concluído</value>
   </data>
   <data name="Notification_TorrentInterrupted" xml:space="preserve">
-    <value>Torrente interrompida</value>
+    <value>Torrent interrompido</value>
   </data>
   <data name="Notification_MetadataReady" xml:space="preserve">
     <value>Metadados prontos</value>
