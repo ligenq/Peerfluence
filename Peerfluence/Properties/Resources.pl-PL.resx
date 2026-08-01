@@ -74,13 +74,13 @@
     <value>Ustawienia</value>
   </data>
   <data name="Downloads_Title" xml:space="preserve">
-    <value>Downloads</value>
+    <value>Pobieranie</value>
   </data>
   <data name="Downloads_TotalDown" xml:space="preserve">
-    <value>Całkowity dół</value>
+    <value>Łącznie pobrano</value>
   </data>
   <data name="Downloads_TotalUp" xml:space="preserve">
-    <value>Razem w górę</value>
+    <value>Łącznie wysłano</value>
   </data>
   <data name="Downloads_Active" xml:space="preserve">
     <value>Aktywne torrenty</value>
@@ -92,7 +92,7 @@
     <value>Dodaj torrent</value>
   </data>
   <data name="Downloads_MagnetWatermark" xml:space="preserve">
-    <value>Wklej link do magnesu</value>
+    <value>Wklej link magnet</value>
   </data>
   <data name="Downloads_AddMagnet" xml:space="preserve">
     <value>Dodaj magnet</value>
@@ -101,13 +101,13 @@
     <value>Wklej magnet</value>
   </data>
   <data name="Downloads_Start" xml:space="preserve">
-    <value>Start</value>
+    <value>Uruchom</value>
   </data>
   <data name="Downloads_Stop" xml:space="preserve">
-    <value>Stop</value>
+    <value>Zatrzymaj</value>
   </data>
   <data name="Downloads_Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Usuń</value>
   </data>
   <data name="Downloads_OpenFolder" xml:space="preserve">
     <value>Otwórz folder</value>
@@ -122,19 +122,19 @@
     <value>Wymuś ponowne sprawdzenie</value>
   </data>
   <data name="Downloads_Grid_Name" xml:space="preserve">
-    <value>Name</value>
+    <value>Nazwa</value>
   </data>
   <data name="Downloads_Grid_Progress" xml:space="preserve">
-    <value>Progress</value>
+    <value>Postęp</value>
   </data>
   <data name="Downloads_Grid_State" xml:space="preserve">
-    <value>State</value>
+    <value>Stan</value>
   </data>
   <data name="Downloads_Grid_Down" xml:space="preserve">
-    <value>Down</value>
+    <value>DL</value>
   </data>
   <data name="Downloads_Grid_Up" xml:space="preserve">
-    <value>Up</value>
+    <value>UL</value>
   </data>
   <data name="Downloads_Grid_Peers" xml:space="preserve">
     <value>Peers</value>
@@ -146,22 +146,22 @@
     <value>Pliki torrentowe</value>
   </data>
   <data name="Details_Title" xml:space="preserve">
-    <value>Details</value>
+    <value>Szczegóły</value>
   </data>
   <data name="Details_State" xml:space="preserve">
-    <value>State</value>
+    <value>Stan</value>
   </data>
   <data name="Details_Peers" xml:space="preserve">
     <value>Peers</value>
   </data>
   <data name="Details_Size" xml:space="preserve">
-    <value>Size</value>
+    <value>Rozmiar</value>
   </data>
   <data name="Details_Downloaded" xml:space="preserve">
-    <value>Downloaded</value>
+    <value>Pobrano</value>
   </data>
   <data name="Details_Path" xml:space="preserve">
-    <value>Path</value>
+    <value>Ścieżka</value>
   </data>
   <data name="Details_DownloadLimit" xml:space="preserve">
     <value>Limit pobierania (B/s)</value>
@@ -170,10 +170,10 @@
     <value>Limit przesyłania (B/s)</value>
   </data>
   <data name="Details_Apply" xml:space="preserve">
-    <value>Apply</value>
+    <value>Zastosuj</value>
   </data>
   <data name="Details_Strategy" xml:space="preserve">
-    <value>Strategy</value>
+    <value>Strategia</value>
   </data>
   <data name="DownloadStrategy_RarestFirst" xml:space="preserve">
     <value>Najpierw najrzadsze fragmenty</value>
@@ -182,10 +182,10 @@
     <value>Sekwencyjnie</value>
   </data>
   <data name="DownloadStrategy_Streaming" xml:space="preserve">
-    <value>Streaming</value>
+    <value>Strumieniowanie</value>
   </data>
   <data name="Details_FilesTab" xml:space="preserve">
-    <value>Files</value>
+    <value>Pliki</value>
   </data>
   <data name="Details_TrackersTab" xml:space="preserve">
     <value>Trackers</value>
@@ -197,52 +197,52 @@
     <value>Zastosuj wybór pliku</value>
   </data>
   <data name="Details_Grid_Selected" xml:space="preserve">
-    <value>Selected</value>
+    <value>Wybrane</value>
   </data>
   <data name="Details_Grid_Priority" xml:space="preserve">
-    <value>Priority</value>
+    <value>Priorytet</value>
   </data>
   <data name="Priority_DoNotDownload" xml:space="preserve">
     <value>Nie pobieraj</value>
   </data>
   <data name="Priority_Low" xml:space="preserve">
-    <value>Low</value>
+    <value>Niski</value>
   </data>
   <data name="Priority_Normal" xml:space="preserve">
-    <value>Normal</value>
+    <value>Normalny</value>
   </data>
   <data name="Priority_High" xml:space="preserve">
-    <value>High</value>
+    <value>Wysoki</value>
   </data>
   <data name="Details_Grid_Path" xml:space="preserve">
-    <value>Path</value>
+    <value>Ścieżka</value>
   </data>
   <data name="Details_Grid_Size" xml:space="preserve">
-    <value>Size</value>
+    <value>Rozmiar</value>
   </data>
   <data name="Details_Grid_Downloaded" xml:space="preserve">
-    <value>Downloaded</value>
+    <value>Pobrano</value>
   </data>
   <data name="Details_Grid_Progress" xml:space="preserve">
-    <value>Progress</value>
+    <value>Postęp</value>
   </data>
   <data name="Details_Trackers_Url" xml:space="preserve">
     <value>URL</value>
   </data>
   <data name="Details_Trackers_State" xml:space="preserve">
-    <value>State</value>
+    <value>Stan</value>
   </data>
   <data name="Details_Trackers_Seeds" xml:space="preserve">
-    <value>Seeds</value>
+    <value>Seedery</value>
   </data>
   <data name="Details_Trackers_Leeches" xml:space="preserve">
-    <value>Leeches</value>
+    <value>Leechery</value>
   </data>
   <data name="Details_Trackers_LastError" xml:space="preserve">
     <value>Ostatni błąd</value>
   </data>
   <data name="TrackerStatus_Working" xml:space="preserve">
-    <value>Working</value>
+    <value>Działa</value>
   </data>
   <data name="TrackerStatus_NotWorking" xml:space="preserve">
     <value>Nie działa</value>
@@ -250,35 +250,38 @@
   <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
     <value>Obwód otwarty</value>
   </data>
+  <data name="TrackerStatus_Disabled" xml:space="preserve">
+    <value>Wyłączony przez tracker</value>
+  </data>
   <data name="TrackerStatus_Unknown" xml:space="preserve">
-    <value>Unknown</value>
+    <value>Nieznany</value>
   </data>
   <data name="Details_Peers_Endpoint" xml:space="preserve">
-    <value>Endpoint</value>
+    <value>Punkt końcowy</value>
   </data>
   <data name="Details_Peers_Client" xml:space="preserve">
-    <value>Client</value>
+    <value>Klient</value>
   </data>
   <data name="Details_Peers_Country" xml:space="preserve">
-    <value>Country</value>
+    <value>Kraj</value>
   </data>
   <data name="Details_Peers_Down" xml:space="preserve">
-    <value>Down</value>
+    <value>DL</value>
   </data>
   <data name="Details_Peers_Up" xml:space="preserve">
-    <value>Up</value>
+    <value>UL</value>
   </data>
   <data name="Details_Peers_Progress" xml:space="preserve">
-    <value>Progress</value>
+    <value>Postęp</value>
   </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Wybierz torrent</value>
   </data>
   <data name="Settings_Title" xml:space="preserve">
-    <value>Settings</value>
+    <value>Ustawienia</value>
   </data>
   <data name="Settings_DownloadFolder" xml:space="preserve">
-    <value>Pobierz folder</value>
+    <value>Folder pobierania</value>
   </data>
   <data name="Settings_SessionFolder" xml:space="preserve">
     <value>Folder danych sesji</value>
@@ -288,6 +291,12 @@
   </data>
   <data name="Settings_EnableDht" xml:space="preserve">
     <value>Włącz DHT</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSampling" xml:space="preserve">
+    <value>Odpowiadaj na żądania próbkowania torrentów</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
+    <value>Pozwala innym węzłom DHT pytać, dla których torrentów znasz peerów – tak indeksy wyszukiwania odkrywają nowe torrenty. Tę samą informację można już uzyskać, pytając, kto ma konkretny torrent, więc wyłączenie tej opcji niewiele ukrywa. Wymaga DHT.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Włącz NAT-PMP</value>
@@ -308,7 +317,7 @@
     <value>Zmiany portu nasłuchiwania zostaną zastosowane przy następnym uruchomieniu Peerfluence.</value>
   </data>
   <data name="Settings_Performance" xml:space="preserve">
-    <value>Performance</value>
+    <value>Wydajność</value>
   </data>
   <data name="Settings_DiskReadLimit" xml:space="preserve">
     <value>Limit odczytu dysku (bytes/sec, 0 = nieograniczony)</value>
@@ -320,43 +329,43 @@
     <value>Wariant tematyczny</value>
   </data>
   <data name="Settings_ThemeVariant_System" xml:space="preserve">
-    <value>System</value>
+    <value>Systemowy</value>
   </data>
   <data name="Settings_ThemeVariant_Light" xml:space="preserve">
-    <value>Light</value>
+    <value>Jasny</value>
   </data>
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
-    <value>Dark</value>
+    <value>Ciemny</value>
   </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Motyw koloru</value>
   </data>
   <data name="Settings_ColorTheme_Indigo" xml:space="preserve">
-    <value>Indigo</value>
+    <value>Indygo</value>
   </data>
   <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
-    <value>Cobalt</value>
+    <value>Kobalt</value>
   </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
-    <value>Mint</value>
+    <value>Miętowy</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
-    <value>Emerald</value>
+    <value>Szmaragd</value>
   </data>
   <data name="Settings_ColorTheme_Rose" xml:space="preserve">
-    <value>Rose</value>
+    <value>Różowy</value>
   </data>
   <data name="Settings_ColorTheme_Vibrant" xml:space="preserve">
-    <value>Vibrant</value>
+    <value>Żywy</value>
   </data>
   <data name="Settings_ColorTheme_Amber" xml:space="preserve">
-    <value>Amber</value>
+    <value>Bursztyn</value>
   </data>
   <data name="Settings_ColorTheme_Slate" xml:space="preserve">
-    <value>Slate</value>
+    <value>Łupek</value>
   </data>
   <data name="Settings_ColorTheme_Solar" xml:space="preserve">
-    <value>Solar</value>
+    <value>Słoneczny</value>
   </data>
   <data name="Settings_BackgroundStyle" xml:space="preserve">
     <value>Styl tła</value>
@@ -371,7 +380,7 @@
     <value>Ciemny gradient</value>
   </data>
   <data name="Settings_BackgroundStyle_Flat" xml:space="preserve">
-    <value>Flat</value>
+    <value>Płaski</value>
   </data>
   <data name="Settings_BackgroundStyle_Bubble" xml:space="preserve">
     <value>Bąbelki</value>
@@ -380,10 +389,10 @@
     <value>Język</value>
   </data>
   <data name="Settings_Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Zapisz</value>
   </data>
   <data name="Settings_Reset" xml:space="preserve">
-    <value>Reset</value>
+    <value>Resetuj</value>
   </data>
   <data name="Status_AddingTorrent" xml:space="preserve">
     <value>Dodawanie torrenta...</value>
@@ -398,10 +407,10 @@
     <value>Wklej link do magnesu w polu lub najpierw skopiuj go do schowka.</value>
   </data>
   <data name="Status_AddingMagnet" xml:space="preserve">
-    <value>Dodawanie magnesu...</value>
+    <value>Dodawanie magnet...</value>
   </data>
   <data name="Status_MagnetAdded" xml:space="preserve">
-    <value>Dodany magnes.</value>
+    <value>Dodano magnet.</value>
   </data>
   <data name="Status_AddMagnetFailed" xml:space="preserve">
     <value>Nie udało się dodać magnesu: {0}</value>
@@ -416,7 +425,7 @@
     <value>Ustawienia resetowane do ostatnio zapisanych wartości.</value>
   </data>
   <data name="Status_TorrentReady" xml:space="preserve">
-    <value>Ready</value>
+    <value>Gotowy</value>
   </data>
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Pobieranie metadanych</value>
@@ -431,10 +440,10 @@
     <value>Pozostało {0} minut</value>
   </data>
   <data name="Eta_HoursMinutes" xml:space="preserve">
-    <value>{0}h {1}m w lewo</value>
+    <value>Pozostało {0} godz. {1} min</value>
   </data>
   <data name="Eta_DaysHours" xml:space="preserve">
-    <value>{0}d {1}h w lewo</value>
+    <value>Pozostało {0} dni {1} godz.</value>
   </data>
   <data name="CreateTorrent_Title" xml:space="preserve">
     <value>Utwórz torrenta</value>
@@ -458,16 +467,16 @@
     <value>Prywatny torrent</value>
   </data>
   <data name="CreateTorrent_Comment" xml:space="preserve">
-    <value>Comment</value>
+    <value>Komentarz</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Create</value>
+    <value>Utwórz</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>Plik...</value>
   </data>
   <data name="CreateTorrent_BrowseFolder" xml:space="preserve">
-    <value>Falcówka...</value>
+    <value>Folder...</value>
   </data>
   <data name="CreateTorrent_SelectSourceFolder" xml:space="preserve">
     <value>Wybierz Folder źródłowy</value>
@@ -497,10 +506,10 @@
     <value>Limit proporcji</value>
   </data>
   <data name="Details_Hash" xml:space="preserve">
-    <value>Haszysz:</value>
+    <value>Hash:</value>
   </data>
   <data name="Details_SeedTimeMinutes" xml:space="preserve">
-    <value>Czas wysiewu (min)</value>
+    <value>Czas seedowania (min)</value>
   </data>
   <data name="Details_QueuePriority" xml:space="preserve">
     <value>Priorytet kolejki</value>
@@ -509,10 +518,10 @@
     <value>Sprawdź pliki</value>
   </data>
   <data name="Details_Stream" xml:space="preserve">
-    <value>Stream</value>
+    <value>Strumieniuj</value>
   </data>
   <data name="Details_Play" xml:space="preserve">
-    <value>Play</value>
+    <value>Odtwórz</value>
   </data>
   <data name="Details_RatioLimitWatermark" xml:space="preserve">
     <value>np. 2.0</value>
@@ -548,7 +557,7 @@
     <value>Maksymalna liczba aktywnych pobrań</value>
   </data>
   <data name="Settings_MaxActiveSeeds" xml:space="preserve">
-    <value>Maksymalnie aktywne nasiona</value>
+    <value>Maks. aktywnych seedów</value>
   </data>
   <data name="Settings_IpBlocklist" xml:space="preserve">
     <value>Lista blokowanych adresów IP</value>
@@ -563,10 +572,10 @@
     <value>Ścieżka do pliku listy zablokowanych (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>Przeglądaj</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
-    <value>Appearance</value>
+    <value>Wygląd</value>
   </data>
   <data name="Settings_BlocklistPicker_Title" xml:space="preserve">
     <value>Wybierz opcję Plik listy zablokowanych</value>
@@ -578,28 +587,28 @@
     <value>Wszystkie pliki</value>
   </data>
   <data name="Details_Trackers_AddWatermark" xml:space="preserve">
-    <value>Wprowadź tracker URL</value>
+    <value>Wprowadź adres URL trackera</value>
   </data>
   <data name="Details_Trackers_Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Dodaj</value>
   </data>
   <data name="Details_Trackers_Announce" xml:space="preserve">
-    <value>Announce</value>
+    <value>Ogłoś</value>
   </data>
   <data name="Details_PiecesTab" xml:space="preserve">
-    <value>Pieces</value>
+    <value>Fragmenty</value>
   </data>
   <data name="Details_Pieces_Have" xml:space="preserve">
-    <value>Have</value>
+    <value>Posiadane</value>
   </data>
   <data name="Details_Pieces_HighAvail" xml:space="preserve">
     <value>Wysoka dostępność</value>
   </data>
   <data name="Details_Pieces_Available" xml:space="preserve">
-    <value>Available</value>
+    <value>Dostępne</value>
   </data>
   <data name="Details_Pieces_Missing" xml:space="preserve">
-    <value>Missing</value>
+    <value>Brakujące</value>
   </data>
   <data name="Settings_GeoIp" xml:space="preserve">
     <value>Baza danych GeoIP</value>
@@ -635,19 +644,19 @@
     <value>Pliki wykonywalne</value>
   </data>
   <data name="Settings_Encryption" xml:space="preserve">
-    <value>Encryption</value>
+    <value>Szyfrowanie</value>
   </data>
   <data name="Settings_EncryptionMode" xml:space="preserve">
     <value>Tryb szyfrowania</value>
   </data>
   <data name="Settings_EncryptionMode_Allow" xml:space="preserve">
-    <value>Allow</value>
+    <value>Zezwalaj</value>
   </data>
   <data name="Settings_EncryptionMode_Require" xml:space="preserve">
-    <value>Require</value>
+    <value>Wymagaj</value>
   </data>
   <data name="Settings_EncryptionMode_Refuse" xml:space="preserve">
-    <value>Refuse</value>
+    <value>Odmawiaj</value>
   </data>
   <data name="Settings_Proxy" xml:space="preserve">
     <value>Proxy</value>
@@ -656,7 +665,7 @@
     <value>Typ proxy</value>
   </data>
   <data name="Settings_ProxyType_None" xml:space="preserve">
-    <value>None</value>
+    <value>Brak</value>
   </data>
   <data name="Settings_ProxyType_Socks5" xml:space="preserve">
     <value>SOCKS5</value>
@@ -671,10 +680,10 @@
     <value>Port</value>
   </data>
   <data name="Settings_ProxyUsername" xml:space="preserve">
-    <value>Username</value>
+    <value>Nazwa użytkownika</value>
   </data>
   <data name="Settings_ProxyPassword" xml:space="preserve">
-    <value>Password</value>
+    <value>Hasło</value>
   </data>
   <data name="Settings_ProxyPeers" xml:space="preserve">
     <value>Połączenia równorzędne proxy</value>
@@ -692,13 +701,13 @@
     <value>Stan mapowania portów</value>
   </data>
   <data name="Settings_PortMapping_Refresh" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Odśwież</value>
   </data>
   <data name="Settings_PortMapping_Protocol" xml:space="preserve">
-    <value>Protocol</value>
+    <value>Protokół</value>
   </data>
   <data name="Settings_PortMapping_Status" xml:space="preserve">
-    <value>Status</value>
+    <value>Stan</value>
   </data>
   <data name="Settings_PortMapping_ExternalPort" xml:space="preserve">
     <value>Port zewnętrzny: {0}</value>
@@ -710,16 +719,16 @@
     <value>Nie podjęto próby</value>
   </data>
   <data name="PortMappingResult_Pending" xml:space="preserve">
-    <value>Pending</value>
+    <value>Oczekuje</value>
   </data>
   <data name="PortMappingResult_Success" xml:space="preserve">
-    <value>Success</value>
+    <value>Powodzenie</value>
   </data>
   <data name="PortMappingResult_Failed" xml:space="preserve">
-    <value>Failed</value>
+    <value>Niepowodzenie</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
-    <value>Koniec gry</value>
+    <value>Tryb końcowy</value>
   </data>
   <data name="Details_DiskReadLimit" xml:space="preserve">
     <value>Limit odczytu dysku (B/s)</value>
@@ -728,16 +737,16 @@
     <value>Limit zapisu na dysku (B/s)</value>
   </data>
   <data name="Details_SaveResumeData" xml:space="preserve">
-    <value>Zapisz dane CV</value>
+    <value>Zapisz dane wznawiania</value>
   </data>
   <data name="Details_SaveResumeData_Title" xml:space="preserve">
-    <value>Zapisz dane CV</value>
+    <value>Zapisz dane wznawiania</value>
   </data>
   <data name="Details_SaveResumeData_FileType" xml:space="preserve">
-    <value>Wznów dane</value>
+    <value>Dane wznawiania</value>
   </data>
   <data name="Details_SaveResumeData_Success" xml:space="preserve">
-    <value>Wznów zapisane dane.</value>
+    <value>Zapisano dane wznawiania.</value>
   </data>
   <data name="Details_SaveResumeData_Failed" xml:space="preserve">
     <value>Nie udało się zapisać danych CV: {0}</value>
@@ -755,7 +764,7 @@
     <value>Nie udało się zmienić ścieżki pobierania: {0}</value>
   </data>
   <data name="Settings_DownloadFolderPicker_Title" xml:space="preserve">
-    <value>Wybierz opcję Pobierz folder</value>
+    <value>Wybierz folder pobierania</value>
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Wybierz Folder danych sesji</value>
@@ -794,16 +803,16 @@
     <value>Przycisk magnesu dodaje prawidłowe łącze magnesu ze schowka. Jeśli schowek go nie zawiera, Peerfluence poprosi o jego wklejenie.</value>
   </data>
   <data name="AddTorrent_Destination" xml:space="preserve">
-    <value>Destination</value>
+    <value>Miejsce docelowe</value>
   </data>
   <data name="AddTorrent_DownloadFolderWatermark" xml:space="preserve">
-    <value>Pobierz folder</value>
+    <value>Folder pobierania</value>
   </data>
   <data name="AddTorrent_StartImmediately" xml:space="preserve">
     <value>Zacznij natychmiast</value>
   </data>
   <data name="AddTorrent_Limits" xml:space="preserve">
-    <value>Limits</value>
+    <value>Limity</value>
   </data>
   <data name="AddTorrent_DownloadLimitKib" xml:space="preserve">
     <value>Pobierz KiB/s</value>
@@ -836,22 +845,22 @@
     <value>Nie znaleziono jeszcze metadanych. Nadal możesz dodać magnes, a Peerfluence będzie kontynuował jego pobieranie.</value>
   </data>
   <data name="AddTorrent_MagnetFallbackName" xml:space="preserve">
-    <value>Linka magnetyczna</value>
+    <value>Link magnet</value>
   </data>
   <data name="AddTorrent_Version" xml:space="preserve">
-    <value>Version</value>
+    <value>Wersja</value>
   </data>
   <data name="AddTorrent_Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Dodaj</value>
   </data>
   <data name="AddTorrent_Advanced" xml:space="preserve">
-    <value>Advanced</value>
+    <value>Zaawansowane</value>
   </data>
   <data name="AddTorrent_SkipThisStepNextTime" xml:space="preserve">
     <value>Następnym razem pomiń ten krok</value>
   </data>
   <data name="AddTorrent_Metadata" xml:space="preserve">
-    <value>Metadata</value>
+    <value>Metadane</value>
   </data>
   <data name="AddTorrent_Hash" xml:space="preserve">
     <value>Hash</value>
@@ -860,19 +869,19 @@
     <value>Rozmiar kawałka</value>
   </data>
   <data name="Common_Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Anuluj</value>
   </data>
   <data name="Common_Close" xml:space="preserve">
-    <value>Close</value>
+    <value>Zamknij</value>
   </data>
   <data name="Common_Later" xml:space="preserve">
-    <value>Later</value>
+    <value>Później</value>
   </data>
   <data name="Common_OK" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="Common_Unknown" xml:space="preserve">
-    <value>Unknown</value>
+    <value>Nieznany</value>
   </data>
   <data name="Settings_ShowAddTorrentOptions" xml:space="preserve">
     <value>Pokaż opcje dodawania torrenta przed dodaniem</value>
@@ -911,7 +920,7 @@
     <value>Ścieżka do pliku wykonywalnego lub skryptu</value>
   </data>
   <data name="Settings_CompletionActionArguments" xml:space="preserve">
-    <value>Arguments</value>
+    <value>Argumenty</value>
   </data>
   <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
     <value>Przykład: --path „{downloadPath}” --name „{name}”</value>
@@ -926,7 +935,7 @@
     <value>Limit czasu (sekundy)</value>
   </data>
   <data name="Settings_CompletionActionWindow" xml:space="preserve">
-    <value>Window</value>
+    <value>Okno</value>
   </data>
   <data name="Settings_CompletionActionRunHidden" xml:space="preserve">
     <value>Biegnij w ukryciu</value>
@@ -935,7 +944,7 @@
     <value>Dostępne tokeny: {name}, {hash}, {downloadPath}, {totalSize}</value>
   </data>
   <data name="Details_SettingsTab" xml:space="preserve">
-    <value>Settings</value>
+    <value>Ustawienia</value>
   </data>
   <data name="Settings_StorageAndSession" xml:space="preserve">
     <value>Przechowywanie i sesja</value>
@@ -971,10 +980,10 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
     <value>Bezpieczeństwo i prywatność</value>
   </data>
   <data name="Settings_Updates" xml:space="preserve">
-    <value>Updates</value>
+    <value>Aktualizacje</value>
   </data>
   <data name="Settings_UpdateUrl" xml:space="preserve">
-    <value>Zaktualizuj URL</value>
+    <value>Adres URL aktualizacji</value>
   </data>
   <data name="Settings_UpdateUrlWatermark" xml:space="preserve">
     <value>https://github.com/ligenq/Peerfluence</value>
@@ -1019,13 +1028,13 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
     <value>Zainstaluj aktualizację</value>
   </data>
   <data name="TorrentState_Active" xml:space="preserve">
-    <value>Active</value>
+    <value>Aktywny</value>
   </data>
   <data name="TorrentState_Stopping" xml:space="preserve">
-    <value>Stopping</value>
+    <value>Zatrzymywanie</value>
   </data>
   <data name="TorrentState_Stopped" xml:space="preserve">
-    <value>Stopped</value>
+    <value>Zatrzymany</value>
   </data>
   <data name="TorrentState_CheckingFiles" xml:space="preserve">
     <value>Sprawdzanie plików</value>

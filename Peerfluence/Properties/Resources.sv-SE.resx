@@ -131,10 +131,10 @@
     <value>Tillstånd</value>
   </data>
   <data name="Downloads_Grid_Down" xml:space="preserve">
-    <value>Ned</value>
+    <value>DL</value>
   </data>
   <data name="Downloads_Grid_Up" xml:space="preserve">
-    <value>Upp</value>
+    <value>UL</value>
   </data>
   <data name="Downloads_Grid_Peers" xml:space="preserve">
     <value>Peers</value>
@@ -250,6 +250,9 @@
   <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
     <value>Kretsen är öppen</value>
   </data>
+  <data name="TrackerStatus_Disabled" xml:space="preserve">
+    <value>Inaktiverad av trackern</value>
+  </data>
   <data name="TrackerStatus_Unknown" xml:space="preserve">
     <value>Okänd</value>
   </data>
@@ -263,10 +266,10 @@
     <value>Land</value>
   </data>
   <data name="Details_Peers_Down" xml:space="preserve">
-    <value>Ned</value>
+    <value>DL</value>
   </data>
   <data name="Details_Peers_Up" xml:space="preserve">
-    <value>Upp</value>
+    <value>UL</value>
   </data>
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Förlopp</value>
@@ -288,6 +291,12 @@
   </data>
   <data name="Settings_EnableDht" xml:space="preserve">
     <value>Aktivera DHT</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSampling" xml:space="preserve">
+    <value>Svara på stickprovsförfrågningar om torrenter</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
+    <value>Låter andra DHT-noder fråga vilka torrenter du känner till peers för, vilket är så söktjänster hittar nya torrenter. Samma information går redan att få genom att fråga vem som har en viss torrent, så att stänga av det döljer inte mycket. Kräver DHT.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Aktivera NAT-PMP</value>
@@ -356,7 +365,7 @@
     <value>Skiffer</value>
   </data>
   <data name="Settings_ColorTheme_Solar" xml:space="preserve">
-    <value>Solar</value>
+    <value>Solgul</value>
   </data>
   <data name="Settings_BackgroundStyle" xml:space="preserve">
     <value>Bakgrundsstil</value>
@@ -422,7 +431,7 @@
     <value>Hämtar metadata</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
-    <value>ETA</value>
+    <value>Återstår</value>
   </data>
   <data name="Eta_Seconds" xml:space="preserve">
     <value>{0} sekunder kvar</value>
@@ -590,7 +599,7 @@
     <value>Bitar</value>
   </data>
   <data name="Details_Pieces_Have" xml:space="preserve">
-    <value>Har</value>
+    <value>Hämtade</value>
   </data>
   <data name="Details_Pieces_HighAvail" xml:space="preserve">
     <value>Hög tillgänglighet</value>
@@ -719,7 +728,7 @@
     <value>Misslyckades</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
-    <value>Slutspel</value>
+    <value>Slutfas</value>
   </data>
   <data name="Details_DiskReadLimit" xml:space="preserve">
     <value>Diskläsningsgräns (B/s)</value>
@@ -794,7 +803,7 @@
     <value>Magnetknappen lägger till en giltig magnetlänk från urklipp. Om urklipp inte innehåller någon ber Peerfluence dig att klistra in den.</value>
   </data>
   <data name="AddTorrent_Destination" xml:space="preserve">
-    <value>Destination</value>
+    <value>Mål</value>
   </data>
   <data name="AddTorrent_DownloadFolderWatermark" xml:space="preserve">
     <value>Nedladdningsmapp</value>

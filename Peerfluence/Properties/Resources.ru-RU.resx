@@ -77,22 +77,22 @@
     <value>Загрузки</value>
   </data>
   <data name="Downloads_TotalDown" xml:space="preserve">
-    <value>Всего вниз</value>
+    <value>Всего скачано</value>
   </data>
   <data name="Downloads_TotalUp" xml:space="preserve">
-    <value>Итого вверх</value>
+    <value>Всего отдано</value>
   </data>
   <data name="Downloads_Active" xml:space="preserve">
     <value>Активные торренты</value>
   </data>
   <data name="Downloads_Peers" xml:space="preserve">
-    <value>Сверстники</value>
+    <value>Пиры</value>
   </data>
   <data name="Downloads_AddTorrent" xml:space="preserve">
     <value>Добавить torrent</value>
   </data>
   <data name="Downloads_MagnetWatermark" xml:space="preserve">
-    <value>Вставить магнитную ссылку</value>
+    <value>Вставить magnet-ссылку</value>
   </data>
   <data name="Downloads_AddMagnet" xml:space="preserve">
     <value>Добавить magnet</value>
@@ -101,13 +101,13 @@
     <value>Вставить magnet</value>
   </data>
   <data name="Downloads_Start" xml:space="preserve">
-    <value>Начинать</value>
+    <value>Запустить</value>
   </data>
   <data name="Downloads_Stop" xml:space="preserve">
-    <value>Останавливаться</value>
+    <value>Остановить</value>
   </data>
   <data name="Downloads_Remove" xml:space="preserve">
-    <value>Удалять</value>
+    <value>Удалить</value>
   </data>
   <data name="Downloads_OpenFolder" xml:space="preserve">
     <value>Открыть папку</value>
@@ -131,13 +131,13 @@
     <value>Состояние</value>
   </data>
   <data name="Downloads_Grid_Down" xml:space="preserve">
-    <value>Вниз</value>
+    <value>DL</value>
   </data>
   <data name="Downloads_Grid_Up" xml:space="preserve">
-    <value>Вверх</value>
+    <value>UL</value>
   </data>
   <data name="Downloads_Grid_Peers" xml:space="preserve">
-    <value>Сверстники</value>
+    <value>Пиры</value>
   </data>
   <data name="Downloads_FilePicker_Title" xml:space="preserve">
     <value>Открыть торрент</value>
@@ -152,7 +152,7 @@
     <value>Состояние</value>
   </data>
   <data name="Details_Peers" xml:space="preserve">
-    <value>Сверстники</value>
+    <value>Пиры</value>
   </data>
   <data name="Details_Size" xml:space="preserve">
     <value>Размер</value>
@@ -170,7 +170,7 @@
     <value>Ограничение загрузки (B/s)</value>
   </data>
   <data name="Details_Apply" xml:space="preserve">
-    <value>Применять</value>
+    <value>Применить</value>
   </data>
   <data name="Details_Strategy" xml:space="preserve">
     <value>Стратегия</value>
@@ -191,7 +191,7 @@
     <value>Трекеры</value>
   </data>
   <data name="Details_PeersTab" xml:space="preserve">
-    <value>Сверстники</value>
+    <value>Пиры</value>
   </data>
   <data name="Details_ApplyFileSelection" xml:space="preserve">
     <value>Применить выбор файла</value>
@@ -209,7 +209,7 @@
     <value>Низкий</value>
   </data>
   <data name="Priority_Normal" xml:space="preserve">
-    <value>Нормальный</value>
+    <value>Обычный</value>
   </data>
   <data name="Priority_High" xml:space="preserve">
     <value>Высокий</value>
@@ -233,10 +233,10 @@
     <value>Состояние</value>
   </data>
   <data name="Details_Trackers_Seeds" xml:space="preserve">
-    <value>Семена</value>
+    <value>Сиды</value>
   </data>
   <data name="Details_Trackers_Leeches" xml:space="preserve">
-    <value>Пиявки</value>
+    <value>Личеры</value>
   </data>
   <data name="Details_Trackers_LastError" xml:space="preserve">
     <value>Последняя ошибка</value>
@@ -249,6 +249,9 @@
   </data>
   <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
     <value>Цепь разомкнута</value>
+  </data>
+  <data name="TrackerStatus_Disabled" xml:space="preserve">
+    <value>Отключён трекером</value>
   </data>
   <data name="TrackerStatus_Unknown" xml:space="preserve">
     <value>Неизвестный</value>
@@ -263,10 +266,10 @@
     <value>Страна</value>
   </data>
   <data name="Details_Peers_Down" xml:space="preserve">
-    <value>Вниз</value>
+    <value>DL</value>
   </data>
   <data name="Details_Peers_Up" xml:space="preserve">
-    <value>Вверх</value>
+    <value>UL</value>
   </data>
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Прогресс</value>
@@ -288,6 +291,12 @@
   </data>
   <data name="Settings_EnableDht" xml:space="preserve">
     <value>Включить DHT</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSampling" xml:space="preserve">
+    <value>Отвечать на запросы выборки торрентов</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
+    <value>Позволяет другим узлам DHT спрашивать, для каких торрентов вам известны пиры — так поисковые индексы находят новые торренты. Ту же информацию можно получить, спросив, у кого есть конкретный торрент, поэтому отключение мало что скрывает. Требуется DHT.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Включить NAT-PMP</value>
@@ -323,10 +332,10 @@
     <value>Система</value>
   </data>
   <data name="Settings_ThemeVariant_Light" xml:space="preserve">
-    <value>Свет</value>
+    <value>Светлая</value>
   </data>
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
-    <value>Темный</value>
+    <value>Тёмная</value>
   </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Цветовая тема</value>
@@ -341,22 +350,22 @@
     <value>Мятный</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
-    <value>Изумруд</value>
+    <value>Изумрудный</value>
   </data>
   <data name="Settings_ColorTheme_Rose" xml:space="preserve">
-    <value>Роза</value>
+    <value>Розовый</value>
   </data>
   <data name="Settings_ColorTheme_Vibrant" xml:space="preserve">
     <value>Яркий</value>
   </data>
   <data name="Settings_ColorTheme_Amber" xml:space="preserve">
-    <value>Янтарь</value>
+    <value>Янтарный</value>
   </data>
   <data name="Settings_ColorTheme_Slate" xml:space="preserve">
-    <value>Шифер</value>
+    <value>Сланец</value>
   </data>
   <data name="Settings_ColorTheme_Solar" xml:space="preserve">
-    <value>Солнечная</value>
+    <value>Солнечный</value>
   </data>
   <data name="Settings_BackgroundStyle" xml:space="preserve">
     <value>Стиль фона</value>
@@ -380,10 +389,10 @@
     <value>Язык</value>
   </data>
   <data name="Settings_Save" xml:space="preserve">
-    <value>Сохранять</value>
+    <value>Сохранить</value>
   </data>
   <data name="Settings_Reset" xml:space="preserve">
-    <value>Перезагрузить</value>
+    <value>Сбросить</value>
   </data>
   <data name="Status_AddingTorrent" xml:space="preserve">
     <value>Добавляю торрент...</value>
@@ -398,10 +407,10 @@
     <value>Вставьте магнитную ссылку в поле или сначала скопируйте ее в буфер обмена.</value>
   </data>
   <data name="Status_AddingMagnet" xml:space="preserve">
-    <value>Добавляем магнит...</value>
+    <value>Добавляем magnet...</value>
   </data>
   <data name="Status_MagnetAdded" xml:space="preserve">
-    <value>Магнит добавил.</value>
+    <value>Magnet добавлен.</value>
   </data>
   <data name="Status_AddMagnetFailed" xml:space="preserve">
     <value>Не удалось добавить магнит: {0}.</value>
@@ -422,7 +431,7 @@
     <value>Получение метаданных</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
-    <value>расчетное время прибытия</value>
+    <value>Осталось</value>
   </data>
   <data name="Eta_Seconds" xml:space="preserve">
     <value>{0} секунд осталось</value>
@@ -431,10 +440,10 @@
     <value>Осталось {0} минут</value>
   </data>
   <data name="Eta_HoursMinutes" xml:space="preserve">
-    <value>{0}h {1}m слева</value>
+    <value>Осталось {0} ч {1} мин</value>
   </data>
   <data name="Eta_DaysHours" xml:space="preserve">
-    <value>{0}d {1}h левый</value>
+    <value>Осталось {0} д {1} ч</value>
   </data>
   <data name="CreateTorrent_Title" xml:space="preserve">
     <value>Создать торрент</value>
@@ -452,7 +461,7 @@
     <value>Введите трекер URLs, по одному в строке...</value>
   </data>
   <data name="CreateTorrent_PieceSize" xml:space="preserve">
-    <value>Размер детали</value>
+    <value>Размер части</value>
   </data>
   <data name="CreateTorrent_Private" xml:space="preserve">
     <value>Частный торрент</value>
@@ -500,7 +509,7 @@
     <value>Хэш:</value>
   </data>
   <data name="Details_SeedTimeMinutes" xml:space="preserve">
-    <value>Время посева (мин)</value>
+    <value>Время раздачи (мин)</value>
   </data>
   <data name="Details_QueuePriority" xml:space="preserve">
     <value>Приоритет очереди</value>
@@ -512,7 +521,7 @@
     <value>Транслировать</value>
   </data>
   <data name="Details_Play" xml:space="preserve">
-    <value>Играть</value>
+    <value>Воспроизвести</value>
   </data>
   <data name="Details_RatioLimitWatermark" xml:space="preserve">
     <value>например 2.0</value>
@@ -548,7 +557,7 @@
     <value>Максимальное количество активных загрузок</value>
   </data>
   <data name="Settings_MaxActiveSeeds" xml:space="preserve">
-    <value>Макс активные семена</value>
+    <value>Макс. активных раздач</value>
   </data>
   <data name="Settings_IpBlocklist" xml:space="preserve">
     <value>Черный список IP-адресов</value>
@@ -563,10 +572,10 @@
     <value>Путь к файлу черного списка (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Просматривать</value>
+    <value>Обзор</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
-    <value>Появление</value>
+    <value>Внешний вид</value>
   </data>
   <data name="Settings_BlocklistPicker_Title" xml:space="preserve">
     <value>Выберите файл черного списка</value>
@@ -578,28 +587,28 @@
     <value>Все файлы</value>
   </data>
   <data name="Details_Trackers_AddWatermark" xml:space="preserve">
-    <value>Введите трекер URL</value>
+    <value>Введите URL трекера</value>
   </data>
   <data name="Details_Trackers_Add" xml:space="preserve">
-    <value>Добавлять</value>
+    <value>Добавить</value>
   </data>
   <data name="Details_Trackers_Announce" xml:space="preserve">
-    <value>объявить</value>
+    <value>Анонсировать</value>
   </data>
   <data name="Details_PiecesTab" xml:space="preserve">
-    <value>Куски</value>
+    <value>Части</value>
   </data>
   <data name="Details_Pieces_Have" xml:space="preserve">
-    <value>Иметь</value>
+    <value>Есть</value>
   </data>
   <data name="Details_Pieces_HighAvail" xml:space="preserve">
     <value>Высокая доступность</value>
   </data>
   <data name="Details_Pieces_Available" xml:space="preserve">
-    <value>Доступный</value>
+    <value>Доступные</value>
   </data>
   <data name="Details_Pieces_Missing" xml:space="preserve">
-    <value>Отсутствующий</value>
+    <value>Отсутствуют</value>
   </data>
   <data name="Settings_GeoIp" xml:space="preserve">
     <value>База данных GeoIP</value>
@@ -641,13 +650,13 @@
     <value>Режим шифрования</value>
   </data>
   <data name="Settings_EncryptionMode_Allow" xml:space="preserve">
-    <value>Позволять</value>
+    <value>Разрешать</value>
   </data>
   <data name="Settings_EncryptionMode_Require" xml:space="preserve">
     <value>Требовать</value>
   </data>
   <data name="Settings_EncryptionMode_Refuse" xml:space="preserve">
-    <value>Мусор</value>
+    <value>Отклонять</value>
   </data>
   <data name="Settings_Proxy" xml:space="preserve">
     <value>Прокси</value>
@@ -656,7 +665,7 @@
     <value>Тип прокси</value>
   </data>
   <data name="Settings_ProxyType_None" xml:space="preserve">
-    <value>Никто</value>
+    <value>Нет</value>
   </data>
   <data name="Settings_ProxyType_Socks5" xml:space="preserve">
     <value>SOCKS5</value>
@@ -665,7 +674,7 @@
     <value>HTTP</value>
   </data>
   <data name="Settings_ProxyHost" xml:space="preserve">
-    <value>Хозяин</value>
+    <value>Хост</value>
   </data>
   <data name="Settings_ProxyPort" xml:space="preserve">
     <value>Порт</value>
@@ -716,10 +725,10 @@
     <value>Успех</value>
   </data>
   <data name="PortMappingResult_Failed" xml:space="preserve">
-    <value>Неуспешный</value>
+    <value>Не удалось</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
-    <value>Конец игры</value>
+    <value>Режим завершения</value>
   </data>
   <data name="Details_DiskReadLimit" xml:space="preserve">
     <value>Ограничение чтения диска (B/s)</value>
@@ -728,13 +737,13 @@
     <value>Ограничение записи на диск (B/s)</value>
   </data>
   <data name="Details_SaveResumeData" xml:space="preserve">
-    <value>Сохранить данные резюме</value>
+    <value>Сохранить данные возобновления</value>
   </data>
   <data name="Details_SaveResumeData_Title" xml:space="preserve">
-    <value>Сохранить данные резюме</value>
+    <value>Сохранить данные возобновления</value>
   </data>
   <data name="Details_SaveResumeData_FileType" xml:space="preserve">
-    <value>Возобновить данные</value>
+    <value>Данные возобновления</value>
   </data>
   <data name="Details_SaveResumeData_Success" xml:space="preserve">
     <value>Данные возобновления сохранены.</value>
@@ -836,13 +845,13 @@
     <value>Метаданные пока не найдены. Вы по-прежнему можете добавить магнит, и Peerfluence продолжит его извлекать.</value>
   </data>
   <data name="AddTorrent_MagnetFallbackName" xml:space="preserve">
-    <value>Магнитная ссылка</value>
+    <value>Magnet-ссылка</value>
   </data>
   <data name="AddTorrent_Version" xml:space="preserve">
     <value>Версия</value>
   </data>
   <data name="AddTorrent_Add" xml:space="preserve">
-    <value>Добавлять</value>
+    <value>Добавить</value>
   </data>
   <data name="AddTorrent_Advanced" xml:space="preserve">
     <value>Передовой</value>
@@ -857,19 +866,19 @@
     <value>Хэш</value>
   </data>
   <data name="AddTorrent_PieceSize" xml:space="preserve">
-    <value>Размер куска</value>
+    <value>Размер части</value>
   </data>
   <data name="Common_Cancel" xml:space="preserve">
     <value>Отмена</value>
   </data>
   <data name="Common_Close" xml:space="preserve">
-    <value>Закрывать</value>
+    <value>Закрыть</value>
   </data>
   <data name="Common_Later" xml:space="preserve">
     <value>Позже</value>
   </data>
   <data name="Common_OK" xml:space="preserve">
-    <value>ХОРОШО</value>
+    <value>ОК</value>
   </data>
   <data name="Common_Unknown" xml:space="preserve">
     <value>Неизвестный</value>
@@ -974,7 +983,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Обновления</value>
   </data>
   <data name="Settings_UpdateUrl" xml:space="preserve">
-    <value>Обновить URL</value>
+    <value>URL обновления</value>
   </data>
   <data name="Settings_UpdateUrlWatermark" xml:space="preserve">
     <value>https://github.com/ligenq/Peerfluence</value>

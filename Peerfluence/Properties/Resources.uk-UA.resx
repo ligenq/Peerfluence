@@ -77,22 +77,22 @@
     <value>Завантаження</value>
   </data>
   <data name="Downloads_TotalDown" xml:space="preserve">
-    <value>Total Down</value>
+    <value>Всього завантажено</value>
   </data>
   <data name="Downloads_TotalUp" xml:space="preserve">
-    <value>Total Up</value>
+    <value>Всього віддано</value>
   </data>
   <data name="Downloads_Active" xml:space="preserve">
     <value>Активні торренти</value>
   </data>
   <data name="Downloads_Peers" xml:space="preserve">
-    <value>Однолітки</value>
+    <value>Піри</value>
   </data>
   <data name="Downloads_AddTorrent" xml:space="preserve">
     <value>Додати torrent</value>
   </data>
   <data name="Downloads_MagnetWatermark" xml:space="preserve">
-    <value>Вставте магнітне посилання</value>
+    <value>Вставте magnet-посилання</value>
   </data>
   <data name="Downloads_AddMagnet" xml:space="preserve">
     <value>Додати magnet</value>
@@ -101,13 +101,13 @@
     <value>Вставити magnet</value>
   </data>
   <data name="Downloads_Start" xml:space="preserve">
-    <value>Почніть</value>
+    <value>Запустити</value>
   </data>
   <data name="Downloads_Stop" xml:space="preserve">
-    <value>СТІЙ</value>
+    <value>Зупинити</value>
   </data>
   <data name="Downloads_Remove" xml:space="preserve">
-    <value>видалити</value>
+    <value>Видалити</value>
   </data>
   <data name="Downloads_OpenFolder" xml:space="preserve">
     <value>Відкрити папку</value>
@@ -128,19 +128,19 @@
     <value>Прогрес</value>
   </data>
   <data name="Downloads_Grid_State" xml:space="preserve">
-    <value>Держава</value>
+    <value>Стан</value>
   </data>
   <data name="Downloads_Grid_Down" xml:space="preserve">
-    <value>вниз</value>
+    <value>DL</value>
   </data>
   <data name="Downloads_Grid_Up" xml:space="preserve">
-    <value>Вгору</value>
+    <value>UL</value>
   </data>
   <data name="Downloads_Grid_Peers" xml:space="preserve">
-    <value>Однолітки</value>
+    <value>Піри</value>
   </data>
   <data name="Downloads_FilePicker_Title" xml:space="preserve">
-    <value>Відкрийте Торрент</value>
+    <value>Відкрити торрент</value>
   </data>
   <data name="Downloads_FilePicker_Filter" xml:space="preserve">
     <value>Торрент файли</value>
@@ -149,10 +149,10 @@
     <value>Подробиці</value>
   </data>
   <data name="Details_State" xml:space="preserve">
-    <value>Держава</value>
+    <value>Стан</value>
   </data>
   <data name="Details_Peers" xml:space="preserve">
-    <value>Однолітки</value>
+    <value>Піри</value>
   </data>
   <data name="Details_Size" xml:space="preserve">
     <value>Розмір</value>
@@ -161,7 +161,7 @@
     <value>Завантажено</value>
   </data>
   <data name="Details_Path" xml:space="preserve">
-    <value>шлях</value>
+    <value>Шлях</value>
   </data>
   <data name="Details_DownloadLimit" xml:space="preserve">
     <value>Ліміт завантаження (B/s)</value>
@@ -191,7 +191,7 @@
     <value>Трекери</value>
   </data>
   <data name="Details_PeersTab" xml:space="preserve">
-    <value>Однолітки</value>
+    <value>Піри</value>
   </data>
   <data name="Details_ApplyFileSelection" xml:space="preserve">
     <value>Застосувати вибір файлу</value>
@@ -209,13 +209,13 @@
     <value>Низький</value>
   </data>
   <data name="Priority_Normal" xml:space="preserve">
-    <value>нормальний</value>
+    <value>Звичайний</value>
   </data>
   <data name="Priority_High" xml:space="preserve">
     <value>Високий</value>
   </data>
   <data name="Details_Grid_Path" xml:space="preserve">
-    <value>шлях</value>
+    <value>Шлях</value>
   </data>
   <data name="Details_Grid_Size" xml:space="preserve">
     <value>Розмір</value>
@@ -230,13 +230,13 @@
     <value>URL</value>
   </data>
   <data name="Details_Trackers_State" xml:space="preserve">
-    <value>Держава</value>
+    <value>Стан</value>
   </data>
   <data name="Details_Trackers_Seeds" xml:space="preserve">
-    <value>Насіння</value>
+    <value>Сіди</value>
   </data>
   <data name="Details_Trackers_Leeches" xml:space="preserve">
-    <value>П'явки</value>
+    <value>Лічери</value>
   </data>
   <data name="Details_Trackers_LastError" xml:space="preserve">
     <value>Остання помилка</value>
@@ -249,6 +249,9 @@
   </data>
   <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
     <value>Ланцюг розімкнено</value>
+  </data>
+  <data name="TrackerStatus_Disabled" xml:space="preserve">
+    <value>Вимкнено трекером</value>
   </data>
   <data name="TrackerStatus_Unknown" xml:space="preserve">
     <value>Невідомий</value>
@@ -263,10 +266,10 @@
     <value>Країна</value>
   </data>
   <data name="Details_Peers_Down" xml:space="preserve">
-    <value>вниз</value>
+    <value>DL</value>
   </data>
   <data name="Details_Peers_Up" xml:space="preserve">
-    <value>Вгору</value>
+    <value>UL</value>
   </data>
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Прогрес</value>
@@ -278,7 +281,7 @@
     <value>Налаштування</value>
   </data>
   <data name="Settings_DownloadFolder" xml:space="preserve">
-    <value>Завантажити папку</value>
+    <value>Папка завантажень</value>
   </data>
   <data name="Settings_SessionFolder" xml:space="preserve">
     <value>Папка даних сеансу</value>
@@ -288,6 +291,12 @@
   </data>
   <data name="Settings_EnableDht" xml:space="preserve">
     <value>Увімкнути DHT</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSampling" xml:space="preserve">
+    <value>Відповідати на запити вибірки торрентів</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
+    <value>Дозволяє іншим вузлам DHT запитувати, для яких торрентів вам відомі піри — саме так пошукові індекси знаходять нові торренти. Ту саму інформацію можна отримати, запитавши, хто має конкретний торрент, тож вимкнення приховує небагато. Потребує DHT.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Увімкнути NAT-PMP</value>
@@ -320,13 +329,13 @@
     <value>Тематичний варіант</value>
   </data>
   <data name="Settings_ThemeVariant_System" xml:space="preserve">
-    <value>система</value>
+    <value>Системна</value>
   </data>
   <data name="Settings_ThemeVariant_Light" xml:space="preserve">
-    <value>світло</value>
+    <value>Світла</value>
   </data>
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
-    <value>Темний</value>
+    <value>Темна</value>
   </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Кольорова тема</value>
@@ -338,25 +347,25 @@
     <value>Кобальт</value>
   </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
-    <value>Монетний двір</value>
+    <value>М'ятний</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Смарагдовий</value>
   </data>
   <data name="Settings_ColorTheme_Rose" xml:space="preserve">
-    <value>Роза</value>
+    <value>Рожевий</value>
   </data>
   <data name="Settings_ColorTheme_Vibrant" xml:space="preserve">
     <value>Яскравий</value>
   </data>
   <data name="Settings_ColorTheme_Amber" xml:space="preserve">
-    <value>Бурштин</value>
+    <value>Бурштиновий</value>
   </data>
   <data name="Settings_ColorTheme_Slate" xml:space="preserve">
-    <value>Шифер</value>
+    <value>Сланець</value>
   </data>
   <data name="Settings_ColorTheme_Solar" xml:space="preserve">
-    <value>Сонячна</value>
+    <value>Сонячний</value>
   </data>
   <data name="Settings_BackgroundStyle" xml:space="preserve">
     <value>Стиль фону</value>
@@ -380,7 +389,7 @@
     <value>Мова</value>
   </data>
   <data name="Settings_Save" xml:space="preserve">
-    <value>зберегти</value>
+    <value>Зберегти</value>
   </data>
   <data name="Settings_Reset" xml:space="preserve">
     <value>Скинути</value>
@@ -398,10 +407,10 @@
     <value>Вставте магнітне посилання в поле або спочатку скопіюйте його в буфер обміну.</value>
   </data>
   <data name="Status_AddingMagnet" xml:space="preserve">
-    <value>Додавання магніту...</value>
+    <value>Додавання magnet...</value>
   </data>
   <data name="Status_MagnetAdded" xml:space="preserve">
-    <value>Додано магніт.</value>
+    <value>Додано magnet.</value>
   </data>
   <data name="Status_AddMagnetFailed" xml:space="preserve">
     <value>Не вдалося додати магніт: {0}</value>
@@ -431,10 +440,10 @@
     <value>Залишилося {0} хвилин</value>
   </data>
   <data name="Eta_HoursMinutes" xml:space="preserve">
-    <value>{0}h {1}m вліво</value>
+    <value>Залишилося {0} год {1} хв</value>
   </data>
   <data name="Eta_DaysHours" xml:space="preserve">
-    <value>{0}d {1}h вліво</value>
+    <value>Залишилося {0} дн {1} год</value>
   </data>
   <data name="CreateTorrent_Title" xml:space="preserve">
     <value>Створити торрент</value>
@@ -500,7 +509,7 @@
     <value>Хеш:</value>
   </data>
   <data name="Details_SeedTimeMinutes" xml:space="preserve">
-    <value>Час посіву (хв)</value>
+    <value>Час роздачі (хв)</value>
   </data>
   <data name="Details_QueuePriority" xml:space="preserve">
     <value>Пріоритет черги</value>
@@ -509,10 +518,10 @@
     <value>Перевірте файли</value>
   </data>
   <data name="Details_Stream" xml:space="preserve">
-    <value>Потік</value>
+    <value>Транслювати</value>
   </data>
   <data name="Details_Play" xml:space="preserve">
-    <value>грати</value>
+    <value>Відтворити</value>
   </data>
   <data name="Details_RatioLimitWatermark" xml:space="preserve">
     <value>напр. 2.0</value>
@@ -548,7 +557,7 @@
     <value>Максимум активних завантажень</value>
   </data>
   <data name="Settings_MaxActiveSeeds" xml:space="preserve">
-    <value>Максимально активне насіння</value>
+    <value>Макс. активних роздач</value>
   </data>
   <data name="Settings_IpBlocklist" xml:space="preserve">
     <value>Чорний список IP-адрес</value>
@@ -563,7 +572,7 @@
     <value>Шлях до файлу списку блокувань (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>переглядати</value>
+    <value>Огляд</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Зовнішній вигляд</value>
@@ -578,28 +587,28 @@
     <value>Всі файли</value>
   </data>
   <data name="Details_Trackers_AddWatermark" xml:space="preserve">
-    <value>Введіть трекер URL</value>
+    <value>Введіть URL трекера</value>
   </data>
   <data name="Details_Trackers_Add" xml:space="preserve">
-    <value>додати</value>
+    <value>Додати</value>
   </data>
   <data name="Details_Trackers_Announce" xml:space="preserve">
     <value>Оголосити</value>
   </data>
   <data name="Details_PiecesTab" xml:space="preserve">
-    <value>штук</value>
+    <value>Частини</value>
   </data>
   <data name="Details_Pieces_Have" xml:space="preserve">
-    <value>мати</value>
+    <value>Наявні</value>
   </data>
   <data name="Details_Pieces_HighAvail" xml:space="preserve">
     <value>Висока доступність</value>
   </data>
   <data name="Details_Pieces_Available" xml:space="preserve">
-    <value>в наявності</value>
+    <value>Доступні</value>
   </data>
   <data name="Details_Pieces_Missing" xml:space="preserve">
-    <value>пропав</value>
+    <value>Відсутні</value>
   </data>
   <data name="Settings_GeoIp" xml:space="preserve">
     <value>База даних GeoIP</value>
@@ -719,7 +728,7 @@
     <value>Не вдалося</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
-    <value>Кінець гри</value>
+    <value>Режим завершення</value>
   </data>
   <data name="Details_DiskReadLimit" xml:space="preserve">
     <value>Ліміт читання диска (B/s)</value>
@@ -728,13 +737,13 @@
     <value>Ліміт запису на диск (B/s)</value>
   </data>
   <data name="Details_SaveResumeData" xml:space="preserve">
-    <value>Зберегти дані резюме</value>
+    <value>Зберегти дані відновлення</value>
   </data>
   <data name="Details_SaveResumeData_Title" xml:space="preserve">
-    <value>Зберегти дані резюме</value>
+    <value>Зберегти дані відновлення</value>
   </data>
   <data name="Details_SaveResumeData_FileType" xml:space="preserve">
-    <value>Дані резюме</value>
+    <value>Дані відновлення</value>
   </data>
   <data name="Details_SaveResumeData_Success" xml:space="preserve">
     <value>Дані відновлення збережено.</value>
@@ -755,7 +764,7 @@
     <value>Не вдалося змінити шлях завантаження: {0}</value>
   </data>
   <data name="Settings_DownloadFolderPicker_Title" xml:space="preserve">
-    <value>Виберіть Завантажити папку</value>
+    <value>Виберіть папку завантажень</value>
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Виберіть папку даних сеансу</value>
@@ -797,7 +806,7 @@
     <value>Пункт призначення</value>
   </data>
   <data name="AddTorrent_DownloadFolderWatermark" xml:space="preserve">
-    <value>Завантажити папку</value>
+    <value>Папка завантажень</value>
   </data>
   <data name="AddTorrent_StartImmediately" xml:space="preserve">
     <value>Почніть негайно</value>
@@ -836,13 +845,13 @@
     <value>Метадані ще не знайдено. Ви все ще можете додати магніт, і Peerfluence продовжить його отримувати.</value>
   </data>
   <data name="AddTorrent_MagnetFallbackName" xml:space="preserve">
-    <value>Магнітне посилання</value>
+    <value>Magnet-посилання</value>
   </data>
   <data name="AddTorrent_Version" xml:space="preserve">
     <value>Версія</value>
   </data>
   <data name="AddTorrent_Add" xml:space="preserve">
-    <value>додати</value>
+    <value>Додати</value>
   </data>
   <data name="AddTorrent_Advanced" xml:space="preserve">
     <value>Просунутий</value>
@@ -869,7 +878,7 @@
     <value>Пізніше</value>
   </data>
   <data name="Common_OK" xml:space="preserve">
-    <value>добре</value>
+    <value>Гаразд</value>
   </data>
   <data name="Common_Unknown" xml:space="preserve">
     <value>Невідомий</value>
@@ -974,7 +983,7 @@ Peerfluence поширюється за MIT License. Установлюючи а
     <value>Оновлення</value>
   </data>
   <data name="Settings_UpdateUrl" xml:space="preserve">
-    <value>Оновити URL</value>
+    <value>URL оновлення</value>
   </data>
   <data name="Settings_UpdateUrlWatermark" xml:space="preserve">
     <value>https://github.com/ligenq/Peerfluence</value>
@@ -1025,7 +1034,7 @@ Peerfluence поширюється за MIT License. Установлюючи а
     <value>Зупинка</value>
   </data>
   <data name="TorrentState_Stopped" xml:space="preserve">
-    <value>Зупинився</value>
+    <value>Зупинено</value>
   </data>
   <data name="TorrentState_CheckingFiles" xml:space="preserve">
     <value>Перевірка файлів</value>
