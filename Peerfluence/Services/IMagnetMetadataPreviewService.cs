@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using PeerSharp.Core;
 
 namespace Peerfluence.Services;
 
@@ -23,7 +24,8 @@ public sealed record MagnetMetadataPreview(
     long PieceSizeBytes,
     bool IsPrivate,
     IReadOnlyList<MagnetMetadataPreviewFile> Files,
-    IReadOnlyList<string> Trackers);
+    IReadOnlyList<string> Trackers,
+    TorrentFile? TorrentFile = null);
 
 public sealed record MagnetMetadataPreviewFile(
     int Index,

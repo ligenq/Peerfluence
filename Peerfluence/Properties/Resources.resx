@@ -250,6 +250,9 @@
   <data name="TrackerStatus_CircuitOpen" xml:space="preserve">
     <value>Circuit open</value>
   </data>
+  <data name="TrackerStatus_Disabled" xml:space="preserve">
+    <value>Disabled by tracker</value>
+  </data>
   <data name="TrackerStatus_Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
@@ -288,6 +291,12 @@
   </data>
   <data name="Settings_EnableDht" xml:space="preserve">
     <value>Enable DHT</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSampling" xml:space="preserve">
+    <value>Answer torrent sampling requests</value>
+  </data>
+  <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
+    <value>Lets other DHT nodes ask which torrents you have peers for, which search indexes use to discover torrents. The same information is already available by asking who has a specific torrent, so turning this off hides little. Requires DHT.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Enable NAT-PMP</value>

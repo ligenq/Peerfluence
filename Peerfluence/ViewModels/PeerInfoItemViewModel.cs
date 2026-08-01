@@ -1,3 +1,4 @@
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Peerfluence.ViewModels;
@@ -17,6 +18,7 @@ public sealed class PeerInfoItemViewModel : ObservableObject
         DownloadSpeedBytesPerSecond = peer.DownloadSpeed;
         UploadSpeedBytesPerSecond = peer.UploadSpeed;
         Progress = peer.Progress;
+        HasReportedPieces = peer.HasReportedPieces;
         IsEncrypted = peer.IsEncrypted;
         IsUtp = peer.IsUtp;
     }
@@ -50,8 +52,35 @@ public sealed class PeerInfoItemViewModel : ObservableObject
     public float Progress
     {
         get;
-        private set => SetProperty(ref field, value);
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(ProgressText));
+            }
+        }
     }
+
+    /// <summary>
+    /// False until the peer sends a bitfield or a have message. A peer that has said nothing reports
+    /// <see cref="Progress"/> of zero, which is indistinguishable from one that genuinely holds
+    /// nothing.
+    /// </summary>
+    public bool HasReportedPieces
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(ProgressText));
+            }
+        }
+    }
+
+    public string ProgressText => HasReportedPieces
+        ? Progress.ToString("P1", CultureInfo.CurrentCulture)
+        : "—";
 
     public bool IsEncrypted
     {

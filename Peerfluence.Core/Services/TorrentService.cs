@@ -40,6 +40,10 @@ public sealed class TorrentService : ITorrentService
     public async Task<ITorrent> AddMagnetAsync(string magnetUri, AddTorrentOptions? options = null, CancellationToken cancellationToken = default)
     {
         var magnet = MagnetLink.Parse(magnetUri);
+        if (!HasUsableInfoHash(magnet))
+        {
+            throw new NotSupportedException(MagnetWithoutInfoHashMessage);
+        }
 
         options ??= new AddTorrentOptions();
         if (string.IsNullOrEmpty(options.DownloadPath))
@@ -50,10 +54,35 @@ public sealed class TorrentService : ITorrentService
         return await _engineService.Engine.AddMagnetAsync(magnet, options, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Shown when a magnet names no torrent we can fetch. In practice that means a BEP 46
+    /// self-updating link (<c>xs=urn:btpk:</c>), whose current info hash lives in the DHT rather
+    /// than in the link.
+    /// </summary>
+    public const string MagnetWithoutInfoHashMessage =
+        "This magnet link is a self-updating (BEP 46) link and carries no info hash. Peerfluence cannot add these yet.";
+
+    /// <summary>
+    /// Whether a parsed magnet names something addable. PeerSharp accepts BEP 46 links that carry a
+    /// public key and no info hash; adding one would register a torrent under an empty hash, which
+    /// can never fetch metadata and collides with the next such link.
+    /// </summary>
+    public static bool HasUsableInfoHash(MagnetLink magnet)
+    {
+        ArgumentNullException.ThrowIfNull(magnet);
+        return !magnet.InfoHash.IsEmpty || !magnet.InfoHashV2.IsEmpty;
+    }
+
     public async Task<ITorrent> AddTorrentFileAsync(string torrentPath, AddTorrentOptions? options = null, CancellationToken cancellationToken = default)
     {
         var torrentFile = await TorrentFile.LoadAsync(torrentPath, cancellationToken).ConfigureAwait(false);
 
+        return await AddTorrentAsync(torrentFile, options, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ITorrent> AddTorrentAsync(TorrentFile torrentFile, AddTorrentOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(torrentFile);
         options ??= new AddTorrentOptions();
         if (string.IsNullOrEmpty(options.DownloadPath))
         {
@@ -99,7 +128,7 @@ public sealed class TorrentService : ITorrentService
         return _engineService.Engine.Alerts.GetAlertsAsync(pollingInterval, cancellationToken);
     }
 
-    public void PublishAlert(Alert alert)
+    public void PublishAlert(Alert alert, CancellationToken cancellationToken = default)
     {
         switch (alert)
         {
@@ -109,14 +138,22 @@ public sealed class TorrentService : ITorrentService
             case MetadataAlert metadataAlert:
                 if (metadataAlert.Id == AlertId.MetadataInitialized)
                 {
-                    _ = EnsureUniqueDownloadPathAsync(metadataAlert.Torrent);
+                    _ = EnsureUniqueDownloadPathAsync(metadataAlert.Torrent, cancellationToken);
                 }
                 _messenger.Publish(new TorrentAlertMessage(metadataAlert.Torrent, alert));
                 break;
         }
     }
 
-    private async Task EnsureUniqueDownloadPathAsync(ITorrent torrent)
+    /// <summary>
+    /// Moves a torrent that landed in the download root into its own folder, once metadata names it.
+    ///
+    /// <para>
+    /// Runs unawaited, so the token is what stops a stop/re-path/restart sequence from continuing
+    /// into engine shutdown and losing the race against disposal.
+    /// </para>
+    /// </summary>
+    private async Task EnsureUniqueDownloadPathAsync(ITorrent torrent, CancellationToken cancellationToken)
     {
         try
         {
@@ -130,7 +167,7 @@ public sealed class TorrentService : ITorrentService
                 bool wasStarted = torrent.Started;
                 if (wasStarted)
                 {
-                    await torrent.StopAsync().ConfigureAwait(false);
+                    await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
                 }
 
                 if (!IsRegistered(torrent))
@@ -138,11 +175,11 @@ public sealed class TorrentService : ITorrentService
                     return;
                 }
 
-                await torrent.SetDownloadPathAsync(uniquePath).ConfigureAwait(false);
+                await torrent.SetDownloadPathAsync(uniquePath, cancellationToken).ConfigureAwait(false);
 
                 if (wasStarted && IsRegistered(torrent))
                 {
-                    await torrent.StartAsync().ConfigureAwait(false);
+                    await torrent.StartAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
         }

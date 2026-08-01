@@ -22,6 +22,8 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     private readonly string _source;
     private readonly bool _isMagnet;
     private CancellationTokenSource? _metadataPreviewCts;
+    private Task? _metadataPreviewTask;
+    private TorrentFile? _previewTorrentFile;
 
     private AddTorrentOptionsViewModel(
         ITorrentService torrentService,
@@ -148,6 +150,8 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         var torrentFile = await TorrentFile.LoadAsync(torrentPath);
         var model = new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, torrentPath, isMagnet: false)
         {
+            // Kept so the add reuses the file we already parsed rather than reading it a second time.
+            _previewTorrentFile = torrentFile,
             Name = torrentFile.Name,
             SourceLabel = torrentPath,
             Hash = torrentFile.InfoHash.IsEmpty ? torrentFile.InfoHashV2.ToString() : torrentFile.InfoHash.ToString(),
@@ -198,11 +202,12 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         _metadataPreviewCts = new CancellationTokenSource();
         IsFetchingMetadata = true;
         MetadataStatusText = Resources.Status_FetchingMetadata;
-        _ = FetchMetadataPreviewAsync(previewService, timeout, _metadataPreviewCts);
+        _metadataPreviewTask = FetchMetadataPreviewAsync(previewService, timeout, _metadataPreviewCts);
     }
 
     internal void ApplyMetadataPreview(MagnetMetadataPreview preview)
     {
+        _previewTorrentFile = preview.TorrentFile;
         Name = preview.Name;
         Hash = preview.Hash;
         VersionLabel = preview.VersionLabel;
@@ -212,6 +217,12 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         PieceSizeBytes = preview.PieceSizeBytes;
         IsPrivate = preview.IsPrivate;
         ExistingTrackers = string.Join(Environment.NewLine, preview.Trackers);
+
+        var defaultDownloadPath = GetDefaultDownloadPath(_settingsService);
+        if (string.Equals(DownloadPath, defaultDownloadPath, StringComparison.OrdinalIgnoreCase))
+        {
+            DownloadPath = Path.Combine(defaultDownloadPath, preview.Name);
+        }
 
         Files.Clear();
         foreach (var file in preview.Files)
@@ -256,19 +267,26 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     private async Task AddAsync()
     {
         ErrorMessage = string.Empty;
-        CancelMetadataPreview();
 
         try
         {
             IsBusy = true;
+
+            // The preview fetches metadata by adding this very hash to the engine and removing it
+            // again. Cancelling only starts that unwind, so adding before it finishes would hit the
+            // engine's duplicate guard and fail an add the user did nothing wrong to make.
+            await CancelMetadataPreviewAsync();
+
             var options = BuildOptions();
-            if (_isMagnet)
+            if (_previewTorrentFile != null)
             {
-                await _torrentService.AddMagnetAsync(_source, options);
+                // Both a .torrent file and a magnet whose preview resolved end up here; adding the
+                // parsed file spares the magnet a second metadata download.
+                await _torrentService.AddTorrentAsync(_previewTorrentFile, options);
             }
             else
             {
-                await _torrentService.AddTorrentFileAsync(_source, options);
+                await _torrentService.AddMagnetAsync(_source, options);
             }
 
             if (SkipThisStepNextTime)
@@ -358,7 +376,16 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         }
         catch
         {
-            // Metadata preview is opportunistic; the user can still add the magnet.
+            // Metadata preview is opportunistic; the user can still add the magnet. Say so rather
+            // than leaving "fetching metadata" on screen for a fetch that has already given up -
+            // an engine that already holds this hash lands here every time.
+            await RunOnUiThreadAsync(() =>
+            {
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    MetadataStatusText = Resources.AddTorrent_MetadataPreviewUnavailable;
+                }
+            }).ConfigureAwait(false);
         }
         finally
         {
@@ -367,6 +394,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
                 if (ReferenceEquals(_metadataPreviewCts, cancellationTokenSource))
                 {
                     _metadataPreviewCts = null;
+                    _metadataPreviewTask = null;
                     IsFetchingMetadata = false;
                 }
 
@@ -381,6 +409,18 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         _metadataPreviewCts = null;
         IsFetchingMetadata = false;
         MetadataStatusText = string.Empty;
+    }
+
+    /// <summary>
+    /// Cancels an in-flight preview and waits for it to finish releasing the engine resources it
+    /// took. <see cref="FetchMetadataPreviewAsync"/> handles its own failures, so the returned task
+    /// completes rather than faults.
+    /// </summary>
+    private Task CancelMetadataPreviewAsync()
+    {
+        var pending = _metadataPreviewTask;
+        CancelMetadataPreview();
+        return pending ?? Task.CompletedTask;
     }
 
     private static Task RunOnUiThreadAsync(Action action)

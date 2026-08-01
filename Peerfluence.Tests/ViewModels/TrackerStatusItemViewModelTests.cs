@@ -6,6 +6,25 @@ namespace Peerfluence.Tests.ViewModels;
 public class TrackerStatusItemViewModelTests
 {
     [Fact]
+    public void State_NamesTheTrackerThatAskedUsNotToRetry()
+    {
+        // BEP 31 "retry in: never". Without a case for it the enum name leaked through untranslated.
+        var status = new TrackerStatus(
+            Url: "http://tracker.test/announce",
+            Status: TrackerStatusType.Disabled,
+            LastAnnounce: DateTimeOffset.UtcNow,
+            NextAnnounce: DateTimeOffset.UtcNow,
+            SeedCount: 0,
+            LeechCount: 0,
+            LastError: null);
+
+        var sut = new TrackerStatusItemViewModel(status);
+
+        Assert.Equal(Peerfluence.Services.LocalizationService.GetString("TrackerStatus_Disabled"), sut.State);
+        Assert.NotEqual(nameof(TrackerStatusType.Disabled), sut.State);
+    }
+
+    [Fact]
     public void Constructor_SetsAllProperties()
     {
         var now = DateTimeOffset.UtcNow;

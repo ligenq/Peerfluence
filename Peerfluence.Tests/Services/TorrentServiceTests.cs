@@ -40,6 +40,34 @@ public sealed class TorrentServiceTests
     }
 
     [Fact]
+    public async Task AddMagnetAsync_RejectsASelfUpdatingLinkThatCarriesNoInfoHash()
+    {
+        // PeerSharp 3.0 parses BEP 46 links, which name no torrent yet: the current info hash lives
+        // in the DHT. Adding one would register a torrent under an empty hash.
+        var engine = Substitute.For<IClientEngine>();
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>());
+
+        var exception = await Assert.ThrowsAsync<NotSupportedException>(
+            () => sut.AddMagnetAsync($"magnet:?xs=urn:btpk:{new string('a', 64)}"));
+
+        Assert.Equal(TorrentService.MagnetWithoutInfoHashMessage, exception.Message);
+        await engine.DidNotReceive().AddMagnetAsync(
+            Arg.Any<MagnetLink>(),
+            Arg.Any<AddTorrentOptions>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567", true)]
+    [InlineData("magnet:?xs=urn:btpk:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
+    public void HasUsableInfoHash_TellsAddableLinksFromOnesThatNameNothingYet(string magnetUri, bool expected)
+    {
+        Assert.Equal(expected, TorrentService.HasUsableInfoHash(MagnetLink.Parse(magnetUri)));
+    }
+
+    [Fact]
     public async Task PublishAlert_MetadataInitialized_MovesTorrentIntoUniqueSubfolder_AndRestartsIfNeeded()
     {
         var defaultRoot = Path.Combine(Path.GetTempPath(), "peerfluence-default-root");

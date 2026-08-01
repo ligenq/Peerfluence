@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
     <!-- Kept in one place so the projects do not drift to different package versions. -->
-    <PeerSharpPackageVersion>2.1.0</PeerSharpPackageVersion>
+    <PeerSharpPackageVersion>3.0.0</PeerSharpPackageVersion>
   </PropertyGroup>
 </Project>

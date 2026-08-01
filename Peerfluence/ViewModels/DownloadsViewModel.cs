@@ -488,7 +488,20 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     private static bool TryNormalizeMagnetLink(string? magnet, out string normalized, out string? error)
     {
         normalized = magnet?.Trim() ?? string.Empty;
-        return PeerSharp.Core.MagnetLink.TryParse(normalized, out _, out error);
+        if (!PeerSharp.Core.MagnetLink.TryParse(normalized, out var parsed, out error))
+        {
+            return false;
+        }
+
+        // Parsing is not enough: a BEP 46 link parses without an info hash, and everything
+        // downstream of here assumes there is one.
+        if (!TorrentService.HasUsableInfoHash(parsed))
+        {
+            error = TorrentService.MagnetWithoutInfoHashMessage;
+            return false;
+        }
+
+        return true;
     }
 
     private Task ShowCreateTorrentAsync()

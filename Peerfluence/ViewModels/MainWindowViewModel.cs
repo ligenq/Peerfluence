@@ -214,6 +214,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
         _disposed = true;
         WeakReferenceMessenger.Default.UnregisterAll(this);
-        DownloadsViewModel?.Dispose();
+        foreach (var disposable in _featureItems.Select(item => item.ViewModel).OfType<IDisposable>())
+        {
+            disposable.Dispose();
+        }
     }
 }
