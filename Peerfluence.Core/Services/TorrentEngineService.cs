@@ -104,7 +104,8 @@ public sealed class TorrentEngineService : ITorrentEngineService
         {
             Dht = new DhtSettings
             {
-                Enabled = settings.Network.EnableDht
+                Enabled = settings.Network.EnableDht,
+                AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling
             },
             Files = new FilesSettings
             {

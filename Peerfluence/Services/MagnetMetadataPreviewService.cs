@@ -1,22 +1,24 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using PeerSharp.Clients;
-using PeerSharp.Config;
-using PeerSharp.Interfaces;
+using Peerfluence.Core.Services;
 using Peerfluence.Properties;
+using PeerSharp.Core;
 
 namespace Peerfluence.Services;
 
 public sealed class MagnetMetadataPreviewService : IMagnetMetadataPreviewService
 {
-    private readonly IAppSettingsService _settingsService;
+    private readonly ITorrentEngineService _engineService;
+    private readonly ITransientTorrentTracker _transientTorrentTracker;
 
-    public MagnetMetadataPreviewService(IAppSettingsService settingsService)
+    public MagnetMetadataPreviewService(
+        ITorrentEngineService engineService,
+        ITransientTorrentTracker transientTorrentTracker)
     {
-        _settingsService = settingsService;
+        _engineService = engineService;
+        _transientTorrentTracker = transientTorrentTracker;
     }
 
     public async Task<MagnetMetadataPreview?> FetchAsync(
@@ -26,144 +28,63 @@ public sealed class MagnetMetadataPreviewService : IMagnetMetadataPreviewService
     {
         using var timeoutCts = new CancellationTokenSource(timeout);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-        var ct = linkedCts.Token;
+        var magnet = MagnetLink.Parse(magnetUri);
 
-        var previewRoot = Path.Combine(Path.GetTempPath(), "Peerfluence", "MagnetMetadataPreview", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(previewRoot);
-
-        await using var engine = ClientEngineFactory.Create(CreatePreviewOptions(previewRoot));
-        ITorrent? torrent = null;
+        // Entered before the fetch, because the engine adds a real torrent to do it and raises
+        // TorrentAdded from inside the add.
+        using var scope = _transientTorrentTracker.Track(
+            magnet.InfoHash.IsEmpty ? magnet.InfoHashV2 : magnet.InfoHash);
 
         try
         {
-            await engine.InitializeAsync(ct).ConfigureAwait(false);
-
-            var metadataReceived = new TaskCompletionSource<ITorrent>(TaskCreationOptions.RunContinuationsAsynchronously);
-            var events = new TorrentEventsBuilder()
-                .OnMetadataReceived(t => metadataReceived.TrySetResult(t))
-                .Build();
-
-            torrent = await engine.AddMagnetAsync(
-                MagnetLink.Parse(magnetUri),
-                new AddTorrentOptions
-                {
-                    DownloadPath = previewRoot,
-                    StartImmediately = true,
-                    Events = events
-                },
-                ct).ConfigureAwait(false);
-
-            if (!torrent.HasMetadata)
-            {
-                torrent = await metadataReceived.Task.WaitAsync(ct).ConfigureAwait(false);
-            }
-
-            if (!torrent.HasMetadata)
-            {
-                return null;
-            }
-
-            return CreatePreview(torrent);
+            var torrentFile = await _engineService.Engine.GetMagnetMetadataAsync(magnet, linkedCts.Token)
+                .ConfigureAwait(false);
+            return CreatePreview(torrentFile);
         }
         catch (OperationCanceledException)
         {
             return null;
         }
-        finally
-        {
-            if (torrent != null)
-            {
-                try
-                {
-                    await engine.RemoveTorrentAsync(torrent, RemoveOptions.DeleteFiles, CancellationToken.None).ConfigureAwait(false);
-                }
-                catch
-                {
-                    // Best effort cleanup of the disposable preview torrent.
-                }
-            }
-
-            try
-            {
-                Directory.Delete(previewRoot, recursive: true);
-            }
-            catch
-            {
-                // Best effort cleanup of the temporary preview folder.
-            }
-        }
     }
 
-    private TorrentClientOptions CreatePreviewOptions(string previewRoot)
+    private static MagnetMetadataPreview CreatePreview(TorrentFile torrentFile)
     {
-        return new TorrentClientOptions
-        {
-            Settings = new Settings
-            {
-                Connection =
-                {
-                    TcpPort = 0,
-                    UdpPort = 0,
-                    EnableTcpIn = true,
-                    EnableUtpIn = true,
-                    UpnpPortMapping = false,
-                    NatPmpPortMapping = false
-                },
-                Dht =
-                {
-                    Enabled = _settingsService.Current.Network.EnableDht
-                },
-                Files =
-                {
-                    DefaultDownloadPath = previewRoot
-                },
-                Session =
-                {
-                    Enabled = false
-                }
-            }
-        };
-    }
-
-    private static MagnetMetadataPreview CreatePreview(ITorrent torrent)
-    {
-        var files = torrent
-            .GetAllFileInfo()
+        var files = torrentFile
+            .GetFiles()
             .Select(file => new MagnetMetadataPreviewFile(file.Index, file.Path, file.Size))
             .ToList();
 
-        var trackers = torrent
+        var trackers = torrentFile
             .Trackers
-            .GetTrackers()
-            .Select(tracker => tracker.Url)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         return new MagnetMetadataPreview(
-            torrent.Name,
-            torrent.Hash.IsEmpty ? torrent.HashV2.ToString() : torrent.Hash.ToString(),
-            GetVersionLabel(torrent.Hash, torrent.HashV2),
-            torrent.TotalSize,
-            torrent.FileCount,
-            torrent.PieceCount,
-            torrent.PieceSize,
-            IsPrivate: false,
+            torrentFile.Name,
+            torrentFile.InfoHash.IsEmpty ? torrentFile.InfoHashV2.ToString() : torrentFile.InfoHash.ToString(),
+            GetVersionLabel(torrentFile.IsV1, torrentFile.IsV2, torrentFile.IsHybrid),
+            torrentFile.TotalSize,
+            torrentFile.FileCount,
+            torrentFile.PieceCount,
+            torrentFile.PieceSize,
+            torrentFile.IsPrivate,
             files,
-            trackers);
+            trackers,
+            torrentFile);
     }
 
-    private static string GetVersionLabel(InfoHash hash, InfoHash hashV2)
+    private static string GetVersionLabel(bool isV1, bool isV2, bool isHybrid)
     {
-        if (!hash.IsEmpty && !hashV2.IsEmpty)
+        if (isHybrid)
         {
             return "V1 + V2";
         }
 
-        if (!hashV2.IsEmpty)
+        if (isV2)
         {
             return "V2";
         }
 
-        return !hash.IsEmpty ? "V1" : Resources.Common_Unknown;
+        return isV1 ? "V1" : Resources.Common_Unknown;
     }
 }

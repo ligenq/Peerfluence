@@ -257,6 +257,15 @@
                         <ToggleSwitch IsChecked="{Binding EnableUpnp, Mode=TwoWay}" Content="{m:L Settings_EnableUpnp}"/>
                     </WrapPanel>
 
+                    <StackPanel Spacing="{StaticResource SpacingSmall}" IsEnabled="{Binding EnableDht}">
+                        <ToggleSwitch IsChecked="{Binding AnswerInfoHashSampling, Mode=TwoWay}"
+                                      Content="{m:L Settings_AnswerInfoHashSampling}"/>
+                        <TextBlock Text="{m:L Settings_AnswerInfoHashSamplingHint}"
+                                   Opacity="0.55"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding UseAutomaticListeningPort, Mode=TwoWay}" Content="{m:L Settings_UseAutomaticListeningPort}"/>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding IsFixedListeningPortEnabled}">

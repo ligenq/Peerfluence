@@ -112,6 +112,7 @@ public class AddTorrentOptionsViewModelTests
         Assert.Equal(2, sut.FileCount);
         Assert.Equal(12, sut.PieceCount);
         Assert.Equal(16384, sut.PieceSizeBytes);
+        Assert.Equal(Path.Combine("C:\\Downloads", "Resolved torrent"), sut.DownloadPath);
         Assert.True(sut.HasFiles);
         Assert.False(sut.IsMetadataPending);
         Assert.Equal($"udp://tracker.example:80{Environment.NewLine}https://tracker.two/announce", sut.ExistingTrackers);
@@ -129,6 +130,48 @@ public class AddTorrentOptionsViewModelTests
                 Assert.Equal("b.bin", file.Path);
                 Assert.Equal(200, file.SizeBytes);
             });
+    }
+
+    [Fact]
+    public async Task AddCommand_AfterMetadataPreview_AddsFetchedTorrentFile()
+    {
+        var torrentFile = new TorrentFileBuilder()
+            .WithName("Resolved torrent")
+            .AddFile("file.bin", new byte[10])
+            .Build();
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService
+            .AddTorrentAsync(torrentFile, Arg.Any<PeerSharp.Config.AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Substitute.For<ITorrent>()));
+        var sut = AddTorrentOptionsViewModel.CreateForMagnet(
+            $"magnet:?xt=urn:btih:{torrentFile.InfoHash}",
+            torrentService,
+            Substitute.For<ITopLevelService>(),
+            CreateSettingsService("C:\\Downloads"));
+        sut.ApplyMetadataPreview(new MagnetMetadataPreview(
+            torrentFile.Name,
+            torrentFile.InfoHash.ToString(),
+            "V1",
+            torrentFile.TotalSize,
+            torrentFile.FileCount,
+            torrentFile.PieceCount,
+            torrentFile.PieceSize,
+            torrentFile.IsPrivate,
+            torrentFile.GetFiles().Select(file => new MagnetMetadataPreviewFile(file.Index, file.Path, file.Size)).ToList(),
+            torrentFile.Trackers,
+            torrentFile));
+
+        await sut.AddCommand.ExecuteAsync(null);
+
+        await torrentService.Received(1).AddTorrentAsync(
+            torrentFile,
+            Arg.Any<PeerSharp.Config.AddTorrentOptions>(),
+            Arg.Any<CancellationToken>());
+        await torrentService.DidNotReceive().AddMagnetAsync(
+            Arg.Any<string>(),
+            Arg.Any<PeerSharp.Config.AddTorrentOptions>(),
+            Arg.Any<CancellationToken>());
+        Assert.True(sut.WasAdded);
     }
 
     private static IAppSettingsService CreateSettingsService(string downloadPath)

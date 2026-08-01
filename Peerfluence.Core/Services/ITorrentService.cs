@@ -12,6 +12,8 @@ public interface ITorrentService
 
     Task<ITorrent> AddMagnetAsync(string magnetUri, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
 
+    Task<ITorrent> AddTorrentAsync(TorrentFile torrentFile, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
+
     Task<ITorrent> AddTorrentFileAsync(string torrentPath, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
 
     Task SaveSessionAsync(CancellationToken cancellationToken = default);
@@ -22,5 +24,5 @@ public interface ITorrentService
 
     IAsyncEnumerable<Alert> GetAlertsAsync(TimeSpan? pollingInterval = null, CancellationToken cancellationToken = default);
 
-    void PublishAlert(Alert alert);
+    void PublishAlert(Alert alert, CancellationToken cancellationToken = default);
 }

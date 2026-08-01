@@ -24,6 +24,7 @@ public static class PriorityOptions
             TrackerStatusType.Working => "TrackerStatus_Working",
             TrackerStatusType.NotWorking => "TrackerStatus_NotWorking",
             TrackerStatusType.CircuitOpen => "TrackerStatus_CircuitOpen",
+            TrackerStatusType.Disabled => "TrackerStatus_Disabled",
             TrackerStatusType.Unknown => "TrackerStatus_Unknown",
             _ => status.ToString()
         });

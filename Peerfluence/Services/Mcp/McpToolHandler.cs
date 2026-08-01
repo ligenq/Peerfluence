@@ -48,9 +48,14 @@ public class McpToolHandler : IMcpToolHandler
         {
             if (magnetOrFile.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase))
             {
-                if (!MagnetLink.TryParse(magnetOrFile, out _))
+                if (!MagnetLink.TryParse(magnetOrFile, out var magnet))
                 {
                     return ToolError("Invalid magnet link format.", "invalid_magnet");
+                }
+
+                if (!TorrentService.HasUsableInfoHash(magnet))
+                {
+                    return ToolError(TorrentService.MagnetWithoutInfoHashMessage, "magnet_without_info_hash");
                 }
 
                 await _torrentService.AddMagnetAsync(magnetOrFile, null, cancellationToken);
@@ -301,6 +306,7 @@ public class McpToolHandler : IMcpToolHandler
             case "sessionpath": current.Storage.SessionPath = value.GetString() ?? current.Storage.SessionPath; break;
             case "enablesessionpersistence": current.Storage.EnableSessionPersistence = value.GetBoolean(); break;
             case "enabledht": current.Network.EnableDht = value.GetBoolean(); break;
+            case "answerinfohashsampling": current.Network.AnswerInfoHashSampling = value.GetBoolean(); break;
             case "enablenatpmp": current.Network.EnableNatPmp = value.GetBoolean(); break;
             case "enableupnp": current.Network.EnableUpnp = value.GetBoolean(); break;
             case "useautomaticlisteningport": current.Network.UseAutomaticListeningPort = value.GetBoolean(); break;
