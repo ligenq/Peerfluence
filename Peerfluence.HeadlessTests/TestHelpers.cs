@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
+using System.Threading.Channels;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Services;
@@ -49,6 +50,13 @@ internal static class TestHelpers
         }
 
         fields.First(f => f.Name == "<Torrents>k__BackingField").SetValue(vm, new ObservableCollection<TorrentListItemViewModel>());
+
+        // Field initializers do not run on an uninitialized object, so Dispose would fault on these.
+        // A view model that cannot be disposed cannot be hosted by a window a test closes.
+        fields.First(f => f.Name == "_loopCts").SetValue(vm, new CancellationTokenSource());
+        fields.First(f => f.Name == "_alertChannel").SetValue(
+            vm,
+            Channel.CreateBounded<TorrentAlertEventArgs>(new BoundedChannelOptions(1) { FullMode = BoundedChannelFullMode.DropOldest }));
 
         // Initialize commands
         fields.First(f => f.Name == "<AddTorrentCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
