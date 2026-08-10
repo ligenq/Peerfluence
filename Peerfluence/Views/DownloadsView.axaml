@@ -8,7 +8,12 @@
              x:Class="Peerfluence.Views.DownloadsView"
              x:DataType="vm:DownloadsViewModel">
     <suki:BusyArea IsBusy="{Binding IsBusy}">
-        <Grid RowDefinitions="Auto,Auto,Auto,2*,8,2*">
+        <!--
+            The last two rows carry the details pane. Their heights are set from code-behind rather
+            than here: hiding a control leaves its star-sized row reserving space, which is what left
+            the list with half the window and nothing under it.
+        -->
+        <Grid x:Name="ContentGrid" RowDefinitions="Auto,Auto,Auto,2*,0,0">
             <!-- Dashboard Header -->
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource MediumBottomMargin}">
@@ -86,6 +91,13 @@
                     <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}">
                         <materialIcons:MaterialIcon Kind="File" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
+
+                    <ToggleButton x:Name="DetailsPaneToggle"
+                                  IsChecked="{Binding IsDetailsPaneVisible, Mode=OneWay}"
+                                  Command="{Binding ToggleDetailsPaneCommand}"
+                                  ToolTip.Tip="{m:L Downloads_ToggleDetails}">
+                        <materialIcons:MaterialIcon Kind="DockBottom" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </ToggleButton>
                 </StackPanel>
             </DockPanel>
         </suki:GlassCard>
@@ -247,9 +259,9 @@
 
         <!-- Detail Pane (Resizable) -->
         <GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" Background="Transparent"
-                      IsVisible="{Binding SelectedTorrent, Converter={StaticResource NullToBoolConverter}}" />
+                      IsVisible="{Binding IsDetailsPaneVisible}" />
         <suki:GlassCard Grid.Row="5"
-                        IsVisible="{Binding SelectedTorrent, Converter={StaticResource NullToBoolConverter}}"
+                        IsVisible="{Binding IsDetailsPaneVisible}"
                         Margin="{StaticResource ZeroThickness}"
                         Padding="{StaticResource ZeroThickness}">
             <ContentControl Content="{Binding SelectedTorrentDetailViewModel}" />

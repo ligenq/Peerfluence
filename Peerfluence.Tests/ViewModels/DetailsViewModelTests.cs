@@ -28,6 +28,9 @@ public class DetailsViewModelTests
         var store = Substitute.For<IAppSettingsStore>();
         var paths = new AppPaths();
         var settingsService = new AppSettingsService(paths, store, new FileSystem());
+        // The pane is closed by default and does no work while it is; these tests are about what it
+        // does when someone is looking at it.
+        settingsService.Current.ShowDetailsPane = true;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
         var engineService = new TorrentEngineService(settingsService, loggerFactory);
         _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>());

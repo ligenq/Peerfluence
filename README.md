@@ -31,7 +31,8 @@ Velopack update path are in place.
 - Optionally remember the remove choice and skip the confirmation dialog.
 - Show live aggregate download/upload speed, active torrent count, and peer count.
 - Show torrent details: files, trackers, peers, pieces, status, progress, paths, hash,
-  limits, ratio rules, seed time rules, and queue priority.
+  limits, ratio rules, seed time rules, and queue priority. The details pane is opened from
+  the toolbar and closed by default, so the list has the whole window until it is wanted.
 - Select files, set file priorities, and apply per-file download choices.
 - Add/remove trackers and manually announce.
 - Offer peer addresses by hand, for a peer no tracker, DHT node or exchange has mentioned.

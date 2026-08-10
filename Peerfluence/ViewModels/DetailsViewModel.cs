@@ -326,7 +326,7 @@ public sealed class DetailsViewModel : ViewModelBase
 
     private void OnTorrentAlert(TorrentAlertMessage msg)
     {
-        if (MatchesSelectedTorrent(msg.Torrent))
+        if (IsPaneOpen && MatchesSelectedTorrent(msg.Torrent))
         {
             _refreshChannel.Writer.TryWrite(msg.Torrent);
         }
@@ -334,9 +334,16 @@ public sealed class DetailsViewModel : ViewModelBase
 
     internal void RefreshFromSelection() => TriggerRefresh();
 
+    /// <summary>
+    /// Whether anything is showing what this view model produces. A closed pane is not worth
+    /// reading a piece bitfield and enumerating peers for on every alert, so a refresh asked for
+    /// while it is closed is dropped; <see cref="DownloadsViewModel"/> refreshes on reopening.
+    /// </summary>
+    private bool IsPaneOpen => _settingsService.Current.ShowDetailsPane;
+
     private void TriggerRefresh()
     {
-        var torrent = _selectionService.SelectedTorrent;
+        var torrent = IsPaneOpen ? _selectionService.SelectedTorrent : null;
         if (torrent != null)
         {
             _refreshChannel.Writer.TryWrite(torrent);

@@ -22,6 +22,12 @@ public sealed class AppSettings
 
     public bool ShowRemoveTorrentOptions { get; set; } = true;
 
+    /// <summary>
+    /// Whether the details pane sits under the torrent list. Off by default: it is a second view of
+    /// one torrent, and while it is closed the list has the whole window to fill.
+    /// </summary>
+    public bool ShowDetailsPane { get; set; }
+
     public bool AssociateTorrentFiles { get; set; }
 
     public bool AssociateMagnetLinks { get; set; }

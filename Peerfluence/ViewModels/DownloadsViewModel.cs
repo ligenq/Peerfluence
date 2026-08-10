@@ -75,6 +75,9 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         CopyHashCommand = new RelayCommand(CopyHash, () => SelectedTorrent != null);
         CopyMagnetCommand = new RelayCommand(CopyMagnet, () => SelectedTorrent != null);
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckSelectedAsync, CanForceRecheckSelected);
+        ToggleDetailsPaneCommand = new RelayCommand(ToggleDetailsPane);
+
+        IsDetailsPaneVisible = _settingsService.Current.ShowDetailsPane;
 
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
         WeakReferenceMessenger.Default.Register<ActivationRequestedMessage>(this, (_, msg) =>
@@ -134,6 +137,16 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
+    /// <summary>
+    /// Whether the details pane is open. Setting it does not persist the choice or wake the pane up;
+    /// <see cref="ToggleDetailsPane"/> is what a user action goes through.
+    /// </summary>
+    public bool IsDetailsPaneVisible
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
     public bool HasTorrents => Torrents.Count > 0;
 
     public bool HasNoTorrents => !HasTorrents;
@@ -190,7 +203,26 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     public IAsyncRelayCommand ForceRecheckCommand { get; }
 
+    public IRelayCommand ToggleDetailsPaneCommand { get; }
+
     public ISukiDialogManager? SukiDialogManager { get; set; }
+
+    /// <summary>
+    /// Opens or closes the details pane and remembers the choice. Opening refreshes the pane by
+    /// hand: while it was closed it ignored the alerts it would normally have redrawn itself from,
+    /// so without this it would come back holding whatever it last saw.
+    /// </summary>
+    private void ToggleDetailsPane()
+    {
+        IsDetailsPaneVisible = !IsDetailsPaneVisible;
+        _settingsService.Current.ShowDetailsPane = IsDetailsPaneVisible;
+        _ = _settingsService.SaveAsync(default);
+
+        if (IsDetailsPaneVisible)
+        {
+            SelectedTorrentDetailViewModel.RefreshFromSelection();
+        }
+    }
 
     private async Task AddTorrentAsync()
     {

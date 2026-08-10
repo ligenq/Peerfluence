@@ -72,6 +72,7 @@ public sealed class AppSettingsService : IAppSettingsService
                 BackgroundStyle = "GradientSoft"
             },
             ShowRemoveTorrentOptions = true,
+            ShowDetailsPane = false,
             DefaultRemoveTorrentAction = "RemoveOnly",
             Language = "en-US"
         };
