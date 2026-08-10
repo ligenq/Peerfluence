@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using System.Net;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core;
+using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -237,6 +238,53 @@ public class DetailsViewModelTests
         Assert.Equal(torrent.Hash.ToString(), _sut.InfoHash);
         Assert.True(_sut.ApplyTorrentSettingsCommand.CanExecute(null));
         Assert.True(_sut.SaveResumeDataCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task AlertForAnotherTorrent_LeavesTheSelectedTorrentsDetailsAlone()
+    {
+        // Two ordinary V1 torrents. Both carry an empty V2 hash, so identity cannot be decided by
+        // comparing hashes that are not there: doing so makes every V1 torrent match every other,
+        // and the pane redraws itself from whichever one last raised an alert.
+        var selected = CreateRefreshableTorrent("Selected", 1);
+        var other = CreateRefreshableTorrent("Other", 2);
+
+        _selectionService.SelectedTorrent = selected;
+        _sut.RefreshFromSelection();
+        await WaitForNameAsync("Selected");
+
+        WeakReferenceMessenger.Default.Send(
+            new TorrentAlertMessage(other, new SimpleTorrentAlert { Id = AlertId.ProgressChanged, Torrent = other }));
+        await Task.Delay(500);
+
+        Assert.Equal("Selected", _sut.Name);
+    }
+
+    private static ITorrent CreateRefreshableTorrent(string name, byte hashSeed)
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Name.Returns(name);
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat(hashSeed, 20).ToArray()));
+        torrent.HashV2.Returns(InfoHash.EmptyV2);
+        torrent.State.Returns(TorrentState.Active);
+
+        var files = Substitute.For<IFiles>();
+        files.DownloadPath.Returns("C:\\Downloads");
+        torrent.Files.Returns(files);
+        torrent.Peers.Returns(Substitute.For<IPeers>());
+        torrent.Trackers.Returns(Substitute.For<ITrackers>());
+
+        return torrent;
+    }
+
+    private async Task WaitForNameAsync(string expected)
+    {
+        for (var attempt = 0; attempt < 50 && _sut.Name != expected; attempt++)
+        {
+            await Task.Delay(20);
+        }
+
+        Assert.Equal(expected, _sut.Name);
     }
 
     [Fact]

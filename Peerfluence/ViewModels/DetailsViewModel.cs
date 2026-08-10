@@ -1024,9 +1024,6 @@ public sealed class DetailsViewModel : ViewModelBase
 
     private static bool MatchesTorrent(ITorrent left, ITorrent right)
     {
-        return left.Hash == right.Hash
-            || left.Hash == right.HashV2
-            || left.HashV2 == right.Hash
-            || left.HashV2 == right.HashV2;
+        return TorrentIdentity.SameTorrent(left, right);
     }
 }
