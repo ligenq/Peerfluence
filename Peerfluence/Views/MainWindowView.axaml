@@ -4,6 +4,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
                  mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
@@ -16,6 +17,13 @@
                  Title="{m:L App_Title}"
                  TransparencyLevelHint="None">
 
+    <!--
+        SukiWindow's template carries no VisualLayerManager, so nothing under it had an
+        OverlayLayer. A popup's light dismiss lives in that layer, which left every context menu
+        in the app unable to close on a click. Supplying one here gives the whole content tree a
+        layer to find.
+    -->
+    <primitives:VisualLayerManager>
     <suki:SukiSideMenu ItemsSource="{Binding NavigationItems}"
                        SelectedItem="{Binding SelectedNavigationItem}"
                        UseCustomContent="True">
@@ -56,4 +64,5 @@
             <ContentControl Content="{Binding CurrentPage}" Margin="{StaticResource MediumLeftTopRightBottomMargin}" />
         </suki:SukiSideMenu.Content>
     </suki:SukiSideMenu>
+    </primitives:VisualLayerManager>
 </suki:SukiWindow>
