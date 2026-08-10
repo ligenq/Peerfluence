@@ -83,6 +83,12 @@ public class LocalizationTests
     [InlineData("TrackerStatus_Disabled")]
     [InlineData("Settings_AnswerInfoHashSampling")]
     [InlineData("Settings_AnswerInfoHashSamplingHint")]
+    [InlineData("Settings_AllowMultipleConnectionsPerIp")]
+    [InlineData("Settings_AllowMultipleConnectionsPerIpHint")]
+    [InlineData("Details_Peers_AddWatermark")]
+    [InlineData("Details_Peers_AddTitle")]
+    [InlineData("Details_Peers_AddAccepted")]
+    [InlineData("Details_Peers_AddRejected")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

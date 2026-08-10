@@ -57,6 +57,7 @@ public sealed class AppSettingsService : IAppSettingsService
             {
                 EnableDht = true,
                 AnswerInfoHashSampling = true,
+                AllowMultipleConnectionsPerIp = true,
                 EnableNatPmp = true,
                 EnableUpnp = false,
                 UseAutomaticListeningPort = false,

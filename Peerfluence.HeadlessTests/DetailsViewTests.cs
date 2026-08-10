@@ -74,6 +74,22 @@ public class DetailsViewTests
     }
 
     [AvaloniaFact]
+    public void PeersTab_OffersAnAddressBoxWiredToTheAddCommand()
+    {
+        var (view, vm) = CreateView();
+
+        var tabControl = view.GetLogicalDescendants().OfType<TabControl>().First();
+        var peersTab = tabControl.Items.OfType<TabItem>().ElementAt(2);
+        var addressBox = peersTab.GetLogicalDescendants().OfType<TextBox>().First();
+        var addButton = peersTab.GetLogicalDescendants().OfType<Button>().First();
+
+        addressBox.Text = "192.168.1.10:51413";
+
+        Assert.Equal("192.168.1.10:51413", vm.NewPeerAddresses);
+        Assert.Same(vm.AddPeersCommand, addButton.Command);
+    }
+
+    [AvaloniaFact]
     public void NumericUpDowns_ExistInSettingsTab()
     {
         var (view, _) = CreateView();

@@ -121,6 +121,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     }
 
+    public bool AllowMultipleConnectionsPerIp
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
     public bool EnableNatPmp
     {
         get;
@@ -474,6 +480,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Network
         EnableDht = settings.Network.EnableDht;
         AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling;
+        AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp;
         EnableNatPmp = settings.Network.EnableNatPmp;
         EnableUpnp = settings.Network.EnableUpnp;
         UseAutomaticListeningPort = settings.Network.UseAutomaticListeningPort;
@@ -538,6 +545,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             // Network
             settings.Network.EnableDht = EnableDht;
             settings.Network.AnswerInfoHashSampling = AnswerInfoHashSampling;
+            settings.Network.AllowMultipleConnectionsPerIp = AllowMultipleConnectionsPerIp;
             settings.Network.EnableNatPmp = EnableNatPmp;
             settings.Network.EnableUpnp = EnableUpnp;
             settings.Network.UseAutomaticListeningPort = UseAutomaticListeningPort;
@@ -609,6 +617,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         AssociateMagnetLinks = defaults.AssociateMagnetLinks;
         EnableDht = defaults.Network.EnableDht;
         AnswerInfoHashSampling = defaults.Network.AnswerInfoHashSampling;
+        AllowMultipleConnectionsPerIp = defaults.Network.AllowMultipleConnectionsPerIp;
         EnableNatPmp = defaults.Network.EnableNatPmp;
         EnableUpnp = defaults.Network.EnableUpnp;
         UseAutomaticListeningPort = defaults.Network.UseAutomaticListeningPort;

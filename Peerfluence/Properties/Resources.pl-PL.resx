@@ -274,6 +274,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Postęp</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Adres peera, np. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Dodaj peerów</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>Przyjęto {0} z {1} adresów jako kandydatów na peerów.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Nie udało się odczytać żadnego z {0} adresów. Użyj formatu IP:port, na przykład 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Wybierz torrent</value>
   </data>
@@ -297,6 +309,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Pozwala innym węzłom DHT pytać, dla których torrentów znasz peerów – tak indeksy wyszukiwania odkrywają nowe torrenty. Tę samą informację można już uzyskać, pytając, kto ma konkretny torrent, więc wyłączenie tej opcji niewiele ukrywa. Wymaga DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Zezwalaj na wiele połączeń z jednego adresu IP</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Zachowuje peerów dzielących jeden adres, jak w sieciach komórkowych i uczelnianych, gdzie wielu abonentów wychodzi tym samym adresem. Po wyłączeniu dopuszczane jest jedno połączenie na adres, a peer łączący się ponownie z nowego portu zostaje odrzucony zamiast rozpoznany.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Włącz NAT-PMP</value>

@@ -13,23 +13,23 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
     private const string MagnetUri = "magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567";
 
     [AvaloniaFact]
-    public async Task AddCommand_WaitsForAnInFlightPreviewToReleaseTheHash()
+    public async Task AddCommand_DoesNotWaitForAnInFlightPreviewToUnwind()
     {
-        // The preview fetches metadata by adding this same hash to the engine, so adding before it
-        // has finished letting go would hit the engine's duplicate guard.
+        // A preview's torrent claims no info hash, so the add has nothing to wait for: it cancels
+        // the preview and goes straight on, however long the engine takes to discard it.
         var previewReleased = false;
         var previewService = Substitute.For<IMagnetMetadataPreviewService>();
         previewService
             .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
             .Returns(call => FetchUntilCancelled(call.Arg<CancellationToken>(), () => previewReleased = true));
 
-        var hashWasReleasedWhenAddRan = false;
+        var previewHadUnwoundWhenAddRan = true;
         var torrentService = Substitute.For<ITorrentService>();
         torrentService
             .AddMagnetAsync(Arg.Any<string>(), Arg.Any<PeerSharp.Config.AddTorrentOptions>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
-                hashWasReleasedWhenAddRan = previewReleased;
+                previewHadUnwoundWhenAddRan = previewReleased;
                 return Task.FromResult(Substitute.For<ITorrent>());
             });
 
@@ -38,7 +38,8 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
 
         await sut.AddCommand.ExecuteAsync(null);
 
-        Assert.True(hashWasReleasedWhenAddRan);
+        Assert.False(previewHadUnwoundWhenAddRan);
+        Assert.False(sut.IsFetchingMetadata);
         Assert.True(sut.WasAdded);
         Assert.Equal(string.Empty, sut.ErrorMessage);
     }
@@ -49,7 +50,7 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
         var previewService = Substitute.For<IMagnetMetadataPreviewService>();
         previewService
             .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-            .Returns<Task<MagnetMetadataPreview?>>(_ => throw new InvalidOperationException("already have it"));
+            .Returns<Task<MagnetMetadataPreview?>>(_ => throw new InvalidOperationException("the fetch failed"));
 
         var sut = CreateMagnetViewModel(Substitute.For<ITorrentService>());
         sut.StartMetadataPreview(previewService, TimeSpan.FromMinutes(1));
@@ -69,8 +70,8 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
         }
         finally
         {
-            // Stands in for the engine removing the transient torrent, which the real fetch also
-            // does after cancellation rather than before returning.
+            // Stands in for the engine discarding its transient torrent, which the real fetch does
+            // after cancellation rather than before returning.
             await Task.Delay(20, CancellationToken.None);
             onReleased();
         }

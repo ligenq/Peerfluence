@@ -274,6 +274,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Прогрес</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Адреса піра, наприклад 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Додати пірів</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>Прийнято адрес як кандидатів у піри: {0} з {1}.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Не вдалося прочитати жодної з {0} адрес. Використовуйте IP:порт, наприклад 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Виберіть торрент</value>
   </data>
@@ -297,6 +309,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Дозволяє іншим вузлам DHT запитувати, для яких торрентів вам відомі піри — саме так пошукові індекси знаходять нові торренти. Ту саму інформацію можна отримати, запитавши, хто має конкретний торрент, тож вимкнення приховує небагато. Потребує DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Дозволяти кілька з'єднань з однієї IP-адреси</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Зберігає пірів, які мають спільну адресу, як у мобільних та університетських мережах, де багато абонентів виходять через одну. Якщо вимкнути, з адреси приймається лише одне з'єднання, а пір, що перепідключився з нового порту, буде відхилений, а не впізнаний.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Увімкнути NAT-PMP</value>

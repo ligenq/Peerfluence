@@ -266,6 +266,15 @@
                                    TextWrapping="Wrap"/>
                     </StackPanel>
 
+                    <StackPanel Spacing="{StaticResource SpacingSmall}">
+                        <ToggleSwitch IsChecked="{Binding AllowMultipleConnectionsPerIp, Mode=TwoWay}"
+                                      Content="{m:L Settings_AllowMultipleConnectionsPerIp}"/>
+                        <TextBlock Text="{m:L Settings_AllowMultipleConnectionsPerIpHint}"
+                                   Opacity="0.55"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding UseAutomaticListeningPort, Mode=TwoWay}" Content="{m:L Settings_UseAutomaticListeningPort}"/>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding IsFixedListeningPortEnabled}">

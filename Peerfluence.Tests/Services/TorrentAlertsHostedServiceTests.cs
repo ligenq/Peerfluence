@@ -22,7 +22,7 @@ public sealed class TorrentAlertsHostedServiceTests
         torrentService.GetAlertsAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => StreamAlerts(alert, callInfo.ArgAt<CancellationToken>(1)));
 
-        var sut = new TorrentAlertsHostedService(torrentService, new TransientTorrentTracker());
+        var sut = new TorrentAlertsHostedService(torrentService);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
         await Task.Delay(50, TestContext.Current.CancellationToken);
@@ -39,39 +39,11 @@ public sealed class TorrentAlertsHostedServiceTests
         torrentService.GetAlertsAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => CancelWhenStopped(callInfo.ArgAt<CancellationToken>(1)));
 
-        var sut = new TorrentAlertsHostedService(torrentService, new TransientTorrentTracker());
+        var sut = new TorrentAlertsHostedService(torrentService);
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         await sut.StopAsync(TestContext.Current.CancellationToken);
-    }
-
-    [Fact]
-    public async Task StartAsync_DoesNotPublishAlertsForATorrentAddedOnlyToReadItsMetadata()
-    {
-        var torrentService = Substitute.For<ITorrentService>();
-        var hash = new InfoHash(Enumerable.Repeat((byte)7, 20).ToArray());
-        var torrent = Substitute.For<ITorrent>();
-        torrent.Hash.Returns(hash);
-        torrent.HashV2.Returns(InfoHash.Empty);
-        var alert = new SimpleMetadataAlert
-        {
-            Id = AlertId.MetadataInitialized,
-            Torrent = torrent
-        };
-
-        torrentService.GetAlertsAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => StreamAlerts(alert, callInfo.ArgAt<CancellationToken>(1)));
-
-        var tracker = new TransientTorrentTracker();
-        using var scope = tracker.Track(hash);
-        var sut = new TorrentAlertsHostedService(torrentService, tracker);
-
-        await sut.StartAsync(TestContext.Current.CancellationToken);
-        await Task.Delay(50, TestContext.Current.CancellationToken);
-        await sut.StopAsync(TestContext.Current.CancellationToken);
-
-        torrentService.DidNotReceive().PublishAlert(Arg.Any<Alert>(), Arg.Any<CancellationToken>());
     }
 
     private static async IAsyncEnumerable<Alert> StreamAlerts(Alert alert, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)

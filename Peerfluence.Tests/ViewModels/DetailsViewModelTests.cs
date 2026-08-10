@@ -1,5 +1,7 @@
 using System.IO.Abstractions;
+using System.Net;
 using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -235,5 +237,57 @@ public class DetailsViewModelTests
         Assert.Equal(torrent.Hash.ToString(), _sut.InfoHash);
         Assert.True(_sut.ApplyTorrentSettingsCommand.CanExecute(null));
         Assert.True(_sut.SaveResumeDataCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void AddPeers_OffersEveryAddressItCanRead_AndClearsTheBox()
+    {
+        var peers = SelectTorrentWithPeers();
+
+        _sut.NewPeerAddresses = "192.168.1.10:51413, [::1]:6881\n10.0.0.5:6889";
+        _sut.AddPeersCommand.Execute(null);
+
+        peers.Received(1).Add(Arg.Is<IEnumerable<IPEndPoint>>(endPoints =>
+            endPoints.Select(endPoint => endPoint.ToString()).SequenceEqual(
+                new[] { "192.168.1.10:51413", "[::1]:6881", "10.0.0.5:6889" })));
+        Assert.Equal(string.Empty, _sut.NewPeerAddresses);
+    }
+
+    [Fact]
+    public void AddPeers_OffersNothingWhenNoAddressCanBeRead()
+    {
+        var peers = SelectTorrentWithPeers();
+
+        // A bare address names no port, and a hostname is not something the engine can dial.
+        _sut.NewPeerAddresses = "192.168.1.10 seedbox.example:6881";
+        _sut.AddPeersCommand.Execute(null);
+
+        peers.DidNotReceive().Add(Arg.Any<IEnumerable<IPEndPoint>>());
+        Assert.Equal("192.168.1.10 seedbox.example:6881", _sut.NewPeerAddresses);
+        _notificationService.Received(1).Publish(
+            Arg.Is<NotificationItem>(item => item.Type == NotificationType.Warning),
+            Arg.Any<TimeSpan?>());
+    }
+
+    [Fact]
+    public void AddPeersCommand_IsDisabledWithoutAnAddress()
+    {
+        SelectTorrentWithPeers();
+
+        Assert.False(_sut.AddPeersCommand.CanExecute(null));
+
+        _sut.NewPeerAddresses = "192.168.1.10:51413";
+
+        Assert.True(_sut.AddPeersCommand.CanExecute(null));
+    }
+
+    private IPeers SelectTorrentWithPeers()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        var peers = Substitute.For<IPeers>();
+        torrent.Peers.Returns(peers);
+        _selectionService.SelectedTorrent = torrent;
+        return peers;
     }
 }

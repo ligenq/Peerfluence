@@ -274,6 +274,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Fortschritt</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Peer-Adresse, z. B. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Peers hinzufügen</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} von {1} Adressen als Peer-Kandidaten übernommen.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Keine der {0} Adressen konnte gelesen werden. Verwenden Sie IP:Port, zum Beispiel 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Wählen Sie einen Torrent aus</value>
   </data>
@@ -297,6 +309,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Erlaubt anderen DHT-Knoten zu fragen, für welche Torrents Sie Peers kennen – so finden Suchindizes neue Torrents. Dieselbe Information lässt sich ohnehin abrufen, indem gezielt nach einem bestimmten Torrent gefragt wird; Deaktivieren verbirgt also wenig. Erfordert DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Mehrere Verbindungen pro IP-Adresse zulassen</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Behält Peers, die sich eine Adresse teilen, wie in Mobilfunk- und Campusnetzen, hinter denen viele Teilnehmer dieselbe Adresse nutzen. Ausgeschaltet wird nur eine Verbindung je Adresse zugelassen, und ein Peer, der sich über einen neuen Port neu verbindet, wird abgewiesen statt wiedererkannt.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>NAT-PMP aktivieren</value>

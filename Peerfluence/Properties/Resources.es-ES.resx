@@ -274,6 +274,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Progreso</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Dirección de par, p. ej. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Añadir pares</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} de {1} direcciones aceptadas como candidatas a par.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>No se ha podido leer ninguna de las {0} direcciones. Use IP:puerto, por ejemplo 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Seleccione un torrent</value>
   </data>
@@ -297,6 +309,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Permite que otros nodos DHT consulten para qué torrents se conocen pares, que es como los índices de búsqueda descubren torrents. Esa información ya se puede obtener preguntando quién tiene un torrent concreto, por lo que desactivarlo oculta poco. Requiere DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Permitir varias conexiones por dirección IP</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Conserva los pares que comparten una dirección, como ocurre en redes móviles y de campus donde muchos abonados salen por la misma. Al desactivarlo solo se admite una conexión por dirección y se rechaza al par que se reconecta desde un puerto nuevo en lugar de reconocerlo.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Habilitar NAT-PMP</value>

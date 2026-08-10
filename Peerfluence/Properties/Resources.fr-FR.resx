@@ -274,6 +274,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Progression</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Adresse de pair, p. ex. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Ajouter des pairs</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} adresses sur {1} retenues comme pairs candidats.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Aucune des {0} adresses n'a pu être lue. Utilisez IP:port, par exemple 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Sélectionnez un torrent</value>
   </data>
@@ -297,6 +309,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Permet aux autres nœuds DHT de demander pour quels torrents vous connaissez des pairs, ce qui permet aux index de recherche de découvrir des torrents. La même information s’obtient déjà en demandant qui possède un torrent précis : désactiver cette option masque donc peu de choses. Nécessite le DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Autoriser plusieurs connexions par adresse IP</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Conserve les pairs qui partagent une adresse, comme sur les réseaux mobiles et universitaires où de nombreux abonnés sortent par la même. Désactivé, une seule connexion par adresse est admise et un pair qui se reconnecte depuis un nouveau port est refusé au lieu d'être reconnu.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Activer NAT-PMP</value>
