@@ -63,6 +63,14 @@ internal static class TestHelpers
         fields.First(f => f.Name == "<CopyMagnetCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
         fields.First(f => f.Name == "<ForceRecheckCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
 
+        // Wired to the real method rather than stubbed: what the details toggle does to the settings
+        // and to the pane is the point of the tests that use it.
+        var toggleDetailsPane = typeof(DownloadsViewModel).GetMethod("ToggleDetailsPane", flags)!;
+        fields.First(f => f.Name == "<ToggleDetailsPaneCommand>k__BackingField")
+            .SetValue(vm, new RelayCommand(() => toggleDetailsPane.Invoke(vm, null)));
+        fields.First(f => f.Name == "<IsDetailsPaneVisible>k__BackingField")
+            .SetValue(vm, settingsService.Current.ShowDetailsPane);
+
         return vm;
     }
 

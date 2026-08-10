@@ -106,6 +106,9 @@
   <data name="Downloads_Stop" xml:space="preserve">
     <value>Parar</value>
   </data>
+  <data name="Downloads_ToggleDetails" xml:space="preserve">
+    <value>Mostrar ou ocultar o painel de detalhes</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Remover</value>
   </data>

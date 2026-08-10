@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia;
@@ -8,6 +9,15 @@ namespace Peerfluence.Views;
 
 public partial class DownloadsView : UserControl
 {
+    /// <summary>
+    /// How much of the window the details pane takes when open, against the list's own 2*.
+    /// </summary>
+    private static readonly GridLength DetailsPaneHeight = new(2, GridUnitType.Star);
+
+    private static readonly GridLength SplitterHeight = new(8, GridUnitType.Pixel);
+
+    private static readonly GridLength Collapsed = new(0, GridUnitType.Pixel);
+
     public DownloadsView()
     {
         InitializeComponent();
@@ -15,6 +25,46 @@ public partial class DownloadsView : UserControl
         if (statusInfoBar != null)
         {
             statusInfoBar.PropertyChanged += DownloadsStatusInfoBar_OnPropertyChanged;
+        }
+
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    /// <summary>
+    /// Gives the details pane's rows their height, or takes it away entirely.
+    ///
+    /// <para>
+    /// A star-sized row goes on reserving its share whether or not the control in it is visible, so
+    /// this cannot be left to <c>IsVisible</c>: with the pane closed the list would still stop
+    /// halfway down the window. Row heights are not bindable from XAML - a RowDefinition is outside
+    /// the logical tree and inherits no DataContext - so the view sets them itself.
+    /// </para>
+    /// </summary>
+    private void ApplyDetailsPaneLayout(bool isVisible)
+    {
+        var rows = ContentGrid.RowDefinitions;
+        rows[4].Height = isVisible ? SplitterHeight : Collapsed;
+        rows[5].Height = isVisible ? DetailsPaneHeight : Collapsed;
+    }
+
+    private void OnDataContextChanged(object? sender, System.EventArgs e)
+    {
+        if (DataContext is not DownloadsViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        ApplyDetailsPaneLayout(viewModel.IsDetailsPaneVisible);
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DownloadsViewModel.IsDetailsPaneVisible)
+            && sender is DownloadsViewModel viewModel)
+        {
+            ApplyDetailsPaneLayout(viewModel.IsDetailsPaneVisible);
         }
     }
 
