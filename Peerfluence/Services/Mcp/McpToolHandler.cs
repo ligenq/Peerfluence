@@ -307,6 +307,7 @@ public class McpToolHandler : IMcpToolHandler
             case "enablesessionpersistence": current.Storage.EnableSessionPersistence = value.GetBoolean(); break;
             case "enabledht": current.Network.EnableDht = value.GetBoolean(); break;
             case "answerinfohashsampling": current.Network.AnswerInfoHashSampling = value.GetBoolean(); break;
+            case "allowmultipleconnectionsperip": current.Network.AllowMultipleConnectionsPerIp = value.GetBoolean(); break;
             case "enablenatpmp": current.Network.EnableNatPmp = value.GetBoolean(); break;
             case "enableupnp": current.Network.EnableUpnp = value.GetBoolean(); break;
             case "useautomaticlisteningport": current.Network.UseAutomaticListeningPort = value.GetBoolean(); break;

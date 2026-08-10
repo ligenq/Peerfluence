@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -75,6 +76,9 @@ public sealed class DetailsViewModel : ViewModelBase
         AddTrackerCommand = new RelayCommand(AddTracker, () => _selectionService.SelectedTorrent != null && !string.IsNullOrWhiteSpace(NewTrackerUrl));
         RemoveTrackerCommand = new RelayCommand<TrackerStatusItemViewModel?>(RemoveTracker, _ => _selectionService.SelectedTorrent != null);
         AnnounceCommand = new AsyncRelayCommand(AnnounceAsync, () => _selectionService.SelectedTorrent != null);
+
+        // Peer management
+        AddPeersCommand = new RelayCommand(AddPeers, () => _selectionService.SelectedTorrent != null && !string.IsNullOrWhiteSpace(NewPeerAddresses));
 
         WeakReferenceMessenger.Default.Register<TorrentSelectionChangedMessage>(this, (_, msg) => OnSelectionChanged(msg));
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
@@ -249,6 +253,19 @@ public sealed class DetailsViewModel : ViewModelBase
         }
     } = string.Empty;
 
+    // Peer management
+    public string NewPeerAddresses
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AddPeersCommand.NotifyCanExecuteChanged();
+            }
+        }
+    } = string.Empty;
+
     // Piece map
     public byte[]? PieceBitfield
     {
@@ -286,6 +303,8 @@ public sealed class DetailsViewModel : ViewModelBase
 
     public IAsyncRelayCommand AnnounceCommand { get; }
 
+    public IRelayCommand AddPeersCommand { get; }
+
     private void OnSelectionChanged(TorrentSelectionChangedMessage msg)
     {
         _streamingCts?.Cancel();
@@ -302,6 +321,7 @@ public sealed class DetailsViewModel : ViewModelBase
         ChangeDownloadPathCommand.NotifyCanExecuteChanged();
         AddTrackerCommand.NotifyCanExecuteChanged();
         AnnounceCommand.NotifyCanExecuteChanged();
+        AddPeersCommand.NotifyCanExecuteChanged();
     }
 
     private void OnTorrentAlert(TorrentAlertMessage msg)
@@ -558,6 +578,7 @@ public sealed class DetailsViewModel : ViewModelBase
         RecheckProgress = 0;
         RecheckStatus = string.Empty;
         NewTrackerUrl = string.Empty;
+        NewPeerAddresses = string.Empty;
         PieceBitfield = null;
         PieceAvailability = null;
         PieceCount = 0;
@@ -824,6 +845,70 @@ public sealed class DetailsViewModel : ViewModelBase
 
         await torrent.Trackers.AnnounceAsync().ConfigureAwait(false);
         TriggerRefresh();
+    }
+
+    // Peer management
+    private void AddPeers()
+    {
+        var torrent = _selectionService.SelectedTorrent;
+        if (torrent == null)
+        {
+            return;
+        }
+
+        var (endPoints, malformed) = ParsePeerAddresses(NewPeerAddresses);
+        if (endPoints.Count == 0)
+        {
+            PublishAddPeersResult(
+                string.Format(Properties.Resources.Details_Peers_AddRejected, malformed),
+                NotificationType.Warning,
+                Material.Icons.MaterialIconKind.AlertCircleOutline);
+            return;
+        }
+
+        // Offered, not forced: the engine still applies the blocklist, the connection limits and its
+        // own duplicate checks, so the count that comes back is how many became candidates.
+        var accepted = torrent.Peers.Add(endPoints);
+        NewPeerAddresses = string.Empty;
+        TriggerRefresh();
+
+        PublishAddPeersResult(
+            string.Format(Properties.Resources.Details_Peers_AddAccepted, accepted, endPoints.Count),
+            accepted > 0 ? NotificationType.Success : NotificationType.Warning,
+            accepted > 0 ? Material.Icons.MaterialIconKind.AccountPlusOutline : Material.Icons.MaterialIconKind.AlertCircleOutline);
+    }
+
+    private void PublishAddPeersResult(string message, NotificationType type, Material.Icons.MaterialIconKind icon)
+    {
+        _notificationService.Publish(
+            new NotificationItem(Properties.Resources.Details_Peers_AddTitle, message, type, icon.ToString()),
+            TimeSpan.FromSeconds(5));
+    }
+
+    /// <summary>
+    /// Reads the address box into endpoints. Accepts one per line or several separated by commas or
+    /// spaces, in either <c>address:port</c> or bracketed IPv6 <c>[::1]:port</c> form. A hostname is
+    /// not accepted: the engine dials addresses rather than resolving names, and a port is required
+    /// because an address without one names nothing to connect to.
+    /// </summary>
+    private static (List<IPEndPoint> EndPoints, int Malformed) ParsePeerAddresses(string value)
+    {
+        var endPoints = new List<IPEndPoint>();
+        var malformed = 0;
+
+        foreach (var candidate in value.Split([',', ';', ' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (IPEndPoint.TryParse(candidate, out var endPoint) && endPoint.Port > 0)
+            {
+                endPoints.Add(endPoint);
+            }
+            else
+            {
+                malformed++;
+            }
+        }
+
+        return (endPoints, malformed);
     }
 
     // Resume data

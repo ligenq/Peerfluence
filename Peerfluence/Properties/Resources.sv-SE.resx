@@ -274,6 +274,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Förlopp</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Peer-adress, t.ex. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Lägg till peers</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} av {1} adresser godtogs som peer-kandidater.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Ingen av de {0} adresserna gick att läsa. Använd IP:port, till exempel 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Välj en torrent</value>
   </data>
@@ -297,6 +309,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Låter andra DHT-noder fråga vilka torrenter du känner till peers för, vilket är så söktjänster hittar nya torrenter. Samma information går redan att få genom att fråga vem som har en viss torrent, så att stänga av det döljer inte mycket. Kräver DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Tillåt flera anslutningar per IP-adress</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Behåller peers som delar en adress, som i mobil- och campusnät där många abonnenter går ut via samma. Avstängt tillåts en enda anslutning per adress, och en peer som återansluter från en ny port avvisas i stället för att kännas igen.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Aktivera NAT-PMP</value>

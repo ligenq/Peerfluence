@@ -24,7 +24,7 @@ public sealed class MagnetMetadataPreviewServiceTests
             .Returns(torrentFile);
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
-        var sut = new MagnetMetadataPreviewService(engineService, new TransientTorrentTracker());
+        var sut = new MagnetMetadataPreviewService(engineService);
 
         var magnetUri = $"magnet:?xt=urn:btih:{torrentFile.InfoHash}";
         var result = await sut.FetchAsync(
@@ -59,7 +59,7 @@ public sealed class MagnetMetadataPreviewServiceTests
             .Returns(call => Task.FromCanceled<TorrentFile>(call.Arg<CancellationToken>()));
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
-        var sut = new MagnetMetadataPreviewService(engineService, new TransientTorrentTracker());
+        var sut = new MagnetMetadataPreviewService(engineService);
 
         var result = await sut.FetchAsync(
             $"magnet:?xt=urn:btih:{new string('a', 40)}",

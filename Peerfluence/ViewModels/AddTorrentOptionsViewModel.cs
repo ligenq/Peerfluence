@@ -22,7 +22,6 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     private readonly string _source;
     private readonly bool _isMagnet;
     private CancellationTokenSource? _metadataPreviewCts;
-    private Task? _metadataPreviewTask;
     private TorrentFile? _previewTorrentFile;
 
     private AddTorrentOptionsViewModel(
@@ -202,7 +201,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         _metadataPreviewCts = new CancellationTokenSource();
         IsFetchingMetadata = true;
         MetadataStatusText = Resources.Status_FetchingMetadata;
-        _metadataPreviewTask = FetchMetadataPreviewAsync(previewService, timeout, _metadataPreviewCts);
+        _ = FetchMetadataPreviewAsync(previewService, timeout, _metadataPreviewCts);
     }
 
     internal void ApplyMetadataPreview(MagnetMetadataPreview preview)
@@ -272,10 +271,9 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         {
             IsBusy = true;
 
-            // The preview fetches metadata by adding this very hash to the engine and removing it
-            // again. Cancelling only starts that unwind, so adding before it finishes would hit the
-            // engine's duplicate guard and fail an add the user did nothing wrong to make.
-            await CancelMetadataPreviewAsync();
+            // Only cancelled, not awaited: a preview's torrent makes no claim on the info hash, so
+            // the add no longer has to wait out an unwind that is already under way.
+            CancelMetadataPreview();
 
             var options = BuildOptions();
             if (_previewTorrentFile != null)
@@ -377,8 +375,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         catch
         {
             // Metadata preview is opportunistic; the user can still add the magnet. Say so rather
-            // than leaving "fetching metadata" on screen for a fetch that has already given up -
-            // an engine that already holds this hash lands here every time.
+            // than leaving "fetching metadata" on screen for a fetch that has already given up.
             await RunOnUiThreadAsync(() =>
             {
                 if (!cancellationToken.IsCancellationRequested)
@@ -394,7 +391,6 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
                 if (ReferenceEquals(_metadataPreviewCts, cancellationTokenSource))
                 {
                     _metadataPreviewCts = null;
-                    _metadataPreviewTask = null;
                     IsFetchingMetadata = false;
                 }
 
@@ -409,18 +405,6 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         _metadataPreviewCts = null;
         IsFetchingMetadata = false;
         MetadataStatusText = string.Empty;
-    }
-
-    /// <summary>
-    /// Cancels an in-flight preview and waits for it to finish releasing the engine resources it
-    /// took. <see cref="FetchMetadataPreviewAsync"/> handles its own failures, so the returned task
-    /// completes rather than faults.
-    /// </summary>
-    private Task CancelMetadataPreviewAsync()
-    {
-        var pending = _metadataPreviewTask;
-        CancelMetadataPreview();
-        return pending ?? Task.CompletedTask;
     }
 
     private static Task RunOnUiThreadAsync(Action action)

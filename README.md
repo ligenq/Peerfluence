@@ -34,6 +34,7 @@ Velopack update path are in place.
   limits, ratio rules, seed time rules, and queue priority.
 - Select files, set file priorities, and apply per-file download choices.
 - Add/remove trackers and manually announce.
+- Offer peer addresses by hand, for a peer no tracker, DHT node or exchange has mentioned.
 - Save resume data.
 - Change a torrent's download path.
 - Stream eligible files through the configured external media player.
@@ -93,8 +94,9 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 
 - Storage and session: download folder, session folder, session persistence, add/remove
   dialog preferences.
-- Network and connectivity: DHT, NAT-PMP, UPnP, automatic or fixed listening port,
-  listening-port hints, and port-mapping status.
+- Network and connectivity: DHT, NAT-PMP, UPnP, whether several connections may share one
+  IP address, automatic or fixed listening port, listening-port hints, and port-mapping
+  status.
 - Performance: disk read/write limits.
 - Queue management: enable queueing, max active downloads, max active seeds.
 - Security and privacy: encryption mode, blocklist, GeoIP, proxy type/host/port,

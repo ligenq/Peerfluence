@@ -12,6 +12,14 @@ public sealed class NetworkSettings
     /// </summary>
     public bool AnswerInfoHashSampling { get; set; } = true;
 
+    /// <summary>
+    /// Whether several peer connections may share one IP address. On by default, matching PeerSharp:
+    /// carrier-grade NAT puts many unrelated subscribers behind a single address, so refusing them
+    /// costs real peers, and the abuse the restriction guards against is already bounded by the
+    /// overall connection limit.
+    /// </summary>
+    public bool AllowMultipleConnectionsPerIp { get; set; } = true;
+
     public bool EnableNatPmp { get; set; } = true;
 
     public bool EnableUpnp { get; set; } = false;

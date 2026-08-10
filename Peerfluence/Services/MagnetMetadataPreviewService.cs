@@ -11,14 +11,10 @@ namespace Peerfluence.Services;
 public sealed class MagnetMetadataPreviewService : IMagnetMetadataPreviewService
 {
     private readonly ITorrentEngineService _engineService;
-    private readonly ITransientTorrentTracker _transientTorrentTracker;
 
-    public MagnetMetadataPreviewService(
-        ITorrentEngineService engineService,
-        ITransientTorrentTracker transientTorrentTracker)
+    public MagnetMetadataPreviewService(ITorrentEngineService engineService)
     {
         _engineService = engineService;
-        _transientTorrentTracker = transientTorrentTracker;
     }
 
     public async Task<MagnetMetadataPreview?> FetchAsync(
@@ -30,11 +26,10 @@ public sealed class MagnetMetadataPreviewService : IMagnetMetadataPreviewService
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
         var magnet = MagnetLink.Parse(magnetUri);
 
-        // Entered before the fetch, because the engine adds a real torrent to do it and raises
-        // TorrentAdded from inside the add.
-        using var scope = _transientTorrentTracker.Track(
-            magnet.InfoHash.IsEmpty ? magnet.InfoHashV2 : magnet.InfoHash);
-
+        // The engine still fetches metadata by adding a torrent, but since PeerSharp 3.1 that
+        // torrent is transient in the engine's own sense: it emits no alerts, takes no session
+        // entry, joins no queue and claims no info hash. Nothing downstream of the alert queue can
+        // see it, so nothing here has to hide it.
         try
         {
             var torrentFile = await _engineService.Engine.GetMagnetMetadataAsync(magnet, linkedCts.Token)

@@ -830,6 +830,33 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} addresses accepted as peer candidates..
+        /// </summary>
+        public static string Details_Peers_AddAccepted {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddAccepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None of the {0} addresses could be read. Use IP:port, for example 192.168.1.10:51413..
+        /// </summary>
+        public static string Details_Peers_AddRejected {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add peers.
+        /// </summary>
+        public static string Details_Peers_AddTitle {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client.
         /// </summary>
         public static string Details_Peers_Client {
