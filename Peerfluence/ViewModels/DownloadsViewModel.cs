@@ -892,7 +892,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     private void RemoveTorrent(InfoHash hash)
     {
         // InfoHash can be V1 or V2. We need to find the entry that matches either.
-        var entry = _torrentLookup.FirstOrDefault(x => x.Value.Torrent.Hash == hash || x.Value.Torrent.HashV2 == hash);
+        var entry = _torrentLookup.FirstOrDefault(x => TorrentIdentity.HasHash(x.Value.Torrent, hash));
         if (entry.Value == null)
         {
             return;
@@ -905,7 +905,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         Torrents.Remove(existing);
         _torrentLookup.Remove(key);
 
-        if (SelectedTorrent == existing || _selectionService.SelectedTorrent?.Hash == hash || _selectionService.SelectedTorrent?.HashV2 == hash)
+        var selected = _selectionService.SelectedTorrent;
+        if (SelectedTorrent == existing || (selected != null && TorrentIdentity.HasHash(selected, hash)))
         {
             SelectedTorrent = null;
             _selectionService.SelectedTorrent = null;

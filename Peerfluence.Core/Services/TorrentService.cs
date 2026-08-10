@@ -197,10 +197,6 @@ public sealed class TorrentService : ITorrentService
             return true;
         }
 
-        return torrents.Any(existing =>
-            existing.Hash == torrent.Hash
-            || existing.Hash == torrent.HashV2
-            || existing.HashV2 == torrent.Hash
-            || existing.HashV2 == torrent.HashV2);
+        return torrents.Any(existing => TorrentIdentity.SameTorrent(existing, torrent));
     }
 }
