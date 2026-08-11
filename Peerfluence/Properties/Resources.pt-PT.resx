@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Mostrar ou ocultar o painel de detalhes</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>A área de transferência não está disponível neste momento.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Não foi possível copiar para a área de transferência: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Remover</value>
   </data>

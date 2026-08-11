@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Visa eller dölj detaljpanelen</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Urklipp är inte tillgängligt just nu.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Kunde inte kopiera till urklipp: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Ta bort</value>
   </data>

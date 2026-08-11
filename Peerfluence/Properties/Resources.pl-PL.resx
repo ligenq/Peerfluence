@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Pokaż lub ukryj panel szczegółów</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Schowek jest w tej chwili niedostępny.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Nie udało się skopiować do schowka: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Usuń</value>
   </data>

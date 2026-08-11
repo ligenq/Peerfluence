@@ -72,8 +72,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         StopSelectedCommand = new AsyncRelayCommand(StopSelectedAsync, CanStopSelected);
         RemoveSelectedCommand = new AsyncRelayCommand(RemoveSelectedAsync, CanRemoveSelected);
         OpenFolderCommand = new RelayCommand(OpenFolder, () => SelectedTorrent != null);
-        CopyHashCommand = new RelayCommand(CopyHash, () => SelectedTorrent != null);
-        CopyMagnetCommand = new RelayCommand(CopyMagnet, () => SelectedTorrent != null);
+        CopyHashCommand = new AsyncRelayCommand(CopyHashAsync, () => SelectedTorrent != null);
+        CopyMagnetCommand = new AsyncRelayCommand(CopyMagnetAsync, () => SelectedTorrent != null);
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckSelectedAsync, CanForceRecheckSelected);
         ToggleDetailsPaneCommand = new RelayCommand(ToggleDetailsPane);
 
@@ -197,9 +197,9 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     public IRelayCommand OpenFolderCommand { get; }
 
-    public IRelayCommand CopyHashCommand { get; }
+    public IAsyncRelayCommand CopyHashCommand { get; }
 
-    public IRelayCommand CopyMagnetCommand { get; }
+    public IAsyncRelayCommand CopyMagnetCommand { get; }
 
     public IAsyncRelayCommand ForceRecheckCommand { get; }
 
@@ -688,32 +688,61 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         }
     }
 
-    private void CopyHash()
+    private Task CopyHashAsync()
     {
         var selected = SelectedTorrent;
-        if (selected == null)
-        {
-            return;
-        }
-
-        var topLevel = _topLevelService.GetTopLevel();
-        var clipboard = topLevel?.Clipboard;
-        clipboard?.SetTextAsync(selected.Torrent.Hash.ToString());
+        return selected == null
+            ? Task.CompletedTask
+            : CopyToClipboardAsync(selected.Torrent.Hash.ToString());
     }
 
-    private void CopyMagnet()
+    private Task CopyMagnetAsync()
     {
         var selected = SelectedTorrent;
         if (selected == null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         // ITorrent interface might not have MagnetLink property, but we can generate it from hash
-        var magnet = $"magnet:?xt=urn:btih:{selected.Torrent.Hash}";
-        var topLevel = _topLevelService.GetTopLevel();
-        var clipboard = topLevel?.Clipboard;
-        clipboard?.SetTextAsync(magnet);
+        return CopyToClipboardAsync($"magnet:?xt=urn:btih:{selected.Torrent.Hash}");
+    }
+
+    /// <summary>
+    /// Puts text on the clipboard, and says so when it does not get there.
+    ///
+    /// <para>
+    /// Flushed, because setting alone does not finish the job. Avalonia hands Windows a data object
+    /// that renders its contents only when something asks for them, so the text belonged to this
+    /// process rather than to the clipboard: pasting elsewhere produced whatever was copied before,
+    /// and closing Peerfluence would have taken it away entirely. <c>FlushAsync</c> is what makes
+    /// the copy real, and it does nothing on the platforms that do not need it.
+    /// </para>
+    ///
+    /// <para>
+    /// Awaited rather than started and abandoned, too. Windows hands the clipboard to one process
+    /// at a time, so losing that race is ordinary rather than exceptional, and an unobserved failure
+    /// left the user believing they had copied something.
+    /// </para>
+    /// </summary>
+    private async Task CopyToClipboardAsync(string text)
+    {
+        var clipboard = _topLevelService.GetTopLevel()?.Clipboard;
+        if (clipboard == null)
+        {
+            SetStatusMessage(Resources.Downloads_ClipboardUnavailable, autoClear: true);
+            return;
+        }
+
+        try
+        {
+            await clipboard.SetTextAsync(text);
+            await clipboard.FlushAsync();
+        }
+        catch (Exception ex)
+        {
+            SetStatusMessage(string.Format(Resources.Downloads_CopyFailed, ex.Message), autoClear: true);
+        }
     }
 
     private bool CanForceRecheckSelected()

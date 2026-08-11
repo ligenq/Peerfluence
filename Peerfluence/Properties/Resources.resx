@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Show or hide the details pane</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>The clipboard is not available right now.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Could not copy to the clipboard: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Remove</value>
   </data>

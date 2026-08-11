@@ -17,8 +17,20 @@ namespace Peerfluence;
 
 internal sealed class Program
 {
+    /// <summary>
+    /// Deliberately synchronous, despite everything it calls being asynchronous.
+    ///
+    /// <para>
+    /// <see cref="STAThreadAttribute"/> applies to the thread the runtime starts this on, and an
+    /// <c>async Task Main</c> keeps that thread only until its first await: the continuation, and so
+    /// the Avalonia UI loop started by it, resumes on a thread-pool thread that belongs to no
+    /// apartment. The Windows clipboard is OLE, and refused every copy from there with
+    /// "CoInitialize has not been called". Blocking rather than awaiting keeps the UI on the thread
+    /// the attribute was put here for.
+    /// </para>
+    /// </summary>
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         var startupTracker = new StartupTracker();
         var velopackApp = VelopackApp.Build();
@@ -32,7 +44,7 @@ internal sealed class Program
 
         if (args.Contains("--mcp"))
         {
-            await RunMcpProxyAsync(GetOptionValue(args, "--profile", "--ui-agent-profile"));
+            RunMcpProxyAsync(GetOptionValue(args, "--profile", "--ui-agent-profile")).GetAwaiter().GetResult();
             return;
         }
 
@@ -73,7 +85,7 @@ internal sealed class Program
             }
 
             // 6. Start Host (Background services, etc.)
-            await host.StartAsync();
+            host.StartAsync().GetAwaiter().GetResult();
             host.Services
                 .GetRequiredService<ILogger<Program>>()
                 .LogInformation("Application host started in {ElapsedMs} ms", startupTracker.ElapsedMilliseconds);
@@ -87,7 +99,7 @@ internal sealed class Program
             // StartWithClassicDesktopLifetime returns, so any await that captures it
             // would deadlock.
             SynchronizationContext.SetSynchronizationContext(null);
-            await host.StopAsync(TimeSpan.FromSeconds(3));
+            host.StopAsync(TimeSpan.FromSeconds(3)).GetAwaiter().GetResult();
         }
         catch (Exception ex)
         {

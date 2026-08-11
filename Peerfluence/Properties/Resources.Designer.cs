@@ -1307,6 +1307,24 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The clipboard is not available right now..
+        /// </summary>
+        public static string Downloads_ClipboardUnavailable {
+            get {
+                return ResourceManager.GetString("Downloads_ClipboardUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not copy to the clipboard: {0}.
+        /// </summary>
+        public static string Downloads_CopyFailed {
+            get {
+                return ResourceManager.GetString("Downloads_CopyFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy Hash.
         /// </summary>
         public static string Downloads_CopyHash {
