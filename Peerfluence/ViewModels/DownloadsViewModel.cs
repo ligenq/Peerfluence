@@ -727,8 +727,12 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     /// </summary>
     private async Task CopyToClipboardAsync(string text)
     {
-        var clipboard = _topLevelService.GetTopLevel()?.Clipboard;
-        if (clipboard == null)
+        IClipboard clipboard;
+        try
+        {
+            clipboard = _topLevelService.GetClipboard();
+        }
+        catch (InvalidOperationException)
         {
             SetStatusMessage(Resources.Downloads_ClipboardUnavailable, autoClear: true);
             return;

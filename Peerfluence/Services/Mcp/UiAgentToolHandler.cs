@@ -32,7 +32,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
 
         var selected = _selectionService.SelectedTorrent;
         var state = new McpConstants.UiAgentStateResponse(
-            WindowAvailable: _topLevelService.GetTopLevel() != null,
+            WindowAvailable: _topLevelService.IsWindowAvailable,
             SelectedTorrentHash: selected?.Hash.ToHexString(),
             SelectedTorrentName: selected?.Name,
             Torrents: _torrentService.GetTorrents().Select(ToSummary).ToList());

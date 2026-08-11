@@ -28,13 +28,6 @@ public sealed class DialogService : IDialogService
         var window = registration.WindowFactory();
         window.DataContext = registration.ViewModelFactory();
 
-        var owner = _topLevelService.GetTopLevel() as Window;
-        if (owner != null)
-        {
-            await window.ShowDialog(owner);
-            return;
-        }
-
-        window.Show();
+        await _topLevelService.ShowDialogAsync(window);
     }
 }
