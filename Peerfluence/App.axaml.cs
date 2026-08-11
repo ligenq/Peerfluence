@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
@@ -34,6 +35,28 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        FocusContextMenusWhenOpened();
+    }
+
+    /// <summary>
+    /// Moves keyboard focus into a context menu as it opens.
+    ///
+    /// <para>
+    /// A context menu opened by the mouse never took focus, which left it with no keyboard at all:
+    /// the arrows did not walk the items, Enter did not invoke one, and Escape did not close it -
+    /// every key went to whatever was focused behind the menu. A class handler covers each context
+    /// menu in the application rather than only the one that was noticed.
+    /// </para>
+    /// </summary>
+    private static void FocusContextMenusWhenOpened()
+    {
+        MenuBase.OpenedEvent.AddClassHandler<ContextMenu>((menu, _) =>
+        {
+            // A ContextMenu ships as Focusable=false, so asking it to take focus does nothing until
+            // it is allowed to hold any.
+            menu.Focusable = true;
+            menu.Focus();
+        });
     }
 
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Safe in this context")]
