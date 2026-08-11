@@ -525,6 +525,11 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
             return false;
         }
 
+        if (parsed is null)
+        {
+            return false;
+        }
+
         // Parsing is not enough: a BEP 46 link parses without an info hash, and everything
         // downstream of here assumes there is one.
         if (!TorrentService.HasUsableInfoHash(parsed))
