@@ -43,8 +43,8 @@ public partial class DownloadsView : UserControl
     private void ApplyDetailsPaneLayout(bool isVisible)
     {
         var rows = ContentGrid.RowDefinitions;
-        rows[4].Height = isVisible ? SplitterHeight : Collapsed;
-        rows[5].Height = isVisible ? DetailsPaneHeight : Collapsed;
+        rows[5].Height = isVisible ? SplitterHeight : Collapsed;
+        rows[6].Height = isVisible ? DetailsPaneHeight : Collapsed;
     }
 
     private void OnDataContextChanged(object? sender, System.EventArgs e)

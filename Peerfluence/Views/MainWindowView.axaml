@@ -7,6 +7,7 @@
                  xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
+                 xmlns:views="using:Peerfluence.Views"
                  mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
                  x:Class="Peerfluence.Views.MainWindowView"
                  x:Name="Root"
@@ -24,8 +25,10 @@
         layer to find.
     -->
     <primitives:VisualLayerManager>
+    <Panel>
     <suki:SukiSideMenu ItemsSource="{Binding NavigationItems}"
                        SelectedItem="{Binding SelectedNavigationItem}"
+                       IsVisible="{Binding !IsSimpleMode}"
                        UseCustomContent="True">
         <suki:SukiSideMenu.HeaderContent>
             <StackPanel Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource LargeLeftRightTopBottomMargin}">
@@ -43,15 +46,11 @@
             </DataTemplate>
         </suki:SukiSideMenu.ItemTemplate>
         <suki:SukiSideMenu.FooterContent>
+            <!--
+                The speeds used to be repeated here as well as on the downloads screen. They live in
+                the status strip now, where the rest of the numbers are.
+            -->
             <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                    <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{DynamicResource SukiPrimaryColor}"/>
-                    <TextBlock Text="{Binding DownloadsViewModel.TotalDownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.8"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                    <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{DynamicResource SukiPrimaryColor}"/>
-                    <TextBlock Text="{Binding DownloadsViewModel.TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.8"/>
-                </StackPanel>
                 <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="0" Margin="0,4,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.5"/>
@@ -64,5 +63,94 @@
             <ContentControl Content="{Binding CurrentPage}" Margin="{StaticResource MediumLeftTopRightBottomMargin}" />
         </suki:SukiSideMenu.Content>
     </suki:SukiSideMenu>
+
+        <!--
+            Simple mode: the one screen, and a quiet way back to everything else. No side menu,
+            because there is nowhere else to navigate to.
+        -->
+        <Grid RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+            <!--
+                The only chrome simple mode gets: a way into settings and a way out to advanced,
+                muted and out of the way of the one thing the screen is for.
+            -->
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        Spacing="{StaticResource SpacingMedium}"
+                        HorizontalAlignment="Right">
+                <Button Classes="Basic"
+                        Command="{Binding ShowSimpleSettingsCommand}"
+                        IsVisible="{Binding !IsSimpleSettingsOpen}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
+                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="Basic"
+                        Command="{Binding CloseSimpleSettingsCommand}"
+                        IsVisible="{Binding IsSimpleSettingsOpen}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
+                        <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
+                        <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <Panel Grid.Row="1" IsVisible="{Binding !IsSimpleSettingsOpen}">
+                <views:SimpleDownloadsView DataContext="{Binding DownloadsViewModel}"/>
+            </Panel>
+            <ContentControl Grid.Row="1"
+                            Content="{Binding SettingsPage}"
+                            IsVisible="{Binding IsSimpleSettingsOpen}"/>
+        </Grid>
+
+        <!-- First run only: one question, two answers, then never again. -->
+        <Border IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpacingLarge}" MaxWidth="760">
+                <StackPanel Spacing="{StaticResource SpacingSmall}">
+                    <TextBlock Text="{m:L Welcome_Title}"
+                               FontSize="{StaticResource FontSizeTitle}"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{m:L Welcome_Subtitle}"
+                               Opacity="0.7"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Center">
+                    <Button Classes="Basic" Command="{Binding ChooseSimpleModeCommand}" Padding="{StaticResource ZeroThickness}">
+                        <suki:GlassCard Width="330" Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
+                            <StackPanel Spacing="{StaticResource SpacingMedium}">
+                                <materialIcons:MaterialIcon Kind="Feather" Width="32" Height="32" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                                <TextBlock Text="{m:L Welcome_Simple_Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="0.7" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </suki:GlassCard>
+                    </Button>
+
+                    <Button Classes="Basic" Command="{Binding ChooseAdvancedModeCommand}" Padding="{StaticResource ZeroThickness}">
+                        <suki:GlassCard Width="330" Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
+                            <StackPanel Spacing="{StaticResource SpacingMedium}">
+                                <materialIcons:MaterialIcon Kind="TuneVariant" Width="32" Height="32" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                                <TextBlock Text="{m:L Welcome_Advanced_Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="0.7" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </suki:GlassCard>
+                    </Button>
+                </StackPanel>
+
+                <TextBlock Text="{m:L Welcome_Footnote}"
+                           Opacity="0.5"
+                           FontSize="{StaticResource FontSizeSmall}"
+                           TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Panel>
     </primitives:VisualLayerManager>
 </suki:SukiWindow>

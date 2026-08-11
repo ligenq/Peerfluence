@@ -29,7 +29,12 @@ Velopack update path are in place.
 - Remove torrents with explicit choices: remove only, delete downloaded files, delete
   torrent metadata, or delete everything.
 - Optionally remember the remove choice and skip the confirmation dialog.
-- Show live aggregate download/upload speed, active torrent count, and peer count.
+- Choose between a simple and an advanced interface on first launch, and switch at any
+  time from settings. Simple mode is one screen — add, watch, open the folder — with no
+  dashboard, details pane or side menu.
+- Show live aggregate download/upload speed, active torrent count, and peer count in a
+  single status line above the list.
+- Search downloads by name and filter by state: all, downloading, seeding, or completed.
 - Show torrent details: files, trackers, peers, pieces, status, progress, paths, hash,
   limits, ratio rules, seed time rules, and queue priority. The details pane is opened from
   the toolbar and closed by default, so the list has the whole window until it is wanted.
@@ -105,7 +110,12 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 - Media player: external media player path.
 - Completion action: program/script, arguments, working directory, timeout, run hidden.
 - Updates: Velopack update URL and restart/apply controls for direct builds.
-- Appearance: system/light/dark theme, color theme, background style, language.
+- Appearance: interface mode (simple or advanced), system/light/dark theme, color theme,
+  background style, language.
+
+Settings apply and persist as they are changed; there is no Save button. Reset restores
+the defaults. In simple mode the screen shows only the download folder and appearance —
+the rest is hidden rather than turned off, and comes back with advanced mode.
 
 Default data locations use the operating system's application-data and Downloads folders.
 On Linux, the configured XDG Downloads directory is honored. Typical Windows locations are:

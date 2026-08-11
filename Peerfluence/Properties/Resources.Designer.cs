@@ -1577,6 +1577,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search downloads.
+        /// </summary>
+        public static string Downloads_Search {
+            get {
+                return ResourceManager.GetString("Downloads_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Start.
         /// </summary>
         public static string Downloads_Start {

@@ -4,6 +4,7 @@
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:m="using:Peerfluence.Markup"
+             xmlns:config="using:Peerfluence.Core.Config"
              x:Class="Peerfluence.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
     <Grid RowDefinitions="Auto,*" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
@@ -12,19 +13,14 @@
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold"/>
-                        <TextBlock Text="{m:L App_Tagline}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+                        <!-- No Save button: changes apply as they are made, so say that instead. -->
+                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Right">
                         <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="Restore" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_Reset}"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Command="{Binding SaveCommand}" Classes="Flat">
-                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                                <materialIcons:MaterialIcon Kind="ContentSaveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                                <TextBlock Text="{m:L Settings_Save}"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -44,10 +40,37 @@
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                        <materialIcons:MaterialIcon Kind="TuneVariant" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <TextBlock Text="{m:L Settings_InterfaceMode}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- The only way back to simple mode once advanced has been chosen. -->
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <RadioButton Classes="Chips" GroupName="InterfaceMode"
+                                     IsChecked="{Binding IsSimpleMode, Mode=OneWay}"
+                                     Command="{Binding SetInterfaceModeCommand}"
+                                     CommandParameter="{x:Static config:InterfaceMode.Simple}"
+                                     Content="{m:L Settings_InterfaceMode_Simple}"/>
+                        <RadioButton Classes="Chips" GroupName="InterfaceMode"
+                                     IsChecked="{Binding IsAdvancedMode, Mode=OneWay}"
+                                     Command="{Binding SetInterfaceModeCommand}"
+                                     CommandParameter="{x:Static config:InterfaceMode.Advanced}"
+                                     Content="{m:L Settings_InterfaceMode_Advanced}"/>
+                    </StackPanel>
+                    <TextBlock Text="{m:L Settings_InterfaceModeHint}"
+                               Opacity="0.55"
+                               FontSize="{StaticResource FontSizeSmall}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </suki:GlassCard>
+
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
                         <materialIcons:MaterialIcon Kind="PaletteOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Appearance}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
-                    
+
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
@@ -216,7 +239,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_NetworkAndConnectivity}">
+            <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
@@ -340,7 +363,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_SecurityAndPrivacy}">
+            <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
@@ -442,7 +465,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Updates}">
+            <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>

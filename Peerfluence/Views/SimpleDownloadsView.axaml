@@ -1,0 +1,154 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:m="using:Peerfluence.Markup"
+             x:Class="Peerfluence.Views.SimpleDownloadsView"
+             x:DataType="vm:DownloadsViewModel">
+    <suki:BusyArea IsBusy="{Binding IsBusy}">
+        <Grid RowDefinitions="Auto,Auto,*" MaxWidth="900" HorizontalAlignment="Stretch">
+
+            <!-- One action, said in words. Everything else lives on the rows. -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}"
+                  Margin="{StaticResource StandardBottomMargin}">
+                <TextBlock Text="{m:L Nav_Downloads}"
+                           FontSize="{StaticResource FontSizeHeader}"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Classes="Flat" Command="{Binding AddTorrentCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                        <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <TextBlock Text="{m:L Downloads_AddTorrent}"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="2" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                        <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <suki:InfoBar Grid.Row="1"
+                          IsVisible="{Binding HasStatusMessage}"
+                          IsClosable="True"
+                          Message="{Binding StatusMessage}"
+                          Margin="{StaticResource StandardBottomMargin}"/>
+
+            <!-- Nothing yet: say what to do, not that a list is empty. -->
+            <suki:GlassCard Grid.Row="2"
+                            IsVisible="{Binding HasNoTorrents}"
+                            VerticalAlignment="Center"
+                            Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
+                <StackPanel Spacing="{StaticResource SpacingLarge}" HorizontalAlignment="Center">
+                    <materialIcons:MaterialIcon Kind="DownloadCircleOutline"
+                                                Width="48" Height="48"
+                                                HorizontalAlignment="Center"
+                                                Foreground="{DynamicResource SukiPrimaryColor}"/>
+                    <StackPanel Spacing="{StaticResource SpacingSmall}">
+                        <TextBlock Text="{m:L Downloads_EmptyTitle}"
+                                   FontSize="{StaticResource FontSizeHeader}"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="{m:L Simple_EmptyBody}"
+                                   Opacity="0.7"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="420"
+                                   TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Center">
+                        <Button Classes="Flat" Command="{Binding AddTorrentCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                <TextBlock Text="{m:L Downloads_AddTorrent}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding AddMagnetCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                                <materialIcons:MaterialIcon Kind="ClipboardArrowDownOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </suki:GlassCard>
+
+            <!--
+                One card per download. Name and progress carry the row; speed and time left sit
+                underneath in muted text, and the two actions worth having are on the row itself so
+                nothing has to be selected first.
+            -->
+            <ScrollViewer Grid.Row="2" IsVisible="{Binding HasTorrents}" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Torrents}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TorrentListItemViewModel">
+                            <suki:GlassCard Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                                <suki:GlassCard.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{m:L Downloads_OpenFolder}"
+                                                  Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).OpenTorrentFolderCommand}"
+                                                  CommandParameter="{Binding}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="FolderOpen"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{m:L Downloads_Remove}"
+                                                  Foreground="{StaticResource ErrorColor}"
+                                                  Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).RemoveTorrentCommand}"
+                                                  CommandParameter="{Binding}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Delete" Foreground="{StaticResource ErrorColor}"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </suki:GlassCard.ContextMenu>
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
+                                    <StackPanel Spacing="{StaticResource SpacingSmall}" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="{StaticResource FontSizeNormal}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <ProgressBar Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="6"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                            <TextBlock Text="{Binding State}" Opacity="0.65" FontSize="{StaticResource FontSizeSmall}"/>
+                                            <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}"
+                                                       Opacity="0.65"
+                                                       FontSize="{StaticResource FontSizeSmall}"
+                                                       IsVisible="{Binding !IsComplete}"/>
+                                            <TextBlock Text="{Binding Eta}"
+                                                       Opacity="0.65"
+                                                       FontSize="{StaticResource FontSizeSmall}"
+                                                       IsVisible="{Binding !IsComplete}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="1"
+                                            Classes="Basic"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).ToggleTorrentCommand}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip.Tip="{m:L Simple_PauseResume}">
+                                        <Panel>
+                                            <materialIcons:MaterialIcon Kind="Pause" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" IsVisible="{Binding IsRunning}"/>
+                                            <materialIcons:MaterialIcon Kind="Play" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" IsVisible="{Binding !IsRunning}"/>
+                                        </Panel>
+                                    </Button>
+
+                                    <Button Grid.Column="2"
+                                            Classes="Basic"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).OpenTorrentFolderCommand}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip.Tip="{m:L Downloads_OpenFolder}">
+                                        <materialIcons:MaterialIcon Kind="FolderOpen" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                    </Button>
+                                </Grid>
+                            </suki:GlassCard>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </suki:BusyArea>
+</UserControl>

@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -41,7 +41,7 @@ public class MainWindowViewModelTests
         _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService);
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
-        _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>());
+        _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>());
 
         // Create an uninitialized DownloadsViewModel to avoid DispatcherTimer in its constructor
 #pragma warning disable SYSLIB0050
@@ -51,7 +51,7 @@ public class MainWindowViewModelTests
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 
         var features = new IFeatureViewModel[] { downloadsVm, _settingsVm };
-        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService);
+        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>());
     }
 
     [Fact]
@@ -110,7 +110,8 @@ public class MainWindowViewModelTests
             new AboutViewModel(NullLogger<AboutViewModel>.Instance),
             _notificationService,
             settings,
-            updateService);
+            updateService,
+            Substitute.For<IInterfaceModeService>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -130,7 +131,8 @@ public class MainWindowViewModelTests
             new AboutViewModel(NullLogger<AboutViewModel>.Instance),
             _notificationService,
             settings,
-            updateService);
+            updateService,
+            Substitute.For<IInterfaceModeService>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 

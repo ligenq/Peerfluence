@@ -18,6 +18,13 @@ public sealed class AppSettings
 
     public McpSettings Mcp { get; set; } = new();
 
+    /// <summary>
+    /// "Simple" or "Advanced". Empty means the user has not been asked yet, which is what brings up
+    /// the welcome on first launch; anything unrecognised is read as Advanced, so a hand-edited or
+    /// downgraded settings file never hides features someone was already using.
+    /// </summary>
+    public string InterfaceMode { get; set; } = string.Empty;
+
     public bool ShowAddTorrentOptions { get; set; } = true;
 
     public bool ShowRemoveTorrentOptions { get; set; } = true;

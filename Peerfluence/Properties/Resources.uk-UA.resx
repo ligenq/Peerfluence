@@ -115,6 +115,69 @@
   <data name="Downloads_CopyFailed" xml:space="preserve">
     <value>Не вдалося скопіювати до буфера обміну: {0}</value>
   </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Додайте файл .torrent або вставте magnet-посилання, щоб почати завантаження.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Призупинити або відновити</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Перейти в розширений режим</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Ласкаво просимо до Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Скільки ви хочете бачити? Це можна змінити будь-коли в налаштуваннях.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Простий</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Лише завантаження: додайте файл або посилання, стежте за перебігом, відкрийте теку. Нічого зайвого.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Розширений</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Усе: трекери, піри, частини, вибір файлів, черга, обмеження швидкості та решта.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Не впевнені? Почніть із простого. Перемкнутися — один клік.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Пошук серед завантажень</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>Завантажуються</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>Роздаються</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Завершені</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Жодне завантаження не відповідає запиту.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Інтерфейс</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Простий залишає одне вікно: додати, стежити, відкрити. Розширений додає панель, область відомостей і всі налаштування.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Простий</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Розширений</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>Зміни зберігаються під час внесення.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Видалити</value>
   </data>

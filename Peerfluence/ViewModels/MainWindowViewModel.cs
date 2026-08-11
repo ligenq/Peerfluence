@@ -8,6 +8,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Material.Icons;
+using Peerfluence.Core.Config;
 using Peerfluence.Core.Messaging;
 using Peerfluence.Properties;
 using SukiUI.Dialogs;
@@ -22,6 +23,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly IUpdateService _updateService;
     private readonly INotificationService _notificationService;
     private readonly AboutViewModel _aboutViewModel;
+    private readonly IInterfaceModeService _interfaceModeService;
     private readonly List<NavigationItem> _featureItems = new();
     private bool _startupUpdateCheckStarted;
     private bool _disposed;
@@ -31,12 +33,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         AboutViewModel aboutViewModel,
         INotificationService notificationService,
         IAppSettingsService settingsService,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        IInterfaceModeService interfaceModeService)
     {
         _settingsService = settingsService;
         _updateService = updateService;
         _notificationService = notificationService;
         _aboutViewModel = aboutViewModel;
+        _interfaceModeService = interfaceModeService;
 
         // Create SukiUI managers here (after UI thread is available)
         ToastManager = new SukiToastManager();
@@ -64,15 +68,83 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
                 DownloadsViewModel = dvm;
                 dvm.SukiDialogManager = DialogManager;
             }
+
+            if (feature is SettingsViewModel svm)
+            {
+                SettingsPage = svm;
+            }
         }
 
         ShowAboutCommand = new RelayCommand(ShowAbout);
+        ShowSimpleSettingsCommand = new RelayCommand(() => IsSimpleSettingsOpen = true);
+        CloseSimpleSettingsCommand = new RelayCommand(() => IsSimpleSettingsOpen = false);
+        ChooseSimpleModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Simple));
+        ChooseAdvancedModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Advanced));
+        SwitchToAdvancedModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Advanced));
 
         NavigationItems = new ObservableCollection<NavigationItem>(_featureItems);
 
         SelectedNavigationItem = NavigationItems.FirstOrDefault();
 
+        IsSimpleMode = _interfaceModeService.IsSimple;
+        IsWelcomeVisible = !_interfaceModeService.HasChosen;
+
         WeakReferenceMessenger.Default.Register<LanguageChangedMessage>(this, (_, _) => UpdateNavigationTitles());
+        WeakReferenceMessenger.Default.Register<InterfaceModeChangedMessage>(this, (_, msg) =>
+        {
+            IsSimpleMode = msg.Mode == InterfaceMode.Simple;
+        });
+    }
+
+    /// <summary>
+    /// Whether the stripped-back interface is showing. Simple mode drops the side menu with it:
+    /// there is one screen to be on, so navigation between two of them is noise.
+    /// </summary>
+    public bool IsSimpleMode
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// Whether the first-run welcome is up. Shown until the question has been answered once, and
+    /// never again after that.
+    /// </summary>
+    public bool IsWelcomeVisible
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// Simple mode has two screens rather than a menu: the downloads, and settings behind one link.
+    /// </summary>
+    public bool IsSimpleSettingsOpen
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// The settings page, so simple mode can show it without the side menu that normally reaches it.
+    /// </summary>
+    public ViewModelBase? SettingsPage { get; private set; }
+
+    public IRelayCommand ShowSimpleSettingsCommand { get; }
+
+    public IRelayCommand CloseSimpleSettingsCommand { get; }
+
+    public IAsyncRelayCommand ChooseSimpleModeCommand { get; }
+
+    public IAsyncRelayCommand ChooseAdvancedModeCommand { get; }
+
+    public IAsyncRelayCommand SwitchToAdvancedModeCommand { get; }
+
+    private async Task ChooseModeAsync(InterfaceMode mode)
+    {
+        await _interfaceModeService.SetAsync(mode);
+        IsSimpleMode = mode == InterfaceMode.Simple;
+        IsWelcomeVisible = false;
     }
 
     public ObservableCollection<NavigationItem> NavigationItems { get; }

@@ -115,6 +115,69 @@
   <data name="Downloads_CopyFailed" xml:space="preserve">
     <value>Impossibile copiare negli appunti: {0}</value>
   </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Aggiungi un file .torrent o incolla un link magnet per iniziare a scaricare.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Metti in pausa o riprendi</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Passa alla modalità avanzata</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Benvenuto in Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Quanto vuoi vedere? Puoi cambiarlo in qualsiasi momento nelle impostazioni.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Semplice</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Solo download: aggiungi un file o un link, guardalo arrivare, apri la cartella. Nient'altro tra i piedi.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Avanzata</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Tutto: tracker, peer, pezzi, selezione dei file, coda, limiti di velocità e il resto.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Non sei sicuro? Inizia dalla modalità semplice. Cambiare costa un clic.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Cerca nei download</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Tutti</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>In download</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>In condivisione</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Completati</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Nessun download corrisponde alla ricerca.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Interfaccia</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Semplice riduce la finestra a una sola schermata: aggiungi, guarda, apri. Avanzata aggiunge il pannello, l'area dei dettagli e tutte le impostazioni.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Semplice</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Avanzata</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>Le modifiche vengono salvate mentre le fai.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Rimuovi</value>
   </data>
