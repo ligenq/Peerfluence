@@ -67,8 +67,8 @@ internal static class TestHelpers
         fields.First(f => f.Name == "<StopSelectedCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<RemoveSelectedCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<OpenFolderCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
-        fields.First(f => f.Name == "<CopyHashCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
-        fields.First(f => f.Name == "<CopyMagnetCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
+        fields.First(f => f.Name == "<CopyHashCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
+        fields.First(f => f.Name == "<CopyMagnetCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<ForceRecheckCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
 
         // Wired to the real method rather than stubbed: what the details toggle does to the settings

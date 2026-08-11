@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Показати або сховати панель відомостей</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Буфер обміну зараз недоступний.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Не вдалося скопіювати до буфера обміну: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Видалити</value>
   </data>

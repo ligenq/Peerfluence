@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Detailbereich ein- oder ausblenden</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Die Zwischenablage ist derzeit nicht verfügbar.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Kopieren in die Zwischenablage nicht möglich: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Entfernen</value>
   </data>

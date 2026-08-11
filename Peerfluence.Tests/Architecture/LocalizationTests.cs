@@ -90,6 +90,8 @@ public class LocalizationTests
     [InlineData("Details_Peers_AddAccepted")]
     [InlineData("Details_Peers_AddRejected")]
     [InlineData("Downloads_ToggleDetails")]
+    [InlineData("Downloads_ClipboardUnavailable")]
+    [InlineData("Downloads_CopyFailed")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

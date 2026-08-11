@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Mostra o nascondi il pannello dei dettagli</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Gli appunti non sono disponibili in questo momento.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Impossibile copiare negli appunti: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Rimuovi</value>
   </data>

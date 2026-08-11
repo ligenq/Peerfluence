@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Mostrar u ocultar el panel de detalles</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>El portapapeles no está disponible en este momento.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>No se ha podido copiar al portapapeles: {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Eliminar</value>
   </data>

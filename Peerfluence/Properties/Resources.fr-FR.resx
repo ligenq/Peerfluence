@@ -109,6 +109,12 @@
   <data name="Downloads_ToggleDetails" xml:space="preserve">
     <value>Afficher ou masquer le volet de détails</value>
   </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Le presse-papiers n'est pas disponible pour le moment.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Impossible de copier dans le presse-papiers : {0}</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Supprimer</value>
   </data>
