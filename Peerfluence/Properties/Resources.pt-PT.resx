@@ -115,6 +115,69 @@
   <data name="Downloads_CopyFailed" xml:space="preserve">
     <value>Não foi possível copiar para a área de transferência: {0}</value>
   </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Adicione um ficheiro .torrent ou cole uma ligação magnet para começar a transferir.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Pausar ou retomar</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Mudar para avançado</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Bem-vindo ao Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Quanto quer ver? Pode mudar isto a qualquer momento nas definições.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Simples</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Apenas transferir: adicione um ficheiro ou uma ligação, veja-o chegar, abra a pasta. Nada mais pelo meio.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Avançado</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Tudo: rastreadores, pares, peças, seleção de ficheiros, fila, limites de velocidade e o resto.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Sem certezas? Comece pelo simples. Mudar custa um clique.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Procurar nas transferências</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Todas</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>A transferir</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>A partilhar</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Concluídas</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Nenhuma transferência corresponde à sua procura.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Simples reduz a janela a um único ecrã: adicionar, ver, abrir. Avançado acrescenta o painel, a área de detalhes e todas as definições.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Simples</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Avançado</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>As alterações são guardadas à medida que as faz.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Remover</value>
   </data>

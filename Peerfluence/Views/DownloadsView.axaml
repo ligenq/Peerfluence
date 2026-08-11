@@ -13,53 +13,39 @@
             than here: hiding a control leaves its star-sized row reserving space, which is what left
             the list with half the window and nothing under it.
         -->
-        <Grid x:Name="ContentGrid" RowDefinitions="Auto,Auto,Auto,2*,0,0">
-            <!-- Dashboard Header -->
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource MediumBottomMargin}">
-                <suki:GlassCard Width="200">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                            <materialIcons:MaterialIcon Kind="Download" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
-                            <TextBlock Text="{m:L Downloads_TotalDown}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding TotalDownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+        <Grid x:Name="ContentGrid" RowDefinitions="Auto,Auto,Auto,Auto,2*,0,0">
+            <!--
+                One line instead of four cards. The same four numbers, in the place a status bar
+                belongs, leaving the list the room the window was opened for.
+            -->
+            <Border Margin="{StaticResource StandardBottomMargin}"
+                    Padding="{StaticResource NormalLeftTopRightBottomMargin}"
+                    Background="{DynamicResource SukiGlassCardBackground}"
+                    CornerRadius="{StaticResource CornerRadiusNormal}">
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingLarge}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <materialIcons:MaterialIcon Kind="Download" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalDownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
-                </suki:GlassCard>
-
-                <suki:GlassCard Width="200">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                            <materialIcons:MaterialIcon Kind="Upload" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
-                            <TextBlock Text="{m:L Downloads_TotalUp}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <materialIcons:MaterialIcon Kind="Upload" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
-                </suki:GlassCard>
-
-                <suki:GlassCard Width="160">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                            <materialIcons:MaterialIcon Kind="CheckboxMarkedCircleOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
-                            <TextBlock Text="{m:L Downloads_Active}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding ActiveTorrents}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <TextBlock Text="{m:L Downloads_Active}" Opacity="0.6" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ActiveTorrents}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
-                </suki:GlassCard>
-
-                <suki:GlassCard Width="160">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                            <materialIcons:MaterialIcon Kind="AccountGroupOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}"/>
-                            <TextBlock Text="{m:L Downloads_Peers}" VerticalAlignment="Center" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding TotalPeers}" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                        <TextBlock Text="{m:L Downloads_Peers}" Opacity="0.6" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalPeers}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
-                </suki:GlassCard>
-            </StackPanel>
-        </ScrollViewer>
+                </StackPanel>
+            </Border>
 
-        <!-- Action Bar -->
+        <!--
+            Actions say what they do. The destructive one especially: it used to be an unlabelled
+            glyph one click away, which is not a thing to leave to a guess.
+        -->
         <suki:GlassCard Grid.Row="1" Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
             <DockPanel>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Left">
@@ -71,19 +57,31 @@
                     </Button>
 
                     <Button Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}">
-                        <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_AddMagnet}"/>
+                        </StackPanel>
                     </Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Right" HorizontalAlignment="Right">
                     <Button Command="{Binding StartSelectedCommand}" ToolTip.Tip="{m:L Downloads_Start}">
-                        <materialIcons:MaterialIcon Kind="Play" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Play" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_Start}"/>
+                        </StackPanel>
                     </Button>
                     <Button Command="{Binding StopSelectedCommand}" ToolTip.Tip="{m:L Downloads_Stop}">
-                        <materialIcons:MaterialIcon Kind="Stop" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Stop" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_Stop}"/>
+                        </StackPanel>
                     </Button>
                     <Button Command="{Binding RemoveSelectedCommand}" ToolTip.Tip="{m:L Downloads_Remove}" Foreground="{StaticResource ErrorColor}">
-                        <materialIcons:MaterialIcon Kind="Delete" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Delete" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            <TextBlock Text="{m:L Downloads_Remove}"/>
+                        </StackPanel>
                     </Button>
 
                     <Separator Width="1" Height="24" Background="{DynamicResource SukiBorderBrush}" Margin="{StaticResource XXSmallLeftRightMargin}"/>
@@ -102,20 +100,55 @@
             </DockPanel>
         </suki:GlassCard>
 
+        <!-- Finding one torrent among many: search by name, and narrow by what it is doing. -->
+        <Grid Grid.Row="2"
+              ColumnDefinitions="Auto,*"
+              ColumnSpacing="{StaticResource SpacingMedium}"
+              IsVisible="{Binding HasTorrents}"
+              Margin="{StaticResource StandardBottomMargin}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=OneWay}"
+                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.All}"
+                             Content="{m:L Downloads_Filter_All}"/>
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterDownloading, Mode=OneWay}"
+                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Downloading}"
+                             Content="{m:L Downloads_Filter_Downloading}"/>
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterSeeding, Mode=OneWay}"
+                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Seeding}"
+                             Content="{m:L Downloads_Filter_Seeding}"/>
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterCompleted, Mode=OneWay}"
+                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Completed}"
+                             Content="{m:L Downloads_Filter_Completed}"/>
+            </StackPanel>
+            <TextBox Grid.Column="1"
+                     Text="{Binding SearchText, Mode=TwoWay}"
+                     PlaceholderText="{m:L Downloads_Search}"
+                     MaxWidth="320"
+                     HorizontalAlignment="Right"/>
+        </Grid>
+
         <suki:InfoBar x:Name="DownloadsStatusInfoBar"
-                      Grid.Row="2"
+                      Grid.Row="3"
                       IsVisible="{Binding HasStatusMessage}"
                       IsClosable="True"
                       Message="{Binding StatusMessage}"
                       Margin="{StaticResource StandardBottomMargin}" />
 
+        <!-- Searched everything away: say so, rather than showing an empty grid. -->
+        <TextBlock Grid.Row="4"
+                   Text="{m:L Downloads_NoMatches}"
+                   IsVisible="{Binding HasNoMatches}"
+                   Opacity="0.6"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
         <!-- Torrent List -->
         <suki:GlassCard x:Name="TorrentTableCard"
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Padding="{StaticResource ZeroThickness}"
                         IsVisible="{Binding HasTorrents}">
             <DataGrid x:Name="TorrentDataGrid"
-                      ItemsSource="{Binding Torrents}"
+                      ItemsSource="{Binding VisibleTorrents}"
                       SelectedItem="{Binding SelectedTorrent, Mode=TwoWay}"
                       SelectionChanged="TorrentDataGrid_OnSelectionChanged"
                       PointerPressed="TorrentDataGrid_OnPointerPressed"
@@ -223,7 +256,7 @@
         </suki:GlassCard>
 
         <suki:GlassCard x:Name="EmptyStateCard"
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Grid.RowSpan="3"
                         IsVisible="{Binding HasNoTorrents}"
                         HorizontalAlignment="Center"
@@ -258,9 +291,9 @@
         </suki:GlassCard>
 
         <!-- Detail Pane (Resizable) -->
-        <GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" Background="Transparent"
+        <GridSplitter Grid.Row="5" Height="4" HorizontalAlignment="Stretch" Background="Transparent"
                       IsVisible="{Binding IsDetailsPaneVisible}" />
-        <suki:GlassCard Grid.Row="5"
+        <suki:GlassCard Grid.Row="6"
                         IsVisible="{Binding IsDetailsPaneVisible}"
                         Margin="{StaticResource ZeroThickness}"
                         Padding="{StaticResource ZeroThickness}">

@@ -76,6 +76,10 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         CopyMagnetCommand = new AsyncRelayCommand(CopyMagnetAsync, () => SelectedTorrent != null);
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckSelectedAsync, CanForceRecheckSelected);
         ToggleDetailsPaneCommand = new RelayCommand(ToggleDetailsPane);
+        SetFilterCommand = new RelayCommand<TorrentFilter>(filter => Filter = filter);
+        ToggleTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(ToggleTorrentAsync);
+        OpenTorrentFolderCommand = new RelayCommand<TorrentListItemViewModel?>(OpenFolderFor);
+        RemoveTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(RemoveTorrentAsync);
 
         IsDetailsPaneVisible = _settingsService.Current.ShowDetailsPane;
 
@@ -151,6 +155,86 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     public bool HasNoTorrents => !HasTorrents;
 
+    /// <summary>
+    /// What the list is narrowed to. The collection the grid binds to is
+    /// <see cref="VisibleTorrents"/>; <see cref="Torrents"/> stays the whole set, because the
+    /// dashboard counts and the alert plumbing are about everything, not about what is on screen.
+    /// </summary>
+    public string SearchText
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                ApplyFilter();
+            }
+        }
+    } = string.Empty;
+
+    public TorrentFilter Filter
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                ApplyFilter();
+            }
+        }
+    } = TorrentFilter.All;
+
+    public ObservableCollection<TorrentListItemViewModel> VisibleTorrents { get; } = new();
+
+    /// <summary>
+    /// True when there are torrents but the search or filter has hidden all of them - a different
+    /// thing to say than "nothing here yet", and a different thing to do about it.
+    /// </summary>
+    public bool HasNoMatches => HasTorrents && VisibleTorrents.Count == 0;
+
+    public IRelayCommand<TorrentFilter> SetFilterCommand { get; }
+
+    public bool IsFilterAll => Filter == TorrentFilter.All;
+
+    public bool IsFilterDownloading => Filter == TorrentFilter.Downloading;
+
+    public bool IsFilterSeeding => Filter == TorrentFilter.Seeding;
+
+    public bool IsFilterCompleted => Filter == TorrentFilter.Completed;
+
+    private void ApplyFilter()
+    {
+        var search = SearchText?.Trim() ?? string.Empty;
+
+        VisibleTorrents.Clear();
+        foreach (var torrent in Torrents.Where(Matches))
+        {
+            VisibleTorrents.Add(torrent);
+        }
+
+        OnPropertyChanged(nameof(HasNoMatches));
+        OnPropertyChanged(nameof(IsFilterAll));
+        OnPropertyChanged(nameof(IsFilterDownloading));
+        OnPropertyChanged(nameof(IsFilterSeeding));
+        OnPropertyChanged(nameof(IsFilterCompleted));
+
+        bool Matches(TorrentListItemViewModel item)
+        {
+            if (search.Length > 0 && item.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return false;
+            }
+
+            return Filter switch
+            {
+                TorrentFilter.Downloading => !item.IsComplete && item.IsRunning,
+                TorrentFilter.Seeding => item.IsComplete && item.IsRunning,
+                TorrentFilter.Completed => item.IsComplete,
+                _ => true
+            };
+        }
+    }
+
     public bool IsBusy
     {
         get;
@@ -204,6 +288,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     public IAsyncRelayCommand ForceRecheckCommand { get; }
 
     public IRelayCommand ToggleDetailsPaneCommand { get; }
+
+    /// <summary>Row actions, so simple mode needs no selection before acting.</summary>
+    public IAsyncRelayCommand<TorrentListItemViewModel?> ToggleTorrentCommand { get; }
+
+    public IRelayCommand<TorrentListItemViewModel?> OpenTorrentFolderCommand { get; }
+
+    public IAsyncRelayCommand<TorrentListItemViewModel?> RemoveTorrentCommand { get; }
 
     public ISukiDialogManager? SukiDialogManager { get; set; }
 
@@ -568,15 +659,20 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         await TorrentService.StopAsync(selected.Torrent);
     }
 
-    private async Task RemoveSelectedAsync()
+    private Task RemoveSelectedAsync()
     {
-        if (SelectedTorrent == null)
+        return RemoveTorrentAsync(SelectedTorrent);
+    }
+
+    private async Task RemoveTorrentAsync(TorrentListItemViewModel? item)
+    {
+        if (item == null)
         {
             return;
         }
 
-        var torrent = SelectedTorrent.Torrent;
-        var torrentName = SelectedTorrent.Name;
+        var torrent = item.Torrent;
+        var torrentName = item.Name;
         var removeAction = GetDefaultRemoveAction();
 
         if (!_settingsService.Current.ShowRemoveTorrentOptions)
@@ -675,13 +771,17 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     private void OpenFolder()
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        OpenFolderFor(SelectedTorrent);
+    }
+
+    private void OpenFolderFor(TorrentListItemViewModel? item)
+    {
+        if (item == null)
         {
             return;
         }
 
-        var path = selected.Torrent.Files.DownloadPath;
+        var path = item.Torrent.Files.DownloadPath;
         if (Directory.Exists(path))
         {
             Process.Start(new ProcessStartInfo
@@ -691,6 +791,22 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
                 Verb = "open"
             });
         }
+    }
+
+    /// <summary>
+    /// Starts a stopped torrent and stops a running one. Simple mode puts one button on each row
+    /// rather than asking the user to select a row and then find the toolbar.
+    /// </summary>
+    private Task ToggleTorrentAsync(TorrentListItemViewModel? item)
+    {
+        if (item == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return item.Torrent.Started
+            ? TorrentService.StopAsync(item.Torrent)
+            : TorrentService.StartAsync(item.Torrent);
     }
 
     private Task CopyHashAsync()
@@ -1057,6 +1173,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     private void OnTorrentsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         UpdateTorrentPresence();
+        ApplyFilter();
     }
 
     private void UpdateTorrentPresence()

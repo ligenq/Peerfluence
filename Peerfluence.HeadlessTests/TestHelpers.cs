@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
 using System.Threading.Channels;
@@ -70,6 +70,9 @@ internal static class TestHelpers
         fields.First(f => f.Name == "<CopyHashCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<CopyMagnetCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<ForceRecheckCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
+        fields.First(f => f.Name == "<ToggleTorrentCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand<TorrentListItemViewModel?>(_ => Task.CompletedTask));
+        fields.First(f => f.Name == "<OpenTorrentFolderCommand>k__BackingField").SetValue(vm, new RelayCommand<TorrentListItemViewModel?>(_ => { }));
+        fields.First(f => f.Name == "<RemoveTorrentCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand<TorrentListItemViewModel?>(_ => Task.CompletedTask));
 
         // Wired to the real method rather than stubbed: what the details toggle does to the settings
         // and to the pane is the point of the tests that use it.
@@ -106,7 +109,7 @@ internal static class TestHelpers
         return vm;
     }
 
-    public static SettingsViewModel CreateSettingsViewModel()
+    public static SettingsViewModel CreateSettingsViewModel(IInterfaceModeService? interfaceModeService = null)
     {
         var store = Substitute.For<IAppSettingsStore>();
         var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
@@ -124,7 +127,8 @@ internal static class TestHelpers
             topLevelService,
             engineService,
             updateService,
-            windowsAssociationService);
+            windowsAssociationService,
+            interfaceModeService ?? Substitute.For<IInterfaceModeService>());
     }
 
     public static CreateTorrentViewModel CreateCreateTorrentViewModel()
@@ -155,6 +159,7 @@ internal static class TestHelpers
             aboutVm,
             notificationService,
             settingsService,
-            updateService);
+            updateService,
+            Substitute.For<IInterfaceModeService>());
     }
 }

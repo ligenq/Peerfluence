@@ -339,6 +339,101 @@ public class DownloadsViewModelTests
     }
 
     [Fact]
+    public void Search_NarrowsTheVisibleListWithoutTouchingTheRealOne()
+    {
+        var sut = CreateViewModelWithTorrents(
+            ("ubuntu-24.04.iso", complete: false, running: true),
+            ("debian-12.iso", complete: false, running: true));
+
+        try
+        {
+            sut.SearchText = "ubu";
+
+            Assert.Equal(["ubuntu-24.04.iso"], sut.VisibleTorrents.Select(t => t.Name));
+            // The counts and the alert plumbing are about everything, not about what is on screen.
+            Assert.Equal(2, sut.Torrents.Count);
+            Assert.False(sut.HasNoMatches);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void SearchingEverythingAway_IsSaidDifferentlyFromHavingNothing()
+    {
+        var sut = CreateViewModelWithTorrents(("ubuntu-24.04.iso", complete: false, running: true));
+
+        try
+        {
+            sut.SearchText = "nothing matches this";
+
+            Assert.Empty(sut.VisibleTorrents);
+            Assert.True(sut.HasNoMatches);
+            Assert.True(sut.HasTorrents);
+            Assert.False(sut.HasNoTorrents);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Theory]
+    [InlineData(TorrentFilter.All, new[] { "downloading", "seeding", "finished-and-stopped" })]
+    [InlineData(TorrentFilter.Downloading, new[] { "downloading" })]
+    [InlineData(TorrentFilter.Seeding, new[] { "seeding" })]
+    [InlineData(TorrentFilter.Completed, new[] { "seeding", "finished-and-stopped" })]
+    public void EachFilter_ShowsWhatItSays(TorrentFilter filter, string[] expected)
+    {
+        var sut = CreateViewModelWithTorrents(
+            ("downloading", complete: false, running: true),
+            ("seeding", complete: true, running: true),
+            ("finished-and-stopped", complete: true, running: false));
+
+        try
+        {
+            sut.SetFilterCommand.Execute(filter);
+
+            Assert.Equal(expected, sut.VisibleTorrents.Select(t => t.Name));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    private DownloadsViewModel CreateViewModelWithTorrents(params (string Name, bool Complete, bool Running)[] torrents)
+    {
+        var torrentService = Substitute.For<ITorrentService>();
+        var built = torrents.Select(spec =>
+        {
+            var torrent = Substitute.For<ITorrent>();
+            torrent.Name.Returns(spec.Name);
+            torrent.Hash.Returns(InfoHash.CreateRandom());
+            torrent.HashV2.Returns(InfoHash.EmptyV2);
+            torrent.Progress.Returns(spec.Complete ? 1f : 0.5f);
+            torrent.Started.Returns(spec.Running);
+            torrent.State.Returns(spec.Running ? TorrentState.Active : TorrentState.Stopped);
+            return torrent;
+        }).ToArray();
+
+        torrentService.GetTorrents().Returns(built);
+        torrentService.GetStats().Returns(new EngineStats());
+
+        return new DownloadsViewModel(
+            torrentService,
+            new TorrentSelectionService(Substitute.For<IAppMessenger>()),
+            new LocalizationService(),
+            Substitute.For<ITopLevelService>(),
+            Substitute.For<IDialogService>(),
+            Substitute.For<IAddTorrentDialogService>(),
+            _settingsService,
+            _detailsVm);
+    }
+
+    [Fact]
     public void ToRemoveOptions_MapsActionToPeerSharpOptions()
     {
         Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.RemoveOnly));

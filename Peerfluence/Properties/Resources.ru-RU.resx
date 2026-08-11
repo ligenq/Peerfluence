@@ -115,6 +115,69 @@
   <data name="Downloads_CopyFailed" xml:space="preserve">
     <value>Не удалось скопировать в буфер обмена: {0}</value>
   </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Добавьте файл .torrent или вставьте magnet-ссылку, чтобы начать загрузку.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Приостановить или продолжить</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Перейти в расширенный режим</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Добро пожаловать в Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Сколько вы хотите видеть? Это можно изменить в любой момент в настройках.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Простой</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Только загрузка: добавьте файл или ссылку, следите за ходом, откройте папку. Ничего лишнего.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Расширенный</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Всё: трекеры, пиры, части, выбор файлов, очередь, ограничения скорости и остальное.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Не уверены? Начните с простого. Переключение — один щелчок.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Поиск по загрузкам</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>Загружаются</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>Раздаются</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Завершены</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Ни одна загрузка не соответствует запросу.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Интерфейс</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Простой оставляет один экран: добавить, следить, открыть. Расширенный добавляет панель, область сведений и все настройки.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Простой</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Расширенный</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>Изменения сохраняются по мере внесения.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Удалить</value>
   </data>

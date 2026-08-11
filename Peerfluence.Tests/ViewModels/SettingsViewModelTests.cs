@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.Globalization;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
@@ -36,7 +36,8 @@ public class SettingsViewModelTests
             _topLevelService,
             _engineService,
             updateService,
-            _windowsAssociationService);
+            _windowsAssociationService,
+            Substitute.For<IInterfaceModeService>());
     }
 
     [Fact]
@@ -361,5 +362,90 @@ public class SettingsViewModelTests
         {
             _localizationService.Apply("en-US");
         }
+    }
+
+    [Fact]
+    public async Task ChangingASetting_SavesItWithoutBeingAsked()
+    {
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var sut = Create(settingsService);
+
+        sut.EnableDht = !sut.EnableDht;
+        var saved = await WaitForSaveAsync(store);
+
+        Assert.True(saved, "the change should have been written without a Save button");
+        Assert.Equal(sut.EnableDht, settingsService.Current.Network.EnableDht);
+    }
+
+    [Fact]
+    public async Task ABurstOfChanges_IsWrittenOnce()
+    {
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var sut = Create(settingsService);
+
+        // What dragging a slider, or Reset writing every field, looks like.
+        sut.MaxActiveDownloads = 3;
+        sut.MaxActiveDownloads = 4;
+        sut.MaxActiveDownloads = 5;
+        await WaitForSaveAsync(store);
+
+        await store.Received(1).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+        Assert.Equal(5, settingsService.Current.Queue.MaxActiveDownloads);
+    }
+
+    [Fact]
+    public async Task LoadingTheScreen_WritesNothing()
+    {
+        // Reading the stored values into the view model is not the user changing anything.
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+
+        Create(settingsService);
+        await Task.Delay(700, TestContext.Current.CancellationToken);
+
+        await store.DidNotReceive().SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public void SimpleMode_HidesTheAdvancedSettings()
+    {
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+
+        var sut = Create(_settingsService, interfaceModeService);
+
+        Assert.True(sut.IsSimpleMode);
+        Assert.False(sut.IsAdvancedMode);
+    }
+
+    private static async Task<bool> WaitForSaveAsync(IAppSettingsStore store)
+    {
+        for (var attempt = 0; attempt < 40; attempt++)
+        {
+            if (store.ReceivedCalls().Any(c => c.GetMethodInfo().Name == nameof(IAppSettingsStore.SaveAsync)))
+            {
+                return true;
+            }
+
+            await Task.Delay(50);
+        }
+
+        return false;
+    }
+
+    private SettingsViewModel Create(IAppSettingsService settingsService, IInterfaceModeService? interfaceModeService = null)
+    {
+        var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
+        return new SettingsViewModel(
+            settingsService,
+            _themeService,
+            _localizationService,
+            _topLevelService,
+            new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
+            new UpdateService(updateLogger, settingsService),
+            _windowsAssociationService,
+            interfaceModeService ?? Substitute.For<IInterfaceModeService>());
     }
 }

@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
@@ -40,7 +40,8 @@ public class DownloadsViewTests
 
         var dataGrid = view.GetLogicalDescendants().OfType<DataGrid>().FirstOrDefault();
         Assert.NotNull(dataGrid);
-        Assert.Same(vm.Torrents, dataGrid.ItemsSource);
+        // The grid shows what search and the filter left, not the whole set.
+        Assert.Same(vm.VisibleTorrents, dataGrid.ItemsSource);
     }
 
     [AvaloniaFact]
@@ -59,8 +60,10 @@ public class DownloadsViewTests
     {
         var (view, _) = CreateView();
 
+        // The search box is the only text box on this screen; the inline magnet field is long gone.
         var textBoxes = view.GetLogicalDescendants().OfType<TextBox>().ToList();
-        Assert.Empty(textBoxes);
+        var textBox = Assert.Single(textBoxes);
+        Assert.Equal(Peerfluence.Properties.Resources.Downloads_Search, textBox.PlaceholderText);
     }
 
     [AvaloniaFact]
@@ -154,8 +157,8 @@ public class DownloadsViewTests
         Assert.False(vm.IsDetailsPaneVisible);
 
         var rows = ContentGrid(view).RowDefinitions;
-        Assert.Equal(0, rows[4].Height.Value);
         Assert.Equal(0, rows[5].Height.Value);
+        Assert.Equal(0, rows[6].Height.Value);
     }
 
     [AvaloniaFact]
@@ -175,14 +178,14 @@ public class DownloadsViewTests
         Assert.True(vm.IsDetailsPaneVisible);
         Assert.True(settingsService.Current.ShowDetailsPane);
         var rows = ContentGrid(view).RowDefinitions;
-        Assert.True(rows[5].Height.IsStar);
-        Assert.True(rows[4].Height.Value > 0);
+        Assert.True(rows[6].Height.IsStar);
+        Assert.True(rows[5].Height.Value > 0);
 
         vm.ToggleDetailsPaneCommand.Execute(null);
 
         Assert.False(vm.IsDetailsPaneVisible);
         Assert.False(settingsService.Current.ShowDetailsPane);
-        Assert.Equal(0, ContentGrid(view).RowDefinitions[5].Height.Value);
+        Assert.Equal(0, ContentGrid(view).RowDefinitions[6].Height.Value);
     }
 
     private static Grid ContentGrid(DownloadsView view)
