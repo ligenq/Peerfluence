@@ -182,32 +182,16 @@ public class McpToolHandler : IMcpToolHandler
     {
         try
         {
-            var topLevel = _topLevelService.GetTopLevel();
-            if (topLevel == null)
+            if (!_topLevelService.IsWindowAvailable)
             {
                 return ToolError("UI window not available.", "ui_unavailable");
             }
 
-            var bitmap = await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var width = topLevel.Bounds.Width;
-                var height = topLevel.Bounds.Height;
-                if (width <= 0 || height <= 0) return null;
-
-                var bmp = new Avalonia.Media.Imaging.RenderTargetBitmap(new Avalonia.PixelSize((int)width, (int)height), new Avalonia.Vector(96, 96));
-                bmp.Render(topLevel);
-                return bmp;
-            });
-
-            if (bitmap == null)
+            var bytes = await _topLevelService.CaptureWindowPngAsync(cancellationToken);
+            if (bytes == null)
             {
                 return ToolError("Invalid window dimensions.", "invalid_window_dimensions");
             }
-
-            await using var ms = new MemoryStream();
-            bitmap.Save(ms);
-            var bytes = ms.ToArray();
 
             return new CallToolResult
             {

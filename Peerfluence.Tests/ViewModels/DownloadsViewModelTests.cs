@@ -211,6 +211,134 @@ public class DownloadsViewModelTests
     }
 
     [Fact]
+    public async Task CopyHashCommand_PutsTheHashOnTheClipboardAndFlushesIt()
+    {
+        var clipboard = Substitute.For<IClipboard>();
+        var sut = CreateViewModelWithSelectedTorrent(clipboard, out var torrent);
+
+        try
+        {
+            await sut.CopyHashCommand.ExecuteAsync(null);
+
+            Assert.Equal(torrent.Hash.ToString(), await CapturedTextAsync(clipboard));
+
+            // Without the flush the text stays this process's to render on request, so it never
+            // reaches another application and dies with Peerfluence.
+            await clipboard.Received(1).FlushAsync();
+            Assert.Equal(string.Empty, sut.StatusMessage);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task CopyMagnetCommand_PutsAMagnetForTheHashOnTheClipboard()
+    {
+        var clipboard = Substitute.For<IClipboard>();
+        var sut = CreateViewModelWithSelectedTorrent(clipboard, out var torrent);
+
+        try
+        {
+            await sut.CopyMagnetCommand.ExecuteAsync(null);
+
+            Assert.Equal($"magnet:?xt=urn:btih:{torrent.Hash}", await CapturedTextAsync(clipboard));
+            await clipboard.Received(1).FlushAsync();
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task CopyHashCommand_SaysSoWhenTheClipboardRefusesTheWrite()
+    {
+        var clipboard = Substitute.For<IClipboard>();
+        clipboard.SetDataAsync(Arg.Any<IAsyncDataTransfer>())
+            .Returns(_ => Task.FromException(new InvalidOperationException("clipboard is busy")));
+        var sut = CreateViewModelWithSelectedTorrent(clipboard, out _);
+
+        try
+        {
+            await sut.CopyHashCommand.ExecuteAsync(null);
+
+            Assert.Contains("clipboard is busy", sut.StatusMessage);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task CopyHashCommand_SaysSoWhenThereIsNoClipboardAtAll()
+    {
+        var topLevelService = Substitute.For<ITopLevelService>();
+        topLevelService.GetClipboard().Returns(_ => throw new InvalidOperationException("TopLevel has not been initialized."));
+        var sut = CreateViewModelWithSelectedTorrent(topLevelService, out _);
+
+        try
+        {
+            await sut.CopyHashCommand.ExecuteAsync(null);
+
+            Assert.Equal(Properties.Resources.Downloads_ClipboardUnavailable, sut.StatusMessage);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    private DownloadsViewModel CreateViewModelWithSelectedTorrent(IClipboard clipboard, out ITorrent torrent)
+    {
+        var topLevelService = Substitute.For<ITopLevelService>();
+        topLevelService.GetClipboard().Returns(clipboard);
+        return CreateViewModelWithSelectedTorrent(topLevelService, out torrent);
+    }
+
+    private DownloadsViewModel CreateViewModelWithSelectedTorrent(ITopLevelService topLevelService, out ITorrent torrent)
+    {
+        var selected = Substitute.For<ITorrent>();
+        selected.Name.Returns("Selected");
+        selected.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0xAB, 20).ToArray()));
+        selected.HashV2.Returns(InfoHash.EmptyV2);
+        torrent = selected;
+
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns(Array.Empty<ITorrent>());
+        torrentService.GetStats().Returns(new EngineStats());
+
+        var sut = new DownloadsViewModel(
+            torrentService,
+            new TorrentSelectionService(Substitute.For<IAppMessenger>()),
+            new LocalizationService(),
+            topLevelService,
+            Substitute.For<IDialogService>(),
+            Substitute.For<IAddTorrentDialogService>(),
+            _settingsService,
+            _detailsVm)
+        {
+            SelectedTorrent = new TorrentListItemViewModel(selected)
+        };
+
+        return sut;
+    }
+
+    /// <summary>
+    /// Reads back what was handed to the clipboard. <c>SetTextAsync</c> is an extension method and
+    /// so cannot be received by a substitute; it wraps the text in a data transfer and calls
+    /// <see cref="IClipboard.SetDataAsync"/>, which can.
+    /// </summary>
+    private static async Task<string?> CapturedTextAsync(IClipboard clipboard)
+    {
+        var call = clipboard.ReceivedCalls().Single(c => c.GetMethodInfo().Name == nameof(IClipboard.SetDataAsync));
+        var dataTransfer = (IAsyncDataTransfer)call.GetArguments()[0]!;
+        return await dataTransfer.TryGetTextAsync();
+    }
+
+    [Fact]
     public void ToRemoveOptions_MapsActionToPeerSharpOptions()
     {
         Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.RemoveOnly));

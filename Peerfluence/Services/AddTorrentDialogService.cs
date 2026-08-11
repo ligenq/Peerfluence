@@ -73,17 +73,7 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
             DataContext = viewModel
         };
 
-        if (_topLevelService.GetTopLevel() is Window owner)
-        {
-            await window.ShowDialog(owner);
-        }
-        else
-        {
-            var closed = new TaskCompletionSource();
-            window.Closed += (_, _) => closed.TrySetResult();
-            window.Show();
-            await closed.Task;
-        }
+        await _topLevelService.ShowDialogAsync(window);
 
         return viewModel.WasAdded;
     }
