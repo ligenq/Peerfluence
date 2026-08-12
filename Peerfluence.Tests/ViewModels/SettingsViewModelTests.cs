@@ -9,6 +9,12 @@ using Peerfluence.ViewModels;
 
 namespace Peerfluence.Tests.ViewModels;
 
+/// <summary>
+/// In the same collection as everything else that touches process-wide state, because this class
+/// changes the application's language: applying a culture is global, and a class reading localized
+/// display names in parallel with this one reads whichever language happened to be in force.
+/// </summary>
+[Collection("Messenger")]
 public class SettingsViewModelTests
 {
     private readonly IAppSettingsService _settingsService;
@@ -362,6 +368,10 @@ public class SettingsViewModelTests
         }
         finally
         {
+            // Settling the debounced save first. Changing the language schedules one, and a save
+            // that lands after the line below has put the culture back would leave every later test
+            // reading Swedish.
+            await _sut.WaitForPendingSaveAsync();
             _localizationService.Apply("en-US");
         }
     }
@@ -395,6 +405,40 @@ public class SettingsViewModelTests
 
         await store.Received(1).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
         Assert.Equal(5, settingsService.Current.Queue.MaxActiveDownloads);
+    }
+
+    [Fact]
+    public async Task SavingSomethingUnrelated_LeavesTheApplicationsLanguageAlone()
+    {
+        // Applying a language swaps the process's culture, so an auto-save triggered by toggling a
+        // checkbox must not touch it. It used to re-apply on every save, which meant every keystroke
+        // in a settings box redressed the whole window - and, in the tests, leaked a language into
+        // whatever ran next.
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var localizationService = Substitute.For<ILocalizationService>();
+        var sut = Create(settingsService, localizationService: localizationService);
+
+        sut.EnableDht = !sut.EnableDht;
+        await WaitForSaveAsync(store);
+        await sut.WaitForPendingSaveAsync();
+
+        localizationService.DidNotReceive().Apply(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ChangingTheLanguage_AppliesItOnce()
+    {
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var localizationService = Substitute.For<ILocalizationService>();
+        var sut = Create(settingsService, localizationService: localizationService);
+
+        sut.SelectedLanguage = "sv-SE";
+        await WaitForSaveAsync(store);
+        await sut.WaitForPendingSaveAsync();
+
+        localizationService.Received(1).Apply("sv-SE");
     }
 
     [Fact]
@@ -478,13 +522,16 @@ public class SettingsViewModelTests
         return false;
     }
 
-    private SettingsViewModel Create(IAppSettingsService settingsService, IInterfaceModeService? interfaceModeService = null)
+    private SettingsViewModel Create(
+        IAppSettingsService settingsService,
+        IInterfaceModeService? interfaceModeService = null,
+        ILocalizationService? localizationService = null)
     {
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         return new SettingsViewModel(
             settingsService,
             _themeService,
-            _localizationService,
+            localizationService ?? _localizationService,
             _topLevelService,
             new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
             new UpdateService(updateLogger, settingsService),

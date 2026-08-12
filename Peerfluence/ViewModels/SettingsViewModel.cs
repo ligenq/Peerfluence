@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -35,7 +35,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private readonly IInterfaceModeService _interfaceModeService;
     private CancellationTokenSource? _autoSaveCts;
+    private Task _pendingSave = Task.CompletedTask;
     private bool _suspendAutoSave;
+    private string? _appliedLanguage;
+    private string? _appliedTheme;
 
     public SettingsViewModel(
         IAppSettingsService settingsService,
@@ -59,6 +62,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         PortMappingStatuses = new ObservableCollection<PortMappingStatusViewModel>();
 
         LoadFromSettings();
+        _appliedTheme = CurrentThemeKey();
         SaveCommand = new AsyncRelayCommand(SaveAsync);
         ResetDefaultsCommand = new RelayCommand(ResetDefaults);
         BrowseBlocklistCommand = new AsyncRelayCommand(BrowseBlocklistAsync);
@@ -151,8 +155,19 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         var cts = new CancellationTokenSource();
         _autoSaveCts = cts;
 
-        _ = AutoSaveAsync(cts);
+        _pendingSave = AutoSaveAsync(cts);
     }
+
+    /// <summary>
+    /// Waits for a scheduled save to finish, so a caller can be sure nothing is still in flight.
+    ///
+    /// <para>
+    /// Exists because a debounced save outlives the change that scheduled it: a language change
+    /// applies the process's culture when the save lands, which can be well after whoever made the
+    /// change has moved on.
+    /// </para>
+    /// </summary>
+    internal Task WaitForPendingSaveAsync() => _pendingSave;
 
     private async Task AutoSaveAsync(CancellationTokenSource cts)
     {
@@ -598,10 +613,18 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         }
     }
 
+    private string CurrentThemeKey()
+    {
+        return $"{SelectedThemeVariant}|{SelectedColorTheme}|{SelectedBackgroundStyle}";
+    }
+
     private void LoadFromSettingsCore()
     {
         var settings = _settingsService.Current;
         IsSimpleMode = _interfaceModeService.IsSimple;
+
+        // What is already in force, so the first save does not re-apply what was loaded.
+        _appliedLanguage = settings.Language;
 
         // Storage
         DownloadPath = settings.Storage.DownloadPath;
@@ -734,9 +757,23 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
             await _settingsService.SaveAsync(default);
             _windowsAssociationService.ApplyAssociations(AssociateTorrentFiles, AssociateMagnetLinks);
-            _themeService.Apply(settings.Theme);
-            _localizationService.Apply(settings.Language);
-            NotifyLocalizedOptionsChanged();
+
+            // Applied only when they actually changed. These reach outside this screen - the theme
+            // repaints the application and the language swaps the process's culture - and now that
+            // every keystroke saves, doing that on each one would mean redressing the whole window
+            // because someone typed a character into a path box.
+            if (_appliedTheme != CurrentThemeKey())
+            {
+                _appliedTheme = CurrentThemeKey();
+                _themeService.Apply(settings.Theme);
+            }
+
+            if (!string.Equals(_appliedLanguage, settings.Language, StringComparison.Ordinal))
+            {
+                _appliedLanguage = settings.Language;
+                _localizationService.Apply(settings.Language);
+                NotifyLocalizedOptionsChanged();
+            }
 
             if (announce)
             {
