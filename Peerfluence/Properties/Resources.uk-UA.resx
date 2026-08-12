@@ -520,6 +520,9 @@
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Отримання метаданих</value>
   </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>ETA</value>
   </data>
@@ -858,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Виберіть папку даних сеансу</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>Прибрати {0} завантажень зі списку?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Видалити торрент</value>

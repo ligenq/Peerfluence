@@ -16,13 +16,13 @@
                            FontSize="{StaticResource FontSizeHeader}"
                            FontWeight="Bold"
                            VerticalAlignment="Center"/>
-                <Button Grid.Column="1" Classes="Flat" Command="{Binding AddTorrentCommand}">
+                <Button Grid.Column="1" Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Downloads_AddTorrent}"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="2" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}">
+                <Button Grid.Column="2" Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
@@ -64,7 +64,7 @@
                                 <TextBlock Text="{m:L Downloads_AddTorrent}"/>
                             </StackPanel>
                         </Button>
-                        <Button Command="{Binding AddMagnetCommand}">
+                        <Button Classes="Flat" Command="{Binding AddMagnetCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="ClipboardArrowDownOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
@@ -87,7 +87,7 @@
                                 <suki:GlassCard.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{m:L Downloads_OpenFolder}"
-                                                  Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).OpenTorrentFolderCommand}"
+                                                  Command="{Binding Actions.OpenTorrentFolderCommand}"
                                                   CommandParameter="{Binding}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="FolderOpen"/>
@@ -95,7 +95,7 @@
                                         </MenuItem>
                                         <MenuItem Header="{m:L Downloads_Remove}"
                                                   Foreground="{StaticResource ErrorColor}"
-                                                  Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).RemoveTorrentCommand}"
+                                                  Command="{Binding Actions.RemoveTorrentCommand}"
                                                   CommandParameter="{Binding}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Delete" Foreground="{StaticResource ErrorColor}"/>
@@ -112,6 +112,9 @@
                                         <ProgressBar Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="6"/>
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
                                             <TextBlock Text="{Binding State}" Opacity="0.65" FontSize="{StaticResource FontSizeSmall}"/>
+                                            <TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}"
+                                                       Opacity="0.65"
+                                                       FontSize="{StaticResource FontSizeSmall}"/>
                                             <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}"
                                                        Opacity="0.65"
                                                        FontSize="{StaticResource FontSizeSmall}"

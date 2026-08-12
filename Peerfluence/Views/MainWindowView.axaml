@@ -146,8 +146,8 @@
                 </StackPanel>
 
                 <TextBlock Text="{m:L Welcome_Footnote}"
-                           Opacity="0.5"
-                           FontSize="{StaticResource FontSizeSmall}"
+                           Opacity="0.6"
+                           FontSize="{StaticResource FontSizeNormal}"
                            TextAlignment="Center"/>
             </StackPanel>
         </Border>

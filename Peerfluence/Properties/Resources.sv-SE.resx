@@ -520,6 +520,9 @@
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Hämtar metadata</value>
   </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Storlek</value>
+  </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>Återstår</value>
   </data>
@@ -858,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Välj mapp för sessionsdata</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>Ta bort {0} hämtningar från listan?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Ta bort torrent</value>

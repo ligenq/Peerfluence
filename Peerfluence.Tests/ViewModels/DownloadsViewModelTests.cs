@@ -434,6 +434,120 @@ public class DownloadsViewModelTests
     }
 
     [Fact]
+    public async Task StartSelected_StartsEveryStoppedTorrentInTheSelection()
+    {
+        var sut = CreateViewModelWithTorrents(
+            ("stopped-one", complete: false, running: false),
+            ("stopped-two", complete: false, running: false),
+            ("already-running", complete: false, running: true));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            Assert.True(sut.StartSelectedCommand.CanExecute(null));
+            await sut.StartSelectedCommand.ExecuteAsync(null);
+
+            // The running one is left alone rather than restarted.
+            foreach (var item in sut.Torrents.Where(t => t.Name.StartsWith("stopped")))
+            {
+                await item.Torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
+            }
+
+            var running = sut.Torrents.Single(t => t.Name == "already-running");
+            await running.Torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task StopSelected_StopsEveryRunningTorrentInTheSelection()
+    {
+        var sut = CreateViewModelWithTorrents(
+            ("running-one", complete: false, running: true),
+            ("running-two", complete: true, running: true));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+            await sut.StopSelectedCommand.ExecuteAsync(null);
+
+            foreach (var item in sut.Torrents)
+            {
+                await item.Torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+            }
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void AMixedSelection_StillOffersBothStartAndStop()
+    {
+        var sut = CreateViewModelWithTorrents(
+            ("stopped", complete: false, running: false),
+            ("running", complete: false, running: true));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            // Enabled when any of the selection can be acted on, not only when all of it can.
+            Assert.True(sut.StartSelectedCommand.CanExecute(null));
+            Assert.True(sut.StopSelectedCommand.CanExecute(null));
+            Assert.True(sut.RemoveSelectedCommand.CanExecute(null));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void WithNothingMultiSelected_TheCommandsStillFollowTheFocusedRow()
+    {
+        var sut = CreateViewModelWithTorrents(("stopped", complete: false, running: false));
+
+        try
+        {
+            sut.SelectedTorrent = sut.Torrents[0];
+
+            Assert.Empty(sut.SelectedTorrents);
+            Assert.True(sut.StartSelectedCommand.CanExecute(null));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void EveryRow_CarriesTheActionsItsContextMenuNeeds()
+    {
+        // A context menu is a popup with its own visual tree, so the row has to hold the commands
+        // rather than reach up for them - reaching up left every menu item disabled.
+        var sut = CreateViewModelWithTorrents(("anything", complete: false, running: true));
+
+        try
+        {
+            var row = Assert.Single(sut.Torrents);
+            Assert.Same(sut, row.Actions);
+            Assert.NotNull(row.Actions!.OpenTorrentFolderCommand);
+            Assert.NotNull(row.Actions.RemoveTorrentCommand);
+            Assert.NotNull(row.Actions.ToggleTorrentCommand);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
     public void ToRemoveOptions_MapsActionToPeerSharpOptions()
     {
         Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.RemoveOnly));

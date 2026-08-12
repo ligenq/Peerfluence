@@ -110,6 +110,8 @@ public class LocalizationTests
     [InlineData("Downloads_Filter_Seeding")]
     [InlineData("Downloads_Filter_Completed")]
     [InlineData("Downloads_NoMatches")]
+    [InlineData("Downloads_Grid_Size")]
+    [InlineData("Downloads_Remove_Confirm_Many")]
     [InlineData("Settings_InterfaceModeHint")]
     [InlineData("Settings_SavedAutomatically")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)

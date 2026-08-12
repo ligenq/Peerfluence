@@ -520,6 +520,9 @@
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Obteniendo metadatos</value>
   </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Tamaño</value>
+  </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>ETA</value>
   </data>
@@ -858,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Seleccione la carpeta de datos de la sesión</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>¿Quitar {0} descargas de la lista?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Quitar torrent</value>

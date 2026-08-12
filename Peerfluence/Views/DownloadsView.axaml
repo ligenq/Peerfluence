@@ -56,7 +56,8 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}">
+                    <!-- Same weight as Add Torrent: two ways to start the same thing. -->
+                    <Button Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddMagnet}"/>
@@ -152,7 +153,7 @@
                       SelectedItem="{Binding SelectedTorrent, Mode=TwoWay}"
                       SelectionChanged="TorrentDataGrid_OnSelectionChanged"
                       PointerPressed="TorrentDataGrid_OnPointerPressed"
-                      SelectionMode="Single"
+                      SelectionMode="Extended"
                       AutoGenerateColumns="False"
                       HeadersVisibility="Column"
                       IsReadOnly="True"
@@ -225,6 +226,10 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
+                                        Binding="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}"
+                                        SortMemberPath="TotalSizeBytes"
+                                        Width="100"/>
                     <DataGridTextColumn Header="{m:L Downloads_Grid_State}" Binding="{Binding State}" Width="100"/>
                     <DataGridTextColumn Header="{m:L Downloads_Grid_Eta}" Binding="{Binding Eta}" Width="100"/>
 
