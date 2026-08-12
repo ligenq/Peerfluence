@@ -260,41 +260,28 @@
             </DataGrid>
         </suki:GlassCard>
 
-        <suki:GlassCard x:Name="EmptyStateCard"
-                        Grid.Row="4"
-                        Grid.RowSpan="3"
-                        IsVisible="{Binding HasNoTorrents}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        MaxWidth="720"
-                        Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
-            <StackPanel Spacing="{StaticResource SpacingLarge}">
-                <StackPanel Spacing="{StaticResource SpacingSmall}">
-                    <materialIcons:MaterialIcon Kind="DownloadCircleOutline"
-                                                Width="{StaticResource IconSizeXLarge}"
-                                                Height="{StaticResource IconSizeXLarge}"
-                                                Foreground="{DynamicResource SukiPrimaryColor}" />
-                    <TextBlock Text="{m:L Downloads_EmptyTitle}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold" />
-                    <TextBlock Text="{m:L Downloads_EmptyBody}" Opacity="0.7" TextWrapping="Wrap" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}">
-                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                            <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                            <TextBlock Text="{m:L Downloads_AddTorrent}"/>
-                        </StackPanel>
-                    </Button>
-                    <Button Command="{Binding AddMagnetCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                            <materialIcons:MaterialIcon Kind="ClipboardArrowDownOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                            <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </suki:GlassCard>
-
+        <!--
+            Nothing added yet. The same restraint as simple mode: the two buttons that add a
+            download are directly above, so an accent icon and a copy of them underneath is
+            decoration, not help. Named still, because tests find it by name.
+        -->
+        <StackPanel x:Name="EmptyStateCard"
+                    Grid.Row="4"
+                    Grid.RowSpan="3"
+                    IsVisible="{Binding HasNoTorrents}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="460"
+                    Spacing="{StaticResource SpacingSmall}">
+            <TextBlock Text="{m:L Downloads_EmptyTitle}"
+                       FontSize="{StaticResource FontSizeLarge}"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="{m:L Downloads_EmptyBody}"
+                       Opacity="0.6"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"/>
+        </StackPanel>
         <!-- Detail Pane (Resizable) -->
         <GridSplitter Grid.Row="5" Height="4" HorizontalAlignment="Stretch" Background="Transparent"
                       IsVisible="{Binding IsDetailsPaneVisible}" />

@@ -125,25 +125,22 @@
     <value>Przełącz na tryb zaawansowany</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Witamy w Peerfluence</value>
+    <value>Wybierz interfejs</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>Ile chcesz widzieć? Możesz to zmienić w każdej chwili w ustawieniach.</value>
+    <value>Możesz to zmienić później w ustawieniach.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Prosty</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Tylko pobieranie: dodaj plik lub link, patrz jak przychodzi, otwórz folder. Nic więcej nie przeszkadza.</value>
+    <value>Dodaj torrent, obserwuj pobieranie, otwórz folder.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Zaawansowany</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Wszystko: trackery, peery, części, wybór plików, kolejka, limity prędkości i reszta.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Nie masz pewności? Zacznij od prostego. Przełączenie to jedno kliknięcie.</value>
+    <value>Dodaje trackery, peery, części, wybór plików, kolejkę i limity prędkości.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Szukaj w pobieraniach</value>
@@ -167,7 +164,7 @@
     <value>Interfejs</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Prosty ogranicza okno do jednego ekranu: dodaj, obserwuj, otwórz. Zaawansowany dodaje panel, obszar szczegółów i wszystkie ustawienia.</value>
+    <value>Prosty pokazuje tylko listę pobierań. Zaawansowany dodaje panel, obszar szczegółów i wszystkie ustawienia.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Prosty</value>

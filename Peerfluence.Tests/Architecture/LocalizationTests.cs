@@ -103,7 +103,6 @@ public class LocalizationTests
     [InlineData("Welcome_Simple_Body")]
     [InlineData("Welcome_Advanced_Title")]
     [InlineData("Welcome_Advanced_Body")]
-    [InlineData("Welcome_Footnote")]
     [InlineData("Downloads_Search")]
     [InlineData("Downloads_Filter_All")]
     [InlineData("Downloads_Filter_Downloading")]

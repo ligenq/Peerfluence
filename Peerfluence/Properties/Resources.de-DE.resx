@@ -125,25 +125,22 @@
     <value>Zu erweitert wechseln</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Willkommen bei Peerfluence</value>
+    <value>Oberfläche wählen</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>Wie viel möchten Sie sehen? Sie können dies jederzeit in den Einstellungen ändern.</value>
+    <value>Sie können dies später in den Einstellungen ändern.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Einfach</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Nur Herunterladen: Datei oder Link hinzufügen, beim Ankommen zusehen, Ordner öffnen. Sonst nichts im Weg.</value>
+    <value>Torrent hinzufügen, beim Herunterladen zusehen, Ordner öffnen.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Erweitert</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Alles: Tracker, Peers, Teile, Dateiauswahl, Warteschlange, Geschwindigkeitsgrenzen und der Rest.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Unsicher? Fangen Sie einfach an. Das Wechseln kostet einen Klick.</value>
+    <value>Ergänzt Tracker, Peers, Teile, Dateiauswahl, Warteschlange und Geschwindigkeitsgrenzen.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Downloads durchsuchen</value>
@@ -167,7 +164,7 @@
     <value>Oberfläche</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Einfach beschränkt das Fenster auf einen Bildschirm: hinzufügen, ansehen, öffnen. Erweitert ergänzt das Dashboard, den Detailbereich und alle Einstellungen.</value>
+    <value>Einfach zeigt nur die Downloadliste. Erweitert ergänzt das Dashboard, den Detailbereich und alle Einstellungen.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Einfach</value>
