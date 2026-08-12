@@ -49,9 +49,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITopLevelService, TopLevelService>();
         services.AddSingleton<ICompletionActionRunner, CompletionActionRunner>();
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
+        services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
         services.AddSingleton<ITorrentService, TorrentService>();
-        services.AddSingleton<ITransientTorrentTracker, TransientTorrentTracker>();
         services.AddSingleton<IUpdateService, UpdateService>();
         services.AddSingleton<IWindowsAssociationService, WindowsAssociationService>();
         return services;

@@ -156,16 +156,24 @@
 
 				<!-- Peers Tab -->
 				<TabItem Header="{m:L Details_PeersTab}">
-					<DataGrid ItemsSource="{Binding Peers}" AutoGenerateColumns="False" IsReadOnly="True">
-						<DataGrid.Columns>
-							<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*"/>
-							<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*"/>
-							<DataGridTextColumn Header="{m:L Details_Peers_Country}" Binding="{Binding Country}" Width="80"/>
-							<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
-							<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
-							<DataGridTextColumn Header="{m:L Details_Peers_Progress}" Binding="{Binding ProgressText}" Width="80"/>
-						</DataGrid.Columns>
-					</DataGrid>
+					<Grid RowDefinitions="Auto,*">
+						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
+							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}"/>
+							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat">
+								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+							</Button>
+						</Grid>
+						<DataGrid Grid.Row="1" ItemsSource="{Binding Peers}" AutoGenerateColumns="False" IsReadOnly="True">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Country}" Binding="{Binding Country}" Width="80"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Progress}" Binding="{Binding ProgressText}" Width="80"/>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
 				</TabItem>
 
 				<!-- Pieces Tab -->

@@ -57,6 +57,7 @@ public sealed class AppSettingsService : IAppSettingsService
             {
                 EnableDht = true,
                 AnswerInfoHashSampling = true,
+                AllowMultipleConnectionsPerIp = true,
                 EnableNatPmp = true,
                 EnableUpnp = false,
                 UseAutomaticListeningPort = false,
@@ -71,6 +72,7 @@ public sealed class AppSettingsService : IAppSettingsService
                 BackgroundStyle = "GradientSoft"
             },
             ShowRemoveTorrentOptions = true,
+            ShowDetailsPane = false,
             DefaultRemoveTorrentAction = "RemoveOnly",
             Language = "en-US"
         };

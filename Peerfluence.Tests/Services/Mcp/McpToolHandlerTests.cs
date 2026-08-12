@@ -310,6 +310,52 @@ public class McpToolHandlerTests
         return settingsService;
     }
 
+    [Fact]
+    public async Task TakeScreenshotAsync_ReturnsTheImageTheWindowRendered()
+    {
+        var png = new byte[] { 0x89, (byte)'P', (byte)'N', (byte)'G' };
+        var topLevelService = Substitute.For<ITopLevelService>();
+        topLevelService.IsWindowAvailable.Returns(true);
+        topLevelService.CaptureWindowPngAsync(Arg.Any<CancellationToken>()).Returns(png);
+
+        var handler = new McpToolHandler(null!, topLevelService, null!, null!);
+
+        var result = await handler.TakeScreenshotAsync(TestContext.Current.CancellationToken);
+
+        var image = Assert.IsType<ImageContentBlock>(Assert.Single(result.Content));
+        Assert.Equal("image/png", image.MimeType);
+    }
+
+    [Fact]
+    public async Task TakeScreenshotAsync_ReturnsError_WhenThereIsNoWindow()
+    {
+        var topLevelService = Substitute.For<ITopLevelService>();
+        topLevelService.IsWindowAvailable.Returns(false);
+
+        var handler = new McpToolHandler(null!, topLevelService, null!, null!);
+
+        var result = await handler.TakeScreenshotAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsError);
+        Assert.Contains("UI window not available", Text(result));
+        await topLevelService.DidNotReceive().CaptureWindowPngAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task TakeScreenshotAsync_ReturnsError_WhenTheWindowHasNothingToRender()
+    {
+        var topLevelService = Substitute.For<ITopLevelService>();
+        topLevelService.IsWindowAvailable.Returns(true);
+        topLevelService.CaptureWindowPngAsync(Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var handler = new McpToolHandler(null!, topLevelService, null!, null!);
+
+        var result = await handler.TakeScreenshotAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsError);
+        Assert.Contains("Invalid window dimensions", Text(result));
+    }
+
     private static string Text(CallToolResult result)
     {
         return Assert.IsType<TextContentBlock>(Assert.Single(result.Content)).Text;

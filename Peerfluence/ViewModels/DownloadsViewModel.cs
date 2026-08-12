@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -24,7 +24,7 @@ using Peerfluence.Properties;
 namespace Peerfluence.ViewModels;
 
 [SingletonService]
-public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisposable
+public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorrentRowActions, IDisposable
 {
     private static readonly TimeSpan StatusAutoClearDelay = TimeSpan.FromSeconds(4);
     private readonly Dictionary<string, TorrentListItemViewModel> _torrentLookup = new();
@@ -72,9 +72,16 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         StopSelectedCommand = new AsyncRelayCommand(StopSelectedAsync, CanStopSelected);
         RemoveSelectedCommand = new AsyncRelayCommand(RemoveSelectedAsync, CanRemoveSelected);
         OpenFolderCommand = new RelayCommand(OpenFolder, () => SelectedTorrent != null);
-        CopyHashCommand = new RelayCommand(CopyHash, () => SelectedTorrent != null);
-        CopyMagnetCommand = new RelayCommand(CopyMagnet, () => SelectedTorrent != null);
+        CopyHashCommand = new AsyncRelayCommand(CopyHashAsync, () => SelectedTorrent != null);
+        CopyMagnetCommand = new AsyncRelayCommand(CopyMagnetAsync, () => SelectedTorrent != null);
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckSelectedAsync, CanForceRecheckSelected);
+        ToggleDetailsPaneCommand = new RelayCommand(ToggleDetailsPane);
+        SetFilterCommand = new RelayCommand<TorrentFilter>(filter => Filter = filter);
+        ToggleTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(ToggleTorrentAsync);
+        OpenTorrentFolderCommand = new RelayCommand<TorrentListItemViewModel?>(OpenFolderFor);
+        RemoveTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(RemoveTorrentAsync);
+
+        IsDetailsPaneVisible = _settingsService.Current.ShowDetailsPane;
 
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
         WeakReferenceMessenger.Default.Register<ActivationRequestedMessage>(this, (_, msg) =>
@@ -134,9 +141,139 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
+    /// <summary>
+    /// Whether the details pane is open. Setting it does not persist the choice or wake the pane up;
+    /// <see cref="ToggleDetailsPane"/> is what a user action goes through.
+    /// </summary>
+    public bool IsDetailsPaneVisible
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
     public bool HasTorrents => Torrents.Count > 0;
 
     public bool HasNoTorrents => !HasTorrents;
+
+    /// <summary>
+    /// What the list is narrowed to. The collection the grid binds to is
+    /// <see cref="VisibleTorrents"/>; <see cref="Torrents"/> stays the whole set, because the
+    /// dashboard counts and the alert plumbing are about everything, not about what is on screen.
+    /// </summary>
+    public string SearchText
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                ApplyFilter();
+            }
+        }
+    } = string.Empty;
+
+    public TorrentFilter Filter
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                ApplyFilter();
+            }
+        }
+    } = TorrentFilter.All;
+
+    public ObservableCollection<TorrentListItemViewModel> VisibleTorrents { get; } = new();
+
+    /// <summary>
+    /// Every row the user has selected, which is not always one.
+    ///
+    /// <para>
+    /// <see cref="SelectedTorrent"/> stays the focused row, because the details pane and the copy
+    /// commands are about a single torrent. Start, stop and remove act on all of these instead:
+    /// stopping fifty torrents one at a time is not a thing to ask of anyone.
+    /// </para>
+    /// </summary>
+    public IReadOnlyList<TorrentListItemViewModel> SelectedTorrents
+    {
+        get;
+        private set
+        {
+            field = value;
+            StartSelectedCommand.NotifyCanExecuteChanged();
+            StopSelectedCommand.NotifyCanExecuteChanged();
+            RemoveSelectedCommand.NotifyCanExecuteChanged();
+        }
+    } = [];
+
+    /// <summary>
+    /// Called by the view as the grid's selection changes. Falls back to the focused row so every
+    /// caller that only ever sets <see cref="SelectedTorrent"/> keeps working.
+    /// </summary>
+    internal void SetSelectedTorrents(IEnumerable<TorrentListItemViewModel> selection)
+    {
+        SelectedTorrents = selection.ToList();
+    }
+
+    private IReadOnlyList<TorrentListItemViewModel> SelectionOrFocused()
+    {
+        if (SelectedTorrents.Count > 0)
+        {
+            return SelectedTorrents;
+        }
+
+        return SelectedTorrent == null ? [] : [SelectedTorrent];
+    }
+
+    /// <summary>
+    /// True when there are torrents but the search or filter has hidden all of them - a different
+    /// thing to say than "nothing here yet", and a different thing to do about it.
+    /// </summary>
+    public bool HasNoMatches => HasTorrents && VisibleTorrents.Count == 0;
+
+    public IRelayCommand<TorrentFilter> SetFilterCommand { get; }
+
+    public bool IsFilterAll => Filter == TorrentFilter.All;
+
+    public bool IsFilterDownloading => Filter == TorrentFilter.Downloading;
+
+    public bool IsFilterSeeding => Filter == TorrentFilter.Seeding;
+
+    public bool IsFilterCompleted => Filter == TorrentFilter.Completed;
+
+    private void ApplyFilter()
+    {
+        var search = SearchText?.Trim() ?? string.Empty;
+
+        VisibleTorrents.Clear();
+        foreach (var torrent in Torrents.Where(Matches))
+        {
+            VisibleTorrents.Add(torrent);
+        }
+
+        OnPropertyChanged(nameof(HasNoMatches));
+        OnPropertyChanged(nameof(IsFilterAll));
+        OnPropertyChanged(nameof(IsFilterDownloading));
+        OnPropertyChanged(nameof(IsFilterSeeding));
+        OnPropertyChanged(nameof(IsFilterCompleted));
+
+        bool Matches(TorrentListItemViewModel item)
+        {
+            if (search.Length > 0 && item.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return false;
+            }
+
+            return Filter switch
+            {
+                TorrentFilter.Downloading => !item.IsComplete && item.IsRunning,
+                TorrentFilter.Seeding => item.IsComplete && item.IsRunning,
+                TorrentFilter.Completed => item.IsComplete,
+                _ => true
+            };
+        }
+    }
 
     public bool IsBusy
     {
@@ -184,13 +321,39 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     public IRelayCommand OpenFolderCommand { get; }
 
-    public IRelayCommand CopyHashCommand { get; }
+    public IAsyncRelayCommand CopyHashCommand { get; }
 
-    public IRelayCommand CopyMagnetCommand { get; }
+    public IAsyncRelayCommand CopyMagnetCommand { get; }
 
     public IAsyncRelayCommand ForceRecheckCommand { get; }
 
+    public IRelayCommand ToggleDetailsPaneCommand { get; }
+
+    /// <summary>Row actions, so simple mode needs no selection before acting.</summary>
+    public IAsyncRelayCommand<TorrentListItemViewModel?> ToggleTorrentCommand { get; }
+
+    public IRelayCommand<TorrentListItemViewModel?> OpenTorrentFolderCommand { get; }
+
+    public IAsyncRelayCommand<TorrentListItemViewModel?> RemoveTorrentCommand { get; }
+
     public ISukiDialogManager? SukiDialogManager { get; set; }
+
+    /// <summary>
+    /// Opens or closes the details pane and remembers the choice. Opening refreshes the pane by
+    /// hand: while it was closed it ignored the alerts it would normally have redrawn itself from,
+    /// so without this it would come back holding whatever it last saw.
+    /// </summary>
+    private void ToggleDetailsPane()
+    {
+        IsDetailsPaneVisible = !IsDetailsPaneVisible;
+        _settingsService.Current.ShowDetailsPane = IsDetailsPaneVisible;
+        _ = _settingsService.SaveAsync(default);
+
+        if (IsDetailsPaneVisible)
+        {
+            SelectedTorrentDetailViewModel.RefreshFromSelection();
+        }
+    }
 
     private async Task AddTorrentAsync()
     {
@@ -277,19 +440,21 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         }
     }
 
+    // Enabled when any of the selection can be acted on, not when all of it can: selecting a mix
+    // of running and stopped torrents and pressing Start should start the stopped ones.
     private bool CanStartSelected()
     {
-        return SelectedTorrent is { Torrent.State: TorrentState.Stopped };
+        return SelectionOrFocused().Any(item => item.Torrent.State == TorrentState.Stopped);
     }
 
     private bool CanStopSelected()
     {
-        return SelectedTorrent is { Torrent.Started: true };
+        return SelectionOrFocused().Any(item => item.Torrent.Started);
     }
 
     private bool CanRemoveSelected()
     {
-        return SelectedTorrent is not null;
+        return SelectionOrFocused().Count > 0;
     }
 
     private void LoadExistingTorrents()
@@ -493,6 +658,11 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
             return false;
         }
 
+        if (parsed is null)
+        {
+            return false;
+        }
+
         // Parsing is not enough: a BEP 46 link parses without an info hash, and everything
         // downstream of here assumes there is one.
         if (!TorrentService.HasUsableInfoHash(parsed))
@@ -511,35 +681,81 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     private async Task StartSelectedAsync()
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        foreach (var item in SelectionOrFocused().Where(item => item.Torrent.State == TorrentState.Stopped))
         {
-            return;
+            await TorrentService.StartAsync(item.Torrent);
         }
-
-        await TorrentService.StartAsync(selected.Torrent);
     }
 
     private async Task StopSelectedAsync()
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        foreach (var item in SelectionOrFocused().Where(item => item.Torrent.Started))
         {
-            return;
+            await TorrentService.StopAsync(item.Torrent);
         }
-
-        await TorrentService.StopAsync(selected.Torrent);
     }
 
+    /// <summary>
+    /// Removes everything selected. One torrent gets the usual dialog naming it; several are
+    /// confirmed once, together, rather than asking the same question over and over.
+    /// </summary>
     private async Task RemoveSelectedAsync()
     {
-        if (SelectedTorrent == null)
+        var selection = SelectionOrFocused();
+        if (selection.Count <= 1)
+        {
+            await RemoveTorrentAsync(selection.FirstOrDefault());
+            return;
+        }
+
+        var removeAction = GetDefaultRemoveAction();
+        if (_settingsService.Current.ShowRemoveTorrentOptions
+            && !await ConfirmRemoveManyAsync(selection.Count))
         {
             return;
         }
 
-        var torrent = SelectedTorrent.Torrent;
-        var torrentName = SelectedTorrent.Name;
+        foreach (var item in selection)
+        {
+            await _torrentService.RemoveAsync(item.Torrent, ToRemoveOptions(removeAction));
+        }
+    }
+
+    private async Task<bool> ConfirmRemoveManyAsync(int count)
+    {
+        if (SukiDialogManager == null)
+        {
+            return true;
+        }
+
+        var confirmed = new TaskCompletionSource<bool>();
+        await SukiDialogManager
+            .CreateDialog()
+            .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
+            .WithTitle(Resources.Downloads_Remove_Confirm_Title)
+            .WithContent(new Avalonia.Controls.TextBlock
+            {
+                Text = string.Format(Resources.Downloads_Remove_Confirm_Many, count),
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            })
+            .Dismiss().ByClickingBackground()
+            .OnDismissed(_ => confirmed.TrySetResult(false))
+            .WithActionButton(Resources.Common_Cancel, _ => confirmed.TrySetResult(false), true)
+            .WithActionButton(Resources.Downloads_Remove, _ => confirmed.TrySetResult(true), true, "Flat")
+            .TryShowAsync();
+
+        return confirmed.Task.IsCompletedSuccessfully && confirmed.Task.Result;
+    }
+
+    private async Task RemoveTorrentAsync(TorrentListItemViewModel? item)
+    {
+        if (item == null)
+        {
+            return;
+        }
+
+        var torrent = item.Torrent;
+        var torrentName = item.Name;
         var removeAction = GetDefaultRemoveAction();
 
         if (!_settingsService.Current.ShowRemoveTorrentOptions)
@@ -638,13 +854,17 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     private void OpenFolder()
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        OpenFolderFor(SelectedTorrent);
+    }
+
+    private void OpenFolderFor(TorrentListItemViewModel? item)
+    {
+        if (item == null)
         {
             return;
         }
 
-        var path = selected.Torrent.Files.DownloadPath;
+        var path = item.Torrent.Files.DownloadPath;
         if (Directory.Exists(path))
         {
             Process.Start(new ProcessStartInfo
@@ -656,32 +876,81 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         }
     }
 
-    private void CopyHash()
+    /// <summary>
+    /// Starts a stopped torrent and stops a running one. Simple mode puts one button on each row
+    /// rather than asking the user to select a row and then find the toolbar.
+    /// </summary>
+    private Task ToggleTorrentAsync(TorrentListItemViewModel? item)
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        if (item == null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        var topLevel = _topLevelService.GetTopLevel();
-        var clipboard = topLevel?.Clipboard;
-        clipboard?.SetTextAsync(selected.Torrent.Hash.ToString());
+        return item.Torrent.Started
+            ? TorrentService.StopAsync(item.Torrent)
+            : TorrentService.StartAsync(item.Torrent);
     }
 
-    private void CopyMagnet()
+    private Task CopyHashAsync()
+    {
+        var selected = SelectedTorrent;
+        return selected == null
+            ? Task.CompletedTask
+            : CopyToClipboardAsync(selected.Torrent.Hash.ToString());
+    }
+
+    private Task CopyMagnetAsync()
     {
         var selected = SelectedTorrent;
         if (selected == null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         // ITorrent interface might not have MagnetLink property, but we can generate it from hash
-        var magnet = $"magnet:?xt=urn:btih:{selected.Torrent.Hash}";
-        var topLevel = _topLevelService.GetTopLevel();
-        var clipboard = topLevel?.Clipboard;
-        clipboard?.SetTextAsync(magnet);
+        return CopyToClipboardAsync($"magnet:?xt=urn:btih:{selected.Torrent.Hash}");
+    }
+
+    /// <summary>
+    /// Puts text on the clipboard, and says so when it does not get there.
+    ///
+    /// <para>
+    /// Flushed, because setting alone does not finish the job. Avalonia hands Windows a data object
+    /// that renders its contents only when something asks for them, so the text belonged to this
+    /// process rather than to the clipboard: pasting elsewhere produced whatever was copied before,
+    /// and closing Peerfluence would have taken it away entirely. <c>FlushAsync</c> is what makes
+    /// the copy real, and it does nothing on the platforms that do not need it.
+    /// </para>
+    ///
+    /// <para>
+    /// Awaited rather than started and abandoned, too. Windows hands the clipboard to one process
+    /// at a time, so losing that race is ordinary rather than exceptional, and an unobserved failure
+    /// left the user believing they had copied something.
+    /// </para>
+    /// </summary>
+    private async Task CopyToClipboardAsync(string text)
+    {
+        IClipboard clipboard;
+        try
+        {
+            clipboard = _topLevelService.GetClipboard();
+        }
+        catch (InvalidOperationException)
+        {
+            SetStatusMessage(Resources.Downloads_ClipboardUnavailable, autoClear: true);
+            return;
+        }
+
+        try
+        {
+            await clipboard.SetTextAsync(text);
+            await clipboard.FlushAsync();
+        }
+        catch (Exception ex)
+        {
+            SetStatusMessage(string.Format(Resources.Downloads_CopyFailed, ex.Message), autoClear: true);
+        }
     }
 
     private bool CanForceRecheckSelected()
@@ -828,7 +1097,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
             return;
         }
 
-        var viewModel = new TorrentListItemViewModel(torrent);
+        var viewModel = new TorrentListItemViewModel(torrent) { Actions = this };
         _torrentLookup[key] = viewModel;
         Torrents.Add(viewModel);
     }
@@ -892,7 +1161,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     private void RemoveTorrent(InfoHash hash)
     {
         // InfoHash can be V1 or V2. We need to find the entry that matches either.
-        var entry = _torrentLookup.FirstOrDefault(x => x.Value.Torrent.Hash == hash || x.Value.Torrent.HashV2 == hash);
+        var entry = _torrentLookup.FirstOrDefault(x => TorrentIdentity.HasHash(x.Value.Torrent, hash));
         if (entry.Value == null)
         {
             return;
@@ -905,7 +1174,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         Torrents.Remove(existing);
         _torrentLookup.Remove(key);
 
-        if (SelectedTorrent == existing || _selectionService.SelectedTorrent?.Hash == hash || _selectionService.SelectedTorrent?.HashV2 == hash)
+        var selected = _selectionService.SelectedTorrent;
+        if (SelectedTorrent == existing || (selected != null && TorrentIdentity.HasHash(selected, hash)))
         {
             SelectedTorrent = null;
             _selectionService.SelectedTorrent = null;
@@ -986,6 +1256,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     private void OnTorrentsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         UpdateTorrentPresence();
+        ApplyFilter();
     }
 
     private void UpdateTorrentPresence()

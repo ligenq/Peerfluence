@@ -1,6 +1,7 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
+using System.Threading.Channels;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Services;
@@ -50,6 +51,13 @@ internal static class TestHelpers
 
         fields.First(f => f.Name == "<Torrents>k__BackingField").SetValue(vm, new ObservableCollection<TorrentListItemViewModel>());
 
+        // Field initializers do not run on an uninitialized object, so Dispose would fault on these.
+        // A view model that cannot be disposed cannot be hosted by a window a test closes.
+        fields.First(f => f.Name == "_loopCts").SetValue(vm, new CancellationTokenSource());
+        fields.First(f => f.Name == "_alertChannel").SetValue(
+            vm,
+            Channel.CreateBounded<TorrentAlertEventArgs>(new BoundedChannelOptions(1) { FullMode = BoundedChannelFullMode.DropOldest }));
+
         // Initialize commands
         fields.First(f => f.Name == "<AddTorrentCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<AddMagnetCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
@@ -59,9 +67,20 @@ internal static class TestHelpers
         fields.First(f => f.Name == "<StopSelectedCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<RemoveSelectedCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<OpenFolderCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
-        fields.First(f => f.Name == "<CopyHashCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
-        fields.First(f => f.Name == "<CopyMagnetCommand>k__BackingField").SetValue(vm, new RelayCommand(() => { }));
+        fields.First(f => f.Name == "<CopyHashCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
+        fields.First(f => f.Name == "<CopyMagnetCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
         fields.First(f => f.Name == "<ForceRecheckCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand(() => Task.CompletedTask));
+        fields.First(f => f.Name == "<ToggleTorrentCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand<TorrentListItemViewModel?>(_ => Task.CompletedTask));
+        fields.First(f => f.Name == "<OpenTorrentFolderCommand>k__BackingField").SetValue(vm, new RelayCommand<TorrentListItemViewModel?>(_ => { }));
+        fields.First(f => f.Name == "<RemoveTorrentCommand>k__BackingField").SetValue(vm, new AsyncRelayCommand<TorrentListItemViewModel?>(_ => Task.CompletedTask));
+
+        // Wired to the real method rather than stubbed: what the details toggle does to the settings
+        // and to the pane is the point of the tests that use it.
+        var toggleDetailsPane = typeof(DownloadsViewModel).GetMethod("ToggleDetailsPane", flags)!;
+        fields.First(f => f.Name == "<ToggleDetailsPaneCommand>k__BackingField")
+            .SetValue(vm, new RelayCommand(() => toggleDetailsPane.Invoke(vm, null)));
+        fields.First(f => f.Name == "<IsDetailsPaneVisible>k__BackingField")
+            .SetValue(vm, settingsService.Current.ShowDetailsPane);
 
         return vm;
     }
@@ -90,7 +109,7 @@ internal static class TestHelpers
         return vm;
     }
 
-    public static SettingsViewModel CreateSettingsViewModel()
+    public static SettingsViewModel CreateSettingsViewModel(IInterfaceModeService? interfaceModeService = null)
     {
         var store = Substitute.For<IAppSettingsStore>();
         var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
@@ -108,7 +127,8 @@ internal static class TestHelpers
             topLevelService,
             engineService,
             updateService,
-            windowsAssociationService);
+            windowsAssociationService,
+            interfaceModeService ?? Substitute.For<IInterfaceModeService>());
     }
 
     public static CreateTorrentViewModel CreateCreateTorrentViewModel()
@@ -139,6 +159,7 @@ internal static class TestHelpers
             aboutVm,
             notificationService,
             settingsService,
-            updateService);
+            updateService,
+            Substitute.For<IInterfaceModeService>());
     }
 }

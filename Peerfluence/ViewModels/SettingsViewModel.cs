@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core.Config;
+using Peerfluence.Core.Messaging;
 
 namespace Peerfluence.ViewModels;
 
@@ -23,6 +27,16 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
 
+    /// <summary>
+    /// Long enough to swallow a burst of changes - a slider being dragged, or Reset writing every
+    /// field - and short enough that closing the window straight after a change still saves it.
+    /// </summary>
+    private static readonly TimeSpan AutoSaveDelay = TimeSpan.FromMilliseconds(400);
+
+    private readonly IInterfaceModeService _interfaceModeService;
+    private CancellationTokenSource? _autoSaveCts;
+    private bool _suspendAutoSave;
+
     public SettingsViewModel(
         IAppSettingsService settingsService,
         IThemeService themeService,
@@ -30,8 +44,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         ITopLevelService topLevelService,
         ITorrentEngineService engineService,
         IUpdateService updateService,
-        IWindowsAssociationService windowsAssociationService)
+        IWindowsAssociationService windowsAssociationService,
+        IInterfaceModeService interfaceModeService)
     {
+        _interfaceModeService = interfaceModeService;
         _settingsService = settingsService;
         _themeService = themeService;
         _localizationService = localizationService;
@@ -54,6 +70,101 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         RefreshPortMappingCommand = new RelayCommand(RefreshPortMapping);
         CheckForUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
         ApplyUpdateAndRestartCommand = new RelayCommand(ApplyUpdateAndRestart);
+
+        SetInterfaceModeCommand = new AsyncRelayCommand<InterfaceMode>(SetInterfaceModeAsync);
+
+        WeakReferenceMessenger.Default.Register<InterfaceModeChangedMessage>(this, (_, msg) => ApplyInterfaceMode(msg.Mode));
+
+        PropertyChanged += OnSettingChanged;
+    }
+
+    /// <summary>
+    /// The way back to simple mode, and the way to simple mode for anyone who chose advanced at the
+    /// welcome. Goes through the mode service rather than the settings save, because the shell
+    /// listens for the change to swap what it is showing.
+    /// </summary>
+    public IAsyncRelayCommand<InterfaceMode> SetInterfaceModeCommand { get; }
+
+    private async Task SetInterfaceModeAsync(InterfaceMode mode)
+    {
+        // Shown before saved. Persisting means writing a file, and making the interface wait on
+        // that is what made switching feel like a stall.
+        ApplyInterfaceMode(mode);
+        await _interfaceModeService.SetAsync(mode);
+    }
+
+    /// <summary>
+    /// Brings the two mode buttons in line with the mode actually in force.
+    ///
+    /// <para>
+    /// Needed because this screen is not the only way to change it: simple mode has its own
+    /// "switch to advanced" link, and answering it left the buttons here showing the mode that had
+    /// just been left behind.
+    /// </para>
+    /// </summary>
+    private void ApplyInterfaceMode(InterfaceMode mode)
+    {
+        IsSimpleMode = mode == InterfaceMode.Simple;
+        OnPropertyChanged(nameof(IsAdvancedMode));
+    }
+
+    /// <summary>
+    /// Properties that are shown but never stored. Everything else on this view model is a setting,
+    /// so changing it is what triggers the save.
+    /// </summary>
+    private static readonly HashSet<string> NotSettings = new(StringComparer.Ordinal)
+    {
+        nameof(StatusMessage),
+        nameof(HasStatusMessage),
+        nameof(IsUpdateAvailable),
+        nameof(IsFixedListeningPortEnabled),
+        nameof(ApplicationVersion),
+        nameof(Title),
+        nameof(IsSimpleMode),
+        nameof(IsAdvancedMode),
+        nameof(ThemeVariantOptions),
+        nameof(ColorThemeOptions),
+        nameof(BackgroundStyleOptions),
+        nameof(EncryptionModeOptions),
+        nameof(ProxyTypeOptions)
+    };
+
+    /// <summary>
+    /// Saves what changed, shortly after it changes.
+    ///
+    /// <para>
+    /// Windows 11 Settings does away with a Save button, and so does this: a settings screen that
+    /// can be left in an unsaved state is a screen that can silently lose what you told it. The
+    /// delay coalesces a burst - dragging a slider, or Reset writing every field at once - into one
+    /// write, and success is deliberately silent. Only a failure is worth a message.
+    /// </para>
+    /// </summary>
+    private void OnSettingChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (_suspendAutoSave || e.PropertyName is null || NotSettings.Contains(e.PropertyName))
+        {
+            return;
+        }
+
+        _autoSaveCts?.Cancel();
+        _autoSaveCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _autoSaveCts = cts;
+
+        _ = AutoSaveAsync(cts);
+    }
+
+    private async Task AutoSaveAsync(CancellationTokenSource cts)
+    {
+        try
+        {
+            await Task.Delay(AutoSaveDelay, cts.Token).ConfigureAwait(true);
+            await SaveAsync(announce: false).ConfigureAwait(true);
+        }
+        catch (OperationCanceledException)
+        {
+            // Superseded by a later change; that one will do the saving.
+        }
     }
 
     // IFeatureViewModel
@@ -121,6 +232,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     }
 
+    public bool AllowMultipleConnectionsPerIp
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
     public bool EnableNatPmp
     {
         get;
@@ -146,6 +263,18 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     public bool IsFixedListeningPortEnabled => !UseAutomaticListeningPort;
+
+    /// <summary>
+    /// In simple mode the screen shows only where downloads go and how the app looks. Everything
+    /// else is still there and still in force - it is hidden, not turned off.
+    /// </summary>
+    public bool IsSimpleMode
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    public bool IsAdvancedMode => !IsSimpleMode;
 
     public int ListeningPort
     {
@@ -456,7 +585,23 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private void LoadFromSettings()
     {
+        // Reading the stored values into the view model is not the user changing anything, so it
+        // must not start a save of what was just read.
+        _suspendAutoSave = true;
+        try
+        {
+            LoadFromSettingsCore();
+        }
+        finally
+        {
+            _suspendAutoSave = false;
+        }
+    }
+
+    private void LoadFromSettingsCore()
+    {
         var settings = _settingsService.Current;
+        IsSimpleMode = _interfaceModeService.IsSimple;
 
         // Storage
         DownloadPath = settings.Storage.DownloadPath;
@@ -474,6 +619,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Network
         EnableDht = settings.Network.EnableDht;
         AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling;
+        AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp;
         EnableNatPmp = settings.Network.EnableNatPmp;
         EnableUpnp = settings.Network.EnableUpnp;
         UseAutomaticListeningPort = settings.Network.UseAutomaticListeningPort;
@@ -520,7 +666,9 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         CheckForUpdatesOnStartup = settings.Update.CheckForUpdatesOnStartup;
     }
 
-    private async Task SaveAsync()
+    private Task SaveAsync() => SaveAsync(announce: true);
+
+    private async Task SaveAsync(bool announce)
     {
         try
         {
@@ -538,6 +686,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             // Network
             settings.Network.EnableDht = EnableDht;
             settings.Network.AnswerInfoHashSampling = AnswerInfoHashSampling;
+            settings.Network.AllowMultipleConnectionsPerIp = AllowMultipleConnectionsPerIp;
             settings.Network.EnableNatPmp = EnableNatPmp;
             settings.Network.EnableUpnp = EnableUpnp;
             settings.Network.UseAutomaticListeningPort = UseAutomaticListeningPort;
@@ -588,7 +737,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             _themeService.Apply(settings.Theme);
             _localizationService.Apply(settings.Language);
             NotifyLocalizedOptionsChanged();
-            StatusMessage = Properties.Resources.Status_SettingsSaved;
+
+            if (announce)
+            {
+                StatusMessage = Properties.Resources.Status_SettingsSaved;
+            }
         }
         catch (Exception ex)
         {
@@ -609,6 +762,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         AssociateMagnetLinks = defaults.AssociateMagnetLinks;
         EnableDht = defaults.Network.EnableDht;
         AnswerInfoHashSampling = defaults.Network.AnswerInfoHashSampling;
+        AllowMultipleConnectionsPerIp = defaults.Network.AllowMultipleConnectionsPerIp;
         EnableNatPmp = defaults.Network.EnableNatPmp;
         EnableUpnp = defaults.Network.EnableUpnp;
         UseAutomaticListeningPort = defaults.Network.UseAutomaticListeningPort;

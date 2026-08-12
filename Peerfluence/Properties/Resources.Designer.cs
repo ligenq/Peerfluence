@@ -830,6 +830,33 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} addresses accepted as peer candidates..
+        /// </summary>
+        public static string Details_Peers_AddAccepted {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddAccepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None of the {0} addresses could be read. Use IP:port, for example 192.168.1.10:51413..
+        /// </summary>
+        public static string Details_Peers_AddRejected {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add peers.
+        /// </summary>
+        public static string Details_Peers_AddTitle {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client.
         /// </summary>
         public static string Details_Peers_Client {
@@ -1280,6 +1307,24 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The clipboard is not available right now..
+        /// </summary>
+        public static string Downloads_ClipboardUnavailable {
+            get {
+                return ResourceManager.GetString("Downloads_ClipboardUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not copy to the clipboard: {0}.
+        /// </summary>
+        public static string Downloads_CopyFailed {
+            get {
+                return ResourceManager.GetString("Downloads_CopyFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy Hash.
         /// </summary>
         public static string Downloads_CopyHash {
@@ -1469,6 +1514,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove {0} downloads from the list?.
+        /// </summary>
+        public static string Downloads_Remove_Confirm_Many {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_Confirm_Many", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove Torrent.
         /// </summary>
         public static string Downloads_Remove_Confirm_Title {
@@ -1528,6 +1582,15 @@ namespace Peerfluence.Properties {
         public static string Downloads_Remove_RememberChoice {
             get {
                 return ResourceManager.GetString("Downloads_Remove_RememberChoice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search downloads.
+        /// </summary>
+        public static string Downloads_Search {
+            get {
+                return ResourceManager.GetString("Downloads_Search", resourceCulture);
             }
         }
         

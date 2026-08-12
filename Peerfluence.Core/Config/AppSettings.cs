@@ -18,9 +18,22 @@ public sealed class AppSettings
 
     public McpSettings Mcp { get; set; } = new();
 
+    /// <summary>
+    /// "Simple" or "Advanced". Empty means the user has not been asked yet, which is what brings up
+    /// the welcome on first launch; anything unrecognised is read as Advanced, so a hand-edited or
+    /// downgraded settings file never hides features someone was already using.
+    /// </summary>
+    public string InterfaceMode { get; set; } = string.Empty;
+
     public bool ShowAddTorrentOptions { get; set; } = true;
 
     public bool ShowRemoveTorrentOptions { get; set; } = true;
+
+    /// <summary>
+    /// Whether the details pane sits under the torrent list. Off by default: it is a second view of
+    /// one torrent, and while it is closed the list has the whole window to fill.
+    /// </summary>
+    public bool ShowDetailsPane { get; set; }
 
     public bool AssociateTorrentFiles { get; set; }
 
