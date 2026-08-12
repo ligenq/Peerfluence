@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
@@ -51,9 +51,14 @@ public sealed class ThemeService : IThemeService
         Application.Current.RequestedThemeVariant = ThemeVariant.Default;
     }
 
-    private void ApplyPalette(string themeName)
+    private void ApplyPalette(string? themeName)
     {
-        if (Application.Current == null || !Palettes.TryGetValue(themeName, out var palette))
+        // Named palette or nothing. The name arrives from settings, so it can be absent or something
+        // this version does not know; the other two Apply methods already shrug such a value off,
+        // while a dictionary lookup throws on a null key rather than missing.
+        if (Application.Current == null
+            || string.IsNullOrEmpty(themeName)
+            || !Palettes.TryGetValue(themeName, out var palette))
         {
             return;
         }
