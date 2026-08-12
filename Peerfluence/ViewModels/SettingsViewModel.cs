@@ -29,7 +29,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     /// <summary>
     /// Long enough to swallow a burst of changes - a slider being dragged, or Reset writing every
-    /// field - and short enough that closing the window straight after a change still saves it.
+    /// field. Nothing is riding on it being short: the change is already in force by the time this
+    /// starts, and the save on shutdown writes it whether or not this has come round.
     /// </summary>
     private static readonly TimeSpan AutoSaveDelay = TimeSpan.FromMilliseconds(400);
 
@@ -39,6 +40,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private bool _suspendAutoSave;
     private string? _appliedLanguage;
     private string? _appliedTheme;
+    private (bool Torrents, bool Magnets)? _appliedAssociations;
 
     public SettingsViewModel(
         IAppSettingsService settingsService,
@@ -62,7 +64,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         PortMappingStatuses = new ObservableCollection<PortMappingStatusViewModel>();
 
         LoadFromSettings();
+
+        // What is already in force when the screen opens, so the first change applies only itself.
         _appliedTheme = CurrentThemeKey();
+        _appliedAssociations = (AssociateTorrentFiles, AssociateMagnetLinks);
         SaveCommand = new AsyncRelayCommand(SaveAsync);
         ResetDefaultsCommand = new RelayCommand(ResetDefaults);
         BrowseBlocklistCommand = new AsyncRelayCommand(BrowseBlocklistAsync);
@@ -150,6 +155,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             return;
         }
 
+        // In force at once; on disk shortly. The settings object is what the rest of the
+        // application reads and what the save on shutdown writes, so the change cannot be lost by
+        // closing the window before the delayed write comes round.
+        ApplyToSettings();
+        ApplySideEffects();
+
         _autoSaveCts?.Cancel();
         _autoSaveCts?.Dispose();
         var cts = new CancellationTokenSource();
@@ -174,7 +185,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         try
         {
             await Task.Delay(AutoSaveDelay, cts.Token).ConfigureAwait(true);
-            await SaveAsync(announce: false).ConfigureAwait(true);
+            await PersistAsync(announce: false).ConfigureAwait(true);
         }
         catch (OperationCanceledException)
         {
@@ -693,7 +704,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private async Task SaveAsync(bool announce)
     {
-        try
+        ApplyToSettings();
+        await PersistAsync(announce).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Copies what is on screen into the settings object. Costs nothing - no disk, no side effects -
+    /// which is why it happens the moment something changes rather than when the write does.
+    ///
+    /// <para>
+    /// It is also what makes the write safe to delay. The shutdown save works from this object, as
+    /// does every other part of the application that reads its settings, so a change is in force
+    /// the moment it is made even if it reaches the disk a fraction of a second later.
+    /// </para>
+    /// </summary>
+    private void ApplyToSettings()
+    {
         {
             var settings = _settingsService.Current;
 
@@ -754,26 +780,53 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             // Updates
             settings.Update.UpdateUrl = UpdateUrl;
             settings.Update.CheckForUpdatesOnStartup = CheckForUpdatesOnStartup;
+        }
+    }
 
-            await _settingsService.SaveAsync(default);
+    /// <summary>
+    /// Applies the things a settings change does beyond storing a value.
+    ///
+    /// <para>
+    /// Each is guarded by whether it actually changed. They reach outside this screen - the theme
+    /// repaints the application, the language swaps the process's culture, the associations write
+    /// to the registry - and with a save on every property change, doing them unconditionally meant
+    /// redressing the whole window because someone typed a character into a path box.
+    /// </para>
+    /// </summary>
+    private void ApplySideEffects()
+    {
+        var settings = _settingsService.Current;
+
+        if (_appliedAssociations != (AssociateTorrentFiles, AssociateMagnetLinks))
+        {
+            _appliedAssociations = (AssociateTorrentFiles, AssociateMagnetLinks);
             _windowsAssociationService.ApplyAssociations(AssociateTorrentFiles, AssociateMagnetLinks);
+        }
 
-            // Applied only when they actually changed. These reach outside this screen - the theme
-            // repaints the application and the language swaps the process's culture - and now that
-            // every keystroke saves, doing that on each one would mean redressing the whole window
-            // because someone typed a character into a path box.
-            if (_appliedTheme != CurrentThemeKey())
-            {
-                _appliedTheme = CurrentThemeKey();
-                _themeService.Apply(settings.Theme);
-            }
+        if (_appliedTheme != CurrentThemeKey())
+        {
+            _appliedTheme = CurrentThemeKey();
+            _themeService.Apply(settings.Theme);
+        }
 
-            if (!string.Equals(_appliedLanguage, settings.Language, StringComparison.Ordinal))
-            {
-                _appliedLanguage = settings.Language;
-                _localizationService.Apply(settings.Language);
-                NotifyLocalizedOptionsChanged();
-            }
+        if (!string.Equals(_appliedLanguage, settings.Language, StringComparison.Ordinal))
+        {
+            _appliedLanguage = settings.Language;
+            _localizationService.Apply(settings.Language);
+            NotifyLocalizedOptionsChanged();
+        }
+    }
+
+    /// <summary>
+    /// Writes the settings to disk. The only part of saving worth delaying, because it is the only
+    /// part that costs anything.
+    /// </summary>
+    private async Task PersistAsync(bool announce)
+    {
+        try
+        {
+            ApplySideEffects();
+            await _settingsService.SaveAsync(default).ConfigureAwait(true);
 
             if (announce)
             {

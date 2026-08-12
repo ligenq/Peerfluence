@@ -291,7 +291,11 @@ public class SettingsViewModelTests
 
         _sut.ResetDefaultsCommand.Execute(null);
 
-        Assert.NotEqual(_settingsService.Current.Storage.DownloadPath, _sut.DownloadPath);
+        // Stated against the factory default directly. This used to be phrased as "the view model
+        // differs from the stored settings", which no longer says anything: a change now reaches
+        // the settings object as it is made, so the two agree by design.
+        Assert.Equal(_settingsService.CreateDefaultSettings().Storage.DownloadPath, _sut.DownloadPath);
+        Assert.NotEqual("/persisted/path", _sut.DownloadPath);
         Assert.Equal(UpdateSettings.DefaultUpdateUrl, _sut.UpdateUrl);
         Assert.True(_sut.EnableDht);
         Assert.False(_sut.UseAutomaticListeningPort);
@@ -405,6 +409,41 @@ public class SettingsViewModelTests
 
         await store.Received(1).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
         Assert.Equal(5, settingsService.Current.Queue.MaxActiveDownloads);
+    }
+
+    [Fact]
+    public void AChangeIsInForceBeforeItReachesTheDisk()
+    {
+        // The point of splitting the two: closing the window inside the debounce window used to
+        // lose the change, because the view model was still the only thing that knew about it.
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var sut = Create(settingsService);
+        var before = settingsService.Current.Network.EnableDht;
+
+        sut.EnableDht = !before;
+
+        // No waiting: the settings object has it already, which is what shutdown writes and what
+        // the rest of the application reads.
+        Assert.Equal(!before, settingsService.Current.Network.EnableDht);
+    }
+
+    [Fact]
+    public async Task AChangeMadeAndAbandonedImmediately_IsStillWrittenByTheShutdownSave()
+    {
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var sut = Create(settingsService);
+
+        sut.ListeningPort = 51999;
+
+        // Shutting down before the debounce has come round at all.
+        var shutdown = new AppSettingsHostedService(settingsService);
+        await shutdown.StopAsync(TestContext.Current.CancellationToken);
+
+        await store.Received().SaveAsync(
+            Arg.Is<AppSettings>(s => s.Network.ListeningPort == 51999),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
