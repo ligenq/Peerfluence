@@ -125,25 +125,22 @@
     <value>Cambiar a avanzado</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Bienvenido a Peerfluence</value>
+    <value>Elija una interfaz</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>¿Cuánto quiere ver? Puede cambiarlo en cualquier momento en los ajustes.</value>
+    <value>Puede cambiarlo más tarde en los ajustes.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Sencillo</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Solo descargar: añada un archivo o un enlace, vea cómo llega y abra la carpeta. Nada más de por medio.</value>
+    <value>Añada un torrent, vea cómo se descarga, abra la carpeta.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Avanzado</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Todo: rastreadores, pares, piezas, selección de archivos, cola, límites de velocidad y lo demás.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>¿No lo tiene claro? Empiece por lo sencillo. Cambiar cuesta un clic.</value>
+    <value>Añade rastreadores, pares, piezas, selección de archivos, cola y límites de velocidad.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Buscar descargas</value>
@@ -167,7 +164,7 @@
     <value>Interfaz</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Sencillo reduce la ventana a una sola pantalla: añadir, ver, abrir. Avanzado añade el panel, el área de detalles y todos los ajustes.</value>
+    <value>Sencillo muestra solo la lista de descargas. Avanzado añade el panel, el área de detalles y todos los ajustes.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Sencillo</value>

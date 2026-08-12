@@ -125,25 +125,22 @@
     <value>Mudar para avançado</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Bem-vindo ao Peerfluence</value>
+    <value>Escolha uma interface</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>Quanto quer ver? Pode mudar isto a qualquer momento nas definições.</value>
+    <value>Pode alterar isto mais tarde nas definições.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Simples</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Apenas transferir: adicione um ficheiro ou uma ligação, veja-o chegar, abra a pasta. Nada mais pelo meio.</value>
+    <value>Adicione um torrent, acompanhe a transferência, abra a pasta.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Avançado</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Tudo: rastreadores, pares, peças, seleção de ficheiros, fila, limites de velocidade e o resto.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Sem certezas? Comece pelo simples. Mudar custa um clique.</value>
+    <value>Acrescenta rastreadores, pares, peças, seleção de ficheiros, fila e limites de velocidade.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Procurar nas transferências</value>
@@ -167,7 +164,7 @@
     <value>Interface</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Simples reduz a janela a um único ecrã: adicionar, ver, abrir. Avançado acrescenta o painel, a área de detalhes e todas as definições.</value>
+    <value>Simples mostra apenas a lista de transferências. Avançado acrescenta o painel, a área de detalhes e todas as definições.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Simples</value>

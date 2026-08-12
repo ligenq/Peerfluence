@@ -125,25 +125,22 @@
     <value>Switch to advanced</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Welcome to Peerfluence</value>
+    <value>Choose an interface</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>How much do you want to see? You can change this at any time in settings.</value>
+    <value>You can change this later in settings.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Simple</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Just downloading: add a file or link, watch it arrive, open the folder. Nothing else in the way.</value>
+    <value>Add a torrent, watch it download, open the folder.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Advanced</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Everything: trackers, peers, pieces, file selection, queueing, speed limits and the rest.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Not sure? Start simple. Switching takes one click.</value>
+    <value>Adds trackers, peers, pieces, file selection, queueing and speed limits.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Search downloads</value>
@@ -167,7 +164,7 @@
     <value>Interface</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Simple keeps the window to one screen: add, watch, open. Advanced adds the dashboard, the details pane and every setting.</value>
+    <value>Simple shows only the download list. Advanced adds the dashboard, the details pane and all settings.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Simple</value>

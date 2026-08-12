@@ -125,25 +125,22 @@
     <value>Passer en mode avancé</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Bienvenue dans Peerfluence</value>
+    <value>Choisissez une interface</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>Quel niveau de détail souhaitez-vous ? Vous pouvez en changer à tout moment dans les paramètres.</value>
+    <value>Vous pourrez changer plus tard dans les paramètres.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Simple</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Uniquement télécharger : ajoutez un fichier ou un lien, regardez-le arriver, ouvrez le dossier. Rien d'autre.</value>
+    <value>Ajoutez un torrent, suivez le téléchargement, ouvrez le dossier.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Avancé</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Tout : traqueurs, pairs, morceaux, sélection de fichiers, file d'attente, limites de vitesse et le reste.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Vous hésitez ? Commencez simple. Changer ne prend qu'un clic.</value>
+    <value>Ajoute traqueurs, pairs, morceaux, sélection de fichiers, file d'attente et limites de vitesse.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Rechercher dans les téléchargements</value>
@@ -167,7 +164,7 @@
     <value>Interface</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Simple limite la fenêtre à un seul écran : ajouter, regarder, ouvrir. Avancé ajoute le tableau de bord, le volet de détails et tous les paramètres.</value>
+    <value>Simple n'affiche que la liste des téléchargements. Avancé ajoute le tableau de bord, le volet de détails et tous les paramètres.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Simple</value>

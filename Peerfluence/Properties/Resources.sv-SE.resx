@@ -125,25 +125,22 @@
     <value>Byt till avancerat</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Välkommen till Peerfluence</value>
+    <value>Välj gränssnitt</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>Hur mycket vill du se? Du kan ändra detta när som helst i inställningarna.</value>
+    <value>Du kan ändra detta senare i inställningarna.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Enkelt</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Bara hämtning: lägg till en fil eller länk, se den komma in, öppna mappen. Inget annat i vägen.</value>
+    <value>Lägg till en torrent, följ hämtningen, öppna mappen.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Avancerat</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Allt: spårare, peers, delar, filval, kö, hastighetsgränser och resten.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Osäker? Börja enkelt. Att byta tar ett klick.</value>
+    <value>Lägger till spårare, peers, delar, filval, kö och hastighetsgränser.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Sök bland hämtningar</value>
@@ -167,7 +164,7 @@
     <value>Gränssnitt</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Enkelt håller fönstret till en skärm: lägg till, se, öppna. Avancerat lägger till panelen, detaljvyn och alla inställningar.</value>
+    <value>Enkelt visar bara hämtningslistan. Avancerat lägger till panelen, detaljvyn och alla inställningar.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Enkelt</value>

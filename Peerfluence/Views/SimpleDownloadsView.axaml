@@ -36,55 +36,33 @@
                           Message="{Binding StatusMessage}"
                           Margin="{StaticResource StandardBottomMargin}"/>
 
-            <!-- Nothing yet: say what to do, not that a list is empty. -->
-            <suki:GlassCard Grid.Row="2"
-                            IsVisible="{Binding HasNoTorrents}"
-                            VerticalAlignment="Center"
-                            Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
-                <StackPanel Spacing="{StaticResource SpacingLarge}" HorizontalAlignment="Center">
-                    <materialIcons:MaterialIcon Kind="DownloadCircleOutline"
-                                                Width="48" Height="48"
-                                                HorizontalAlignment="Center"
-                                                Foreground="{DynamicResource SukiPrimaryColor}"/>
-                    <StackPanel Spacing="{StaticResource SpacingSmall}">
-                        <TextBlock Text="{m:L Downloads_EmptyTitle}"
-                                   FontSize="{StaticResource FontSizeHeader}"
-                                   FontWeight="Bold"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="{m:L Simple_EmptyBody}"
-                                   Opacity="0.7"
-                                   TextWrapping="Wrap"
-                                   MaxWidth="420"
-                                   TextAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Center">
-                        <Button Classes="Flat" Command="{Binding AddTorrentCommand}">
-                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                                <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                                <TextBlock Text="{m:L Downloads_AddTorrent}"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Classes="Flat" Command="{Binding AddMagnetCommand}">
-                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
-                                <materialIcons:MaterialIcon Kind="ClipboardArrowDownOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                                <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </StackPanel>
-            </suki:GlassCard>
+            <!--
+                Nothing yet. One line, where the list would be. The two buttons that add a download
+                sit an inch above it; repeating them under a large icon would be decoration dressed
+                up as help.
+            -->
+            <TextBlock Grid.Row="2"
+                       Text="{m:L Simple_EmptyBody}"
+                       IsVisible="{Binding HasNoTorrents}"
+                       Opacity="0.6"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
 
             <!--
-                One card per download. Name and progress carry the row; speed and time left sit
-                underneath in muted text, and the two actions worth having are on the row itself so
-                nothing has to be selected first.
+                A list, not a deck of cards. Downloads are homogeneous rows of one thing, so they
+                read as a list with a rule between them; floating each onto its own translucent
+                panel is dashboard styling applied to something that is not a dashboard.
             -->
             <ScrollViewer Grid.Row="2" IsVisible="{Binding HasTorrents}" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Torrents}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:TorrentListItemViewModel">
-                            <suki:GlassCard Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
-                                <suki:GlassCard.ContextMenu>
+                            <Border Padding="{StaticResource NormalLeftTopRightBottomMargin}"
+                                    BorderThickness="0,0,0,1"
+                                    BorderBrush="{DynamicResource SukiBorderBrush}"
+                                    Background="Transparent">
+                                <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{m:L Downloads_OpenFolder}"
                                                   Command="{Binding Actions.OpenTorrentFolderCommand}"
@@ -102,7 +80,7 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
-                                </suki:GlassCard.ContextMenu>
+                                </Border.ContextMenu>
                                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
                                     <StackPanel Spacing="{StaticResource SpacingSmall}" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Name}"
@@ -147,7 +125,7 @@
                                         <materialIcons:MaterialIcon Kind="FolderOpen" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                     </Button>
                                 </Grid>
-                            </suki:GlassCard>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

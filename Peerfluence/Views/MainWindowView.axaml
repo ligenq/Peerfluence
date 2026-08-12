@@ -109,46 +109,43 @@
                             IsVisible="{Binding IsSimpleSettingsOpen}"/>
         </Grid>
 
-        <!-- First run only: one question, two answers, then never again. -->
+        <!--
+            First run only. A preference, asked plainly and once: left-aligned, ordinary type, no
+            hero and no decoration. The thing being chosen is which interface to show, not a product
+            to be sold.
+        -->
         <Border IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpacingLarge}" MaxWidth="760">
-                <StackPanel Spacing="{StaticResource SpacingSmall}">
-                    <TextBlock Text="{m:L Welcome_Title}"
-                               FontSize="{StaticResource FontSizeTitle}"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"/>
-                    <TextBlock Text="{m:L Welcome_Subtitle}"
-                               Opacity="0.7"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"/>
-                </StackPanel>
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Spacing="{StaticResource SpacingStandard}"
+                        MaxWidth="420">
+                <TextBlock Text="{m:L Welcome_Title}"
+                           FontSize="{StaticResource FontSizeLarge}"
+                           FontWeight="SemiBold"/>
+                <TextBlock Text="{m:L Welcome_Subtitle}"
+                           Opacity="0.65"
+                           TextWrapping="Wrap"
+                           Margin="{StaticResource StandardBottomMargin}"/>
 
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Center">
-                    <Button Classes="Basic" Command="{Binding ChooseSimpleModeCommand}" Padding="{StaticResource ZeroThickness}">
-                        <suki:GlassCard Width="330" Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
-                            <StackPanel Spacing="{StaticResource SpacingMedium}">
-                                <materialIcons:MaterialIcon Kind="Feather" Width="32" Height="32" Foreground="{DynamicResource SukiPrimaryColor}"/>
-                                <TextBlock Text="{m:L Welcome_Simple_Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
-                                <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="0.7" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </suki:GlassCard>
-                    </Button>
+                <Button Command="{Binding ChooseSimpleModeCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Welcome_Simple_Title}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="0.65" TextWrapping="Wrap" MaxWidth="360"/>
+                    </StackPanel>
+                </Button>
 
-                    <Button Classes="Basic" Command="{Binding ChooseAdvancedModeCommand}" Padding="{StaticResource ZeroThickness}">
-                        <suki:GlassCard Width="330" Padding="{StaticResource MLargeLeftTopRightBottomMargin}">
-                            <StackPanel Spacing="{StaticResource SpacingMedium}">
-                                <materialIcons:MaterialIcon Kind="TuneVariant" Width="32" Height="32" Foreground="{DynamicResource SukiPrimaryColor}"/>
-                                <TextBlock Text="{m:L Welcome_Advanced_Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
-                                <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="0.7" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </suki:GlassCard>
-                    </Button>
-                </StackPanel>
-
-                <TextBlock Text="{m:L Welcome_Footnote}"
-                           Opacity="0.6"
-                           FontSize="{StaticResource FontSizeNormal}"
-                           TextAlignment="Center"/>
+                <Button Command="{Binding ChooseAdvancedModeCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Welcome_Advanced_Title}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="0.65" TextWrapping="Wrap" MaxWidth="360"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
     </Panel>

@@ -125,25 +125,22 @@
     <value>Перейти в расширенный режим</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Добро пожаловать в Peerfluence</value>
+    <value>Выберите интерфейс</value>
   </data>
   <data name="Welcome_Subtitle" xml:space="preserve">
-    <value>Сколько вы хотите видеть? Это можно изменить в любой момент в настройках.</value>
+    <value>Это можно изменить позже в настройках.</value>
   </data>
   <data name="Welcome_Simple_Title" xml:space="preserve">
     <value>Простой</value>
   </data>
   <data name="Welcome_Simple_Body" xml:space="preserve">
-    <value>Только загрузка: добавьте файл или ссылку, следите за ходом, откройте папку. Ничего лишнего.</value>
+    <value>Добавьте торрент, следите за загрузкой, откройте папку.</value>
   </data>
   <data name="Welcome_Advanced_Title" xml:space="preserve">
     <value>Расширенный</value>
   </data>
   <data name="Welcome_Advanced_Body" xml:space="preserve">
-    <value>Всё: трекеры, пиры, части, выбор файлов, очередь, ограничения скорости и остальное.</value>
-  </data>
-  <data name="Welcome_Footnote" xml:space="preserve">
-    <value>Не уверены? Начните с простого. Переключение — один щелчок.</value>
+    <value>Добавляет трекеры, пиры, части, выбор файлов, очередь и ограничения скорости.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
     <value>Поиск по загрузкам</value>
@@ -167,7 +164,7 @@
     <value>Интерфейс</value>
   </data>
   <data name="Settings_InterfaceModeHint" xml:space="preserve">
-    <value>Простой оставляет один экран: добавить, следить, открыть. Расширенный добавляет панель, область сведений и все настройки.</value>
+    <value>Простой показывает только список загрузок. Расширенный добавляет панель, область сведений и все настройки.</value>
   </data>
   <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
     <value>Простой</value>
