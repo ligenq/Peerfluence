@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
@@ -115,6 +116,27 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         IsSimpleMode = mode == InterfaceMode.Simple;
         OnPropertyChanged(nameof(IsAdvancedMode));
+    }
+
+    /// <summary>
+    /// Sets one of the fixed-choice settings, ignoring an empty value.
+    ///
+    /// <para>
+    /// There is no "no theme" or "no proxy type" to choose, so an empty value is never the user
+    /// picking something - it is a ComboBox reporting that it currently has nothing selected, which
+    /// it does briefly whenever its items are replaced. Changing the language replaces all five of
+    /// these lists to relabel them, and letting that transient nothing through meant storing a null
+    /// theme and handing it straight to the theme service.
+    /// </para>
+    /// </summary>
+    private void SetChoice(ref string field, string value, [CallerMemberName] string? propertyName = null)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        SetProperty(ref field, value, propertyName);
     }
 
     /// <summary>
@@ -324,19 +346,19 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     public string SelectedThemeVariant
     {
         get;
-        set => SetProperty(ref field, value);
+        set => SetChoice(ref field, value);
     } = "System";
 
     public string SelectedColorTheme
     {
         get;
-        set => SetProperty(ref field, value);
+        set => SetChoice(ref field, value);
     } = "Indigo";
 
     public string SelectedBackgroundStyle
     {
         get;
-        set => SetProperty(ref field, value);
+        set => SetChoice(ref field, value);
     } = "GradientSoft";
 
     public string SelectedLanguage
@@ -438,14 +460,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     public string SelectedEncryptionMode
     {
         get;
-        set => SetProperty(ref field, value);
+        set => SetChoice(ref field, value);
     } = "Allow";
 
     // Proxy
     public string SelectedProxyType
     {
         get;
-        set => SetProperty(ref field, value);
+        set => SetChoice(ref field, value);
     } = "None";
 
     public string ProxyHost

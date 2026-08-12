@@ -447,6 +447,52 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void AComboBoxReportingNothingSelected_IsNotTakenAsAChoice()
+    {
+        // What a ComboBox does for a moment when its items are replaced. It is not the user
+        // choosing "no theme" - there is no such choice - and taking it as one stored a null theme
+        // and handed it to the theme service, which threw on the lookup.
+        var before = _sut.SelectedColorTheme;
+
+        _sut.SelectedColorTheme = null!;
+        _sut.SelectedThemeVariant = null!;
+        _sut.SelectedBackgroundStyle = null!;
+        _sut.SelectedEncryptionMode = string.Empty;
+        _sut.SelectedProxyType = string.Empty;
+
+        Assert.Equal(before, _sut.SelectedColorTheme);
+        Assert.False(string.IsNullOrEmpty(_sut.SelectedThemeVariant));
+        Assert.False(string.IsNullOrEmpty(_sut.SelectedBackgroundStyle));
+        Assert.False(string.IsNullOrEmpty(_sut.SelectedEncryptionMode));
+        Assert.False(string.IsNullOrEmpty(_sut.SelectedProxyType));
+    }
+
+    [Fact]
+    public async Task ChangingTheLanguage_DoesNotBlankTheOtherChoicesOnTheWay()
+    {
+        // Changing the language relabels all five choice lists, which is what replaces their items.
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        var localizationService = Substitute.For<ILocalizationService>();
+        var sut = Create(settingsService, localizationService: localizationService);
+
+        try
+        {
+            sut.SelectedLanguage = "sv-SE";
+            await WaitForSaveAsync(store);
+            await sut.WaitForPendingSaveAsync();
+
+            Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.ColorTheme));
+            Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.ThemeVariant));
+            Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.BackgroundStyle));
+        }
+        finally
+        {
+            await sut.WaitForPendingSaveAsync();
+        }
+    }
+
+    [Fact]
     public async Task SavingSomethingUnrelated_LeavesTheApplicationsLanguageAlone()
     {
         // Applying a language swaps the process's culture, so an auto-save triggered by toggling a
