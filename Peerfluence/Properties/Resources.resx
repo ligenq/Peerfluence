@@ -106,6 +106,78 @@
   <data name="Downloads_Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
+  <data name="Downloads_ToggleDetails" xml:space="preserve">
+    <value>Show or hide the details pane</value>
+  </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>The clipboard is not available right now.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Could not copy to the clipboard: {0}</value>
+  </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Add a .torrent file or paste a magnet link to start downloading.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Pause or resume</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Switch to advanced</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Welcome to Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>How much do you want to see? You can change this at any time in settings.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Simple</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Just downloading: add a file or link, watch it arrive, open the folder. Nothing else in the way.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Everything: trackers, peers, pieces, file selection, queueing, speed limits and the rest.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Not sure? Start simple. Switching takes one click.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Search downloads</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>Downloading</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>Seeding</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>No downloads match your search.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Simple keeps the window to one screen: add, watch, open. Advanced adds the dashboard, the details pane and every setting.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Simple</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>Changes are saved as you make them.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Remove</value>
   </data>
@@ -274,6 +346,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Progress</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Peer address, e.g. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Add peers</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} of {1} addresses accepted as peer candidates.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>None of the {0} addresses could be read. Use IP:port, for example 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Select a torrent</value>
   </data>
@@ -297,6 +381,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Lets other DHT nodes ask which torrents you have peers for, which search indexes use to discover torrents. The same information is already available by asking who has a specific torrent, so turning this off hides little. Requires DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Allow several connections per IP address</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Keeps peers that share one address, as mobile and campus networks do when many subscribers sit behind the same one. Turning it off admits a single connection per address, and refuses a peer that reconnects from a new port instead of recognising it.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Enable NAT-PMP</value>
@@ -429,6 +519,9 @@
   </data>
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Fetching metadata</value>
+  </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Size</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>ETA</value>
@@ -768,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Select Session Data Folder</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>Remove {0} downloads from the list?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Remove Torrent</value>

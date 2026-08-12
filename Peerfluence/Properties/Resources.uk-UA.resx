@@ -106,6 +106,78 @@
   <data name="Downloads_Stop" xml:space="preserve">
     <value>Зупинити</value>
   </data>
+  <data name="Downloads_ToggleDetails" xml:space="preserve">
+    <value>Показати або сховати панель відомостей</value>
+  </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Буфер обміну зараз недоступний.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Не вдалося скопіювати до буфера обміну: {0}</value>
+  </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Додайте файл .torrent або вставте magnet-посилання, щоб почати завантаження.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Призупинити або відновити</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Перейти в розширений режим</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Ласкаво просимо до Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Скільки ви хочете бачити? Це можна змінити будь-коли в налаштуваннях.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Простий</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Лише завантаження: додайте файл або посилання, стежте за перебігом, відкрийте теку. Нічого зайвого.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Розширений</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Усе: трекери, піри, частини, вибір файлів, черга, обмеження швидкості та решта.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Не впевнені? Почніть із простого. Перемкнутися — один клік.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Пошук серед завантажень</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>Завантажуються</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>Роздаються</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Завершені</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Жодне завантаження не відповідає запиту.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Інтерфейс</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Простий залишає одне вікно: додати, стежити, відкрити. Розширений додає панель, область відомостей і всі налаштування.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Простий</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Розширений</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>Зміни зберігаються під час внесення.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Видалити</value>
   </data>
@@ -274,6 +346,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Прогрес</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Адреса піра, наприклад 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Додати пірів</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>Прийнято адрес як кандидатів у піри: {0} з {1}.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Не вдалося прочитати жодної з {0} адрес. Використовуйте IP:порт, наприклад 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Виберіть торрент</value>
   </data>
@@ -297,6 +381,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Дозволяє іншим вузлам DHT запитувати, для яких торрентів вам відомі піри — саме так пошукові індекси знаходять нові торренти. Ту саму інформацію можна отримати, запитавши, хто має конкретний торрент, тож вимкнення приховує небагато. Потребує DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Дозволяти кілька з'єднань з однієї IP-адреси</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Зберігає пірів, які мають спільну адресу, як у мобільних та університетських мережах, де багато абонентів виходять через одну. Якщо вимкнути, з адреси приймається лише одне з'єднання, а пір, що перепідключився з нового порту, буде відхилений, а не впізнаний.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Увімкнути NAT-PMP</value>
@@ -429,6 +519,9 @@
   </data>
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Отримання метаданих</value>
+  </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Розмір</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>ETA</value>
@@ -768,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Виберіть папку даних сеансу</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>Прибрати {0} завантажень зі списку?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Видалити торрент</value>

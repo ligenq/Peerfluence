@@ -1,5 +1,8 @@
 using System.IO.Abstractions;
+using System.Net;
 using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core;
+using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -25,6 +28,9 @@ public class DetailsViewModelTests
         var store = Substitute.For<IAppSettingsStore>();
         var paths = new AppPaths();
         var settingsService = new AppSettingsService(paths, store, new FileSystem());
+        // The pane is closed by default and does no work while it is; these tests are about what it
+        // does when someone is looking at it.
+        settingsService.Current.ShowDetailsPane = true;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
         var engineService = new TorrentEngineService(settingsService, loggerFactory);
         _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>());
@@ -235,5 +241,104 @@ public class DetailsViewModelTests
         Assert.Equal(torrent.Hash.ToString(), _sut.InfoHash);
         Assert.True(_sut.ApplyTorrentSettingsCommand.CanExecute(null));
         Assert.True(_sut.SaveResumeDataCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task AlertForAnotherTorrent_LeavesTheSelectedTorrentsDetailsAlone()
+    {
+        // Two ordinary V1 torrents. Both carry an empty V2 hash, so identity cannot be decided by
+        // comparing hashes that are not there: doing so makes every V1 torrent match every other,
+        // and the pane redraws itself from whichever one last raised an alert.
+        var selected = CreateRefreshableTorrent("Selected", 1);
+        var other = CreateRefreshableTorrent("Other", 2);
+
+        _selectionService.SelectedTorrent = selected;
+        _sut.RefreshFromSelection();
+        await WaitForNameAsync("Selected");
+
+        WeakReferenceMessenger.Default.Send(
+            new TorrentAlertMessage(other, new SimpleTorrentAlert { Id = AlertId.ProgressChanged, Torrent = other }));
+        await Task.Delay(500);
+
+        Assert.Equal("Selected", _sut.Name);
+    }
+
+    private static ITorrent CreateRefreshableTorrent(string name, byte hashSeed)
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Name.Returns(name);
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat(hashSeed, 20).ToArray()));
+        torrent.HashV2.Returns(InfoHash.EmptyV2);
+        torrent.State.Returns(TorrentState.Active);
+
+        var files = Substitute.For<IFiles>();
+        files.DownloadPath.Returns("C:\\Downloads");
+        torrent.Files.Returns(files);
+        torrent.Peers.Returns(Substitute.For<IPeers>());
+        torrent.Trackers.Returns(Substitute.For<ITrackers>());
+
+        return torrent;
+    }
+
+    private async Task WaitForNameAsync(string expected)
+    {
+        for (var attempt = 0; attempt < 50 && _sut.Name != expected; attempt++)
+        {
+            await Task.Delay(20);
+        }
+
+        Assert.Equal(expected, _sut.Name);
+    }
+
+    [Fact]
+    public void AddPeers_OffersEveryAddressItCanRead_AndClearsTheBox()
+    {
+        var peers = SelectTorrentWithPeers();
+
+        _sut.NewPeerAddresses = "192.168.1.10:51413, [::1]:6881\n10.0.0.5:6889";
+        _sut.AddPeersCommand.Execute(null);
+
+        peers.Received(1).Add(Arg.Is<IEnumerable<IPEndPoint>>(endPoints =>
+            endPoints.Select(endPoint => endPoint.ToString()).SequenceEqual(
+                new[] { "192.168.1.10:51413", "[::1]:6881", "10.0.0.5:6889" })));
+        Assert.Equal(string.Empty, _sut.NewPeerAddresses);
+    }
+
+    [Fact]
+    public void AddPeers_OffersNothingWhenNoAddressCanBeRead()
+    {
+        var peers = SelectTorrentWithPeers();
+
+        // A bare address names no port, and a hostname is not something the engine can dial.
+        _sut.NewPeerAddresses = "192.168.1.10 seedbox.example:6881";
+        _sut.AddPeersCommand.Execute(null);
+
+        peers.DidNotReceive().Add(Arg.Any<IEnumerable<IPEndPoint>>());
+        Assert.Equal("192.168.1.10 seedbox.example:6881", _sut.NewPeerAddresses);
+        _notificationService.Received(1).Publish(
+            Arg.Is<NotificationItem>(item => item.Type == NotificationType.Warning),
+            Arg.Any<TimeSpan?>());
+    }
+
+    [Fact]
+    public void AddPeersCommand_IsDisabledWithoutAnAddress()
+    {
+        SelectTorrentWithPeers();
+
+        Assert.False(_sut.AddPeersCommand.CanExecute(null));
+
+        _sut.NewPeerAddresses = "192.168.1.10:51413";
+
+        Assert.True(_sut.AddPeersCommand.CanExecute(null));
+    }
+
+    private IPeers SelectTorrentWithPeers()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        var peers = Substitute.For<IPeers>();
+        torrent.Peers.Returns(peers);
+        _selectionService.SelectedTorrent = torrent;
+        return peers;
     }
 }

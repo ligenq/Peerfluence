@@ -119,6 +119,7 @@ public sealed class TorrentEngineService : ITorrentEngineService
                 UdpPort = GetListeningPort(settings.Network),
                 NatPmpPortMapping = settings.Network.EnableNatPmp,
                 UpnpPortMapping = settings.Network.EnableUpnp,
+                AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp,
                 Encryption = ParseEncryption(settings.EncryptionMode)
             },
             Session = new SessionSettings

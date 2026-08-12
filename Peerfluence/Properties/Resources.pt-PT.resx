@@ -106,6 +106,78 @@
   <data name="Downloads_Stop" xml:space="preserve">
     <value>Parar</value>
   </data>
+  <data name="Downloads_ToggleDetails" xml:space="preserve">
+    <value>Mostrar ou ocultar o painel de detalhes</value>
+  </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>A área de transferência não está disponível neste momento.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Não foi possível copiar para a área de transferência: {0}</value>
+  </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Adicione um ficheiro .torrent ou cole uma ligação magnet para começar a transferir.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Pausar ou retomar</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Mudar para avançado</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Bem-vindo ao Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Quanto quer ver? Pode mudar isto a qualquer momento nas definições.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Simples</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Apenas transferir: adicione um ficheiro ou uma ligação, veja-o chegar, abra a pasta. Nada mais pelo meio.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Avançado</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Tudo: rastreadores, pares, peças, seleção de ficheiros, fila, limites de velocidade e o resto.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Sem certezas? Comece pelo simples. Mudar custa um clique.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Procurar nas transferências</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Todas</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>A transferir</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>A partilhar</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Concluídas</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Nenhuma transferência corresponde à sua procura.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Simples reduz a janela a um único ecrã: adicionar, ver, abrir. Avançado acrescenta o painel, a área de detalhes e todas as definições.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Simples</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Avançado</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>As alterações são guardadas à medida que as faz.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Remover</value>
   </data>
@@ -274,6 +346,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Progresso</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Endereço de par, p. ex. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Adicionar pares</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} de {1} endereços aceites como candidatos a par.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Não foi possível ler nenhum dos {0} endereços. Use IP:porta, por exemplo 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Selecione um torrent</value>
   </data>
@@ -297,6 +381,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Permite que outros nós DHT perguntem para que torrents conhece pares, que é como os índices de pesquisa descobrem torrents. A mesma informação já pode ser obtida perguntando quem tem um torrent específico, pelo que desativar isto esconde pouco. Requer DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Permitir várias ligações por endereço IP</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Mantém os pares que partilham um endereço, como nas redes móveis e universitárias em que muitos assinantes saem pelo mesmo. Se desativar, só é admitida uma ligação por endereço e um par que se volta a ligar a partir de uma porta nova é recusado em vez de reconhecido.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>Habilitar NAT-PMP</value>
@@ -429,6 +519,9 @@
   </data>
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Buscando metadados</value>
+  </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Tamanho</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>Tempo rest.</value>
@@ -768,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Selecione a pasta de dados da sessão</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>Remover {0} transferências da lista?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Remover torrent</value>

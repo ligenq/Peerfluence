@@ -41,6 +41,7 @@ public sealed class TorrentListItemViewModel : ViewModelBase
             if (SetProperty(ref field, value))
             {
                 OnPropertyChanged(nameof(ProgressPercent));
+                OnPropertyChanged(nameof(IsComplete));
             }
         }
     }
@@ -95,10 +96,29 @@ public sealed class TorrentListItemViewModel : ViewModelBase
         set => SetProperty(ref field, value);
     } = string.Empty;
 
+    /// <summary>
+    /// What this row can do, so its context menu can bind to the commands directly instead of
+    /// walking a visual tree it is not part of. Null only in tests that build a row on its own.
+    /// </summary>
+    public ITorrentRowActions? Actions { get; internal set; }
+
+    /// <summary>
+    /// Whether the torrent is running, so a row can offer the one action that makes sense for it
+    /// rather than a pair of buttons of which one is always dead.
+    /// </summary>
+    public bool IsRunning
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    public bool IsComplete => Progress >= 1f;
+
     public void UpdateFrom(ITorrent torrent)
     {
         Name = torrent.Name;
         Progress = torrent.Progress;
+        IsRunning = torrent.Started;
         State = torrent.State.ToDisplayString();
         TotalSizeBytes = torrent.TotalSize;
         DataLeftBytes = torrent.DataLeft;

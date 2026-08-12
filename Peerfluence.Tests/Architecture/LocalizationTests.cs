@@ -83,6 +83,37 @@ public class LocalizationTests
     [InlineData("TrackerStatus_Disabled")]
     [InlineData("Settings_AnswerInfoHashSampling")]
     [InlineData("Settings_AnswerInfoHashSamplingHint")]
+    [InlineData("Settings_AllowMultipleConnectionsPerIp")]
+    [InlineData("Settings_AllowMultipleConnectionsPerIpHint")]
+    [InlineData("Details_Peers_AddWatermark")]
+    [InlineData("Details_Peers_AddTitle")]
+    [InlineData("Details_Peers_AddAccepted")]
+    [InlineData("Details_Peers_AddRejected")]
+    [InlineData("Downloads_ToggleDetails")]
+    [InlineData("Downloads_ClipboardUnavailable")]
+    [InlineData("Downloads_CopyFailed")]
+    [InlineData("Simple_EmptyBody")]
+    [InlineData("Simple_PauseResume")]
+    [InlineData("Simple_SwitchToAdvanced")]
+    [InlineData("Welcome_Title")]
+    [InlineData("Welcome_Subtitle")]
+    // Welcome_Simple_Title and Settings_InterfaceMode are deliberately absent: "Simple" and
+    // "Interface" are the same word in French, so this guard cannot tell a real translation from a
+    // missing one. Their presence is still covered by EveryShippedLanguage_TranslatesEveryString.
+    [InlineData("Welcome_Simple_Body")]
+    [InlineData("Welcome_Advanced_Title")]
+    [InlineData("Welcome_Advanced_Body")]
+    [InlineData("Welcome_Footnote")]
+    [InlineData("Downloads_Search")]
+    [InlineData("Downloads_Filter_All")]
+    [InlineData("Downloads_Filter_Downloading")]
+    [InlineData("Downloads_Filter_Seeding")]
+    [InlineData("Downloads_Filter_Completed")]
+    [InlineData("Downloads_NoMatches")]
+    [InlineData("Downloads_Grid_Size")]
+    [InlineData("Downloads_Remove_Confirm_Many")]
+    [InlineData("Settings_InterfaceModeHint")]
+    [InlineData("Settings_SavedAutomatically")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

@@ -106,6 +106,78 @@
   <data name="Downloads_Stop" xml:space="preserve">
     <value>Stoppen</value>
   </data>
+  <data name="Downloads_ToggleDetails" xml:space="preserve">
+    <value>Detailbereich ein- oder ausblenden</value>
+  </data>
+  <data name="Downloads_ClipboardUnavailable" xml:space="preserve">
+    <value>Die Zwischenablage ist derzeit nicht verfügbar.</value>
+  </data>
+  <data name="Downloads_CopyFailed" xml:space="preserve">
+    <value>Kopieren in die Zwischenablage nicht möglich: {0}</value>
+  </data>
+  <data name="Simple_EmptyBody" xml:space="preserve">
+    <value>Fügen Sie eine .torrent-Datei hinzu oder fügen Sie einen Magnet-Link ein, um den Download zu starten.</value>
+  </data>
+  <data name="Simple_PauseResume" xml:space="preserve">
+    <value>Anhalten oder fortsetzen</value>
+  </data>
+  <data name="Simple_SwitchToAdvanced" xml:space="preserve">
+    <value>Zu erweitert wechseln</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Willkommen bei Peerfluence</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Wie viel möchten Sie sehen? Sie können dies jederzeit in den Einstellungen ändern.</value>
+  </data>
+  <data name="Welcome_Simple_Title" xml:space="preserve">
+    <value>Einfach</value>
+  </data>
+  <data name="Welcome_Simple_Body" xml:space="preserve">
+    <value>Nur Herunterladen: Datei oder Link hinzufügen, beim Ankommen zusehen, Ordner öffnen. Sonst nichts im Weg.</value>
+  </data>
+  <data name="Welcome_Advanced_Title" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="Welcome_Advanced_Body" xml:space="preserve">
+    <value>Alles: Tracker, Peers, Teile, Dateiauswahl, Warteschlange, Geschwindigkeitsgrenzen und der Rest.</value>
+  </data>
+  <data name="Welcome_Footnote" xml:space="preserve">
+    <value>Unsicher? Fangen Sie einfach an. Das Wechseln kostet einen Klick.</value>
+  </data>
+  <data name="Downloads_Search" xml:space="preserve">
+    <value>Downloads durchsuchen</value>
+  </data>
+  <data name="Downloads_Filter_All" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="Downloads_Filter_Downloading" xml:space="preserve">
+    <value>Wird heruntergeladen</value>
+  </data>
+  <data name="Downloads_Filter_Seeding" xml:space="preserve">
+    <value>Wird verteilt</value>
+  </data>
+  <data name="Downloads_Filter_Completed" xml:space="preserve">
+    <value>Abgeschlossen</value>
+  </data>
+  <data name="Downloads_NoMatches" xml:space="preserve">
+    <value>Keine Downloads entsprechen Ihrer Suche.</value>
+  </data>
+  <data name="Settings_InterfaceMode" xml:space="preserve">
+    <value>Oberfläche</value>
+  </data>
+  <data name="Settings_InterfaceModeHint" xml:space="preserve">
+    <value>Einfach beschränkt das Fenster auf einen Bildschirm: hinzufügen, ansehen, öffnen. Erweitert ergänzt das Dashboard, den Detailbereich und alle Einstellungen.</value>
+  </data>
+  <data name="Settings_InterfaceMode_Simple" xml:space="preserve">
+    <value>Einfach</value>
+  </data>
+  <data name="Settings_InterfaceMode_Advanced" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="Settings_SavedAutomatically" xml:space="preserve">
+    <value>Änderungen werden beim Vornehmen gespeichert.</value>
+  </data>
   <data name="Downloads_Remove" xml:space="preserve">
     <value>Entfernen</value>
   </data>
@@ -274,6 +346,18 @@
   <data name="Details_Peers_Progress" xml:space="preserve">
     <value>Fortschritt</value>
   </data>
+  <data name="Details_Peers_AddWatermark" xml:space="preserve">
+    <value>Peer-Adresse, z. B. 192.168.1.10:51413</value>
+  </data>
+  <data name="Details_Peers_AddTitle" xml:space="preserve">
+    <value>Peers hinzufügen</value>
+  </data>
+  <data name="Details_Peers_AddAccepted" xml:space="preserve">
+    <value>{0} von {1} Adressen als Peer-Kandidaten übernommen.</value>
+  </data>
+  <data name="Details_Peers_AddRejected" xml:space="preserve">
+    <value>Keine der {0} Adressen konnte gelesen werden. Verwenden Sie IP:Port, zum Beispiel 192.168.1.10:51413.</value>
+  </data>
   <data name="Details_SelectTorrent" xml:space="preserve">
     <value>Wählen Sie einen Torrent aus</value>
   </data>
@@ -297,6 +381,12 @@
   </data>
   <data name="Settings_AnswerInfoHashSamplingHint" xml:space="preserve">
     <value>Erlaubt anderen DHT-Knoten zu fragen, für welche Torrents Sie Peers kennen – so finden Suchindizes neue Torrents. Dieselbe Information lässt sich ohnehin abrufen, indem gezielt nach einem bestimmten Torrent gefragt wird; Deaktivieren verbirgt also wenig. Erfordert DHT.</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIp" xml:space="preserve">
+    <value>Mehrere Verbindungen pro IP-Adresse zulassen</value>
+  </data>
+  <data name="Settings_AllowMultipleConnectionsPerIpHint" xml:space="preserve">
+    <value>Behält Peers, die sich eine Adresse teilen, wie in Mobilfunk- und Campusnetzen, hinter denen viele Teilnehmer dieselbe Adresse nutzen. Ausgeschaltet wird nur eine Verbindung je Adresse zugelassen, und ein Peer, der sich über einen neuen Port neu verbindet, wird abgewiesen statt wiedererkannt.</value>
   </data>
   <data name="Settings_EnableNatPmp" xml:space="preserve">
     <value>NAT-PMP aktivieren</value>
@@ -429,6 +519,9 @@
   </data>
   <data name="Status_FetchingMetadata" xml:space="preserve">
     <value>Metadaten abrufen</value>
+  </data>
+  <data name="Downloads_Grid_Size" xml:space="preserve">
+    <value>Größe</value>
   </data>
   <data name="Downloads_Grid_Eta" xml:space="preserve">
     <value>Restzeit</value>
@@ -768,6 +861,9 @@
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
     <value>Wählen Sie den Sitzungsdatenordner aus</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
+    <value>{0} Downloads aus der Liste entfernen?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Torrent entfernen</value>

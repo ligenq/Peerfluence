@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
@@ -40,7 +40,8 @@ public class DownloadsViewTests
 
         var dataGrid = view.GetLogicalDescendants().OfType<DataGrid>().FirstOrDefault();
         Assert.NotNull(dataGrid);
-        Assert.Same(vm.Torrents, dataGrid.ItemsSource);
+        // The grid shows what search and the filter left, not the whole set.
+        Assert.Same(vm.VisibleTorrents, dataGrid.ItemsSource);
     }
 
     [AvaloniaFact]
@@ -50,8 +51,8 @@ public class DownloadsViewTests
 
         var dataGrid = view.GetLogicalDescendants().OfType<DataGrid>().FirstOrDefault();
         Assert.NotNull(dataGrid);
-        // Name, Progress, State, ETA, Down, Up, Peers
-        Assert.Equal(7, dataGrid.Columns.Count);
+        // Name, Progress, Size, State, ETA, Down, Up, Peers
+        Assert.Equal(8, dataGrid.Columns.Count);
     }
 
     [AvaloniaFact]
@@ -59,8 +60,10 @@ public class DownloadsViewTests
     {
         var (view, _) = CreateView();
 
+        // The search box is the only text box on this screen; the inline magnet field is long gone.
         var textBoxes = view.GetLogicalDescendants().OfType<TextBox>().ToList();
-        Assert.Empty(textBoxes);
+        var textBox = Assert.Single(textBoxes);
+        Assert.Equal(Peerfluence.Properties.Resources.Downloads_Search, textBox.PlaceholderText);
     }
 
     [AvaloniaFact]
@@ -129,22 +132,65 @@ public class DownloadsViewTests
     }
 
     [AvaloniaFact]
-    public void DetailPane_VisibleWhenTorrentSelected()
+    public void DetailPane_StaysClosedWhenATorrentIsSelected()
     {
+        // Selecting a torrent no longer opens the pane; the toggle is what decides.
         var (view, vm) = CreateView();
 
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Test Torrent");
         torrent.Hash.Returns(new PeerSharp.Core.InfoHash(new byte[20]));
-        var torrentVm = new TorrentListItemViewModel(torrent);
+        vm.SelectedTorrent = new TorrentListItemViewModel(torrent);
 
-        vm.SelectedTorrent = torrentVm;
-
+        Assert.False(vm.IsDetailsPaneVisible);
         var splitter = view.GetLogicalDescendants().OfType<GridSplitter>().FirstOrDefault();
-        if (splitter != null)
-        {
-            Assert.True(splitter.IsVisible);
-        }
+        Assert.False(splitter?.IsVisible ?? false);
+    }
+
+    [AvaloniaFact]
+    public void DetailPane_ClosedByDefault_LeavesItsRowsWithNoHeight()
+    {
+        // The bug this guards: a hidden control in a star-sized row still reserves its share, so the
+        // list stopped halfway down the window with nothing underneath it.
+        var (view, vm) = CreateView();
+
+        Assert.False(vm.IsDetailsPaneVisible);
+
+        var rows = ContentGrid(view).RowDefinitions;
+        Assert.Equal(0, rows[5].Height.Value);
+        Assert.Equal(0, rows[6].Height.Value);
+    }
+
+    [AvaloniaFact]
+    public void TogglingTheDetailPane_GivesItsRowsHeightBackAndRemembersTheChoice()
+    {
+        var settingsService = new AppSettingsService(new AppPaths(), Substitute.For<IAppSettingsStore>(), new System.IO.Abstractions.FileSystem());
+        var vm = TestHelpers.CreateDownloadsViewModel(
+            settingsService: settingsService,
+            detailsViewModel: TestHelpers.CreateDetailsViewModel());
+        var view = new DownloadsView { DataContext = vm };
+        var window = new Window { Content = view, Width = 1200, Height = 800 };
+        window.ApplyTemplate();
+        window.Presenter!.ApplyTemplate();
+
+        vm.ToggleDetailsPaneCommand.Execute(null);
+
+        Assert.True(vm.IsDetailsPaneVisible);
+        Assert.True(settingsService.Current.ShowDetailsPane);
+        var rows = ContentGrid(view).RowDefinitions;
+        Assert.True(rows[6].Height.IsStar);
+        Assert.True(rows[5].Height.Value > 0);
+
+        vm.ToggleDetailsPaneCommand.Execute(null);
+
+        Assert.False(vm.IsDetailsPaneVisible);
+        Assert.False(settingsService.Current.ShowDetailsPane);
+        Assert.Equal(0, ContentGrid(view).RowDefinitions[6].Height.Value);
+    }
+
+    private static Grid ContentGrid(DownloadsView view)
+    {
+        return view.GetLogicalDescendants().OfType<Grid>().First(grid => grid.Name == "ContentGrid");
     }
 
     [AvaloniaFact]

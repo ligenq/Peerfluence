@@ -8,16 +8,12 @@ namespace Peerfluence.Services;
 public sealed class TorrentAlertsHostedService : IHostedService
 {
     private readonly ITorrentService _torrentService;
-    private readonly ITransientTorrentTracker _transientTorrentTracker;
     private CancellationTokenSource? _cancellationTokenSource;
     private Task? _monitorTask;
 
-    public TorrentAlertsHostedService(
-        ITorrentService torrentService,
-        ITransientTorrentTracker transientTorrentTracker)
+    public TorrentAlertsHostedService(ITorrentService torrentService)
     {
         _torrentService = torrentService;
-        _transientTorrentTracker = transientTorrentTracker;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -68,15 +64,6 @@ public sealed class TorrentAlertsHostedService : IHostedService
         {
             await foreach (var alert in _torrentService.GetAlertsAsync(cancellationToken: cancellationToken).ConfigureAwait(false))
             {
-                // Torrents the engine added only to read a magnet's metadata are removed again
-                // moments later. Publishing their lifecycle would put a row in the downloads list,
-                // raise a "metadata ready" notification and rewrite a download path, all for a
-                // torrent the user never asked for.
-                if (_transientTorrentTracker.ShouldSuppress(alert))
-                {
-                    continue;
-                }
-
                 _torrentService.PublishAlert(alert, cancellationToken);
             }
         }

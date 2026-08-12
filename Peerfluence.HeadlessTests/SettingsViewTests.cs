@@ -144,6 +144,48 @@ public class SettingsViewTests
     }
 
     [AvaloniaFact]
+    public void ThereIsNoSaveButton_BecauseChangesApplyThemselves()
+    {
+        var (view, vm) = CreateView();
+
+        var buttons = view.GetLogicalDescendants().OfType<Button>().ToList();
+        Assert.DoesNotContain(buttons, button => ReferenceEquals(button.Command, vm.SaveCommand));
+        // Reset stays: undoing everything is still worth an explicit action.
+        Assert.Contains(buttons, button => ReferenceEquals(button.Command, vm.ResetDefaultsCommand));
+    }
+
+    [AvaloniaFact]
+    public void TheInterfaceModeIsOfferedHere_SoAdvancedModeHasAWayBack()
+    {
+        var (view, vm) = CreateView();
+
+        var modeChoices = view.GetLogicalDescendants()
+            .OfType<RadioButton>()
+            .Where(radio => ReferenceEquals(radio.Command, vm.SetInterfaceModeCommand))
+            .ToList();
+
+        Assert.Equal(2, modeChoices.Count);
+    }
+
+    [AvaloniaFact]
+    public void SimpleMode_ShowsOnlyTheTabsItNeeds()
+    {
+        var interfaceModeService = Substitute.For<Peerfluence.Core.Services.IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+        var vm = TestHelpers.CreateSettingsViewModel(interfaceModeService);
+        var view = new SettingsView { DataContext = vm };
+        var window = new Window { Content = view, Width = 1200, Height = 800 };
+        window.ApplyTemplate();
+        window.Presenter!.ApplyTemplate();
+
+        var tabs = view.FindControl<TabControl>("SettingsTabs")!;
+        var visible = tabs.Items.Cast<TabItem>().Where(tab => tab.IsVisible).ToList();
+
+        // Appearance and Storage: where downloads go, and how the app looks.
+        Assert.Equal(2, visible.Count);
+    }
+
+    [AvaloniaFact]
     public void StatusInfoBar_ReflectsStatusMessage()
     {
         var (view, vm) = CreateView();
