@@ -1514,6 +1514,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove {0} downloads from the list?.
+        /// </summary>
+        public static string Downloads_Remove_Confirm_Many {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_Confirm_Many", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove Torrent.
         /// </summary>
         public static string Downloads_Remove_Confirm_Title {

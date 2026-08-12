@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia;
@@ -76,6 +77,9 @@ public partial class DownloadsView : UserControl
         }
 
         viewModel.SelectedTorrent = dataGrid.SelectedItem as TorrentListItemViewModel;
+
+        // SelectedItems has no bindable form on DataGrid, so the view hands the selection over.
+        viewModel.SetSelectedTorrents(dataGrid.SelectedItems.OfType<TorrentListItemViewModel>());
     }
 
     private void TorrentDataGrid_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -86,10 +90,21 @@ public partial class DownloadsView : UserControl
         }
 
         var torrent = TryGetTorrentFromEventSource(e.Source);
-        if (torrent != null)
+        if (torrent == null)
+        {
+            return;
+        }
+
+        // Right-clicking inside an existing selection keeps it, as everywhere else in Windows;
+        // collapsing to the row under the pointer would throw away what the user just picked out.
+        if (viewModel.SelectedTorrents.Contains(torrent))
         {
             viewModel.SelectedTorrent = torrent;
+            return;
         }
+
+        viewModel.SelectedTorrent = torrent;
+        viewModel.SetSelectedTorrents([torrent]);
     }
 
     private void DownloadsStatusInfoBar_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

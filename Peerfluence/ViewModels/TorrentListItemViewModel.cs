@@ -97,6 +97,12 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     } = string.Empty;
 
     /// <summary>
+    /// What this row can do, so its context menu can bind to the commands directly instead of
+    /// walking a visual tree it is not part of. Null only in tests that build a row on its own.
+    /// </summary>
+    public ITorrentRowActions? Actions { get; internal set; }
+
+    /// <summary>
     /// Whether the torrent is running, so a row can offer the one action that makes sense for it
     /// rather than a pair of buttons of which one is always dead.
     /// </summary>

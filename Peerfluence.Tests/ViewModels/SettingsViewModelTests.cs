@@ -1,6 +1,8 @@
 ﻿using System.IO.Abstractions;
 using System.Globalization;
+using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Config;
+using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -406,6 +408,47 @@ public class SettingsViewModelTests
         await Task.Delay(700, TestContext.Current.CancellationToken);
 
         await store.DidNotReceive().SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public void AModeChangeMadeElsewhere_MovesTheButtonsHereToo()
+    {
+        // Simple mode has its own "switch to advanced" link. Answering it used to leave these
+        // buttons showing the mode that had just been left behind.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+        var sut = Create(_settingsService, interfaceModeService);
+        Assert.True(sut.IsSimpleMode);
+
+        WeakReferenceMessenger.Default.Send(new InterfaceModeChangedMessage(InterfaceMode.Advanced));
+
+        Assert.False(sut.IsSimpleMode);
+        Assert.True(sut.IsAdvancedMode);
+    }
+
+    [Fact]
+    public async Task ChoosingAMode_ShowsItBeforeWaitingOnTheSave()
+    {
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        var saveStarted = new TaskCompletionSource();
+        var releaseSave = new TaskCompletionSource();
+        interfaceModeService
+            .SetAsync(Arg.Any<InterfaceMode>(), Arg.Any<CancellationToken>())
+            .Returns(async _ =>
+            {
+                saveStarted.TrySetResult();
+                await releaseSave.Task;
+            });
+
+        var sut = Create(_settingsService, interfaceModeService);
+        var switching = sut.SetInterfaceModeCommand.ExecuteAsync(InterfaceMode.Simple);
+        await saveStarted.Task;
+
+        // Still mid-save, and the interface has already moved.
+        Assert.True(sut.IsSimpleMode);
+
+        releaseSave.TrySetResult();
+        await switching;
     }
 
     [Fact]

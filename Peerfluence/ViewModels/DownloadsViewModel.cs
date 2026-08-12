@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -24,7 +24,7 @@ using Peerfluence.Properties;
 namespace Peerfluence.ViewModels;
 
 [SingletonService]
-public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisposable
+public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorrentRowActions, IDisposable
 {
     private static readonly TimeSpan StatusAutoClearDelay = TimeSpan.FromSeconds(4);
     private readonly Dictionary<string, TorrentListItemViewModel> _torrentLookup = new();
@@ -185,6 +185,46 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
     } = TorrentFilter.All;
 
     public ObservableCollection<TorrentListItemViewModel> VisibleTorrents { get; } = new();
+
+    /// <summary>
+    /// Every row the user has selected, which is not always one.
+    ///
+    /// <para>
+    /// <see cref="SelectedTorrent"/> stays the focused row, because the details pane and the copy
+    /// commands are about a single torrent. Start, stop and remove act on all of these instead:
+    /// stopping fifty torrents one at a time is not a thing to ask of anyone.
+    /// </para>
+    /// </summary>
+    public IReadOnlyList<TorrentListItemViewModel> SelectedTorrents
+    {
+        get;
+        private set
+        {
+            field = value;
+            StartSelectedCommand.NotifyCanExecuteChanged();
+            StopSelectedCommand.NotifyCanExecuteChanged();
+            RemoveSelectedCommand.NotifyCanExecuteChanged();
+        }
+    } = [];
+
+    /// <summary>
+    /// Called by the view as the grid's selection changes. Falls back to the focused row so every
+    /// caller that only ever sets <see cref="SelectedTorrent"/> keeps working.
+    /// </summary>
+    internal void SetSelectedTorrents(IEnumerable<TorrentListItemViewModel> selection)
+    {
+        SelectedTorrents = selection.ToList();
+    }
+
+    private IReadOnlyList<TorrentListItemViewModel> SelectionOrFocused()
+    {
+        if (SelectedTorrents.Count > 0)
+        {
+            return SelectedTorrents;
+        }
+
+        return SelectedTorrent == null ? [] : [SelectedTorrent];
+    }
 
     /// <summary>
     /// True when there are torrents but the search or filter has hidden all of them - a different
@@ -400,19 +440,21 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
         }
     }
 
+    // Enabled when any of the selection can be acted on, not when all of it can: selecting a mix
+    // of running and stopped torrents and pressing Start should start the stopped ones.
     private bool CanStartSelected()
     {
-        return SelectedTorrent is { Torrent.State: TorrentState.Stopped };
+        return SelectionOrFocused().Any(item => item.Torrent.State == TorrentState.Stopped);
     }
 
     private bool CanStopSelected()
     {
-        return SelectedTorrent is { Torrent.Started: true };
+        return SelectionOrFocused().Any(item => item.Torrent.Started);
     }
 
     private bool CanRemoveSelected()
     {
-        return SelectedTorrent is not null;
+        return SelectionOrFocused().Count > 0;
     }
 
     private void LoadExistingTorrents()
@@ -639,29 +681,70 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
 
     private async Task StartSelectedAsync()
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        foreach (var item in SelectionOrFocused().Where(item => item.Torrent.State == TorrentState.Stopped))
         {
-            return;
+            await TorrentService.StartAsync(item.Torrent);
         }
-
-        await TorrentService.StartAsync(selected.Torrent);
     }
 
     private async Task StopSelectedAsync()
     {
-        var selected = SelectedTorrent;
-        if (selected == null)
+        foreach (var item in SelectionOrFocused().Where(item => item.Torrent.Started))
+        {
+            await TorrentService.StopAsync(item.Torrent);
+        }
+    }
+
+    /// <summary>
+    /// Removes everything selected. One torrent gets the usual dialog naming it; several are
+    /// confirmed once, together, rather than asking the same question over and over.
+    /// </summary>
+    private async Task RemoveSelectedAsync()
+    {
+        var selection = SelectionOrFocused();
+        if (selection.Count <= 1)
+        {
+            await RemoveTorrentAsync(selection.FirstOrDefault());
+            return;
+        }
+
+        var removeAction = GetDefaultRemoveAction();
+        if (_settingsService.Current.ShowRemoveTorrentOptions
+            && !await ConfirmRemoveManyAsync(selection.Count))
         {
             return;
         }
 
-        await TorrentService.StopAsync(selected.Torrent);
+        foreach (var item in selection)
+        {
+            await _torrentService.RemoveAsync(item.Torrent, ToRemoveOptions(removeAction));
+        }
     }
 
-    private Task RemoveSelectedAsync()
+    private async Task<bool> ConfirmRemoveManyAsync(int count)
     {
-        return RemoveTorrentAsync(SelectedTorrent);
+        if (SukiDialogManager == null)
+        {
+            return true;
+        }
+
+        var confirmed = new TaskCompletionSource<bool>();
+        await SukiDialogManager
+            .CreateDialog()
+            .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
+            .WithTitle(Resources.Downloads_Remove_Confirm_Title)
+            .WithContent(new Avalonia.Controls.TextBlock
+            {
+                Text = string.Format(Resources.Downloads_Remove_Confirm_Many, count),
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            })
+            .Dismiss().ByClickingBackground()
+            .OnDismissed(_ => confirmed.TrySetResult(false))
+            .WithActionButton(Resources.Common_Cancel, _ => confirmed.TrySetResult(false), true)
+            .WithActionButton(Resources.Downloads_Remove, _ => confirmed.TrySetResult(true), true, "Flat")
+            .TryShowAsync();
+
+        return confirmed.Task.IsCompletedSuccessfully && confirmed.Task.Result;
     }
 
     private async Task RemoveTorrentAsync(TorrentListItemViewModel? item)
@@ -1014,7 +1097,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, IDisp
             return;
         }
 
-        var viewModel = new TorrentListItemViewModel(torrent);
+        var viewModel = new TorrentListItemViewModel(torrent) { Actions = this };
         _torrentLookup[key] = viewModel;
         Torrents.Add(viewModel);
     }

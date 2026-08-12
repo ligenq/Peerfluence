@@ -51,8 +51,8 @@ public class DownloadsViewTests
 
         var dataGrid = view.GetLogicalDescendants().OfType<DataGrid>().FirstOrDefault();
         Assert.NotNull(dataGrid);
-        // Name, Progress, State, ETA, Down, Up, Peers
-        Assert.Equal(7, dataGrid.Columns.Count);
+        // Name, Progress, Size, State, ETA, Down, Up, Peers
+        Assert.Equal(8, dataGrid.Columns.Count);
     }
 
     [AvaloniaFact]

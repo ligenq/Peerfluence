@@ -142,9 +142,16 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     private async Task ChooseModeAsync(InterfaceMode mode)
     {
-        await _interfaceModeService.SetAsync(mode);
+        // Switch first, persist after: the write is a file, and waiting on it before redrawing is
+        // what made the change feel like a freeze.
         IsSimpleMode = mode == InterfaceMode.Simple;
         IsWelcomeVisible = false;
+
+        // Leaving settings open across a switch would drop the user somewhere they did not ask to
+        // be - the advanced shell has its own way to settings.
+        IsSimpleSettingsOpen = false;
+
+        await _interfaceModeService.SetAsync(mode);
     }
 
     public ObservableCollection<NavigationItem> NavigationItems { get; }

@@ -6,7 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Config;
+using Peerfluence.Core.Messaging;
 
 namespace Peerfluence.ViewModels;
 
@@ -71,6 +73,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
         SetInterfaceModeCommand = new AsyncRelayCommand<InterfaceMode>(SetInterfaceModeAsync);
 
+        WeakReferenceMessenger.Default.Register<InterfaceModeChangedMessage>(this, (_, msg) => ApplyInterfaceMode(msg.Mode));
+
         PropertyChanged += OnSettingChanged;
     }
 
@@ -83,7 +87,23 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private async Task SetInterfaceModeAsync(InterfaceMode mode)
     {
+        // Shown before saved. Persisting means writing a file, and making the interface wait on
+        // that is what made switching feel like a stall.
+        ApplyInterfaceMode(mode);
         await _interfaceModeService.SetAsync(mode);
+    }
+
+    /// <summary>
+    /// Brings the two mode buttons in line with the mode actually in force.
+    ///
+    /// <para>
+    /// Needed because this screen is not the only way to change it: simple mode has its own
+    /// "switch to advanced" link, and answering it left the buttons here showing the mode that had
+    /// just been left behind.
+    /// </para>
+    /// </summary>
+    private void ApplyInterfaceMode(InterfaceMode mode)
+    {
         IsSimpleMode = mode == InterfaceMode.Simple;
         OnPropertyChanged(nameof(IsAdvancedMode));
     }
