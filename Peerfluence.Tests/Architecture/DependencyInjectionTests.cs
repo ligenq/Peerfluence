@@ -71,6 +71,7 @@ public class DependencyInjectionTests
         Assert.NotNull(provider.GetRequiredService<IAppSettingsService>());
         Assert.NotNull(provider.GetRequiredService<ITorrentEngineService>());
         Assert.NotNull(provider.GetRequiredService<ITorrentService>());
+        Assert.NotNull(provider.GetRequiredService<ITorrentSearchService>());
         Assert.NotNull(provider.GetRequiredService<IMcpToolHandler>());
         Assert.NotNull(provider.GetRequiredService<IMcpResourceHandler>());
         Assert.NotNull(provider.GetRequiredService<IUiAgentToolHandler>());

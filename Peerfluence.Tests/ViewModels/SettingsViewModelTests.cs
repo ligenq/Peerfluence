@@ -45,7 +45,8 @@ public class SettingsViewModelTests
             _engineService,
             updateService,
             _windowsAssociationService,
-            Substitute.For<IInterfaceModeService>());
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<ITorrentSearchService>());
     }
 
     [Fact]
@@ -610,7 +611,8 @@ public class SettingsViewModelTests
     private SettingsViewModel Create(
         IAppSettingsService settingsService,
         IInterfaceModeService? interfaceModeService = null,
-        ILocalizationService? localizationService = null)
+        ILocalizationService? localizationService = null,
+        ITorrentSearchService? searchService = null)
     {
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         return new SettingsViewModel(
@@ -621,6 +623,97 @@ public class SettingsViewModelTests
             new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
             new UpdateService(updateLogger, settingsService),
             _windowsAssociationService,
-            interfaceModeService ?? Substitute.For<IInterfaceModeService>());
+            interfaceModeService ?? Substitute.For<IInterfaceModeService>(),
+            searchService ?? Substitute.For<ITorrentSearchService>());
+    }
+
+    [Fact]
+    public void UseIndexerPreset_FillsInTheAddress_SoOnlyTheKeyIsLeftToSupply()
+    {
+        _sut.UseIndexerPresetCommand.Execute(SearchSettings.ProwlarrTemplate);
+
+        Assert.Equal(SearchSettings.ProwlarrTemplate, _sut.TorznabUrl);
+        Assert.True(_sut.HasSearchStatusMessage);
+    }
+
+    [Fact]
+    public void UseIndexerPreset_IgnoresAnEmptyTemplate()
+    {
+        _sut.TorznabUrl = "http://example.invalid/api";
+
+        _sut.UseIndexerPresetCommand.Execute(string.Empty);
+
+        Assert.Equal("http://example.invalid/api", _sut.TorznabUrl);
+    }
+
+    [Fact]
+    public async Task Detect_FillsInWhateverItFound()
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.DetectLocalEndpointAsync(Arg.Any<CancellationToken>())
+            .Returns(SearchSettings.JackettTemplate);
+        var sut = Create(_settingsService, searchService: searchService);
+
+        await sut.DetectIndexerCommand.ExecuteAsync(null);
+
+        Assert.Equal(SearchSettings.JackettTemplate, sut.TorznabUrl);
+        Assert.Equal(Peerfluence.Properties.Resources.Settings_Search_Detected, sut.SearchStatusMessage);
+    }
+
+    [Fact]
+    public async Task Detect_LeavesTheAddressAlone_WhenNothingIsRunning()
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.DetectLocalEndpointAsync(Arg.Any<CancellationToken>()).Returns((string?)null);
+        var sut = Create(_settingsService, searchService: searchService);
+        sut.TorznabUrl = "http://example.invalid/api";
+
+        await sut.DetectIndexerCommand.ExecuteAsync(null);
+
+        Assert.Equal("http://example.invalid/api", sut.TorznabUrl);
+        Assert.Equal(Peerfluence.Properties.Resources.Settings_Search_NotDetected, sut.SearchStatusMessage);
+    }
+
+    /// <summary>
+    /// The service reads the endpoint from settings, so a Test pressed straight after typing must
+    /// test what is in the box - not what the debounced save last wrote.
+    /// </summary>
+    [Fact]
+    public async Task Test_ChecksTheAddressCurrentlyInTheBox()
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns((string?)null);
+        var sut = Create(_settingsService, searchService: searchService);
+
+        sut.TorznabUrl = "http://example.invalid/typed-just-now";
+        await sut.TestIndexerCommand.ExecuteAsync(null);
+
+        Assert.Equal("http://example.invalid/typed-just-now", _settingsService.Current.Search.TorznabUrl);
+        Assert.Equal(Peerfluence.Properties.Resources.Settings_Search_TestPassed, sut.SearchStatusMessage);
+    }
+
+    [Fact]
+    public async Task Test_ReportsWhyTheEndpointDidNotAnswer()
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns("Connection refused");
+        var sut = Create(_settingsService, searchService: searchService);
+
+        await sut.TestIndexerCommand.ExecuteAsync(null);
+
+        Assert.Contains("Connection refused", sut.SearchStatusMessage);
+    }
+
+    [Fact]
+    public async Task TheSearchEndpoint_SurvivesASaveAndReload()
+    {
+        _sut.TorznabUrl = "http://example.invalid/api";
+        _sut.TorznabApiKey = "abc123";
+        await _sut.SaveCommand.ExecuteAsync(null);
+
+        var reloaded = Create(_settingsService);
+
+        Assert.Equal("http://example.invalid/api", reloaded.TorznabUrl);
+        Assert.Equal("abc123", reloaded.TorznabApiKey);
     }
 }

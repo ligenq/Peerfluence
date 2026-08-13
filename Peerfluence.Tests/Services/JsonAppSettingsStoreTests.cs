@@ -67,6 +67,25 @@ public sealed class JsonAppSettingsStoreTests : IDisposable
         }
     }
 
+    /// <summary>
+    /// A derived value has no business in the file. It would be a second answer to a question the
+    /// address already answers, and one that reads back into nothing.
+    /// </summary>
+    [Fact]
+    public async Task SaveAsync_DoesNotWriteValuesThatAreDerivedFromOtherSettings()
+    {
+        var sut = new JsonAppSettingsStore(_paths, new FileSystem());
+        var settings = new AppSettings();
+        settings.Search.TorznabUrl = "http://example.invalid/api";
+
+        await sut.SaveAsync(settings, TestContext.Current.CancellationToken);
+
+        var json = await File.ReadAllTextAsync(_paths.SettingsFilePath, TestContext.Current.CancellationToken);
+
+        Assert.Contains("TorznabUrl", json);
+        Assert.DoesNotContain("IsConfigured", json);
+    }
+
     private sealed record TestAppPaths(
         string AppDataDirectory,
         string DefaultDownloadDirectory,

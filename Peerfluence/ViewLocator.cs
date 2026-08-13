@@ -16,6 +16,7 @@ public class ViewLocator : IDataTemplate
         [typeof(DownloadsViewModel)] = typeof(DownloadsView),
         [typeof(DetailsViewModel)] = typeof(DetailsView),
         [typeof(SettingsViewModel)] = typeof(SettingsView),
+        [typeof(FindTorrentsViewModel)] = typeof(FindTorrentsView),
         [typeof(AboutViewModel)] = typeof(AboutView),
         [typeof(CreateTorrentViewModel)] = typeof(CreateTorrentWindow),
     };

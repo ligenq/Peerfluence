@@ -143,7 +143,7 @@
     <value>Lägger till spårare, peers, delar, filval, kö och hastighetsgränser.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
-    <value>Sök bland hämtningar</value>
+    <value>Filtrera hämtningar</value>
   </data>
   <data name="Downloads_Filter_All" xml:space="preserve">
     <value>Alla</value>
@@ -1182,5 +1182,104 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   </data>
   <data name="Crash_ReportSaved" xml:space="preserve">
     <value>En kraschrapport har sparats i:</value>
+  </data>
+  <data name="Nav_FindTorrents" xml:space="preserve">
+    <value>Hitta torrenter</value>
+  </data>
+  <data name="Find_Search" xml:space="preserve">
+    <value>Sök</value>
+  </data>
+  <data name="Find_QueryWatermark" xml:space="preserve">
+    <value>Sök på ett namn, en titel, vad som helst</value>
+  </data>
+  <data name="Find_Add" xml:space="preserve">
+    <value>Lägg till</value>
+  </data>
+  <data name="Find_Column_Name" xml:space="preserve">
+    <value>Namn</value>
+  </data>
+  <data name="Find_Column_Seeds" xml:space="preserve">
+    <value>Seeds</value>
+  </data>
+  <data name="Find_Column_Indexer" xml:space="preserve">
+    <value>Indexerare</value>
+  </data>
+  <data name="Find_Column_Age" xml:space="preserve">
+    <value>Ålder</value>
+  </data>
+  <data name="Find_NotConfiguredTitle" xml:space="preserve">
+    <value>Ingen indexerare ansluten</value>
+  </data>
+  <data name="Find_NotConfiguredBody" xml:space="preserve">
+    <value>Peerfluence söker i de indexerare du ansluter till det. Anslut en under Inställningar, Sök.</value>
+  </data>
+  <data name="Find_NoResults" xml:space="preserve">
+    <value>Sökningen gav inga träffar.</value>
+  </data>
+  <data name="Find_PartialResults" xml:space="preserve">
+    <value>{0} av {1} indexerare svarade. Vissa träffar kan saknas.</value>
+  </data>
+  <data name="Find_SearchFailed" xml:space="preserve">
+    <value>Sökningen misslyckades: {0}</value>
+  </data>
+  <data name="Find_AddFailed" xml:space="preserve">
+    <value>Kunde inte läggas till: {0}</value>
+  </data>
+  <data name="Find_AgeHours" xml:space="preserve">
+    <value>{0} tim</value>
+  </data>
+  <data name="Find_AgeDays" xml:space="preserve">
+    <value>{0} dgr</value>
+  </data>
+  <data name="Find_AgeWeeks" xml:space="preserve">
+    <value>{0} v</value>
+  </data>
+  <data name="Find_AgeYears" xml:space="preserve">
+    <value>{0} år</value>
+  </data>
+  <data name="Settings_Search" xml:space="preserve">
+    <value>Sök</value>
+  </data>
+  <data name="Settings_SearchHint" xml:space="preserve">
+    <value>Peerfluence har inget eget index. Det frågar en Torznab-slutpunkt som du själv kör, till exempel Prowlarr eller Jackett, och visar vad som kommer tillbaka.</value>
+  </data>
+  <data name="Settings_Search_UseProwlarr" xml:space="preserve">
+    <value>Använd Prowlarr</value>
+  </data>
+  <data name="Settings_Search_UseJackett" xml:space="preserve">
+    <value>Använd Jackett</value>
+  </data>
+  <data name="Settings_Search_Detect" xml:space="preserve">
+    <value>Hitta</value>
+  </data>
+  <data name="Settings_Search_Url" xml:space="preserve">
+    <value>Torznab-slutpunkt</value>
+  </data>
+  <data name="Settings_Search_ApiKey" xml:space="preserve">
+    <value>API-nyckel</value>
+  </data>
+  <data name="Settings_Search_Test" xml:space="preserve">
+    <value>Testa</value>
+  </data>
+  <data name="Settings_Search_PresetApplied" xml:space="preserve">
+    <value>Adressen ifylld. Lägg till API-nyckeln från den appens egna inställningar.</value>
+  </data>
+  <data name="Settings_Search_Detecting" xml:space="preserve">
+    <value>Söker efter en indexerarhanterare på den här datorn...</value>
+  </data>
+  <data name="Settings_Search_Detected" xml:space="preserve">
+    <value>Hittade en. Lägg till API-nyckeln från den appens egna inställningar.</value>
+  </data>
+  <data name="Settings_Search_NotDetected" xml:space="preserve">
+    <value>Inget svarade på de vanliga portarna. Ange adressen själv.</value>
+  </data>
+  <data name="Settings_Search_Testing" xml:space="preserve">
+    <value>Testar...</value>
+  </data>
+  <data name="Settings_Search_TestPassed" xml:space="preserve">
+    <value>Slutpunkten svarade.</value>
+  </data>
+  <data name="Settings_Search_TestFailed" xml:space="preserve">
+    <value>Slutpunkten svarade inte: {0}</value>
   </data>
 </root>

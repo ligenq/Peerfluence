@@ -1675,6 +1675,159 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string Find_Add {
+            get {
+                return ResourceManager.GetString("Find_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not add that: {0}.
+        /// </summary>
+        public static string Find_AddFailed {
+            get {
+                return ResourceManager.GetString("Find_AddFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} d.
+        /// </summary>
+        public static string Find_AgeDays {
+            get {
+                return ResourceManager.GetString("Find_AgeDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} h.
+        /// </summary>
+        public static string Find_AgeHours {
+            get {
+                return ResourceManager.GetString("Find_AgeHours", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} w.
+        /// </summary>
+        public static string Find_AgeWeeks {
+            get {
+                return ResourceManager.GetString("Find_AgeWeeks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} y.
+        /// </summary>
+        public static string Find_AgeYears {
+            get {
+                return ResourceManager.GetString("Find_AgeYears", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Age.
+        /// </summary>
+        public static string Find_Column_Age {
+            get {
+                return ResourceManager.GetString("Find_Column_Age", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indexer.
+        /// </summary>
+        public static string Find_Column_Indexer {
+            get {
+                return ResourceManager.GetString("Find_Column_Indexer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string Find_Column_Name {
+            get {
+                return ResourceManager.GetString("Find_Column_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seeds.
+        /// </summary>
+        public static string Find_Column_Seeds {
+            get {
+                return ResourceManager.GetString("Find_Column_Seeds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing matched that search..
+        /// </summary>
+        public static string Find_NoResults {
+            get {
+                return ResourceManager.GetString("Find_NoResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peerfluence searches the indexers you connect to it. Connect one under Settings, Search..
+        /// </summary>
+        public static string Find_NotConfiguredBody {
+            get {
+                return ResourceManager.GetString("Find_NotConfiguredBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No indexer connected.
+        /// </summary>
+        public static string Find_NotConfiguredTitle {
+            get {
+                return ResourceManager.GetString("Find_NotConfiguredTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} indexers answered. Some results may be missing..
+        /// </summary>
+        public static string Find_PartialResults {
+            get {
+                return ResourceManager.GetString("Find_PartialResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search for a name, a title, anything.
+        /// </summary>
+        public static string Find_QueryWatermark {
+            get {
+                return ResourceManager.GetString("Find_QueryWatermark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string Find_Search {
+            get {
+                return ResourceManager.GetString("Find_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search failed: {0}.
+        /// </summary>
+        public static string Find_SearchFailed {
+            get {
+                return ResourceManager.GetString("Find_SearchFailed", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to About.
         /// </summary>
@@ -1702,6 +1855,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find torrents.
+        /// </summary>
+        public static string Nav_FindTorrents {
+            get {
+                return ResourceManager.GetString("Nav_FindTorrents", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
@@ -2620,6 +2782,141 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string Settings_Search {
+            get {
+                return ResourceManager.GetString("Settings_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to API key.
+        /// </summary>
+        public static string Settings_Search_ApiKey {
+            get {
+                return ResourceManager.GetString("Settings_Search_ApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Detect.
+        /// </summary>
+        public static string Settings_Search_Detect {
+            get {
+                return ResourceManager.GetString("Settings_Search_Detect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found one. Add the API key from that app's own settings..
+        /// </summary>
+        public static string Settings_Search_Detected {
+            get {
+                return ResourceManager.GetString("Settings_Search_Detected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Looking for an indexer manager on this machine....
+        /// </summary>
+        public static string Settings_Search_Detecting {
+            get {
+                return ResourceManager.GetString("Settings_Search_Detecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing answered on the usual ports. Enter the address yourself..
+        /// </summary>
+        public static string Settings_Search_NotDetected {
+            get {
+                return ResourceManager.GetString("Settings_Search_NotDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address filled in. Add the API key from that app's own settings..
+        /// </summary>
+        public static string Settings_Search_PresetApplied {
+            get {
+                return ResourceManager.GetString("Settings_Search_PresetApplied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test.
+        /// </summary>
+        public static string Settings_Search_Test {
+            get {
+                return ResourceManager.GetString("Settings_Search_Test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The endpoint did not answer: {0}.
+        /// </summary>
+        public static string Settings_Search_TestFailed {
+            get {
+                return ResourceManager.GetString("Settings_Search_TestFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Testing....
+        /// </summary>
+        public static string Settings_Search_Testing {
+            get {
+                return ResourceManager.GetString("Settings_Search_Testing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The endpoint answered..
+        /// </summary>
+        public static string Settings_Search_TestPassed {
+            get {
+                return ResourceManager.GetString("Settings_Search_TestPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Torznab endpoint.
+        /// </summary>
+        public static string Settings_Search_Url {
+            get {
+                return ResourceManager.GetString("Settings_Search_Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Jackett.
+        /// </summary>
+        public static string Settings_Search_UseJackett {
+            get {
+                return ResourceManager.GetString("Settings_Search_UseJackett", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Prowlarr.
+        /// </summary>
+        public static string Settings_Search_UseProwlarr {
+            get {
+                return ResourceManager.GetString("Settings_Search_UseProwlarr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peerfluence does not host an index. It queries a Torznab endpoint you run yourself, such as Prowlarr or Jackett, and shows what comes back..
+        /// </summary>
+        public static string Settings_SearchHint {
+            get {
+                return ResourceManager.GetString("Settings_SearchHint", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Security &amp; Privacy.
         /// </summary>

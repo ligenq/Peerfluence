@@ -143,7 +143,7 @@
     <value>Adds trackers, peers, pieces, file selection, queueing and speed limits.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
-    <value>Search downloads</value>
+    <value>Filter downloads</value>
   </data>
   <data name="Downloads_Filter_All" xml:space="preserve">
     <value>All</value>
@@ -1177,4 +1177,103 @@
   <data name="Crash_ReportSaved" xml:space="preserve">
     <value>A crash report has been saved to:</value>
   </data>
-  </root>
+    <data name="Nav_FindTorrents" xml:space="preserve">
+    <value>Find torrents</value>
+  </data>
+  <data name="Find_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Find_QueryWatermark" xml:space="preserve">
+    <value>Search for a name, a title, anything</value>
+  </data>
+  <data name="Find_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Find_Column_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Find_Column_Seeds" xml:space="preserve">
+    <value>Seeds</value>
+  </data>
+  <data name="Find_Column_Indexer" xml:space="preserve">
+    <value>Indexer</value>
+  </data>
+  <data name="Find_Column_Age" xml:space="preserve">
+    <value>Age</value>
+  </data>
+  <data name="Find_NotConfiguredTitle" xml:space="preserve">
+    <value>No indexer connected</value>
+  </data>
+  <data name="Find_NotConfiguredBody" xml:space="preserve">
+    <value>Peerfluence searches the indexers you connect to it. Connect one under Settings, Search.</value>
+  </data>
+  <data name="Find_NoResults" xml:space="preserve">
+    <value>Nothing matched that search.</value>
+  </data>
+  <data name="Find_PartialResults" xml:space="preserve">
+    <value>{0} of {1} indexers answered. Some results may be missing.</value>
+  </data>
+  <data name="Find_SearchFailed" xml:space="preserve">
+    <value>Search failed: {0}</value>
+  </data>
+  <data name="Find_AddFailed" xml:space="preserve">
+    <value>Could not add that: {0}</value>
+  </data>
+  <data name="Find_AgeHours" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="Find_AgeDays" xml:space="preserve">
+    <value>{0} d</value>
+  </data>
+  <data name="Find_AgeWeeks" xml:space="preserve">
+    <value>{0} w</value>
+  </data>
+  <data name="Find_AgeYears" xml:space="preserve">
+    <value>{0} y</value>
+  </data>
+  <data name="Settings_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Settings_SearchHint" xml:space="preserve">
+    <value>Peerfluence does not host an index. It queries a Torznab endpoint you run yourself, such as Prowlarr or Jackett, and shows what comes back.</value>
+  </data>
+  <data name="Settings_Search_UseProwlarr" xml:space="preserve">
+    <value>Use Prowlarr</value>
+  </data>
+  <data name="Settings_Search_UseJackett" xml:space="preserve">
+    <value>Use Jackett</value>
+  </data>
+  <data name="Settings_Search_Detect" xml:space="preserve">
+    <value>Detect</value>
+  </data>
+  <data name="Settings_Search_Url" xml:space="preserve">
+    <value>Torznab endpoint</value>
+  </data>
+  <data name="Settings_Search_ApiKey" xml:space="preserve">
+    <value>API key</value>
+  </data>
+  <data name="Settings_Search_Test" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="Settings_Search_PresetApplied" xml:space="preserve">
+    <value>Address filled in. Add the API key from that app's own settings.</value>
+  </data>
+  <data name="Settings_Search_Detecting" xml:space="preserve">
+    <value>Looking for an indexer manager on this machine...</value>
+  </data>
+  <data name="Settings_Search_Detected" xml:space="preserve">
+    <value>Found one. Add the API key from that app's own settings.</value>
+  </data>
+  <data name="Settings_Search_NotDetected" xml:space="preserve">
+    <value>Nothing answered on the usual ports. Enter the address yourself.</value>
+  </data>
+  <data name="Settings_Search_Testing" xml:space="preserve">
+    <value>Testing...</value>
+  </data>
+  <data name="Settings_Search_TestPassed" xml:space="preserve">
+    <value>The endpoint answered.</value>
+  </data>
+  <data name="Settings_Search_TestFailed" xml:space="preserve">
+    <value>The endpoint did not answer: {0}</value>
+  </data>
+</root>

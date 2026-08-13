@@ -185,6 +185,40 @@ public class SettingsViewTests
         Assert.Equal(2, visible.Count);
     }
 
+    /// <summary>
+    /// The preset buttons carry the endpoint templates as literal parameters, so this is the only
+    /// place that proves they are wired to something real rather than to an empty string.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheIndexerPresetButtons_FillInTheEndpointTheyName()
+    {
+        var (view, vm) = CreateView();
+
+        var buttons = view.GetLogicalDescendants().OfType<Button>()
+            .Where(button => button.Command == vm.UseIndexerPresetCommand)
+            .ToList();
+
+        Assert.Equal(2, buttons.Count);
+        Assert.Contains(buttons, button => Equals(button.CommandParameter, SearchSettings.ProwlarrTemplate));
+        Assert.Contains(buttons, button => Equals(button.CommandParameter, SearchSettings.JackettTemplate));
+
+        var prowlarr = buttons.Single(button => Equals(button.CommandParameter, SearchSettings.ProwlarrTemplate));
+        prowlarr.Command!.Execute(prowlarr.CommandParameter);
+
+        Assert.Equal(SearchSettings.ProwlarrTemplate, vm.TorznabUrl);
+    }
+
+    [AvaloniaFact]
+    public void TheSearchTab_IsThere_InAdvancedMode()
+    {
+        var (view, _) = CreateView();
+
+        var tabs = view.FindControl<TabControl>("SettingsTabs")!;
+        var headers = tabs.Items.Cast<TabItem>().Where(tab => tab.IsVisible).Select(tab => tab.Header).ToList();
+
+        Assert.Contains(Peerfluence.Properties.Resources.Settings_Search, headers);
+    }
+
     [AvaloniaFact]
     public void StatusInfoBar_ReflectsStatusMessage()
     {

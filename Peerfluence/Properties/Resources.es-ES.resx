@@ -143,7 +143,7 @@
     <value>Añade rastreadores, pares, piezas, selección de archivos, cola y límites de velocidad.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
-    <value>Buscar descargas</value>
+    <value>Filtrar descargas</value>
   </data>
   <data name="Downloads_Filter_All" xml:space="preserve">
     <value>Todas</value>
@@ -1182,5 +1182,104 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
   </data>
   <data name="Crash_ReportSaved" xml:space="preserve">
     <value>Se ha guardado un informe de fallo en:</value>
+  </data>
+  <data name="Nav_FindTorrents" xml:space="preserve">
+    <value>Buscar torrents</value>
+  </data>
+  <data name="Find_Search" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="Find_QueryWatermark" xml:space="preserve">
+    <value>Busca un nombre, un título, lo que sea</value>
+  </data>
+  <data name="Find_Add" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="Find_Column_Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Find_Column_Seeds" xml:space="preserve">
+    <value>Semillas</value>
+  </data>
+  <data name="Find_Column_Indexer" xml:space="preserve">
+    <value>Indexador</value>
+  </data>
+  <data name="Find_Column_Age" xml:space="preserve">
+    <value>Antigüedad</value>
+  </data>
+  <data name="Find_NotConfiguredTitle" xml:space="preserve">
+    <value>Ningún indexador conectado</value>
+  </data>
+  <data name="Find_NotConfiguredBody" xml:space="preserve">
+    <value>Peerfluence busca en los indexadores que le conectes. Conecta uno en Ajustes, Búsqueda.</value>
+  </data>
+  <data name="Find_NoResults" xml:space="preserve">
+    <value>La búsqueda no encontró nada.</value>
+  </data>
+  <data name="Find_PartialResults" xml:space="preserve">
+    <value>Respondieron {0} de {1} indexadores. Puede que falten resultados.</value>
+  </data>
+  <data name="Find_SearchFailed" xml:space="preserve">
+    <value>La búsqueda falló: {0}</value>
+  </data>
+  <data name="Find_AddFailed" xml:space="preserve">
+    <value>No se pudo añadir: {0}</value>
+  </data>
+  <data name="Find_AgeHours" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="Find_AgeDays" xml:space="preserve">
+    <value>{0} d</value>
+  </data>
+  <data name="Find_AgeWeeks" xml:space="preserve">
+    <value>{0} sem</value>
+  </data>
+  <data name="Find_AgeYears" xml:space="preserve">
+    <value>{0} a</value>
+  </data>
+  <data name="Settings_Search" xml:space="preserve">
+    <value>Búsqueda</value>
+  </data>
+  <data name="Settings_SearchHint" xml:space="preserve">
+    <value>Peerfluence no aloja ningún índice. Consulta un extremo Torznab que ejecutas tú, como Prowlarr o Jackett, y muestra lo que devuelve.</value>
+  </data>
+  <data name="Settings_Search_UseProwlarr" xml:space="preserve">
+    <value>Usar Prowlarr</value>
+  </data>
+  <data name="Settings_Search_UseJackett" xml:space="preserve">
+    <value>Usar Jackett</value>
+  </data>
+  <data name="Settings_Search_Detect" xml:space="preserve">
+    <value>Detectar</value>
+  </data>
+  <data name="Settings_Search_Url" xml:space="preserve">
+    <value>Extremo Torznab</value>
+  </data>
+  <data name="Settings_Search_ApiKey" xml:space="preserve">
+    <value>Clave de API</value>
+  </data>
+  <data name="Settings_Search_Test" xml:space="preserve">
+    <value>Probar</value>
+  </data>
+  <data name="Settings_Search_PresetApplied" xml:space="preserve">
+    <value>Dirección rellenada. Añade la clave de API desde los ajustes de esa aplicación.</value>
+  </data>
+  <data name="Settings_Search_Detecting" xml:space="preserve">
+    <value>Buscando un gestor de indexadores en este equipo...</value>
+  </data>
+  <data name="Settings_Search_Detected" xml:space="preserve">
+    <value>Se encontró uno. Añade la clave de API desde los ajustes de esa aplicación.</value>
+  </data>
+  <data name="Settings_Search_NotDetected" xml:space="preserve">
+    <value>Nada respondió en los puertos habituales. Introduce la dirección tú mismo.</value>
+  </data>
+  <data name="Settings_Search_Testing" xml:space="preserve">
+    <value>Probando...</value>
+  </data>
+  <data name="Settings_Search_TestPassed" xml:space="preserve">
+    <value>El extremo respondió.</value>
+  </data>
+  <data name="Settings_Search_TestFailed" xml:space="preserve">
+    <value>El extremo no respondió: {0}</value>
   </data>
 </root>

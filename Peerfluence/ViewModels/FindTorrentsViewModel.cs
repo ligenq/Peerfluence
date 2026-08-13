@@ -1,0 +1,202 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
+using Peerfluence.Core.Services;
+using Peerfluence.Properties;
+using PeerSharp.Config;
+
+namespace Peerfluence.ViewModels;
+
+[SingletonService]
+public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
+{
+    private readonly ITorrentSearchService _searchService;
+    private readonly ITorrentService _torrentService;
+    private readonly IAddTorrentDialogService _addTorrentDialogService;
+    private CancellationTokenSource? _searchCts;
+
+    public FindTorrentsViewModel(
+        ITorrentSearchService searchService,
+        ITorrentService torrentService,
+        IAddTorrentDialogService addTorrentDialogService)
+    {
+        _searchService = searchService;
+        _torrentService = torrentService;
+        _addTorrentDialogService = addTorrentDialogService;
+
+        SearchCommand = new AsyncRelayCommand(SearchAsync, () => !string.IsNullOrWhiteSpace(Query));
+        AddCommand = new AsyncRelayCommand<TorrentSearchResultViewModel?>(AddAsync);
+    }
+
+    // IFeatureViewModel
+    public string Title => Resources.Nav_FindTorrents;
+
+    public string IconKind => "Magnify";
+
+    public int Order => 50;
+
+    public ObservableCollection<TorrentSearchResultViewModel> Results { get; } = new();
+
+    public string Query
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                SearchCommand.NotifyCanExecuteChanged();
+            }
+        }
+    } = string.Empty;
+
+    public TorrentSearchResultViewModel? SelectedResult
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public bool IsSearching
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// Whether an endpoint has been configured. Re-read on every visit rather than cached, because
+    /// settings is where it gets configured and the user walks straight back here afterwards.
+    /// </summary>
+    public bool IsConfigured
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    public bool IsNotConfigured => !IsConfigured;
+
+    /// <summary>
+    /// What happened, when it is worth saying: a failure, a partial result, or nothing found.
+    /// Empty when the last search simply worked.
+    /// </summary>
+    public string StatusMessage
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(HasStatusMessage));
+            }
+        }
+    } = string.Empty;
+
+    public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
+
+    public IAsyncRelayCommand SearchCommand { get; }
+
+    public IAsyncRelayCommand<TorrentSearchResultViewModel?> AddCommand { get; }
+
+    /// <summary>
+    /// Called when the screen is shown, so an endpoint configured a moment ago takes effect without
+    /// a restart.
+    /// </summary>
+    public void Refresh()
+    {
+        IsConfigured = _searchService.IsConfigured;
+        OnPropertyChanged(nameof(IsNotConfigured));
+    }
+
+    private async Task SearchAsync()
+    {
+        Refresh();
+        if (!IsConfigured)
+        {
+            return;
+        }
+
+        // A new search replaces the one in flight rather than racing it.
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _searchCts = cts;
+
+        IsSearching = true;
+        StatusMessage = string.Empty;
+
+        try
+        {
+            var response = await _searchService.SearchAsync(Query, cts.Token).ConfigureAwait(true);
+            if (cts.Token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            Results.Clear();
+
+            // Seeds descending: on an aggregated search it is the only quality signal the feed
+            // carries, and the ones nobody is seeding are the ones nobody wants.
+            foreach (var result in response.Results.OrderByDescending(r => r.Seeders))
+            {
+                Results.Add(new TorrentSearchResultViewModel(result));
+            }
+
+            StatusMessage = DescribeOutcome(response);
+        }
+        catch (OperationCanceledException) when (cts.Token.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(_searchCts, cts))
+            {
+                IsSearching = false;
+            }
+        }
+    }
+
+    private static string DescribeOutcome(TorrentSearchResponse response)
+    {
+        if (response.HasFailure)
+        {
+            return string.Format(Resources.Find_SearchFailed, response.FailureMessage);
+        }
+
+        // Said plainly rather than hidden: an empty list because two indexers timed out is a
+        // different problem from an empty list because nothing matched.
+        if (response.IsPartial)
+        {
+            var responded = response.IndexersQueried - response.IndexersFailed;
+            return string.Format(Resources.Find_PartialResults, responded, response.IndexersQueried);
+        }
+
+        return response.Results.Count == 0 ? Resources.Find_NoResults : string.Empty;
+    }
+
+    private async Task AddAsync(TorrentSearchResultViewModel? result)
+    {
+        if (result == null)
+        {
+            return;
+        }
+
+        try
+        {
+            // Through the same dialog as every other add, so the download path and file selection
+            // are asked for in the one place that asks for them.
+            if (result.IsMagnet)
+            {
+                await _addTorrentDialogService.ShowMagnetAsync(result.Link);
+                return;
+            }
+
+            await _torrentService.AddTorrentFileAsync(result.Link, new AddTorrentOptions());
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = string.Format(Resources.Find_AddFailed, ex.Message);
+        }
+    }
+}

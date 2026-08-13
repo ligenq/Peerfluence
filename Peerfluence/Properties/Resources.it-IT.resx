@@ -143,7 +143,7 @@
     <value>Aggiunge tracker, peer, pezzi, selezione dei file, coda e limiti di velocità.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
-    <value>Cerca nei download</value>
+    <value>Filtra i download</value>
   </data>
   <data name="Downloads_Filter_All" xml:space="preserve">
     <value>Tutti</value>
@@ -1183,4 +1183,103 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   <data name="Crash_ReportSaved" xml:space="preserve">
     <value>Un rapporto sugli arresti anomali è stato salvato in:</value>
   </data>
-  </root>
+    <data name="Nav_FindTorrents" xml:space="preserve">
+    <value>Trova torrent</value>
+  </data>
+  <data name="Find_Search" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="Find_QueryWatermark" xml:space="preserve">
+    <value>Cerca un nome, un titolo, qualsiasi cosa</value>
+  </data>
+  <data name="Find_Add" xml:space="preserve">
+    <value>Aggiungi</value>
+  </data>
+  <data name="Find_Column_Name" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="Find_Column_Seeds" xml:space="preserve">
+    <value>Seed</value>
+  </data>
+  <data name="Find_Column_Indexer" xml:space="preserve">
+    <value>Indicizzatore</value>
+  </data>
+  <data name="Find_Column_Age" xml:space="preserve">
+    <value>Età</value>
+  </data>
+  <data name="Find_NotConfiguredTitle" xml:space="preserve">
+    <value>Nessun indicizzatore collegato</value>
+  </data>
+  <data name="Find_NotConfiguredBody" xml:space="preserve">
+    <value>Peerfluence cerca negli indicizzatori che gli colleghi. Collegane uno in Impostazioni, Ricerca.</value>
+  </data>
+  <data name="Find_NoResults" xml:space="preserve">
+    <value>Nessun risultato per questa ricerca.</value>
+  </data>
+  <data name="Find_PartialResults" xml:space="preserve">
+    <value>Hanno risposto {0} indicizzatori su {1}. Alcuni risultati potrebbero mancare.</value>
+  </data>
+  <data name="Find_SearchFailed" xml:space="preserve">
+    <value>Ricerca non riuscita: {0}</value>
+  </data>
+  <data name="Find_AddFailed" xml:space="preserve">
+    <value>Impossibile aggiungere: {0}</value>
+  </data>
+  <data name="Find_AgeHours" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="Find_AgeDays" xml:space="preserve">
+    <value>{0} g</value>
+  </data>
+  <data name="Find_AgeWeeks" xml:space="preserve">
+    <value>{0} set</value>
+  </data>
+  <data name="Find_AgeYears" xml:space="preserve">
+    <value>{0} a</value>
+  </data>
+  <data name="Settings_Search" xml:space="preserve">
+    <value>Ricerca</value>
+  </data>
+  <data name="Settings_SearchHint" xml:space="preserve">
+    <value>Peerfluence non ospita alcun indice. Interroga un endpoint Torznab gestito da te, come Prowlarr o Jackett, e mostra ciò che risponde.</value>
+  </data>
+  <data name="Settings_Search_UseProwlarr" xml:space="preserve">
+    <value>Usa Prowlarr</value>
+  </data>
+  <data name="Settings_Search_UseJackett" xml:space="preserve">
+    <value>Usa Jackett</value>
+  </data>
+  <data name="Settings_Search_Detect" xml:space="preserve">
+    <value>Rileva</value>
+  </data>
+  <data name="Settings_Search_Url" xml:space="preserve">
+    <value>Endpoint Torznab</value>
+  </data>
+  <data name="Settings_Search_ApiKey" xml:space="preserve">
+    <value>Chiave API</value>
+  </data>
+  <data name="Settings_Search_Test" xml:space="preserve">
+    <value>Prova</value>
+  </data>
+  <data name="Settings_Search_PresetApplied" xml:space="preserve">
+    <value>Indirizzo inserito. Aggiungi la chiave API dalle impostazioni di quell'applicazione.</value>
+  </data>
+  <data name="Settings_Search_Detecting" xml:space="preserve">
+    <value>Ricerca di un gestore di indicizzatori su questo computer...</value>
+  </data>
+  <data name="Settings_Search_Detected" xml:space="preserve">
+    <value>Ne è stato trovato uno. Aggiungi la chiave API dalle impostazioni di quell'applicazione.</value>
+  </data>
+  <data name="Settings_Search_NotDetected" xml:space="preserve">
+    <value>Nessuna risposta sulle porte abituali. Inserisci tu l'indirizzo.</value>
+  </data>
+  <data name="Settings_Search_Testing" xml:space="preserve">
+    <value>Prova in corso...</value>
+  </data>
+  <data name="Settings_Search_TestPassed" xml:space="preserve">
+    <value>L'endpoint ha risposto.</value>
+  </data>
+  <data name="Settings_Search_TestFailed" xml:space="preserve">
+    <value>L'endpoint non ha risposto: {0}</value>
+  </data>
+</root>

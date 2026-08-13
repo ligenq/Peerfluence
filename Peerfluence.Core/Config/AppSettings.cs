@@ -18,6 +18,8 @@ public sealed class AppSettings
 
     public McpSettings Mcp { get; set; } = new();
 
+    public SearchSettings Search { get; set; } = new();
+
     /// <summary>
     /// "Simple" or "Advanced". Empty means the user has not been asked yet, which is what brings up
     /// the welcome on first launch; anything unrecognised is read as Advanced, so a hand-edited or

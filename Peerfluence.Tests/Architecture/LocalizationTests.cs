@@ -113,6 +113,37 @@ public class LocalizationTests
     [InlineData("Downloads_Remove_Confirm_Many")]
     [InlineData("Settings_InterfaceModeHint")]
     [InlineData("Settings_SavedAutomatically")]
+    [InlineData("Nav_FindTorrents")]
+    [InlineData("Find_Search")]
+    [InlineData("Find_QueryWatermark")]
+    [InlineData("Find_Add")]
+    [InlineData("Find_Column_Indexer")]
+    [InlineData("Find_Column_Age")]
+    [InlineData("Find_NotConfiguredTitle")]
+    [InlineData("Find_NotConfiguredBody")]
+    [InlineData("Find_NoResults")]
+    [InlineData("Find_PartialResults")]
+    [InlineData("Find_SearchFailed")]
+    [InlineData("Find_AddFailed")]
+    // Find_Column_Name, Find_Column_Seeds and the Find_Age* units are deliberately absent: "Name",
+    // "Seeds" and "{0} h" are the same in several of these languages, so this guard cannot tell a
+    // real translation from a missing one. EveryShippedLanguage_TranslatesEveryString still covers
+    // their presence.
+    [InlineData("Settings_Search")]
+    [InlineData("Settings_SearchHint")]
+    [InlineData("Settings_Search_UseProwlarr")]
+    [InlineData("Settings_Search_UseJackett")]
+    [InlineData("Settings_Search_Detect")]
+    [InlineData("Settings_Search_Url")]
+    [InlineData("Settings_Search_ApiKey")]
+    [InlineData("Settings_Search_Test")]
+    [InlineData("Settings_Search_PresetApplied")]
+    [InlineData("Settings_Search_Detecting")]
+    [InlineData("Settings_Search_Detected")]
+    [InlineData("Settings_Search_NotDetected")]
+    [InlineData("Settings_Search_Testing")]
+    [InlineData("Settings_Search_TestPassed")]
+    [InlineData("Settings_Search_TestFailed")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

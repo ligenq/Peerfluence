@@ -465,6 +465,67 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}">
+                <ScrollViewer>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                        <suki:GlassCard>
+                            <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <materialIcons:MaterialIcon Kind="Magnify" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <TextBlock Text="{m:L Settings_Search}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <TextBlock Text="{m:L Settings_SearchHint}"
+                                           Opacity="0.6"
+                                           FontSize="{StaticResource FontSizeSmall}"
+                                           TextWrapping="Wrap"/>
+
+                                <!--
+                                    The two indexer managers people actually run, so the endpoint
+                                    does not have to be typed or looked up. Neither names a torrent
+                                    index: which indexes exist is configured inside Prowlarr or
+                                    Jackett by whoever runs it.
+                                -->
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <Button Command="{Binding UseIndexerPresetCommand}"
+                                            CommandParameter="{x:Static config:SearchSettings.ProwlarrTemplate}"
+                                            Content="{m:L Settings_Search_UseProwlarr}"/>
+                                    <Button Command="{Binding UseIndexerPresetCommand}"
+                                            CommandParameter="{x:Static config:SearchSettings.JackettTemplate}"
+                                            Content="{m:L Settings_Search_UseJackett}"/>
+                                    <Button Command="{Binding DetectIndexerCommand}" Classes="Flat">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                                            <materialIcons:MaterialIcon Kind="Radar" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                            <TextBlock Text="{m:L Settings_Search_Detect}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+
+                                <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                    <TextBlock Text="{m:L Settings_Search_Url}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                    <TextBox Text="{Binding TorznabUrl, Mode=TwoWay}" PlaceholderText="{x:Static config:SearchSettings.JackettTemplate}"/>
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
+                                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                        <TextBlock Text="{m:L Settings_Search_ApiKey}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBox Text="{Binding TorznabApiKey, Mode=TwoWay}" PasswordChar="*"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Command="{Binding TestIndexerCommand}"
+                                            Content="{m:L Settings_Search_Test}"
+                                            VerticalAlignment="Bottom"/>
+                                </Grid>
+
+                                <suki:InfoBar IsVisible="{Binding HasSearchStatusMessage}"
+                                              IsClosable="False"
+                                              Message="{Binding SearchStatusMessage}"/>
+                            </StackPanel>
+                        </suki:GlassCard>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
