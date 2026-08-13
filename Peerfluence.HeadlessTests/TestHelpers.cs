@@ -128,7 +128,8 @@ internal static class TestHelpers
             engineService,
             updateService,
             windowsAssociationService,
-            interfaceModeService ?? Substitute.For<IInterfaceModeService>());
+            interfaceModeService ?? Substitute.For<IInterfaceModeService>(),
+            Substitute.For<ITorrentSearchService>());
     }
 
     public static CreateTorrentViewModel CreateCreateTorrentViewModel()

@@ -1,0 +1,106 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:m="using:Peerfluence.Markup"
+             x:Class="Peerfluence.Views.FindTorrentsView"
+             x:DataType="vm:FindTorrentsViewModel">
+    <suki:BusyArea IsBusy="{Binding IsSearching}">
+        <Grid RowDefinitions="Auto,Auto,*" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+
+            <Grid Grid.Row="0"
+                  x:Name="QueryBar"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource SpacingMedium}"
+                  IsVisible="{Binding IsConfigured}"
+                  Margin="{StaticResource StandardBottomMargin}">
+                <TextBox Text="{Binding Query, Mode=TwoWay}"
+                         PlaceholderText="{m:L Find_QueryWatermark}">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}"/>
+                    </TextBox.KeyBindings>
+                </TextBox>
+                <Button Grid.Column="1" Classes="Flat" Command="{Binding SearchCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                        <materialIcons:MaterialIcon Kind="Magnify" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <TextBlock Text="{m:L Find_Search}"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!--
+                Said rather than hidden. A search that returned nothing because two indexes timed
+                out is a different problem from one that found nothing, and only the user can tell
+                which they care about.
+            -->
+            <suki:InfoBar Grid.Row="1"
+                          IsVisible="{Binding HasStatusMessage}"
+                          IsClosable="False"
+                          Message="{Binding StatusMessage}"
+                          Margin="{StaticResource StandardBottomMargin}"/>
+
+            <suki:GlassCard Grid.Row="2"
+                            x:Name="ResultsCard"
+                            IsVisible="{Binding IsConfigured}"
+                            Padding="{StaticResource ZeroThickness}">
+                <DataGrid x:Name="ResultsGrid"
+                          ItemsSource="{Binding Results}"
+                          SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
+                          DoubleTapped="ResultsGrid_OnDoubleTapped"
+                          SelectionMode="Single"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          IsReadOnly="True"
+                          CanUserReorderColumns="False"
+                          CanUserResizeColumns="True"
+                          GridLinesVisibility="None"
+                          BorderThickness="0">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{m:L Find_Add}" Command="{Binding AddCommand}" CommandParameter="{Binding SelectedResult}">
+                                <MenuItem.Icon>
+                                    <materialIcons:MaterialIcon Kind="Plus"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{m:L Find_Column_Name}" Binding="{Binding Title}" Width="*"/>
+                        <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
+                                            Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}"
+                                            SortMemberPath="SizeBytes"
+                                            Width="100"/>
+                        <DataGridTextColumn Header="{m:L Find_Column_Seeds}"
+                                            Binding="{Binding SeedersText}"
+                                            SortMemberPath="Seeders"
+                                            Width="80"/>
+                        <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}"
+                                            Binding="{Binding PeersText}"
+                                            SortMemberPath="Peers"
+                                            Width="80"/>
+                        <DataGridTextColumn Header="{m:L Find_Column_Indexer}" Binding="{Binding IndexerName}" Width="140"/>
+                        <DataGridTextColumn Header="{m:L Find_Column_Age}" Binding="{Binding AgeText}" Width="80"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </suki:GlassCard>
+
+            <StackPanel Grid.Row="2"
+                        x:Name="EmptyState"
+                        IsVisible="{Binding IsNotConfigured}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        MaxWidth="420"
+                        Spacing="{StaticResource SpacingSmall}">
+                <TextBlock Text="{m:L Find_NotConfiguredTitle}"
+                           FontSize="{StaticResource FontSizeLarge}"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="{m:L Find_NotConfiguredBody}"
+                           Opacity="0.6"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </suki:BusyArea>
+</UserControl>

@@ -36,6 +36,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private static readonly TimeSpan AutoSaveDelay = TimeSpan.FromMilliseconds(400);
 
     private readonly IInterfaceModeService _interfaceModeService;
+    private readonly ITorrentSearchService _searchService;
     private CancellationTokenSource? _autoSaveCts;
     private Task _pendingSave = Task.CompletedTask;
     private bool _suspendAutoSave;
@@ -51,9 +52,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         ITorrentEngineService engineService,
         IUpdateService updateService,
         IWindowsAssociationService windowsAssociationService,
-        IInterfaceModeService interfaceModeService)
+        IInterfaceModeService interfaceModeService,
+        ITorrentSearchService searchService)
     {
         _interfaceModeService = interfaceModeService;
+        _searchService = searchService;
         _settingsService = settingsService;
         _themeService = themeService;
         _localizationService = localizationService;
@@ -82,6 +85,9 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         ApplyUpdateAndRestartCommand = new RelayCommand(ApplyUpdateAndRestart);
 
         SetInterfaceModeCommand = new AsyncRelayCommand<InterfaceMode>(SetInterfaceModeAsync);
+        UseIndexerPresetCommand = new RelayCommand<string>(UseIndexerPreset);
+        DetectIndexerCommand = new AsyncRelayCommand(DetectIndexerAsync);
+        TestIndexerCommand = new AsyncRelayCommand(TestIndexerAsync);
 
         WeakReferenceMessenger.Default.Register<InterfaceModeChangedMessage>(this, (_, msg) => ApplyInterfaceMode(msg.Mode));
 
@@ -153,6 +159,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(Title),
         nameof(IsSimpleMode),
         nameof(IsAdvancedMode),
+        nameof(SearchStatusMessage),
+        nameof(HasSearchStatusMessage),
         nameof(ThemeVariantOptions),
         nameof(ColorThemeOptions),
         nameof(BackgroundStyleOptions),
@@ -323,6 +331,88 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     public bool IsAdvancedMode => !IsSimpleMode;
+
+    // Search
+    public string TorznabUrl
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    public string TorznabApiKey
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    /// <summary>
+    /// What Detect or Test last found. Not a setting, so it neither saves nor triggers one.
+    /// </summary>
+    public string SearchStatusMessage
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(HasSearchStatusMessage));
+            }
+        }
+    } = string.Empty;
+
+    public bool HasSearchStatusMessage => !string.IsNullOrWhiteSpace(SearchStatusMessage);
+
+    public IRelayCommand<string> UseIndexerPresetCommand { get; private set; } = null!;
+
+    public IAsyncRelayCommand DetectIndexerCommand { get; private set; } = null!;
+
+    public IAsyncRelayCommand TestIndexerCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Fills in the endpoint for one of the two indexer managers people actually run, so the only
+    /// thing left to supply is the key. Nothing here names a torrent index: which indexes exist is
+    /// configured in Prowlarr or Jackett, by the person running it.
+    /// </summary>
+    private void UseIndexerPreset(string? template)
+    {
+        if (string.IsNullOrWhiteSpace(template))
+        {
+            return;
+        }
+
+        TorznabUrl = template;
+        SearchStatusMessage = Properties.Resources.Settings_Search_PresetApplied;
+    }
+
+    private async Task DetectIndexerAsync()
+    {
+        SearchStatusMessage = Properties.Resources.Settings_Search_Detecting;
+
+        var found = await _searchService.DetectLocalEndpointAsync().ConfigureAwait(true);
+        if (found == null)
+        {
+            SearchStatusMessage = Properties.Resources.Settings_Search_NotDetected;
+            return;
+        }
+
+        TorznabUrl = found;
+        SearchStatusMessage = Properties.Resources.Settings_Search_Detected;
+    }
+
+    /// <summary>
+    /// Checks the address currently in the box. Nothing has to be applied first: a change is in
+    /// force in the settings object the moment it is made, and that object is where the service
+    /// reads the endpoint from. Only the write to disk is delayed.
+    /// </summary>
+    private async Task TestIndexerAsync()
+    {
+        SearchStatusMessage = Properties.Resources.Settings_Search_Testing;
+
+        var failure = await _searchService.TestAsync().ConfigureAwait(true);
+        SearchStatusMessage = failure == null
+            ? Properties.Resources.Settings_Search_TestPassed
+            : string.Format(Properties.Resources.Settings_Search_TestFailed, failure);
+    }
 
     public int ListeningPort
     {
@@ -720,6 +810,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Updates
         UpdateUrl = settings.Update.UpdateUrl;
         CheckForUpdatesOnStartup = settings.Update.CheckForUpdatesOnStartup;
+
+        // Search
+        TorznabUrl = settings.Search.TorznabUrl;
+        TorznabApiKey = settings.Search.ApiKey;
     }
 
     private Task SaveAsync() => SaveAsync(announce: true);
@@ -802,6 +896,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             // Updates
             settings.Update.UpdateUrl = UpdateUrl;
             settings.Update.CheckForUpdatesOnStartup = CheckForUpdatesOnStartup;
+
+            // Search
+            settings.Search.TorznabUrl = TorznabUrl;
+            settings.Search.ApiKey = TorznabApiKey;
         }
     }
 

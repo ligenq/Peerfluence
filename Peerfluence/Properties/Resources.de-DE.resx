@@ -143,7 +143,7 @@
     <value>Ergänzt Tracker, Peers, Teile, Dateiauswahl, Warteschlange und Geschwindigkeitsgrenzen.</value>
   </data>
   <data name="Downloads_Search" xml:space="preserve">
-    <value>Downloads durchsuchen</value>
+    <value>Downloads filtern</value>
   </data>
   <data name="Downloads_Filter_All" xml:space="preserve">
     <value>Alle</value>
@@ -1182,5 +1182,104 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   </data>
   <data name="Crash_ReportSaved" xml:space="preserve">
     <value>Ein Absturzbericht wurde gespeichert unter:</value>
+  </data>
+  <data name="Nav_FindTorrents" xml:space="preserve">
+    <value>Torrents finden</value>
+  </data>
+  <data name="Find_Search" xml:space="preserve">
+    <value>Suchen</value>
+  </data>
+  <data name="Find_QueryWatermark" xml:space="preserve">
+    <value>Nach einem Namen, einem Titel, irgendetwas suchen</value>
+  </data>
+  <data name="Find_Add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="Find_Column_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Find_Column_Seeds" xml:space="preserve">
+    <value>Seeds</value>
+  </data>
+  <data name="Find_Column_Indexer" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="Find_Column_Age" xml:space="preserve">
+    <value>Alter</value>
+  </data>
+  <data name="Find_NotConfiguredTitle" xml:space="preserve">
+    <value>Kein Index verbunden</value>
+  </data>
+  <data name="Find_NotConfiguredBody" xml:space="preserve">
+    <value>Peerfluence durchsucht die Indizes, die Sie damit verbinden. Verbinden Sie einen unter Einstellungen, Suche.</value>
+  </data>
+  <data name="Find_NoResults" xml:space="preserve">
+    <value>Keine Treffer für diese Suche.</value>
+  </data>
+  <data name="Find_PartialResults" xml:space="preserve">
+    <value>{0} von {1} Indizes haben geantwortet. Es können Ergebnisse fehlen.</value>
+  </data>
+  <data name="Find_SearchFailed" xml:space="preserve">
+    <value>Suche fehlgeschlagen: {0}</value>
+  </data>
+  <data name="Find_AddFailed" xml:space="preserve">
+    <value>Konnte nicht hinzugefügt werden: {0}</value>
+  </data>
+  <data name="Find_AgeHours" xml:space="preserve">
+    <value>{0} Std.</value>
+  </data>
+  <data name="Find_AgeDays" xml:space="preserve">
+    <value>{0} Tg.</value>
+  </data>
+  <data name="Find_AgeWeeks" xml:space="preserve">
+    <value>{0} Wo.</value>
+  </data>
+  <data name="Find_AgeYears" xml:space="preserve">
+    <value>{0} J.</value>
+  </data>
+  <data name="Settings_Search" xml:space="preserve">
+    <value>Suche</value>
+  </data>
+  <data name="Settings_SearchHint" xml:space="preserve">
+    <value>Peerfluence betreibt keinen eigenen Index. Es fragt einen Torznab-Endpunkt ab, den Sie selbst betreiben, etwa Prowlarr oder Jackett, und zeigt, was zurückkommt.</value>
+  </data>
+  <data name="Settings_Search_UseProwlarr" xml:space="preserve">
+    <value>Prowlarr verwenden</value>
+  </data>
+  <data name="Settings_Search_UseJackett" xml:space="preserve">
+    <value>Jackett verwenden</value>
+  </data>
+  <data name="Settings_Search_Detect" xml:space="preserve">
+    <value>Erkennen</value>
+  </data>
+  <data name="Settings_Search_Url" xml:space="preserve">
+    <value>Torznab-Endpunkt</value>
+  </data>
+  <data name="Settings_Search_ApiKey" xml:space="preserve">
+    <value>API-Schlüssel</value>
+  </data>
+  <data name="Settings_Search_Test" xml:space="preserve">
+    <value>Testen</value>
+  </data>
+  <data name="Settings_Search_PresetApplied" xml:space="preserve">
+    <value>Adresse eingetragen. Fügen Sie den API-Schlüssel aus den Einstellungen jener Anwendung hinzu.</value>
+  </data>
+  <data name="Settings_Search_Detecting" xml:space="preserve">
+    <value>Suche nach einer Index-Verwaltung auf diesem Rechner...</value>
+  </data>
+  <data name="Settings_Search_Detected" xml:space="preserve">
+    <value>Eine gefunden. Fügen Sie den API-Schlüssel aus den Einstellungen jener Anwendung hinzu.</value>
+  </data>
+  <data name="Settings_Search_NotDetected" xml:space="preserve">
+    <value>Auf den üblichen Ports hat nichts geantwortet. Geben Sie die Adresse selbst ein.</value>
+  </data>
+  <data name="Settings_Search_Testing" xml:space="preserve">
+    <value>Wird getestet...</value>
+  </data>
+  <data name="Settings_Search_TestPassed" xml:space="preserve">
+    <value>Der Endpunkt hat geantwortet.</value>
+  </data>
+  <data name="Settings_Search_TestFailed" xml:space="preserve">
+    <value>Der Endpunkt hat nicht geantwortet: {0}</value>
   </data>
 </root>

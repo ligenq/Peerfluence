@@ -1,4 +1,6 @@
+using System;
 using System.IO.Abstractions;
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Peerfluence.Services.Mcp;
 using Peerfluence.ViewModels;
@@ -51,6 +53,14 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
         services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
+
+        // One client for the lifetime of the app rather than one per search: a new HttpClient per
+        // call leaves sockets in TIME_WAIT, and searching is something people do repeatedly. The
+        // timeout is short because the endpoint is normally on this machine, and a Torznab query
+        // that has not answered in fifteen seconds is not going to.
+        services.AddSingleton<ITorrentSearchService>(sp => new TorznabSearchService(
+            sp.GetRequiredService<IAppSettingsService>(),
+            new HttpClient { Timeout = TimeSpan.FromSeconds(15) }));
         services.AddSingleton<ITorrentService, TorrentService>();
         services.AddSingleton<IUpdateService, UpdateService>();
         services.AddSingleton<IWindowsAssociationService, WindowsAssociationService>();
@@ -78,9 +88,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<CreateTorrentViewModel>();
+        services.AddSingleton<FindTorrentsViewModel>();
 
         // IFeatureViewModel discovery (order matters for navigation)
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<DownloadsViewModel>());
+        services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<FindTorrentsViewModel>());
         services.AddTransient<IFeatureViewModel>(sp => sp.GetRequiredService<SettingsViewModel>());
 
         return services;
@@ -92,6 +104,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<DownloadsView>();
         services.AddTransient<DetailsView>();
         services.AddTransient<SettingsView>();
+        services.AddTransient<FindTorrentsView>();
         services.AddTransient<AboutView>();
         services.AddTransient<CreateTorrentWindow>();
         services.AddTransient<AddTorrentOptionsWindow>();
