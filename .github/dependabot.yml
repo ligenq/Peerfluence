@@ -1,0 +1,43 @@
+version: 2
+
+updates:
+  # Peerfluence ships self-contained builds, so a dependency that goes stale here stays stale on
+  # every machine that installed it until a release goes out. Weekly, because a torrent client
+  # parses input from strangers and a fix that sits unnoticed for a month is the actual risk.
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "Update"
+    groups:
+      # Avalonia and SukiUI move together - SukiUI is built on Avalonia, and taking one without the
+      # other is how you get a build that restores but does not run.
+      avalonia:
+        patterns:
+          - "Avalonia*"
+          - "SukiUI"
+          - "Material.Icons.Avalonia"
+      dotnet-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+      # Test-only, and noisy. One PR rather than six.
+      testing:
+        patterns:
+          - "xunit*"
+          - "NSubstitute"
+          - "Microsoft.NET.Test.Sdk"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "Update"
+    groups:
+      actions:
+        patterns:
+          - "*"
