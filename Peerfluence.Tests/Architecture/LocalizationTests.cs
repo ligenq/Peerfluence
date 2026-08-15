@@ -160,6 +160,19 @@ public class LocalizationTests
     [InlineData("Find_Failure_RateLimited")]
     [InlineData("Settings_Search_UseAcademicTorrents")]
     [InlineData("Settings_Search_AcademicTorrentsHint")]
+    [InlineData("Settings_DownloadLimit")]
+    [InlineData("Settings_UploadLimit")]
+    [InlineData("Settings_SpeedLimitHint")]
+    [InlineData("Settings_Categories")]
+    [InlineData("Settings_CategoriesHint")]
+    [InlineData("Settings_Categories_PathWatermark")]
+    [InlineData("Downloads_Grid_Category")]
+    [InlineData("Downloads_Category_None")]
+    [InlineData("Downloads_Category_All")]
+    // Settings_Categories_NameWatermark, Settings_Categories_Add, Downloads_Category and
+    // AddTorrent_Category are deliberately absent: "Name", "Add" and "Category" are the same word in
+    // German or Portuguese, so this guard cannot tell a translation from a missing one. Their
+    // presence is still covered by EveryShippedLanguage_TranslatesEveryString.
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

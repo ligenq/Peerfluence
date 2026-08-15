@@ -18,6 +18,8 @@ public sealed class AppSettings
 
     public McpSettings Mcp { get; set; } = new();
 
+    public CategorySettings Categories { get; set; } = new();
+
     public SearchSettings Search { get; set; } = new();
 
     /// <summary>

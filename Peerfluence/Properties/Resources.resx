@@ -1324,4 +1324,43 @@
   <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
     <value>Research datasets, papers and course material, shared by the people who produced them. Also built in.</value>
   </data>
+  <data name="Settings_DownloadLimit" xml:space="preserve">
+    <value>Download limit (KiB/s)</value>
+  </data>
+  <data name="Settings_UploadLimit" xml:space="preserve">
+    <value>Upload limit (KiB/s)</value>
+  </data>
+  <data name="Settings_SpeedLimitHint" xml:space="preserve">
+    <value>Zero means no limit. Takes effect immediately, without restarting anything.</value>
+  </data>
+  <data name="Settings_Categories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="Settings_CategoriesHint" xml:space="preserve">
+    <value>Group downloads, and give each group a folder of its own. A category without a folder still groups; it just leaves downloads where they would have gone.</value>
+  </data>
+  <data name="Settings_Categories_NameWatermark" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Settings_Categories_PathWatermark" xml:space="preserve">
+    <value>Folder (optional)</value>
+  </data>
+  <data name="Settings_Categories_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Downloads_Grid_Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Downloads_Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Downloads_Category_None" xml:space="preserve">
+    <value>No category</value>
+  </data>
+  <data name="Downloads_Category_All" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="AddTorrent_Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
 </root>

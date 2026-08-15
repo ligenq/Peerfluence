@@ -51,7 +51,8 @@ public class SettingsViewModelTests
             updateService,
             _windowsAssociationService,
             Substitute.For<IInterfaceModeService>(),
-            searchService);
+            searchService,
+            Substitute.For<ITorrentCategoryService>());
     }
 
     [Fact]
@@ -613,11 +614,58 @@ public class SettingsViewModelTests
         return false;
     }
 
+    /// <summary>
+    /// Shown in kibibytes per second because that is the unit every other client uses, stored in
+    /// bytes because that is what the engine takes. The conversion is the only place that can go
+    /// wrong, and getting it wrong by 1024 is not a subtle bug to live with.
+    /// </summary>
+    [Fact]
+    public async Task ASpeedLimit_IsStoredInBytesAndShownInKibibytes()
+    {
+        _sut.MaxDownloadSpeedKibibytesPerSecond = 500;
+        _sut.MaxUploadSpeedKibibytesPerSecond = 64;
+        await _sut.SaveCommand.ExecuteAsync(null);
+
+        Assert.Equal(500 * 1024, _settingsService.Current.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(64 * 1024, _settingsService.Current.Network.MaxUploadSpeedBytesPerSecond);
+
+        var reloaded = Create(_settingsService);
+
+        Assert.Equal(500, reloaded.MaxDownloadSpeedKibibytesPerSecond);
+        Assert.Equal(64, reloaded.MaxUploadSpeedKibibytesPerSecond);
+    }
+
+    [Fact]
+    public void ANegativeSpeedLimit_IsRefused()
+    {
+        // Unsigned at the engine, so a negative would wrap into an enormous limit rather than none.
+        _sut.MaxDownloadSpeedKibibytesPerSecond = -1;
+
+        Assert.Equal(0, _sut.MaxDownloadSpeedKibibytesPerSecond);
+    }
+
+    /// <summary>
+    /// The point of the setting: someone throttles mid-download to get out of the way of a video
+    /// call. Restarting the engine to apply it would drop every connection they have.
+    /// </summary>
+    [Fact]
+    public void ChangingASpeedLimit_ReachesTheRunningEngine()
+    {
+        var engineService = Substitute.For<ITorrentEngineService>();
+        var sut = Create(_settingsService, engineService: engineService);
+        engineService.ClearReceivedCalls();
+
+        sut.MaxDownloadSpeedKibibytesPerSecond = 250;
+
+        engineService.Received().ApplySpeedLimits();
+    }
+
     private SettingsViewModel Create(
         IAppSettingsService settingsService,
         IInterfaceModeService? interfaceModeService = null,
         ILocalizationService? localizationService = null,
-        ITorrentSearchService? searchService = null)
+        ITorrentSearchService? searchService = null,
+        ITorrentEngineService? engineService = null)
     {
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         return new SettingsViewModel(
@@ -625,11 +673,12 @@ public class SettingsViewModelTests
             _themeService,
             localizationService ?? _localizationService,
             _topLevelService,
-            new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
+            engineService ?? new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
             new UpdateService(updateLogger, settingsService),
             _windowsAssociationService,
             interfaceModeService ?? Substitute.For<IInterfaceModeService>(),
-            searchService ?? Substitute.For<ITorrentSearchService>());
+            searchService ?? Substitute.For<ITorrentSearchService>(),
+            Substitute.For<ITorrentCategoryService>());
     }
 
     [Fact]

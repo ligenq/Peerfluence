@@ -134,6 +134,11 @@ public sealed class TorrentEngineService : ITorrentEngineService
                 MaxActiveSeeds = settings.Queue.MaxActiveSeeds,
                 EnforceAutoStop = true
             },
+            Transfer = new TransferSettings
+            {
+                MaxDownloadSpeed = ToSpeed(settings.Network.MaxDownloadSpeedBytesPerSecond),
+                MaxUploadSpeed = ToSpeed(settings.Network.MaxUploadSpeedBytesPerSecond)
+            },
             Proxy = CreateProxySettings(settings.Proxy)
         };
 
@@ -144,6 +149,31 @@ public sealed class TorrentEngineService : ITorrentEngineService
         };
 
         return ClientEngineFactory.Create(options);
+    }
+
+    public void ApplySpeedLimits()
+    {
+        if (_engine is not { } engine)
+        {
+            // Nothing running yet, and nothing to do: whatever is stored is read when it is created.
+            return;
+        }
+
+        // Properties rather than a replacement Transfer object. The engine reads these from its own
+        // loops and does not support having a sub-settings object swapped underneath it.
+        var network = _settingsService.Current.Network;
+        engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(network.MaxDownloadSpeedBytesPerSecond);
+        engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(network.MaxUploadSpeedBytesPerSecond);
+    }
+
+    /// <summary>
+    /// Clamps a stored limit into what the engine takes. A negative value is meaningless and would
+    /// wrap into an enormous limit rather than an absent one, which is the opposite of what someone
+    /// typing a minus sign meant.
+    /// </summary>
+    private static uint ToSpeed(long bytesPerSecond)
+    {
+        return (uint)Math.Clamp(bytesPerSecond, 0, uint.MaxValue);
     }
 
     private static ushort GetListeningPort(NetworkSettings settings)

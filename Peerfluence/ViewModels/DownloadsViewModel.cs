@@ -35,6 +35,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     private readonly IDialogService _dialogService;
     private readonly IAddTorrentDialogService _addTorrentDialogService;
     private readonly IAppSettingsService _settingsService;
+    private readonly ITorrentCategoryService _categoryService;
     private readonly Channel<TorrentAlertEventArgs> _alertChannel;
     private readonly CancellationTokenSource _loopCts = new();
     private readonly Task _alertTask;
@@ -50,6 +51,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         IDialogService dialogService,
         IAddTorrentDialogService addTorrentDialogService,
         IAppSettingsService settingsService,
+        ITorrentCategoryService categoryService,
         DetailsViewModel detailsViewModel)
     {
         _torrentService = torrentService;
@@ -59,6 +61,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         _dialogService = dialogService;
         _addTorrentDialogService = addTorrentDialogService;
         _settingsService = settingsService;
+        _categoryService = categoryService;
         SelectedTorrentDetailViewModel = detailsViewModel;
 
         Torrents = new ObservableCollection<TorrentListItemViewModel>();
@@ -77,12 +80,15 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckSelectedAsync, CanForceRecheckSelected);
         ToggleDetailsPaneCommand = new RelayCommand(ToggleDetailsPane);
         SetFilterCommand = new RelayCommand<TorrentFilter>(filter => Filter = filter);
+        SetCategoryFilterCommand = new RelayCommand<string?>(SetCategoryFilter);
+        AssignCategoryCommand = new AsyncRelayCommand<string?>(AssignCategoryToSelectionAsync);
         ToggleTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(ToggleTorrentAsync);
         OpenTorrentFolderCommand = new RelayCommand<TorrentListItemViewModel?>(OpenFolderFor);
         RemoveTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(RemoveTorrentAsync);
 
         IsDetailsPaneVisible = _settingsService.Current.ShowDetailsPane;
 
+        WeakReferenceMessenger.Default.Register<CategoriesChangedMessage>(this, (_, _) => RefreshCategories());
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
         WeakReferenceMessenger.Default.Register<ActivationRequestedMessage>(this, (_, msg) =>
         {
@@ -234,6 +240,88 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     public IRelayCommand<TorrentFilter> SetFilterCommand { get; }
 
+    /// <summary>Narrows the list to one category, or back to all of them when given nothing.</summary>
+    public IRelayCommand<string?> SetCategoryFilterCommand { get; }
+
+    /// <summary>
+    /// Files everything selected under a category, or unfiles it when given nothing. Works on the
+    /// whole selection, because filing a batch is the reason anyone opens this menu.
+    /// </summary>
+    public IAsyncRelayCommand<string?> AssignCategoryCommand { get; }
+
+    /// <summary>The categories on offer, refreshed whenever they change.</summary>
+    public ObservableCollection<string> Categories { get; } = new();
+
+    /// <summary>Which category the list is narrowed to, or empty for all of them.</summary>
+    public string CategoryFilter
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(HasCategoryFilter));
+        OnPropertyChanged(nameof(IsAllCategories));
+                OnPropertyChanged(nameof(IsAllCategories));
+                ApplyFilter();
+            }
+        }
+    } = string.Empty;
+
+    public bool HasCategoryFilter => CategoryFilter.Length > 0;
+
+    /// <summary>Whether the list is showing every category, which is the state of the "All" chip.</summary>
+    public bool IsAllCategories => CategoryFilter.Length == 0;
+
+    /// <summary>
+    /// Whether there is anything to filter by. Nobody who has not defined a category should be shown
+    /// a row of category chips.
+    /// </summary>
+    public bool HasCategories => Categories.Count > 0;
+
+    private void SetCategoryFilter(string? category)
+    {
+        CategoryFilter = category ?? string.Empty;
+    }
+
+    private async Task AssignCategoryToSelectionAsync(string? category)
+    {
+        // A copy, because assigning saves and announces, and the announcement rebuilds the list.
+        foreach (var item in SelectedTorrents.ToList())
+        {
+            await _categoryService.AssignAsync(item.Hash, category).ConfigureAwait(true);
+        }
+    }
+
+    /// <summary>
+    /// Re-reads the categories and what each row is filed under. Cheap, and simpler than working out
+    /// which rows a change touched.
+    /// </summary>
+    private void RefreshCategories()
+    {
+        Categories.Clear();
+        foreach (var category in _categoryService.Categories)
+        {
+            Categories.Add(category.Name);
+        }
+
+        OnPropertyChanged(nameof(HasCategories));
+
+        foreach (var item in Torrents)
+        {
+            item.Category = _categoryService.GetCategory(item.Hash) ?? string.Empty;
+        }
+
+        // A category that has just been removed cannot go on filtering the list.
+        if (CategoryFilter.Length > 0 && !Categories.Contains(CategoryFilter, StringComparer.OrdinalIgnoreCase))
+        {
+            CategoryFilter = string.Empty;
+            return;
+        }
+
+        ApplyFilter();
+    }
+
     public bool IsFilterAll => Filter == TorrentFilter.All;
 
     public bool IsFilterDownloading => Filter == TorrentFilter.Downloading;
@@ -257,10 +345,17 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         OnPropertyChanged(nameof(IsFilterDownloading));
         OnPropertyChanged(nameof(IsFilterSeeding));
         OnPropertyChanged(nameof(IsFilterCompleted));
+        OnPropertyChanged(nameof(HasCategoryFilter));
 
         bool Matches(TorrentListItemViewModel item)
         {
             if (search.Length > 0 && item.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return false;
+            }
+
+            if (CategoryFilter is { Length: > 0 } category &&
+                !string.Equals(item.Category, category, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -1097,7 +1192,11 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             return;
         }
 
-        var viewModel = new TorrentListItemViewModel(torrent) { Actions = this };
+        var viewModel = new TorrentListItemViewModel(torrent)
+        {
+            Actions = this,
+            Category = _categoryService.GetCategory(torrent.Hash) ?? string.Empty
+        };
         _torrentLookup[key] = viewModel;
         Torrents.Add(viewModel);
     }

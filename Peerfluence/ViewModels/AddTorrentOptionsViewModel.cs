@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Peerfluence.Properties;
 using PeerSharp.Config;
+using PeerSharp.Interfaces;
 
 namespace Peerfluence.ViewModels;
 
@@ -140,11 +141,64 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
 
     public bool WasAdded { get; private set; }
 
+    /// <summary>The categories on offer, with an empty first entry for filing this under nothing.</summary>
+    public ObservableCollection<string> Categories { get; } = new();
+
+    /// <summary>
+    /// The category this torrent is being filed under. Choosing one that has a save path of its own
+    /// redirects the download there, which is the reason most people define categories at all.
+    /// </summary>
+    public string SelectedCategory
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                ApplyCategorySavePath();
+            }
+        }
+    } = string.Empty;
+
+    public bool HasCategories => Categories.Count > 1;
+
+    private ITorrentCategoryService? _categoryService;
+
+    private void LoadCategories(ITorrentCategoryService categoryService)
+    {
+        _categoryService = categoryService;
+
+        // The empty entry is the "no category" choice, and has to be first so it is what a torrent
+        // gets when nobody picks anything.
+        Categories.Add(string.Empty);
+        foreach (var category in categoryService.Categories)
+        {
+            Categories.Add(category.Name);
+        }
+
+        OnPropertyChanged(nameof(HasCategories));
+    }
+
+    /// <summary>
+    /// Points the download at the category's folder, under a folder named for the torrent so that two
+    /// downloads in one category do not unpack over each other.
+    /// </summary>
+    private void ApplyCategorySavePath()
+    {
+        if (_categoryService?.ResolveSavePath(SelectedCategory) is not { } savePath)
+        {
+            return;
+        }
+
+        DownloadPath = _isMagnet ? savePath : Path.Combine(savePath, Name);
+    }
+
     public static async Task<AddTorrentOptionsViewModel> CreateForTorrentFileAsync(
         string torrentPath,
         ITorrentService torrentService,
         ITopLevelService topLevelService,
-        IAppSettingsService settingsService)
+        IAppSettingsService settingsService,
+        ITorrentCategoryService categoryService)
     {
         var torrentFile = await TorrentFile.LoadAsync(torrentPath);
         var model = new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, torrentPath, isMagnet: false)
@@ -169,6 +223,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             model.Files.Add(new AddTorrentFileOptionViewModel(file.Index, file.Path, file.Size));
         }
 
+        model.LoadCategories(categoryService);
         return model;
     }
 
@@ -176,10 +231,11 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         string magnetUri,
         ITorrentService torrentService,
         ITopLevelService topLevelService,
-        IAppSettingsService settingsService)
+        IAppSettingsService settingsService,
+        ITorrentCategoryService categoryService)
     {
         var magnet = MagnetLink.Parse(magnetUri);
-        return new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, magnetUri, isMagnet: true)
+        var model = new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, magnetUri, isMagnet: true)
         {
             Name = string.IsNullOrWhiteSpace(magnet.DisplayName) ? Resources.AddTorrent_MagnetFallbackName : magnet.DisplayName!,
             SourceLabel = magnetUri,
@@ -188,6 +244,9 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             ExistingTrackers = string.Join(Environment.NewLine, magnet.Trackers),
             DownloadPath = GetDefaultDownloadPath(settingsService)
         };
+
+        model.LoadCategories(categoryService);
+        return model;
     }
 
     public void StartMetadataPreview(IMagnetMetadataPreviewService previewService, TimeSpan timeout)
@@ -276,15 +335,23 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             CancelMetadataPreview();
 
             var options = BuildOptions();
+            ITorrent added;
             if (_previewTorrentFile != null)
             {
                 // Both a .torrent file and a magnet whose preview resolved end up here; adding the
                 // parsed file spares the magnet a second metadata download.
-                await _torrentService.AddTorrentAsync(_previewTorrentFile, options);
+                added = await _torrentService.AddTorrentAsync(_previewTorrentFile, options);
             }
             else
             {
-                await _torrentService.AddMagnetAsync(_source, options);
+                added = await _torrentService.AddMagnetAsync(_source, options);
+            }
+
+            // Filed after the add, because the assignment is keyed by info hash and a magnet has no
+            // usable one until the engine has taken it.
+            if (SelectedCategory.Length > 0 && _categoryService != null)
+            {
+                await _categoryService.AssignAsync(added.Hash, SelectedCategory);
             }
 
             if (SkipThisStepNextTime)

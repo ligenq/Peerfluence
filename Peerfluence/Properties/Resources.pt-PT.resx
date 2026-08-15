@@ -1330,4 +1330,43 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
   <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
     <value>Conjuntos de dados de investigação, artigos e material de cursos, partilhados por quem os produziu. Também integrado.</value>
   </data>
+  <data name="Settings_DownloadLimit" xml:space="preserve">
+    <value>Limite de transferência (KiB/s)</value>
+  </data>
+  <data name="Settings_UploadLimit" xml:space="preserve">
+    <value>Limite de envio (KiB/s)</value>
+  </data>
+  <data name="Settings_SpeedLimitHint" xml:space="preserve">
+    <value>Zero significa sem limite. Tem efeito imediato, sem reiniciar nada.</value>
+  </data>
+  <data name="Settings_Categories" xml:space="preserve">
+    <value>Categorias</value>
+  </data>
+  <data name="Settings_CategoriesHint" xml:space="preserve">
+    <value>Agrupe as transferências e dê a cada grupo uma pasta própria. Uma categoria sem pasta continua a agrupar; apenas deixa as transferências onde teriam ido.</value>
+  </data>
+  <data name="Settings_Categories_NameWatermark" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="Settings_Categories_PathWatermark" xml:space="preserve">
+    <value>Pasta (opcional)</value>
+  </data>
+  <data name="Settings_Categories_Add" xml:space="preserve">
+    <value>Adicionar</value>
+  </data>
+  <data name="Downloads_Grid_Category" xml:space="preserve">
+    <value>Categoria</value>
+  </data>
+  <data name="Downloads_Category" xml:space="preserve">
+    <value>Categoria</value>
+  </data>
+  <data name="Downloads_Category_None" xml:space="preserve">
+    <value>Sem categoria</value>
+  </data>
+  <data name="Downloads_Category_All" xml:space="preserve">
+    <value>Todas as categorias</value>
+  </data>
+  <data name="AddTorrent_Category" xml:space="preserve">
+    <value>Categoria</value>
+  </data>
 </root>

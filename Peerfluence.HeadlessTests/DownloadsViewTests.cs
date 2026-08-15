@@ -51,8 +51,8 @@ public class DownloadsViewTests
 
         var dataGrid = view.GetLogicalDescendants().OfType<DataGrid>().FirstOrDefault();
         Assert.NotNull(dataGrid);
-        // Name, Progress, Size, State, ETA, Down, Up, Peers
-        Assert.Equal(8, dataGrid.Columns.Count);
+        // Name, Progress, Size, Category, State, ETA, Down, Up, Peers
+        Assert.Equal(9, dataGrid.Columns.Count);
     }
 
     [AvaloniaFact]
@@ -348,6 +348,7 @@ public class DownloadsViewTests
             dialogService,
             addTorrentDialogService,
             settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             detailsViewModel);
     }
 

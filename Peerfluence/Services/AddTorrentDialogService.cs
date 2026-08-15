@@ -11,6 +11,7 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
     private static readonly TimeSpan MagnetMetadataPreviewTimeout = TimeSpan.FromSeconds(45);
     private readonly ITorrentService _torrentService;
     private readonly ITopLevelService _topLevelService;
+    private readonly ITorrentCategoryService _categoryService;
     private readonly IAppSettingsService _settingsService;
     private readonly IMagnetMetadataPreviewService _metadataPreviewService;
 
@@ -18,10 +19,12 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
         ITorrentService torrentService,
         ITopLevelService topLevelService,
         IAppSettingsService settingsService,
-        IMagnetMetadataPreviewService metadataPreviewService)
+        IMagnetMetadataPreviewService metadataPreviewService,
+        ITorrentCategoryService categoryService)
     {
         _torrentService = torrentService;
         _topLevelService = topLevelService;
+        _categoryService = categoryService;
         _settingsService = settingsService;
         _metadataPreviewService = metadataPreviewService;
     }
@@ -38,7 +41,8 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
             torrentPath,
             _torrentService,
             _topLevelService,
-            _settingsService);
+            _settingsService,
+            _categoryService);
 
         return await ShowAsync(viewModel);
     }
@@ -54,7 +58,8 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
             magnetUri,
             _torrentService,
             _topLevelService,
-            _settingsService);
+            _settingsService,
+            _categoryService);
         viewModel.StartMetadataPreview(_metadataPreviewService, MagnetMetadataPreviewTimeout);
 
         return ShowAsync(viewModel);

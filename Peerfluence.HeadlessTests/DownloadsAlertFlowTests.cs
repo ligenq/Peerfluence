@@ -114,6 +114,7 @@ public sealed class DownloadsAlertFlowTests : IDisposable
             dialogService,
             addTorrentDialogService,
             settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             detailsViewModel);
     }
 

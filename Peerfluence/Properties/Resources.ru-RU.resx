@@ -1330,4 +1330,43 @@ Peerfluence распространяется по MIT License. Устанавл�
   <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
     <value>Исследовательские наборы данных, статьи и учебные материалы от тех, кто их создал. Тоже встроено.</value>
   </data>
+  <data name="Settings_DownloadLimit" xml:space="preserve">
+    <value>Ограничение загрузки (КиБ/с)</value>
+  </data>
+  <data name="Settings_UploadLimit" xml:space="preserve">
+    <value>Ограничение отдачи (КиБ/с)</value>
+  </data>
+  <data name="Settings_SpeedLimitHint" xml:space="preserve">
+    <value>Ноль означает без ограничения. Действует сразу, без перезапуска.</value>
+  </data>
+  <data name="Settings_Categories" xml:space="preserve">
+    <value>Категории</value>
+  </data>
+  <data name="Settings_CategoriesHint" xml:space="preserve">
+    <value>Группируйте загрузки и дайте каждой группе свою папку. Категория без папки всё равно группирует — она просто оставляет загрузки там, куда они попали бы и так.</value>
+  </data>
+  <data name="Settings_Categories_NameWatermark" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Settings_Categories_PathWatermark" xml:space="preserve">
+    <value>Папка (необязательно)</value>
+  </data>
+  <data name="Settings_Categories_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Downloads_Grid_Category" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Downloads_Category" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Downloads_Category_None" xml:space="preserve">
+    <value>Без категории</value>
+  </data>
+  <data name="Downloads_Category_All" xml:space="preserve">
+    <value>Все категории</value>
+  </data>
+  <data name="AddTorrent_Category" xml:space="preserve">
+    <value>Категория</value>
+  </data>
 </root>

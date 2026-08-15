@@ -108,6 +108,29 @@
               IsVisible="{Binding HasTorrents}"
               Margin="{StaticResource StandardBottomMargin}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                <!-- One chip per category, in the same row and the same idiom as the state filters,
+                     and only there at all once categories exist. -->
+                <ItemsControl ItemsSource="{Binding Categories}" IsVisible="{Binding HasCategories}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <RadioButton Classes="Chips" GroupName="CategoryFilter"
+                                         Content="{Binding}"
+                                         Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).SetCategoryFilterCommand}"
+                                         CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <RadioButton Classes="Chips" GroupName="CategoryFilter"
+                             IsVisible="{Binding HasCategories}"
+                             IsChecked="{Binding IsAllCategories, Mode=OneWay}"
+                             Command="{Binding SetCategoryFilterCommand}"
+                             CommandParameter="{x:Null}"
+                             Content="{m:L Downloads_Category_All}"/>
                 <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=OneWay}"
                              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.All}"
                              Content="{m:L Downloads_Filter_All}"/>
@@ -201,6 +224,26 @@
                                 <materialIcons:MaterialIcon Kind="Delete" Foreground="{StaticResource ErrorColor}" />
                             </MenuItem.Icon>
                         </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="{m:L Downloads_Category}" ItemsSource="{Binding Categories}">
+                            <MenuItem.Icon>
+                                <materialIcons:MaterialIcon Kind="FolderMultipleOutline" />
+                            </MenuItem.Icon>
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
+                            <MenuItem.Styles>
+                                <Style Selector="MenuItem > MenuItem">
+                                    <Setter Property="Command" Value="{Binding $parent[DataGrid].((vm:DownloadsViewModel)DataContext).AssignCategoryCommand}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                </Style>
+                            </MenuItem.Styles>
+                        </MenuItem>
+                        <MenuItem Header="{m:L Downloads_Category_None}"
+                                  Command="{Binding AssignCategoryCommand}"
+                                  CommandParameter="{x:Null}"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
@@ -230,6 +273,7 @@
                                         Binding="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}"
                                         SortMemberPath="TotalSizeBytes"
                                         Width="100"/>
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Category}" Binding="{Binding Category}" Width="120"/>
                     <DataGridTextColumn Header="{m:L Downloads_Grid_State}" Binding="{Binding State}" Width="100"/>
                     <DataGridTextColumn Header="{m:L Downloads_Grid_Eta}" Binding="{Binding Eta}" Width="100"/>
 
