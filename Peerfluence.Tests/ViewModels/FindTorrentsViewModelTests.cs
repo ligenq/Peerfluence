@@ -253,15 +253,22 @@ public class FindTorrentsViewModelTests
         await _torrentService.DidNotReceive().AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>());
     }
 
+    /// <summary>
+    /// A search result is never a file on this machine. The Internet Archive and Academic Torrents
+    /// both hand back a link to a .torrent on their own server, and the engine's file loader only
+    /// reads local paths - so routing these through it failed every add with "torrent file not
+    /// found", which is true and useless.
+    /// </summary>
     [Fact]
-    public async Task Add_SendsATorrentFileLinkToTheEngine()
+    public async Task Add_FetchesATorrentThatLivesOnSomeoneElsesServer()
     {
         var sut = Create();
         var result = new TorrentSearchResultViewModel(Result("ubuntu", magnet: false));
 
         await sut.AddCommand.ExecuteAsync(result);
 
-        await _torrentService.Received(1).AddTorrentFileAsync(result.Link, Arg.Any<AddTorrentOptions>());
+        await _torrentService.Received(1).AddTorrentFromUrlAsync(result.Link, Arg.Any<AddTorrentOptions>());
+        await _torrentService.DidNotReceive().AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>());
         await _addTorrentDialogService.DidNotReceive().ShowMagnetAsync(Arg.Any<string>());
     }
 

@@ -347,6 +347,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = true;
 
+    /// <summary>Research datasets, papers and courses. On by default.</summary>
+    public bool UseAcademicTorrents
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = true;
+
     public string TorznabUrl
     {
         get;
@@ -872,6 +879,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
         // Search
         UseInternetArchive = settings.Search.UseInternetArchive;
+        UseAcademicTorrents = settings.Search.UseAcademicTorrents;
         TorznabUrl = settings.Search.TorznabUrl;
         TorznabApiKey = settings.Search.ApiKey;
     }
@@ -959,6 +967,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
             // Search
             settings.Search.UseInternetArchive = UseInternetArchive;
+            settings.Search.UseAcademicTorrents = UseAcademicTorrents;
             settings.Search.TorznabUrl = TorznabUrl;
             settings.Search.ApiKey = TorznabApiKey;
         }

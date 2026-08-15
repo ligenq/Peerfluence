@@ -10,10 +10,13 @@ public sealed class TorrentService : ITorrentService
     private readonly ITorrentEngineService _engineService;
     private readonly IAppMessenger _messenger;
 
-    public TorrentService(ITorrentEngineService engineService, IAppMessenger messenger)
+    private readonly HttpClient _httpClient;
+
+    public TorrentService(ITorrentEngineService engineService, IAppMessenger messenger, HttpClient httpClient)
     {
         _engineService = engineService;
         _messenger = messenger;
+        _httpClient = httpClient;
     }
 
     public IReadOnlyList<ITorrent> GetTorrents()
@@ -76,6 +79,18 @@ public sealed class TorrentService : ITorrentService
     public async Task<ITorrent> AddTorrentFileAsync(string torrentPath, AddTorrentOptions? options = null, CancellationToken cancellationToken = default)
     {
         var torrentFile = await TorrentFile.LoadAsync(torrentPath, cancellationToken).ConfigureAwait(false);
+
+        return await AddTorrentAsync(torrentFile, options, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ITorrent> AddTorrentFromUrlAsync(string url, AddTorrentOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var data = await _httpClient.GetByteArrayAsync(url, cancellationToken).ConfigureAwait(false);
+
+        // Parsed here rather than written to a temporary file and loaded back: the bytes are already
+        // in hand, and something that turns out not to be a torrent should fail before anything
+        // touches the disk.
+        var torrentFile = TorrentFile.Parse(data);
 
         return await AddTorrentAsync(torrentFile, options, cancellationToken).ConfigureAwait(false);
     }

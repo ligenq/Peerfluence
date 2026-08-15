@@ -1,4 +1,4 @@
-using Peerfluence.Core.Services;
+﻿using Peerfluence.Core.Services;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Config;
 using PeerSharp.Core;
@@ -15,7 +15,7 @@ public sealed class TorrentServiceTests
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(_ => throw new InvalidOperationException("Torrent engine is not initialized."));
         var messenger = Substitute.For<IAppMessenger>();
-        var sut = new TorrentService(engineService, messenger);
+        var sut = new TorrentService(engineService, messenger, new HttpClient());
 
         var stats = sut.GetStats();
 
@@ -31,7 +31,7 @@ public sealed class TorrentServiceTests
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
         var messenger = Substitute.For<IAppMessenger>();
-        var sut = new TorrentService(engineService, messenger);
+        var sut = new TorrentService(engineService, messenger, new HttpClient());
 
         var stats = sut.GetStats();
 
@@ -47,7 +47,7 @@ public sealed class TorrentServiceTests
         var engine = Substitute.For<IClientEngine>();
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>());
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
 
         var exception = await Assert.ThrowsAsync<NotSupportedException>(
             () => sut.AddMagnetAsync($"magnet:?xs=urn:btpk:{new string('a', 64)}"));
@@ -101,7 +101,7 @@ public sealed class TorrentServiceTests
                 return Task.CompletedTask;
             });
 
-        var sut = new TorrentService(engineService, messenger);
+        var sut = new TorrentService(engineService, messenger, new HttpClient());
 
         sut.PublishAlert(new SimpleMetadataAlert
         {

@@ -73,6 +73,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITorznabIndexer, TorznabSearchService>();
         services.AddSingleton<ITorrentSearchSource>(sp => sp.GetRequiredService<ITorznabIndexer>());
         services.AddSingleton<ITorrentSearchSource, InternetArchiveSearchSource>();
+        services.AddSingleton<ITorrentSearchSource, AcademicTorrentsSearchSource>();
         services.AddSingleton<ITorrentSearchService, AggregateTorrentSearchService>();
         services.AddSingleton<ITorrentService, TorrentService>();
         services.AddSingleton<IUpdateService, UpdateService>();

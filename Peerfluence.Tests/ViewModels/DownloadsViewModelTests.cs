@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
 using Avalonia.Input;
@@ -36,7 +36,7 @@ public class DownloadsViewModelTests
         _settingsService = settingsService;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
         var engineService = new TorrentEngineService(settingsService, loggerFactory);
-        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>());
+        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
         var notificationService = Substitute.For<INotificationService>();
 
         _detailsVm = new DetailsViewModel(
