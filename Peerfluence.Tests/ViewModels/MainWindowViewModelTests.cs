@@ -41,7 +41,7 @@ public class MainWindowViewModelTests
         _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService);
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
-        _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>());
+        _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>(), Substitute.For<ITorrentCategoryService>());
 
         // Create an uninitialized DownloadsViewModel to avoid DispatcherTimer in its constructor
 #pragma warning disable SYSLIB0050

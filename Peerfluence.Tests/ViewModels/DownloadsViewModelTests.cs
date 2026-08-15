@@ -158,6 +158,7 @@ public class DownloadsViewModelTests
             Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             _settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             _detailsVm);
 
         try
@@ -194,6 +195,7 @@ public class DownloadsViewModelTests
             Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             _settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             _detailsVm);
 
         try
@@ -318,6 +320,7 @@ public class DownloadsViewModelTests
             Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             _settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             _detailsVm)
         {
             SelectedTorrent = new TorrentListItemViewModel(selected)
@@ -430,6 +433,7 @@ public class DownloadsViewModelTests
             Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             _settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             _detailsVm);
     }
 
@@ -578,6 +582,7 @@ public class DownloadsViewModelTests
             Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             _detailsVm);
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Test");
@@ -623,6 +628,7 @@ public class DownloadsViewModelTests
             Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             _detailsVm);
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Test");

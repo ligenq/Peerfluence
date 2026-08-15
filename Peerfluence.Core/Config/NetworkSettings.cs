@@ -28,6 +28,19 @@ public sealed class NetworkSettings
 
     public int ListeningPort { get; set; } = 55125;
 
+    /// <summary>
+    /// How fast torrents may download, in bytes per second. Zero is unlimited.
+    ///
+    /// <para>
+    /// Stored in bytes because that is what the engine takes. The setting is shown in kibibytes per
+    /// second, which is the unit every other client uses and the one people think in.
+    /// </para>
+    /// </summary>
+    public long MaxDownloadSpeedBytesPerSecond { get; set; } = 0;
+
+    /// <summary>How fast torrents may upload, in bytes per second. Zero is unlimited.</summary>
+    public long MaxUploadSpeedBytesPerSecond { get; set; } = 0;
+
     public long MaxDiskReadSpeedBytesPerSecond { get; set; } = 0;
 
     public long MaxDiskWriteSpeedBytesPerSecond { get; set; } = 0;

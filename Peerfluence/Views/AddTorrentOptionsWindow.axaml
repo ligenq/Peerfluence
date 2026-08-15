@@ -46,6 +46,15 @@
                     <suki:GlassCard>
                         <StackPanel Spacing="{StaticResource SpacingStandard}">
                             <TextBlock Text="{m:L AddTorrent_Destination}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                            <!-- Above the folder, because choosing a category is what fills the folder
+                                 in. Absent entirely for anyone who has not defined one. -->
+                            <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding HasCategories}">
+                                <TextBlock Text="{m:L AddTorrent_Category}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                <ComboBox x:Name="CategoryPicker"
+                                          ItemsSource="{Binding Categories}"
+                                          SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"/>
+                            </StackPanel>
                             <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                                 <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" PlaceholderText="{m:L AddTorrent_DownloadFolderWatermark}"/>
                                 <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}">

@@ -1,4 +1,4 @@
-using Peerfluence.Core.Config;
+﻿using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;
@@ -94,7 +94,7 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
             MagnetUri,
             torrentService,
             Substitute.For<ITopLevelService>(),
-            settingsService);
+            settingsService, Substitute.For<ITorrentCategoryService>());
     }
 
     private static async Task WaitForAsync(Func<bool> condition)

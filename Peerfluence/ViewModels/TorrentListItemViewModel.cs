@@ -27,6 +27,16 @@ public sealed class TorrentListItemViewModel : ViewModelBase
 
     public InfoHash Hash { get; }
 
+    /// <summary>
+    /// Which category this torrent is filed under, or empty. Set by the list rather than read from
+    /// the torrent, because the engine has no notion of one.
+    /// </summary>
+    public string Category
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
     public string Name
     {
         get;

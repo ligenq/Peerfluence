@@ -71,6 +71,7 @@ public sealed class DownloadsViewModelRuntimeTests
             dialogService,
             addTorrentDialogService,
             settingsService,
+            Substitute.For<ITorrentCategoryService>(),
             detailsViewModel);
     }
 

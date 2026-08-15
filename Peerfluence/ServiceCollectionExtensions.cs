@@ -53,6 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
         services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
+        services.AddSingleton<ITorrentCategoryService, TorrentCategoryService>();
 
         // One client for the lifetime of the app rather than one per search: a new HttpClient per
         // call leaves sockets in TIME_WAIT, and searching is something people do repeatedly. Fifteen

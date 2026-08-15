@@ -37,6 +37,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private readonly IInterfaceModeService _interfaceModeService;
     private readonly ITorrentSearchService _searchService;
+    private readonly ITorrentCategoryService _categoryService;
     private CancellationTokenSource? _autoSaveCts;
     private Task _pendingSave = Task.CompletedTask;
     private bool _suspendAutoSave;
@@ -53,10 +54,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         IUpdateService updateService,
         IWindowsAssociationService windowsAssociationService,
         IInterfaceModeService interfaceModeService,
-        ITorrentSearchService searchService)
+        ITorrentSearchService searchService,
+        ITorrentCategoryService categoryService)
     {
         _interfaceModeService = interfaceModeService;
         _searchService = searchService;
+        _categoryService = categoryService;
         _settingsService = settingsService;
         _themeService = themeService;
         _localizationService = localizationService;
@@ -86,6 +89,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
         SetInterfaceModeCommand = new AsyncRelayCommand<InterfaceMode>(SetInterfaceModeAsync);
         UseIndexerPresetCommand = new AsyncRelayCommand<string>(UseIndexerPresetAsync);
+        AddCategoryCommand = new AsyncRelayCommand(AddCategoryAsync, () => NewCategoryName.Trim().Length > 0);
+        RemoveCategoryCommand = new AsyncRelayCommand<string?>(RemoveCategoryAsync);
+        BrowseCategoryPathCommand = new AsyncRelayCommand(BrowseCategoryPathAsync);
+        RefreshCategories();
         DetectIndexerCommand = new AsyncRelayCommand(DetectIndexerAsync);
         TestIndexerCommand = new AsyncRelayCommand(TestIndexerAsync);
 
@@ -165,6 +172,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(SearchStatusMessage),
         nameof(HasSearchStatusMessage),
         nameof(SelectedTabIndex),
+        nameof(NewCategoryName),
+        nameof(NewCategoryPath),
         nameof(ThemeVariantOptions),
         nameof(ColorThemeOptions),
         nameof(BackgroundStyleOptions),
@@ -336,6 +345,80 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool IsAdvancedMode => !IsSimpleMode;
 
+    // Categories
+    public ObservableCollection<TorrentCategory> CategoryList { get; } = new();
+
+    public string NewCategoryName
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AddCategoryCommand.NotifyCanExecuteChanged();
+            }
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Where the new category will save to. Optional: a category with no path of its own is still
+    /// useful for grouping, it just leaves downloads where they would have gone anyway.
+    /// </summary>
+    public string NewCategoryPath
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    public IAsyncRelayCommand AddCategoryCommand { get; private set; } = null!;
+
+    public IAsyncRelayCommand<string?> RemoveCategoryCommand { get; private set; } = null!;
+
+    public IAsyncRelayCommand BrowseCategoryPathCommand { get; private set; } = null!;
+
+    private async Task AddCategoryAsync()
+    {
+        await _categoryService.AddAsync(NewCategoryName, NewCategoryPath).ConfigureAwait(true);
+
+        NewCategoryName = string.Empty;
+        NewCategoryPath = string.Empty;
+        RefreshCategories();
+    }
+
+    private async Task RemoveCategoryAsync(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return;
+        }
+
+        await _categoryService.RemoveAsync(name).ConfigureAwait(true);
+        RefreshCategories();
+    }
+
+    private async Task BrowseCategoryPathAsync()
+    {
+        var folders = await _topLevelService.GetStorageProvider().OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = Properties.Resources.Settings_DownloadFolderPicker_Title,
+            AllowMultiple = false
+        });
+
+        if (folders.FirstOrDefault() is { } folder)
+        {
+            NewCategoryPath = folder.Path.LocalPath;
+        }
+    }
+
+    private void RefreshCategories()
+    {
+        CategoryList.Clear();
+        foreach (var category in _categoryService.Categories)
+        {
+            CategoryList.Add(category);
+        }
+    }
+
     // Search
     /// <summary>
     /// The built-in source. On by default, and the reason the search screen works before anything
@@ -388,7 +471,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// removed when the mode changes, so the positions do not shift - and if anyone reorders them,
     /// the headless test that checks the selected tab's header says so.
     /// </summary>
-    public const int SearchTabIndex = 4;
+    public const int SearchTabIndex = 5;
 
     /// <summary>
     /// Which tab is showing. Settable so that arriving here from somewhere that knows what it came
@@ -485,6 +568,23 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         get;
         set => SetProperty(ref field, Math.Clamp(value, 1, 65535));
     } = 55125;
+
+    /// <summary>
+    /// The download limit in kibibytes per second, which is the unit every other client uses and the
+    /// one people think in. Zero is unlimited. Stored in bytes, because that is what the engine takes.
+    /// </summary>
+    public long MaxDownloadSpeedKibibytesPerSecond
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    /// <summary>The upload limit, on the same terms.</summary>
+    public long MaxUploadSpeedKibibytesPerSecond
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
 
     public long MaxDiskReadSpeedBytesPerSecond
     {
@@ -836,6 +936,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableUpnp = settings.Network.EnableUpnp;
         UseAutomaticListeningPort = settings.Network.UseAutomaticListeningPort;
         ListeningPort = settings.Network.ListeningPort;
+        MaxDownloadSpeedKibibytesPerSecond = ToKibibytes(settings.Network.MaxDownloadSpeedBytesPerSecond);
+        MaxUploadSpeedKibibytesPerSecond = ToKibibytes(settings.Network.MaxUploadSpeedBytesPerSecond);
         MaxDiskReadSpeedBytesPerSecond = settings.Network.MaxDiskReadSpeedBytesPerSecond;
         MaxDiskWriteSpeedBytesPerSecond = settings.Network.MaxDiskWriteSpeedBytesPerSecond;
 
@@ -924,6 +1026,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Network.EnableUpnp = EnableUpnp;
             settings.Network.UseAutomaticListeningPort = UseAutomaticListeningPort;
             settings.Network.ListeningPort = ListeningPort;
+            settings.Network.MaxDownloadSpeedBytesPerSecond = ToBytes(MaxDownloadSpeedKibibytesPerSecond);
+            settings.Network.MaxUploadSpeedBytesPerSecond = ToBytes(MaxUploadSpeedKibibytesPerSecond);
             settings.Network.MaxDiskReadSpeedBytesPerSecond = MaxDiskReadSpeedBytesPerSecond;
             settings.Network.MaxDiskWriteSpeedBytesPerSecond = MaxDiskWriteSpeedBytesPerSecond;
 
@@ -983,6 +1087,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// redressing the whole window because someone typed a character into a path box.
     /// </para>
     /// </summary>
+    private const long BytesPerKibibyte = 1024;
+
+    private static long ToKibibytes(long bytes) => bytes / BytesPerKibibyte;
+
+    private static long ToBytes(long kibibytes) => kibibytes * BytesPerKibibyte;
+
     private void ApplySideEffects()
     {
         var settings = _settingsService.Current;
@@ -1005,6 +1115,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             _localizationService.Apply(settings.Language);
             NotifyLocalizedOptionsChanged();
         }
+
+        // Unconditional, unlike the three above: pushing two numbers at a running engine costs
+        // nothing, and there is no side effect to avoid repeating.
+        _engineService.ApplySpeedLimits();
     }
 
     /// <summary>

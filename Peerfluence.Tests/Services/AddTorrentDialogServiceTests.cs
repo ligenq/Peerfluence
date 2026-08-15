@@ -1,4 +1,4 @@
-using Peerfluence.Core.Config;
+﻿using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using PeerSharp.Interfaces;
@@ -20,7 +20,7 @@ public class AddTorrentDialogServiceTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(showAddTorrentOptions: false),
-            Substitute.For<IMagnetMetadataPreviewService>());
+            Substitute.For<IMagnetMetadataPreviewService>(), Substitute.For<ITorrentCategoryService>());
 
         var wasAdded = await sut.ShowMagnetAsync(magnet);
 

@@ -136,6 +136,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Category.
+        /// </summary>
+        public static string AddTorrent_Category {
+            get {
+                return ResourceManager.GetString("AddTorrent_Category", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Destination.
         /// </summary>
@@ -1306,6 +1315,33 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Category.
+        /// </summary>
+        public static string Downloads_Category {
+            get {
+                return ResourceManager.GetString("Downloads_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All categories.
+        /// </summary>
+        public static string Downloads_Category_All {
+            get {
+                return ResourceManager.GetString("Downloads_Category_All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No category.
+        /// </summary>
+        public static string Downloads_Category_None {
+            get {
+                return ResourceManager.GetString("Downloads_Category_None", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to The clipboard is not available right now..
         /// </summary>
@@ -1396,6 +1432,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Category.
+        /// </summary>
+        public static string Downloads_Grid_Category {
+            get {
+                return ResourceManager.GetString("Downloads_Grid_Category", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Down.
         /// </summary>
@@ -2116,6 +2161,51 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Categories.
+        /// </summary>
+        public static string Settings_Categories {
+            get {
+                return ResourceManager.GetString("Settings_Categories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string Settings_Categories_Add {
+            get {
+                return ResourceManager.GetString("Settings_Categories_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string Settings_Categories_NameWatermark {
+            get {
+                return ResourceManager.GetString("Settings_Categories_NameWatermark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folder (optional).
+        /// </summary>
+        public static string Settings_Categories_PathWatermark {
+            get {
+                return ResourceManager.GetString("Settings_Categories_PathWatermark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group downloads, and give each group a folder of its own. A category without a folder still groups; it just leaves downloads where they would have gone..
+        /// </summary>
+        public static string Settings_CategoriesHint {
+            get {
+                return ResourceManager.GetString("Settings_CategoriesHint", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Check now.
         /// </summary>
@@ -2386,6 +2476,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download limit (KiB/s).
+        /// </summary>
+        public static string Settings_DownloadLimit {
+            get {
+                return ResourceManager.GetString("Settings_DownloadLimit", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Enable IP blocklist.
         /// </summary>
@@ -3106,6 +3205,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zero means no limit. Takes effect immediately, without restarting anything..
+        /// </summary>
+        public static string Settings_SpeedLimitHint {
+            get {
+                return ResourceManager.GetString("Settings_SpeedLimitHint", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Storage &amp; Session.
         /// </summary>
@@ -3196,6 +3304,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload limit (KiB/s).
+        /// </summary>
+        public static string Settings_UploadLimit {
+            get {
+                return ResourceManager.GetString("Settings_UploadLimit", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Use automatic listening port.
         /// </summary>

@@ -326,6 +326,23 @@
                         <TextBlock Text="{m:L Settings_Performance}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
+                    <!-- The setting people reach for while a download is running, so it is above the
+                         disk throttles rather than below them. Applied to the running engine at once. -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                            <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown x:Name="DownloadLimitBox" Value="{Binding MaxDownloadSpeedKibibytesPerSecond}" Minimum="0" Increment="128"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                            <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown x:Name="UploadLimitBox" Value="{Binding MaxUploadSpeedKibibytesPerSecond}" Minimum="0" Increment="128"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="{m:L Settings_SpeedLimitHint}"
+                               Opacity="0.55"
+                               FontSize="{StaticResource FontSizeSmall}"
+                               TextWrapping="Wrap"/>
+
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_DiskReadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
@@ -461,6 +478,50 @@
                     </WrapPanel>
                 </StackPanel>
             </suki:GlassCard>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}">
+                <ScrollViewer>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                        <suki:GlassCard>
+                            <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <materialIcons:MaterialIcon Kind="FolderMultipleOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <TextBlock Text="{m:L Settings_Categories}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <TextBlock Text="{m:L Settings_CategoriesHint}"
+                                           Opacity="0.6"
+                                           FontSize="{StaticResource FontSizeSmall}"
+                                           TextWrapping="Wrap"/>
+
+                                <ItemsControl x:Name="CategoryList" ItemsSource="{Binding CategoryList}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="config:TorrentCategory">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource XXSmallBottomMargin}">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" MinWidth="120"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding SavePath}" Opacity="0.6" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                <Button Grid.Column="2"
+                                                        Classes="Basic"
+                                                        Command="{Binding $parent[ItemsControl].((vm:SettingsViewModel)DataContext).RemoveCategoryCommand}"
+                                                        CommandParameter="{Binding Name}">
+                                                    <materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Grid ColumnDefinitions="*,2*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
+                                    <TextBox Text="{Binding NewCategoryName, Mode=TwoWay}" Watermark="{m:L Settings_Categories_NameWatermark}"/>
+                                    <TextBox Grid.Column="1" Text="{Binding NewCategoryPath, Mode=TwoWay}" Watermark="{m:L Settings_Categories_PathWatermark}"/>
+                                    <Button Grid.Column="2" Command="{Binding BrowseCategoryPathCommand}" Content="{m:L Settings_Browse}"/>
+                                    <Button Grid.Column="3" Command="{Binding AddCategoryCommand}" Content="{m:L Settings_Categories_Add}"/>
+                                </Grid>
+                            </StackPanel>
+                        </suki:GlassCard>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

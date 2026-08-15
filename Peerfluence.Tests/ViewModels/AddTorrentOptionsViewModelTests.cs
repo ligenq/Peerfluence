@@ -1,4 +1,4 @@
-using Peerfluence.Core.Config;
+﻿using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -16,7 +16,7 @@ public class AddTorrentOptionsViewModelTests
             "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&dn=Test",
             Substitute.For<ITorrentService>(),
             Substitute.For<ITopLevelService>(),
-            CreateSettingsService("C:\\Downloads"));
+            CreateSettingsService("C:\\Downloads"), Substitute.For<ITorrentCategoryService>());
 
         sut.DownloadPath = "C:\\Downloads\\Test";
         sut.StartImmediately = false;
@@ -68,7 +68,7 @@ public class AddTorrentOptionsViewModelTests
             "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&dn=Test",
             torrentService,
             Substitute.For<ITopLevelService>(),
-            settingsService);
+            settingsService, Substitute.For<ITorrentCategoryService>());
         sut.SkipThisStepNextTime = true;
 
         await sut.AddCommand.ExecuteAsync(null);
@@ -85,7 +85,7 @@ public class AddTorrentOptionsViewModelTests
             "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&dn=Test",
             Substitute.For<ITorrentService>(),
             Substitute.For<ITopLevelService>(),
-            CreateSettingsService("C:\\Downloads"));
+            CreateSettingsService("C:\\Downloads"), Substitute.For<ITorrentCategoryService>());
         var preview = new MagnetMetadataPreview(
             "Resolved torrent",
             "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -147,7 +147,7 @@ public class AddTorrentOptionsViewModelTests
             $"magnet:?xt=urn:btih:{torrentFile.InfoHash}",
             torrentService,
             Substitute.For<ITopLevelService>(),
-            CreateSettingsService("C:\\Downloads"));
+            CreateSettingsService("C:\\Downloads"), Substitute.For<ITorrentCategoryService>());
         sut.ApplyMetadataPreview(new MagnetMetadataPreview(
             torrentFile.Name,
             torrentFile.InfoHash.ToString(),
