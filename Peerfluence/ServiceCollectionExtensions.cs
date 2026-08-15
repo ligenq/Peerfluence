@@ -2,6 +2,7 @@ using System;
 using System.IO.Abstractions;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Peerfluence.Core.Services.Rpc;
 using Peerfluence.Services.Mcp;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
@@ -54,6 +55,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
         services.AddSingleton<ITorrentCategoryService, TorrentCategoryService>();
+        services.AddSingleton<ITorrentTransferSnapshots, TorrentTransferSnapshots>();
+        services.AddSingleton<ITransmissionRpcHandler>(sp => new TransmissionRpcHandler(
+            sp.GetRequiredService<ITorrentService>(),
+            sp.GetRequiredService<IAppSettingsService>(),
+            sp.GetRequiredService<ITorrentTransferSnapshots>(),
+            sp.GetRequiredService<ITorrentCategoryService>(),
+            ApplicationVersionInfo.Version));
 
         // One client for the lifetime of the app rather than one per search: a new HttpClient per
         // call leaves sockets in TIME_WAIT, and searching is something people do repeatedly. Fifteen
@@ -137,6 +145,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<TorrentEngineHostedService>();
         services.AddHostedService<TorrentAlertsHostedService>();
         services.AddHostedService<McpServerHostedService>();
+        // Last of the servers, and does nothing unless switched on.
+        services.AddHostedService<TransmissionRpcHostedService>();
         // Opt-in diagnostic; does nothing unless PEERFLUENCE_EXCEPTION_STATS is set.
         services.AddHostedService<ExceptionRateDiagnosticHostedService>();
         return services;

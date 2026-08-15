@@ -2926,6 +2926,87 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remote control.
+        /// </summary>
+        public static string Settings_Remote {
+            get {
+                return ResourceManager.GetString("Settings_Remote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reachable from other machines.
+        /// </summary>
+        public static string Settings_Remote_AllowRemote {
+            get {
+                return ResourceManager.GetString("Settings_Remote_AllowRemote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow remote control.
+        /// </summary>
+        public static string Settings_Remote_Enable {
+            get {
+                return ResourceManager.GetString("Settings_Remote_Enable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reaching this from another machine needs a username and password. Without them, remote control will not start..
+        /// </summary>
+        public static string Settings_Remote_NeedsCredentials {
+            get {
+                return ResourceManager.GetString("Settings_Remote_NeedsCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        public static string Settings_Remote_Password {
+            get {
+                return ResourceManager.GetString("Settings_Remote_Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Port.
+        /// </summary>
+        public static string Settings_Remote_Port {
+            get {
+                return ResourceManager.GetString("Settings_Remote_Port", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes here take effect the next time Peerfluence starts..
+        /// </summary>
+        public static string Settings_Remote_RestartHint {
+            get {
+                return ResourceManager.GetString("Settings_Remote_RestartHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username.
+        /// </summary>
+        public static string Settings_Remote_Username {
+            get {
+                return ResourceManager.GetString("Settings_Remote_Username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lets other programs drive Peerfluence over the Transmission protocol, which is what Sonarr, Radarr and similar tools speak. Off by default, and reachable only from this machine unless you say otherwise..
+        /// </summary>
+        public static string Settings_RemoteHint {
+            get {
+                return ResourceManager.GetString("Settings_RemoteHint", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Reset.
         /// </summary>

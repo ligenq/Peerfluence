@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 
@@ -84,6 +84,8 @@ public sealed class JsonAppSettingsStoreTests : IDisposable
 
         Assert.Contains("TorznabUrl", json);
         Assert.DoesNotContain("IsConfigured", json);
+        Assert.DoesNotContain("IsUsable", json);
+        Assert.DoesNotContain("RequiresAuthentication", json);
     }
 
     private sealed record TestAppPaths(

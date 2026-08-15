@@ -20,6 +20,8 @@ public sealed class AppSettings
 
     public CategorySettings Categories { get; set; } = new();
 
+    public RemoteSettings Remote { get; set; } = new();
+
     public SearchSettings Search { get; set; } = new();
 
     /// <summary>

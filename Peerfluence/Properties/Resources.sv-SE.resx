@@ -1369,4 +1369,31 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="AddTorrent_Category" xml:space="preserve">
     <value>Kategori</value>
   </data>
+  <data name="Settings_Remote" xml:space="preserve">
+    <value>Fjärrstyrning</value>
+  </data>
+  <data name="Settings_RemoteHint" xml:space="preserve">
+    <value>Låter andra program styra Peerfluence via Transmission-protokollet, som är det Sonarr, Radarr och liknande verktyg talar. Avstängt som standard och nåbart endast från den här datorn om du inte anger annat.</value>
+  </data>
+  <data name="Settings_Remote_Enable" xml:space="preserve">
+    <value>Tillåt fjärrstyrning</value>
+  </data>
+  <data name="Settings_Remote_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Settings_Remote_AllowRemote" xml:space="preserve">
+    <value>Nåbart från andra datorer</value>
+  </data>
+  <data name="Settings_Remote_Username" xml:space="preserve">
+    <value>Användarnamn</value>
+  </data>
+  <data name="Settings_Remote_Password" xml:space="preserve">
+    <value>Lösenord</value>
+  </data>
+  <data name="Settings_Remote_NeedsCredentials" xml:space="preserve">
+    <value>Att nå detta från en annan dator kräver användarnamn och lösenord. Utan dem startar inte fjärrstyrningen.</value>
+  </data>
+  <data name="Settings_Remote_RestartHint" xml:space="preserve">
+    <value>Ändringar här träder i kraft nästa gång Peerfluence startar.</value>
+  </data>
 </root>
