@@ -1205,7 +1205,7 @@
     <value>No indexer connected</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence searches the indexers you connect to it. Connect one under Settings, Search.</value>
+    <value>Peerfluence has no index of its own. It searches through Prowlarr or Jackett - separate applications you install and run yourself.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Nothing matched that search.</value>
@@ -1256,7 +1256,7 @@
     <value>Test</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Address filled in. Add the API key from that app's own settings.</value>
+    <value>Address filled in. Checking whether it answers...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Looking for an indexer manager on this machine...</value>
@@ -1275,5 +1275,35 @@
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>The endpoint did not answer: {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Set up an indexer</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Open search settings</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>No indexer has been set up yet.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>Nothing answered at {0}. Prowlarr or Jackett is probably not running.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>The indexer refused the request. Check the API key.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>That address answered, but not with a Torznab feed. Check the endpoint.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Fill in an address first.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>Nothing answered at {0}. Start Prowlarr or Jackett, then test again.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>The indexer answered but refused the key. Copy it again from that app's settings.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Something answered, but it was not a Torznab feed. Check the address.</value>
   </data>
 </root>

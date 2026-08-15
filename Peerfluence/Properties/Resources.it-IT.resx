@@ -1211,7 +1211,7 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
     <value>Nessun indicizzatore collegato</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence cerca negli indicizzatori che gli colleghi. Collegane uno in Impostazioni, Ricerca.</value>
+    <value>Peerfluence non ha un indice proprio. Cerca tramite Prowlarr o Jackett, applicazioni separate che installi e avvii tu.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Nessun risultato per questa ricerca.</value>
@@ -1262,7 +1262,7 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
     <value>Prova</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Indirizzo inserito. Aggiungi la chiave API dalle impostazioni di quell'applicazione.</value>
+    <value>Indirizzo inserito. Verifica della risposta in corso...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Ricerca di un gestore di indicizzatori su questo computer...</value>
@@ -1281,5 +1281,35 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>L'endpoint non ha risposto: {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Configura un indicizzatore</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Apri le impostazioni di ricerca</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>Non è ancora stato configurato alcun indicizzatore.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>Nessuna risposta da {0}. Probabilmente Prowlarr o Jackett non è in esecuzione.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>L'indicizzatore ha rifiutato la richiesta. Controlla la chiave API.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>Quell'indirizzo ha risposto, ma non con un feed Torznab. Controlla l'endpoint.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Inserisci prima un indirizzo.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>Nessuna risposta da {0}. Avvia Prowlarr o Jackett, poi riprova.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>L'indicizzatore ha risposto ma ha rifiutato la chiave. Copiala di nuovo dalle impostazioni di quell'applicazione.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Qualcosa ha risposto, ma non era un feed Torznab. Controlla l'indirizzo.</value>
   </data>
 </root>

@@ -85,11 +85,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         ApplyUpdateAndRestartCommand = new RelayCommand(ApplyUpdateAndRestart);
 
         SetInterfaceModeCommand = new AsyncRelayCommand<InterfaceMode>(SetInterfaceModeAsync);
-        UseIndexerPresetCommand = new RelayCommand<string>(UseIndexerPreset);
+        UseIndexerPresetCommand = new AsyncRelayCommand<string>(UseIndexerPresetAsync);
         DetectIndexerCommand = new AsyncRelayCommand(DetectIndexerAsync);
         TestIndexerCommand = new AsyncRelayCommand(TestIndexerAsync);
 
         WeakReferenceMessenger.Default.Register<InterfaceModeChangedMessage>(this, (_, msg) => ApplyInterfaceMode(msg.Mode));
+
+        // Someone arriving from the Find torrents screen is here for one thing, so open on it.
+        WeakReferenceMessenger.Default.Register<ShowSearchSettingsMessage>(this, (_, _) => SelectedTabIndex = SearchTabIndex);
 
         PropertyChanged += OnSettingChanged;
     }
@@ -161,6 +164,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(IsAdvancedMode),
         nameof(SearchStatusMessage),
         nameof(HasSearchStatusMessage),
+        nameof(SelectedTabIndex),
         nameof(ThemeVariantOptions),
         nameof(ColorThemeOptions),
         nameof(BackgroundStyleOptions),
@@ -362,7 +366,24 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool HasSearchStatusMessage => !string.IsNullOrWhiteSpace(SearchStatusMessage);
 
-    public IRelayCommand<string> UseIndexerPresetCommand { get; private set; } = null!;
+    /// <summary>
+    /// Where Search sits among the tabs. A fixed number is safe because tabs are hidden rather than
+    /// removed when the mode changes, so the positions do not shift - and if anyone reorders them,
+    /// the headless test that checks the selected tab's header says so.
+    /// </summary>
+    public const int SearchTabIndex = 4;
+
+    /// <summary>
+    /// Which tab is showing. Settable so that arriving here from somewhere that knows what it came
+    /// for lands on the right one.
+    /// </summary>
+    public int SelectedTabIndex
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public IAsyncRelayCommand<string> UseIndexerPresetCommand { get; private set; } = null!;
 
     public IAsyncRelayCommand DetectIndexerCommand { get; private set; } = null!;
 
@@ -373,7 +394,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// thing left to supply is the key. Nothing here names a torrent index: which indexes exist is
     /// configured in Prowlarr or Jackett, by the person running it.
     /// </summary>
-    private void UseIndexerPreset(string? template)
+    private async Task UseIndexerPresetAsync(string? template)
     {
         if (string.IsNullOrWhiteSpace(template))
         {
@@ -382,6 +403,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
         TorznabUrl = template;
         SearchStatusMessage = Properties.Resources.Settings_Search_PresetApplied;
+
+        // Checked straight away rather than left for the user to discover on the search screen. A
+        // preset fills in an address for software they may not have installed, and finding that out
+        // here - next to the buttons that can fix it - is the whole point of pressing one.
+        //
+        // Awaited rather than started and forgotten: a fire-and-forget async call from a synchronous
+        // command puts any failure inside it on a thread with nobody listening.
+        await TestIndexerAsync().ConfigureAwait(true);
     }
 
     private async Task DetectIndexerAsync()
@@ -408,10 +437,30 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         SearchStatusMessage = Properties.Resources.Settings_Search_Testing;
 
-        var failure = await _searchService.TestAsync().ConfigureAwait(true);
-        SearchStatusMessage = failure == null
-            ? Properties.Resources.Settings_Search_TestPassed
-            : string.Format(Properties.Resources.Settings_Search_TestFailed, failure);
+        var response = await _searchService.TestAsync().ConfigureAwait(true);
+        SearchStatusMessage = DescribeTest(response);
+    }
+
+    /// <summary>
+    /// The same distinctions the Find torrents screen makes, said here where they can be acted on.
+    /// "Nothing is running there" and "it refused your key" send the user to different places, and
+    /// the raw socket message sends them nowhere.
+    /// </summary>
+    private static string DescribeTest(TorrentSearchResponse response)
+    {
+        return response.Failure switch
+        {
+            SearchFailure.None => Properties.Resources.Settings_Search_TestPassed,
+            SearchFailure.NotConfigured => Properties.Resources.Settings_Search_TestNotConfigured,
+            SearchFailure.Unreachable => string.Format(
+                Properties.Resources.Settings_Search_TestUnreachable,
+                response.FailureDetail ?? string.Empty),
+            SearchFailure.Rejected => Properties.Resources.Settings_Search_TestRejected,
+            SearchFailure.NotTorznab => Properties.Resources.Settings_Search_TestNotTorznab,
+            _ => string.Format(
+                Properties.Resources.Settings_Search_TestFailed,
+                response.FailureDetail ?? string.Empty)
+        };
     }
 
     public int ListeningPort

@@ -1211,7 +1211,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Индексатор не подключён</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence ищет в индексаторах, которые вы к нему подключите. Подключите один в разделе «Настройки», «Поиск».</value>
+    <value>У Peerfluence нет собственного индекса. Он ищет через Prowlarr или Jackett — отдельные приложения, которые вы устанавливаете и запускаете сами.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>По этому запросу ничего не найдено.</value>
@@ -1262,7 +1262,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Проверить</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Адрес заполнен. Добавьте ключ API из настроек того приложения.</value>
+    <value>Адрес заполнен. Проверяем, отвечает ли он...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Поиск менеджера индексаторов на этом компьютере...</value>
@@ -1281,5 +1281,35 @@ Peerfluence распространяется по MIT License. Устанавл�
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>Точка не ответила: {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Настроить индексатор</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Открыть настройки поиска</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>Индексатор ещё не настроен.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>По адресу {0} никто не ответил. Скорее всего, Prowlarr или Jackett не запущен.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>Индексатор отклонил запрос. Проверьте ключ API.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>Этот адрес ответил, но не лентой Torznab. Проверьте точку доступа.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Сначала укажите адрес.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>По адресу {0} никто не ответил. Запустите Prowlarr или Jackett и проверьте снова.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>Индексатор ответил, но отклонил ключ. Скопируйте его заново из настроек того приложения.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Что-то ответило, но это не лента Torznab. Проверьте адрес.</value>
   </data>
 </root>

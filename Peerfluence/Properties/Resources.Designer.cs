@@ -1766,6 +1766,42 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No indexer has been set up yet..
+        /// </summary>
+        public static string Find_Failure_NotConfigured {
+            get {
+                return ResourceManager.GetString("Find_Failure_NotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to That address answered, but not with a Torznab feed. Check the endpoint..
+        /// </summary>
+        public static string Find_Failure_NotTorznab {
+            get {
+                return ResourceManager.GetString("Find_Failure_NotTorznab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The indexer refused the request. Check the API key..
+        /// </summary>
+        public static string Find_Failure_Rejected {
+            get {
+                return ResourceManager.GetString("Find_Failure_Rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing answered at {0}. Prowlarr or Jackett is probably not running..
+        /// </summary>
+        public static string Find_Failure_Unreachable {
+            get {
+                return ResourceManager.GetString("Find_Failure_Unreachable", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Nothing matched that search..
         /// </summary>
@@ -1793,6 +1829,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open search settings.
+        /// </summary>
+        public static string Find_OpenSearchSettings {
+            get {
+                return ResourceManager.GetString("Find_OpenSearchSettings", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to {0} of {1} indexers answered. Some results may be missing..
         /// </summary>
@@ -1820,6 +1865,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set up an indexer.
+        /// </summary>
+        public static string Find_SetUpIndexer {
+            get {
+                return ResourceManager.GetString("Find_SetUpIndexer", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Search failed: {0}.
         /// </summary>
@@ -2873,6 +2927,24 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fill in an address first..
+        /// </summary>
+        public static string Settings_Search_TestNotConfigured {
+            get {
+                return ResourceManager.GetString("Settings_Search_TestNotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something answered, but it was not a Torznab feed. Check the address..
+        /// </summary>
+        public static string Settings_Search_TestNotTorznab {
+            get {
+                return ResourceManager.GetString("Settings_Search_TestNotTorznab", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to The endpoint answered..
         /// </summary>
@@ -2882,6 +2954,24 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The indexer answered but refused the key. Copy it again from that app's settings..
+        /// </summary>
+        public static string Settings_Search_TestRejected {
+            get {
+                return ResourceManager.GetString("Settings_Search_TestRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing answered at {0}. Start Prowlarr or Jackett, then test again..
+        /// </summary>
+        public static string Settings_Search_TestUnreachable {
+            get {
+                return ResourceManager.GetString("Settings_Search_TestUnreachable", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Torznab endpoint.
         /// </summary>

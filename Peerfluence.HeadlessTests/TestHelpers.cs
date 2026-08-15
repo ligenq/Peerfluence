@@ -120,6 +120,11 @@ internal static class TestHelpers
         var updateService = Substitute.For<IUpdateService>();
         var windowsAssociationService = Substitute.For<IWindowsAssociationService>();
 
+        // Answers as the real service does. Pressing a preset now checks the endpoint, and a bare
+        // substitute would hand that check a completed task with a null result.
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns(TorrentSearchResponse.Succeeded([]));
+
         return new SettingsViewModel(
             settingsService,
             themeService,
@@ -129,7 +134,7 @@ internal static class TestHelpers
             updateService,
             windowsAssociationService,
             interfaceModeService ?? Substitute.For<IInterfaceModeService>(),
-            Substitute.For<ITorrentSearchService>());
+            searchService);
     }
 
     public static CreateTorrentViewModel CreateCreateTorrentViewModel()

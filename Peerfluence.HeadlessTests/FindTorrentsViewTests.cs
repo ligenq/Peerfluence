@@ -85,6 +85,31 @@ public class FindTorrentsViewTests
         Assert.All(grid.Columns, column => Assert.NotNull(column.Header));
     }
 
+    /// <summary>
+    /// The empty state used to be a paragraph and nothing else: it named the settings and left the
+    /// user to go and find them.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheExplanation_CarriesAWayToActOnIt()
+    {
+        var (view, vm) = CreateView(configured: false);
+
+        var button = view.FindControl<Button>("SetUpIndexerButton")!;
+
+        Assert.True(button.IsVisible);
+        Assert.Same(vm.OpenSearchSettingsCommand, button.Command);
+    }
+
+    [AvaloniaFact]
+    public void TheOfferToFixIt_AppearsOnlyWhenTheSettingsCouldFixIt()
+    {
+        var (view, _) = CreateView(configured: true);
+
+        var button = view.FindControl<Button>("FixInSettingsButton")!;
+
+        Assert.False(button.IsVisible);
+    }
+
     [AvaloniaFact]
     public void PressingEnterInTheQueryBox_Searches()
     {

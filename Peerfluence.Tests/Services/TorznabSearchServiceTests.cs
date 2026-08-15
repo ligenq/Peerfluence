@@ -137,19 +137,57 @@ public sealed class TorznabSearchServiceTests
 
         var response = await sut.SearchAsync("ubuntu", TestContext.Current.CancellationToken);
 
-        Assert.Equal("Incorrect user credentials", response.FailureMessage);
+        // Torznab code 100 is a credentials problem, and the user needs to hear about the key
+        // rather than about the transport.
+        Assert.Equal(SearchFailure.Rejected, response.Failure);
+        Assert.Equal("Incorrect user credentials", response.FailureDetail);
         Assert.Empty(response.Results);
     }
 
+    /// <summary>
+    /// The reported case: pressing a preset writes an address for software that may not be
+    /// installed, and Windows answers with "the target machine actively refused it". That is a
+    /// sentence about sockets, in one language, and it reaches ten-language users untranslated.
+    /// What survives the classification is the address, which is the part they can act on.
+    /// </summary>
     [Fact]
-    public async Task AnUnreachableEndpoint_IsAnOrdinaryFailure()
+    public async Task AnEndpointWithNothingListening_IsReportedAsUnreachable_NotAsASocketMessage()
     {
-        var sut = Create(_ => throw new HttpRequestException("No connection could be made"), out _);
+        var sut = Create(
+            _ => throw new HttpRequestException("No connection could be made because the target machine actively refused it"),
+            out _);
 
         var response = await sut.SearchAsync("ubuntu", TestContext.Current.CancellationToken);
 
-        Assert.True(response.HasFailure);
-        Assert.Contains("No connection", response.FailureMessage);
+        Assert.Equal(SearchFailure.Unreachable, response.Failure);
+        Assert.Equal("127.0.0.1:9117", response.FailureDetail);
+        Assert.True(response.IsSettingsFixable);
+        Assert.DoesNotContain("socket", response.FailureDetail ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task AnEndpointThatNeverAnswers_IsUnreachableToo()
+    {
+        var sut = Create(_ => throw new TaskCanceledException("The request timed out"), out _);
+
+        var response = await sut.SearchAsync("ubuntu", TestContext.Current.CancellationToken);
+
+        Assert.Equal(SearchFailure.Unreachable, response.Failure);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.Unauthorized, SearchFailure.Rejected)]
+    [InlineData(HttpStatusCode.Forbidden, SearchFailure.Rejected)]
+    [InlineData(HttpStatusCode.NotFound, SearchFailure.NotTorznab)]
+    [InlineData(HttpStatusCode.ServiceUnavailable, SearchFailure.Unreachable)]
+    [InlineData(HttpStatusCode.InternalServerError, SearchFailure.Other)]
+    public async Task AStatusCode_IsTranslatedIntoSomethingTheUserCanActOn(HttpStatusCode status, SearchFailure expected)
+    {
+        var sut = Create(_ => new HttpResponseMessage(status), out _);
+
+        var response = await sut.SearchAsync("ubuntu", TestContext.Current.CancellationToken);
+
+        Assert.Equal(expected, response.Failure);
     }
 
     [Fact]
@@ -214,9 +252,9 @@ public sealed class TorznabSearchServiceTests
     {
         var sut = Create(JackettFeed, out var handler);
 
-        var failure = await sut.TestAsync(TestContext.Current.CancellationToken);
+        var response = await sut.TestAsync(TestContext.Current.CancellationToken);
 
-        Assert.Null(failure);
+        Assert.False(response.HasFailure);
         Assert.Contains("t=caps", Assert.Single(handler.Requests).AbsoluteUri);
     }
 
@@ -225,9 +263,9 @@ public sealed class TorznabSearchServiceTests
     {
         var sut = Create(_ => throw new HttpRequestException("Connection refused"), out _);
 
-        var failure = await sut.TestAsync(TestContext.Current.CancellationToken);
+        var response = await sut.TestAsync(TestContext.Current.CancellationToken);
 
-        Assert.Contains("Connection refused", failure);
+        Assert.Equal(SearchFailure.Unreachable, response.Failure);
     }
 
     [Fact]

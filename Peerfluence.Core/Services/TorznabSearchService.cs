@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using System.Xml.Linq;
 using Peerfluence.Core.Config;
 
@@ -38,12 +39,11 @@ public sealed class TorznabSearchService : ITorrentSearchService
         return QueryAsync("search", query, cancellationToken);
     }
 
-    public async Task<string?> TestAsync(CancellationToken cancellationToken = default)
+    public Task<TorrentSearchResponse> TestAsync(CancellationToken cancellationToken = default)
     {
         // "caps" is Torznab's describe-yourself call: cheap, and it fails the same way a real
         // search would if the URL or the key is wrong.
-        var response = await QueryAsync("caps", query: null, cancellationToken).ConfigureAwait(false);
-        return response.FailureMessage;
+        return QueryAsync("caps", query: null, cancellationToken);
     }
 
     public async Task<string?> DetectLocalEndpointAsync(CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ public sealed class TorznabSearchService : ITorrentSearchService
         var settings = _settingsService.Current.Search;
         if (!settings.IsConfigured)
         {
-            return TorrentSearchResponse.Failed("No indexer configured.");
+            return TorrentSearchResponse.Failed(SearchFailure.NotConfigured);
         }
 
         Uri uri;
@@ -85,7 +85,7 @@ public sealed class TorznabSearchService : ITorrentSearchService
         }
         catch (UriFormatException ex)
         {
-            return TorrentSearchResponse.Failed(ex.Message);
+            return TorrentSearchResponse.Failed(SearchFailure.NotTorznab, ex.Message);
         }
 
         try
@@ -93,7 +93,7 @@ public sealed class TorznabSearchService : ITorrentSearchService
             using var response = await _httpClient.GetAsync(uri, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
-                return TorrentSearchResponse.Failed($"{(int)response.StatusCode} {response.ReasonPhrase}");
+                return FromStatusCode(response.StatusCode, response.ReasonPhrase, uri);
             }
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -103,12 +103,49 @@ public sealed class TorznabSearchService : ITorrentSearchService
         {
             throw;
         }
+        catch (TaskCanceledException)
+        {
+            // Not our cancellation, so it is the client's timeout: something is at that address but
+            // it never finished answering. Unreachable from where the user is standing.
+            return TorrentSearchResponse.Failed(SearchFailure.Unreachable, Authority(uri));
+        }
+        catch (HttpRequestException)
+        {
+            // Someone else's server on the other end of this: not running, wrong port, no route, bad
+            // TLS. All ordinary, none of them a crash, and all of them the same thing to the user -
+            // nothing is answering where they pointed this.
+            return TorrentSearchResponse.Failed(SearchFailure.Unreachable, Authority(uri));
+        }
         catch (Exception ex)
         {
-            // Someone else's server on the other end of this: unreachable, wrong port, bad TLS and
-            // malformed XML are all ordinary, and none of them should reach the user as a crash.
-            return TorrentSearchResponse.Failed(ex.Message);
+            return TorrentSearchResponse.Failed(SearchFailure.Other, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// The part of the address worth repeating back: "127.0.0.1:9117". The full endpoint is a long
+    /// path nobody needs to read to understand that nothing is listening on that port.
+    /// </summary>
+    private static string Authority(Uri uri)
+    {
+        return uri.IsDefaultPort ? uri.Host : $"{uri.Host}:{uri.Port}";
+    }
+
+    private static TorrentSearchResponse FromStatusCode(HttpStatusCode statusCode, string? reasonPhrase, Uri uri)
+    {
+        var detail = $"{(int)statusCode} {reasonPhrase}".Trim();
+
+        return statusCode switch
+        {
+            HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden
+                => TorrentSearchResponse.Failed(SearchFailure.Rejected, detail),
+            HttpStatusCode.NotFound
+                => TorrentSearchResponse.Failed(SearchFailure.NotTorznab, detail),
+            // A gateway that cannot reach what it fronts is the same problem one hop further out.
+            HttpStatusCode.BadGateway or HttpStatusCode.ServiceUnavailable
+                => TorrentSearchResponse.Failed(SearchFailure.Unreachable, Authority(uri)),
+            _ => TorrentSearchResponse.Failed(SearchFailure.Other, detail)
+        };
     }
 
     private static Uri BuildUri(SearchSettings settings, string type, string? query)
@@ -143,9 +180,11 @@ public sealed class TorznabSearchService : ITorrentSearchService
         {
             document = XDocument.Parse(body);
         }
-        catch (System.Xml.XmlException ex)
+        catch (System.Xml.XmlException)
         {
-            return TorrentSearchResponse.Failed(ex.Message);
+            // Answered with something that is not XML at all. Whatever is on that port, it is not
+            // the Torznab endpoint the address claims.
+            return TorrentSearchResponse.Failed(SearchFailure.NotTorznab);
         }
 
         // Torznab reports its own failures inside a 200 response, which is why this is checked
@@ -153,8 +192,15 @@ public sealed class TorznabSearchService : ITorrentSearchService
         var error = document.Root?.Name.LocalName == "error" ? document.Root : null;
         if (error != null)
         {
-            var description = error.Attribute("description")?.Value ?? "The indexer rejected the request.";
-            return TorrentSearchResponse.Failed(description);
+            // Torznab's own codes: 100-103 are all "your key is missing, wrong, or not allowed to
+            // do that". Anything else is the indexer objecting to the query itself.
+            var description = error.Attribute("description")?.Value;
+            var code = error.Attribute("code")?.Value;
+            var rejected = code is "100" or "101" or "102" or "103";
+
+            return TorrentSearchResponse.Failed(
+                rejected ? SearchFailure.Rejected : SearchFailure.Other,
+                description);
         }
 
         // A wrong URL usually answers with an HTML error page, and HTML parses as XML perfectly
@@ -162,22 +208,21 @@ public sealed class TorznabSearchService : ITorrentSearchService
         // mistake it is.
         if (document.Root?.Name.LocalName is not "rss" and not "feed")
         {
-            return TorrentSearchResponse.Failed("That address did not return a Torznab feed.");
+            return TorrentSearchResponse.Failed(SearchFailure.NotTorznab);
         }
 
         var channel = document.Root.Element("channel");
         if (channel == null)
         {
-            return new TorrentSearchResponse([]);
+            return TorrentSearchResponse.Succeeded([]);
         }
 
         var results = channel.Elements("item").Select(ParseItem).ToList();
 
-        return new TorrentSearchResponse(
+        return TorrentSearchResponse.Succeeded(
             results,
-            FailureMessage: null,
-            IndexersQueried: ReadResponseCount(channel, "total"),
-            IndexersFailed: ReadResponseCount(channel, "failed"));
+            indexersQueried: ReadResponseCount(channel, "total"),
+            indexersFailed: ReadResponseCount(channel, "failed"));
     }
 
     /// <summary>

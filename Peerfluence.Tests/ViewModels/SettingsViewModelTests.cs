@@ -37,6 +37,11 @@ public class SettingsViewModelTests
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         var updateService = new UpdateService(updateLogger, _settingsService);
 
+        // Answers as the real service does. A bare substitute returns a completed task with a null
+        // result, which is not something this service is allowed to do.
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns(TorrentSearchResponse.Succeeded([]));
+
         _sut = new SettingsViewModel(
             _settingsService,
             _themeService,
@@ -46,7 +51,7 @@ public class SettingsViewModelTests
             updateService,
             _windowsAssociationService,
             Substitute.For<IInterfaceModeService>(),
-            Substitute.For<ITorrentSearchService>());
+            searchService);
     }
 
     [Fact]
@@ -628,20 +633,20 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public void UseIndexerPreset_FillsInTheAddress_SoOnlyTheKeyIsLeftToSupply()
+    public async Task UseIndexerPreset_FillsInTheAddress_SoOnlyTheKeyIsLeftToSupply()
     {
-        _sut.UseIndexerPresetCommand.Execute(SearchSettings.ProwlarrTemplate);
+        await _sut.UseIndexerPresetCommand.ExecuteAsync(SearchSettings.ProwlarrTemplate);
 
         Assert.Equal(SearchSettings.ProwlarrTemplate, _sut.TorznabUrl);
         Assert.True(_sut.HasSearchStatusMessage);
     }
 
     [Fact]
-    public void UseIndexerPreset_IgnoresAnEmptyTemplate()
+    public async Task UseIndexerPreset_IgnoresAnEmptyTemplate()
     {
         _sut.TorznabUrl = "http://example.invalid/api";
 
-        _sut.UseIndexerPresetCommand.Execute(string.Empty);
+        await _sut.UseIndexerPresetCommand.ExecuteAsync(string.Empty);
 
         Assert.Equal("http://example.invalid/api", _sut.TorznabUrl);
     }
@@ -682,7 +687,7 @@ public class SettingsViewModelTests
     public async Task Test_ChecksTheAddressCurrentlyInTheBox()
     {
         var searchService = Substitute.For<ITorrentSearchService>();
-        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns((string?)null);
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns(TorrentSearchResponse.Succeeded([]));
         var sut = Create(_settingsService, searchService: searchService);
 
         sut.TorznabUrl = "http://example.invalid/typed-just-now";
@@ -692,16 +697,63 @@ public class SettingsViewModelTests
         Assert.Equal(Peerfluence.Properties.Resources.Settings_Search_TestPassed, sut.SearchStatusMessage);
     }
 
+    /// <summary>
+    /// The address, not the socket error. Someone reading this needs to know which port nothing is
+    /// listening on, and that the thing to do about it is start the application that should be.
+    /// </summary>
     [Fact]
-    public async Task Test_ReportsWhyTheEndpointDidNotAnswer()
+    public async Task Test_NamesTheAddress_WhenNothingIsListening()
     {
         var searchService = Substitute.For<ITorrentSearchService>();
-        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns("Connection refused");
+        searchService.TestAsync(Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Unreachable, "127.0.0.1:9117"));
         var sut = Create(_settingsService, searchService: searchService);
 
         await sut.TestIndexerCommand.ExecuteAsync(null);
 
-        Assert.Contains("Connection refused", sut.SearchStatusMessage);
+        Assert.Contains("127.0.0.1:9117", sut.SearchStatusMessage);
+        Assert.Contains("Jackett", sut.SearchStatusMessage);
+    }
+
+    [Fact]
+    public async Task Test_SaysItIsTheKey_WhenTheIndexerAnswersAndRefuses()
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Rejected, "401 Unauthorized"));
+        var sut = Create(_settingsService, searchService: searchService);
+
+        await sut.TestIndexerCommand.ExecuteAsync(null);
+
+        Assert.Equal(Peerfluence.Properties.Resources.Settings_Search_TestRejected, sut.SearchStatusMessage);
+    }
+
+    /// <summary>
+    /// The whole reason the preset buttons exist is to save the user finding the address. Letting
+    /// them walk to the search screen to discover the software is not running would give that back.
+    /// </summary>
+    [Fact]
+    public async Task UseIndexerPreset_ChecksStraightAway_RatherThanLeavingItToBeDiscoveredLater()
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Unreachable, "127.0.0.1:9696"));
+        var sut = Create(_settingsService, searchService: searchService);
+
+        await sut.UseIndexerPresetCommand.ExecuteAsync(SearchSettings.ProwlarrTemplate);
+
+        await searchService.Received(1).TestAsync(Arg.Any<CancellationToken>());
+        Assert.Contains("127.0.0.1:9696", sut.SearchStatusMessage);
+    }
+
+    [Fact]
+    public void ArrivingFromTheSearchScreen_OpensTheSearchTab()
+    {
+        Assert.NotEqual(SettingsViewModel.SearchTabIndex, _sut.SelectedTabIndex);
+
+        WeakReferenceMessenger.Default.Send(new ShowSearchSettingsMessage());
+
+        Assert.Equal(SettingsViewModel.SearchTabIndex, _sut.SelectedTabIndex);
     }
 
     [Fact]

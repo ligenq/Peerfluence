@@ -1211,7 +1211,7 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>Ingen indexerare ansluten</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence söker i de indexerare du ansluter till det. Anslut en under Inställningar, Sök.</value>
+    <value>Peerfluence har inget eget index. Det söker via Prowlarr eller Jackett - fristående program som du installerar och kör själv.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Sökningen gav inga träffar.</value>
@@ -1262,7 +1262,7 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>Testa</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Adressen ifylld. Lägg till API-nyckeln från den appens egna inställningar.</value>
+    <value>Adressen ifylld. Kontrollerar om den svarar...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Söker efter en indexerarhanterare på den här datorn...</value>
@@ -1281,5 +1281,35 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>Slutpunkten svarade inte: {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Konfigurera en indexerare</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Öppna sökinställningarna</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>Ingen indexerare har konfigurerats än.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>Inget svarade på {0}. Prowlarr eller Jackett är förmodligen inte igång.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>Indexeraren avvisade begäran. Kontrollera API-nyckeln.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>Adressen svarade, men inte med ett Torznab-flöde. Kontrollera slutpunkten.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Ange en adress först.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>Inget svarade på {0}. Starta Prowlarr eller Jackett och testa igen.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>Indexeraren svarade men avvisade nyckeln. Kopiera den igen från den appens inställningar.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Något svarade, men det var inget Torznab-flöde. Kontrollera adressen.</value>
   </data>
 </root>
