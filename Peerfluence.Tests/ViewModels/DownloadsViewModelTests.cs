@@ -345,8 +345,8 @@ public class DownloadsViewModelTests
     public void Search_NarrowsTheVisibleListWithoutTouchingTheRealOne()
     {
         var sut = CreateViewModelWithTorrents(
-            ("ubuntu-24.04.iso", complete: false, running: true),
-            ("debian-12.iso", complete: false, running: true));
+            ("ubuntu-24.04.iso", Complete: false, Running: true),
+            ("debian-12.iso", Complete: false, Running: true));
 
         try
         {
@@ -366,7 +366,7 @@ public class DownloadsViewModelTests
     [Fact]
     public void SearchingEverythingAway_IsSaidDifferentlyFromHavingNothing()
     {
-        var sut = CreateViewModelWithTorrents(("ubuntu-24.04.iso", complete: false, running: true));
+        var sut = CreateViewModelWithTorrents(("ubuntu-24.04.iso", Complete: false, Running: true));
 
         try
         {
@@ -391,9 +391,9 @@ public class DownloadsViewModelTests
     public void EachFilter_ShowsWhatItSays(TorrentFilter filter, string[] expected)
     {
         var sut = CreateViewModelWithTorrents(
-            ("downloading", complete: false, running: true),
-            ("seeding", complete: true, running: true),
-            ("finished-and-stopped", complete: true, running: false));
+            ("downloading", Complete: false, Running: true),
+            ("seeding", Complete: true, Running: true),
+            ("finished-and-stopped", Complete: true, Running: false));
 
         try
         {
@@ -441,9 +441,9 @@ public class DownloadsViewModelTests
     public async Task StartSelected_StartsEveryStoppedTorrentInTheSelection()
     {
         var sut = CreateViewModelWithTorrents(
-            ("stopped-one", complete: false, running: false),
-            ("stopped-two", complete: false, running: false),
-            ("already-running", complete: false, running: true));
+            ("stopped-one", Complete: false, Running: false),
+            ("stopped-two", Complete: false, Running: false),
+            ("already-running", Complete: false, Running: true));
 
         try
         {
@@ -471,8 +471,8 @@ public class DownloadsViewModelTests
     public async Task StopSelected_StopsEveryRunningTorrentInTheSelection()
     {
         var sut = CreateViewModelWithTorrents(
-            ("running-one", complete: false, running: true),
-            ("running-two", complete: true, running: true));
+            ("running-one", Complete: false, Running: true),
+            ("running-two", Complete: true, Running: true));
 
         try
         {
@@ -494,8 +494,8 @@ public class DownloadsViewModelTests
     public void AMixedSelection_StillOffersBothStartAndStop()
     {
         var sut = CreateViewModelWithTorrents(
-            ("stopped", complete: false, running: false),
-            ("running", complete: false, running: true));
+            ("stopped", Complete: false, Running: false),
+            ("running", Complete: false, Running: true));
 
         try
         {
@@ -515,7 +515,7 @@ public class DownloadsViewModelTests
     [Fact]
     public void WithNothingMultiSelected_TheCommandsStillFollowTheFocusedRow()
     {
-        var sut = CreateViewModelWithTorrents(("stopped", complete: false, running: false));
+        var sut = CreateViewModelWithTorrents(("stopped", Complete: false, Running: false));
 
         try
         {
@@ -535,7 +535,7 @@ public class DownloadsViewModelTests
     {
         // A context menu is a popup with its own visual tree, so the row has to hold the commands
         // rather than reach up for them - reaching up left every menu item disabled.
-        var sut = CreateViewModelWithTorrents(("anything", complete: false, running: true));
+        var sut = CreateViewModelWithTorrents(("anything", Complete: false, Running: true));
 
         try
         {

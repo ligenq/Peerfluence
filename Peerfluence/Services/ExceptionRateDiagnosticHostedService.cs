@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -132,6 +133,17 @@ public sealed class ExceptionRateDiagnosticHostedService : IHostedService, IDisp
     /// <summary>
     /// Names the code responsible, which is the part a bare type name cannot tell you.
     /// </summary>
+    /// <remarks>
+    /// Reads metadata that trimming is allowed to remove, and the release build does trim. That is
+    /// tolerable only because of what this is: an opt-in diagnostic that already answers
+    /// "(unattributed)" or "(stack unavailable)" when it cannot see far enough, so a trimmed build
+    /// gets a less specific name rather than a wrong one or a crash. Suppressed rather than left as
+    /// a warning so that the warnings that do matter are not buried under four that do not.
+    /// </remarks>
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:RequiresUnreferencedCode",
+        Justification = "Diagnostic only, and degrades to a less specific name when metadata is trimmed away.")]
     private static string DescribeSite(Exception exception)
     {
         try

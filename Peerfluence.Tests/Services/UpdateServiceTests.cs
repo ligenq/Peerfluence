@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
@@ -97,7 +97,7 @@ public class UpdateServiceTests
     [Fact]
     public async Task DownloadUpdateAsync_ReturnsFalse_WhenNotInstalled()
     {
-        var result = await _sut.DownloadUpdateAsync();
+        var result = await _sut.DownloadUpdateAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.False(result);
     }
 
@@ -181,7 +181,7 @@ public class UpdateServiceTests
 
         var sut = new UpdateService(logger, settingsService, _ => adapter);
 
-        var downloadResult = await sut.DownloadUpdateAsync();
+        var downloadResult = await sut.DownloadUpdateAsync(cancellationToken: TestContext.Current.CancellationToken);
         sut.ApplyUpdateAndRestart(["--restart"]);
 
         Assert.True(downloadResult);

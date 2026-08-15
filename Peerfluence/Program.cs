@@ -8,9 +8,11 @@ using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Peerfluence.Core.Services.Rpc;
 using Peerfluence.Logging;
 using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
+using Peerfluence.ViewModels;
 using Velopack;
 
 namespace Peerfluence;
@@ -48,6 +50,8 @@ internal sealed class Program
             return;
         }
 
+        // Starts everything, proves it came up, and leaves again. See RunSmokeTest.
+        var smokeTest = args.Contains("--smoke-test");
         var uiAgentMode = args.Contains("--ui-agent");
         var profilePath = GetOptionValue(args, "--profile", "--ui-agent-profile");
         var appPaths = new AppPaths(profilePath);
@@ -90,6 +94,12 @@ internal sealed class Program
                 .GetRequiredService<ILogger<Program>>()
                 .LogInformation("Application host started in {ElapsedMs} ms", startupTracker.ElapsedMilliseconds);
 
+            if (smokeTest)
+            {
+                RunSmokeTest(host);
+                return;
+            }
+
             // 7. Run Avalonia App (This is a blocking call)
             var appBuilder = BuildAvaloniaApp(host.Services);
             appBuilder.StartWithClassicDesktopLifetime(avaloniaArgs);
@@ -100,6 +110,14 @@ internal sealed class Program
             // would deadlock.
             SynchronizationContext.SetSynchronizationContext(null);
             host.StopAsync(TimeSpan.FromSeconds(3)).GetAwaiter().GetResult();
+        }
+        catch (Exception ex) when (smokeTest)
+        {
+            // Never the crash dialog here. The smoke test runs where there is nobody to dismiss one,
+            // so showing it turns a failure that should take seconds into a job that hangs until its
+            // timeout - which is what happened the first time this was tried.
+            Console.Error.WriteLine("smoke test failed: " + ex);
+            Environment.Exit(1);
         }
         catch (Exception ex)
         {
@@ -159,6 +177,36 @@ internal sealed class Program
         await Task.WhenAny(t1, t2);
     }
 
+    /// <summary>
+    /// Starts the whole application except its window, checks it came up, and stops it again.
+    ///
+    /// <para>
+    /// For continuous integration, which has no desktop to show a window on but can still run
+    /// everything behind one. What it covers is the part no unit test reaches: that the dependency
+    /// graph actually resolves, that every hosted service starts and stops without throwing, and
+    /// that settings survive a round trip on a machine that has never run this before. A missing
+    /// registration or a service that throws on startup is invisible until something does this.
+    /// </para>
+    /// </summary>
+    private static void RunSmokeTest(IHost host)
+    {
+        // Resolved rather than assumed: a registration can be missing and nothing notices until the
+        // screen that needs it is opened, which in a windowless run is never.
+        _ = host.Services.GetRequiredService<ITorrentService>();
+        _ = host.Services.GetRequiredService<ITorrentSearchService>();
+        _ = host.Services.GetRequiredService<ITorrentCategoryService>();
+        _ = host.Services.GetRequiredService<ITransmissionRpcHandler>();
+        _ = host.Services.GetRequiredService<MainWindowViewModel>();
+
+        var settings = host.Services.GetRequiredService<IAppSettingsService>();
+        settings.SaveAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        SynchronizationContext.SetSynchronizationContext(null);
+        host.StopAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
+
+        Console.WriteLine("smoke test: started, resolved and stopped cleanly");
+    }
+
     private static string? GetOptionValue(string[] args, params string[] names)
     {
         for (var i = 0; i < args.Length; i++)
@@ -182,7 +230,7 @@ internal sealed class Program
         var result = new System.Collections.Generic.List<string>();
         for (var i = 0; i < args.Length; i++)
         {
-            if (args[i] == "--ui-agent")
+            if (args[i] is "--ui-agent" or "--smoke-test")
             {
                 continue;
             }

@@ -3,4 +3,24 @@
     <!-- Kept in one place so the projects do not drift to different package versions. -->
     <PeerSharpPackageVersion>3.1.0</PeerSharpPackageVersion>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      Warnings are errors because the ones that mattered here were invisible among the ones that did
+      not. The ninety-four this replaced included two possible-null dereferences, four uses of
+      metadata that the trimmed release build is allowed to remove, and twenty-eight tests that could
+      hang for ever rather than be cancelled - none of which anything would ever have failed on.
+
+      The bar is now zero. Anything genuinely not worth fixing is suppressed at the line that causes
+      it, with a justification, rather than left to accumulate.
+    -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!--
+      Off for the release build only. A warning that stops a developer should not stop a release
+      being cut hours after some analyzer package updated itself, and CI compiles Debug as well.
+    -->
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">false</TreatWarningsAsErrors>
+    <WarningsAsErrors Condition="'$(Configuration)' == 'Release'"></WarningsAsErrors>
+  </PropertyGroup>
 </Project>
