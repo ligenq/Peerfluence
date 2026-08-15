@@ -337,6 +337,16 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     public bool IsAdvancedMode => !IsSimpleMode;
 
     // Search
+    /// <summary>
+    /// The built-in source. On by default, and the reason the search screen works before anything
+    /// has been installed.
+    /// </summary>
+    public bool UseInternetArchive
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = true;
+
     public string TorznabUrl
     {
         get;
@@ -861,6 +871,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         CheckForUpdatesOnStartup = settings.Update.CheckForUpdatesOnStartup;
 
         // Search
+        UseInternetArchive = settings.Search.UseInternetArchive;
         TorznabUrl = settings.Search.TorznabUrl;
         TorznabApiKey = settings.Search.ApiKey;
     }
@@ -947,6 +958,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Update.CheckForUpdatesOnStartup = CheckForUpdatesOnStartup;
 
             // Search
+            settings.Search.UseInternetArchive = UseInternetArchive;
             settings.Search.TorznabUrl = TorznabUrl;
             settings.Search.ApiKey = TorznabApiKey;
         }

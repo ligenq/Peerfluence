@@ -154,6 +154,10 @@ public class LocalizationTests
     [InlineData("Settings_Search_TestUnreachable")]
     [InlineData("Settings_Search_TestRejected")]
     [InlineData("Settings_Search_TestNotTorznab")]
+    [InlineData("Settings_Search_UseInternetArchive")]
+    [InlineData("Settings_Search_InternetArchiveHint")]
+    [InlineData("Settings_Search_YourOwnIndexer")]
+    [InlineData("Find_Failure_RateLimited")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

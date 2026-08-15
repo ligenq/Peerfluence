@@ -1208,10 +1208,10 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Возраст</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Индексатор не подключён</value>
+    <value>Все источники выключены</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>У Peerfluence нет собственного индекса. Он ищет через Prowlarr или Jackett — отдельные приложения, которые вы устанавливаете и запускаете сами.</value>
+    <value>Снова включите «Архив Интернета» или подключите Prowlarr либо Jackett — отдельные приложения, которые вы устанавливаете и запускаете сами.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>По этому запросу ничего не найдено.</value>
@@ -1241,7 +1241,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Поиск</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence не содержит собственного индекса. Он обращается к точке Torznab, которую вы запускаете сами, например Prowlarr или Jackett, и показывает ответ.</value>
+    <value>У Peerfluence нет собственного индекса. Он сразу ищет в «Архиве Интернета», а также в любой точке Torznab, которую вы запускаете сами, например Prowlarr или Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Использовать Prowlarr</value>
@@ -1283,13 +1283,13 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Точка не ответила: {0}</value>
   </data>
   <data name="Find_SetUpIndexer" xml:space="preserve">
-    <value>Настроить индексатор</value>
+    <value>Открыть настройки поиска</value>
   </data>
   <data name="Find_OpenSearchSettings" xml:space="preserve">
     <value>Открыть настройки поиска</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Индексатор ещё не настроен.</value>
+    <value>Все источники поиска выключены.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>По адресу {0} никто не ответил. Скорее всего, Prowlarr или Jackett не запущен.</value>
@@ -1311,5 +1311,17 @@ Peerfluence распространяется по MIT License. Устанавл�
   </data>
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Что-то ответило, но это не лента Torznab. Проверьте адрес.</value>
+  </data>
+  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
+    <value>Искать в «Архиве Интернета»</value>
+  </data>
+  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
+    <value>Встроено и ничего не нужно устанавливать. Архив публикует торрент для всего, что хранит, поэтому это работает сразу.</value>
+  </data>
+  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
+    <value>Ваш собственный индексатор</value>
+  </data>
+  <data name="Find_Failure_RateLimited" xml:space="preserve">
+    <value>{0} просит подождать. Повторите попытку чуть позже.</value>
   </data>
 </root>

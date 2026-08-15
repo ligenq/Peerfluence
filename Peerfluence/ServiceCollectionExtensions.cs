@@ -55,12 +55,25 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
 
         // One client for the lifetime of the app rather than one per search: a new HttpClient per
-        // call leaves sockets in TIME_WAIT, and searching is something people do repeatedly. The
-        // timeout is short because the endpoint is normally on this machine, and a Torznab query
-        // that has not answered in fifteen seconds is not going to.
-        services.AddSingleton<ITorrentSearchService>(sp => new TorznabSearchService(
-            sp.GetRequiredService<IAppSettingsService>(),
-            new HttpClient { Timeout = TimeSpan.FromSeconds(15) }));
+        // call leaves sockets in TIME_WAIT, and searching is something people do repeatedly. Fifteen
+        // seconds because a Torznab endpoint is normally on this machine, and one that has not
+        // answered by then is not going to.
+        //
+        // The user agent is not decoration. The Internet Archive's guidance for automated access
+        // requires one that names the tool and its version, and this is the client that talks to
+        // them.
+        services.AddSingleton(_ =>
+        {
+            var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                $"Peerfluence/{ApplicationVersionInfo.Version} (+https://github.com/ligenq/Peerfluence)");
+            return client;
+        });
+
+        services.AddSingleton<ITorznabIndexer, TorznabSearchService>();
+        services.AddSingleton<ITorrentSearchSource>(sp => sp.GetRequiredService<ITorznabIndexer>());
+        services.AddSingleton<ITorrentSearchSource, InternetArchiveSearchSource>();
+        services.AddSingleton<ITorrentSearchService, AggregateTorrentSearchService>();
         services.AddSingleton<ITorrentService, TorrentService>();
         services.AddSingleton<IUpdateService, UpdateService>();
         services.AddSingleton<IWindowsAssociationService, WindowsAssociationService>();

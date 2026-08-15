@@ -9,7 +9,7 @@ namespace Peerfluence.Core.Services;
 /// Talks Torznab: a query string in, an RSS document out, with the numbers that matter carried in
 /// <c>torznab:attr</c> elements alongside each item.
 /// </summary>
-public sealed class TorznabSearchService : ITorrentSearchService
+public sealed class TorznabSearchService : ITorznabIndexer
 {
     private static readonly XNamespace Torznab = "http://torznab.com/schemas/2015/feed";
 
@@ -31,6 +31,14 @@ public sealed class TorznabSearchService : ITorrentSearchService
         _settingsService = settingsService;
         _httpClient = httpClient;
     }
+
+    public string Name => "Torznab";
+
+    /// <summary>
+    /// Queried only once an address exists. Before that there is nothing to ask, and asking would
+    /// report a failure the user has not caused yet.
+    /// </summary>
+    public bool IsEnabled => IsConfigured;
 
     public bool IsConfigured => _settingsService.Current.Search.IsConfigured;
 
