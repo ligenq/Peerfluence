@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services.Mcp;
 
@@ -28,7 +28,7 @@ public class McpResourceHandlerTests : IDisposable
         var handler = new McpResourceHandler(null!, _appPaths, logger);
 
         var logFilePath = Path.Combine(_testLogDir, "test_log_123.log");
-        await File.WriteAllTextAsync(logFilePath, "Test Log Line 1\nTest Log Line 2");
+        await File.WriteAllTextAsync(logFilePath, "Test Log Line 1\nTest Log Line 2", TestContext.Current.CancellationToken);
 
         try
         {

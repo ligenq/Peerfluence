@@ -48,7 +48,10 @@ public class McpToolHandler : IMcpToolHandler
         {
             if (magnetOrFile.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase))
             {
-                if (!MagnetLink.TryParse(magnetOrFile, out var magnet))
+                // The null is checked as well as the bool: TryParse hands back a nullable without
+                // promising the compiler that success means non-null, so this is the only thing
+                // standing between a malformed magnet and a null reference further down.
+                if (!MagnetLink.TryParse(magnetOrFile, out var magnet) || magnet == null)
                 {
                     return ToolError("Invalid magnet link format.", "invalid_magnet");
                 }

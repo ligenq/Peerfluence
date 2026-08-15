@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
@@ -250,7 +250,7 @@ public class FindTorrentsViewModelTests
         await sut.AddCommand.ExecuteAsync(result);
 
         await _addTorrentDialogService.Received(1).ShowMagnetAsync(result.Link);
-        await _torrentService.DidNotReceive().AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>());
+        await _torrentService.DidNotReceive().AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
     }
 
     /// <summary>
@@ -267,8 +267,8 @@ public class FindTorrentsViewModelTests
 
         await sut.AddCommand.ExecuteAsync(result);
 
-        await _torrentService.Received(1).AddTorrentFromUrlAsync(result.Link, Arg.Any<AddTorrentOptions>());
-        await _torrentService.DidNotReceive().AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>());
+        await _torrentService.Received(1).AddTorrentFromUrlAsync(result.Link, Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
+        await _torrentService.DidNotReceive().AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
         await _addTorrentDialogService.DidNotReceive().ShowMagnetAsync(Arg.Any<string>());
     }
 

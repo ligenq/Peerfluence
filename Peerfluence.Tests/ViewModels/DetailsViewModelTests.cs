@@ -235,7 +235,7 @@ public class DetailsViewModelTests
         _sut.RefreshFromSelection();
 
         // Wait for debounce and background work
-        await Task.Delay(400);
+        await Task.Delay(400, TestContext.Current.CancellationToken);
 
         Assert.Equal("Test Torrent", _sut.Name);
         Assert.Equal(torrent.Hash.ToString(), _sut.InfoHash);
@@ -258,7 +258,7 @@ public class DetailsViewModelTests
 
         WeakReferenceMessenger.Default.Send(
             new TorrentAlertMessage(other, new SimpleTorrentAlert { Id = AlertId.ProgressChanged, Torrent = other }));
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.Current.CancellationToken);
 
         Assert.Equal("Selected", _sut.Name);
     }

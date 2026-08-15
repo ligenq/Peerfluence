@@ -41,6 +41,18 @@ jobs:
       - name: Headless UI tests
         run: dotnet test Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --no-build --configuration Release --logger "console;verbosity=minimal" --logger "trx;LogFileName=headless-${{ matrix.os }}.trx" --results-directory TestResults
 
+      # The part no unit test reaches: that the dependency graph resolves, that every hosted service
+      # starts and stops without throwing, and that settings survive a round trip on a machine that
+      # has never run this before. A missing registration is invisible until something does this.
+      - name: Smoke test the built application
+        shell: bash
+        run: |
+          profile="${RUNNER_TEMP}/peerfluence-smoke"
+          rm -rf "$profile"
+          dotnet run --project Peerfluence/Peerfluence.csproj --configuration Release --no-build --             --smoke-test --profile "$profile"
+          test -f "$profile/settings.json" || { echo "::error::the smoke test wrote no settings file"; exit 1; }
+          echo "settings written to $profile/settings.json"
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
