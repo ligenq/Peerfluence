@@ -241,7 +241,10 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
                 return;
             }
 
-            await _torrentService.AddTorrentFileAsync(result.Link, new AddTorrentOptions());
+            // A search result is never a file on this machine. Sources that carry a link point at a
+            // .torrent on someone's server, and the engine's file loader only reads local paths -
+            // handing it a URL failed with "torrent file not found", which is true and useless.
+            await _torrentService.AddTorrentFromUrlAsync(result.Link, new AddTorrentOptions());
         }
         catch (Exception ex)
         {

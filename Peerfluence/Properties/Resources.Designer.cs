@@ -2855,6 +2855,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Research datasets, papers and course material, shared by the people who produced them. Also built in..
+        /// </summary>
+        public static string Settings_Search_AcademicTorrentsHint {
+            get {
+                return ResourceManager.GetString("Settings_Search_AcademicTorrentsHint", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to API key.
         /// </summary>
@@ -3000,6 +3009,15 @@ namespace Peerfluence.Properties {
         }
         
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search Academic Torrents.
+        /// </summary>
+        public static string Settings_Search_UseAcademicTorrents {
+            get {
+                return ResourceManager.GetString("Settings_Search_UseAcademicTorrents", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Search the Internet Archive.
         /// </summary>

@@ -1211,7 +1211,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Toutes les sources sont désactivées</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Réactivez Internet Archive, ou connectez Prowlarr ou Jackett, des applications distinctes que vous installez et lancez vous-même.</value>
+    <value>Réactivez une source intégrée, ou connectez Prowlarr ou Jackett, des applications distinctes que vous installez et lancez vous-même.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Aucun résultat pour cette recherche.</value>
@@ -1241,7 +1241,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Recherche</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence n'a pas d'index à lui. Il cherche dans Internet Archive dès le départ, ainsi que dans tout point d'accès Torznab que vous hébergez, comme Prowlarr ou Jackett.</value>
+    <value>Peerfluence n'a pas d'index à lui. Il cherche dans Internet Archive et Academic Torrents dès le départ, ainsi que dans tout point d'accès Torznab que vous hébergez, comme Prowlarr ou Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Utiliser Prowlarr</value>
@@ -1323,5 +1323,11 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} a demandé un moment. Réessayez dans un instant.</value>
+  </data>
+  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
+    <value>Rechercher dans Academic Torrents</value>
+  </data>
+  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
+    <value>Jeux de données de recherche, articles et supports de cours, partagés par ceux qui les ont produits. Également intégré.</value>
   </data>
 </root>

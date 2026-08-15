@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.Net;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core;
@@ -33,7 +33,7 @@ public class DetailsViewModelTests
         settingsService.Current.ShowDetailsPane = true;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
         var engineService = new TorrentEngineService(settingsService, loggerFactory);
-        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>());
+        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
 
         _sut = new DetailsViewModel(
             _selectionService,

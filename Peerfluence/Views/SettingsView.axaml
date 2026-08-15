@@ -491,6 +491,15 @@
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
 
+                                <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                    <ToggleSwitch IsChecked="{Binding UseAcademicTorrents}"
+                                                  Content="{m:L Settings_Search_UseAcademicTorrents}"/>
+                                    <TextBlock Text="{m:L Settings_Search_AcademicTorrentsHint}"
+                                               Opacity="0.55"
+                                               FontSize="{StaticResource FontSizeSmall}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+
                                 <Separator/>
 
                                 <TextBlock Text="{m:L Settings_Search_YourOwnIndexer}"

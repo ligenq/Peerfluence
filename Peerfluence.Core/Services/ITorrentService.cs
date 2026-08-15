@@ -16,6 +16,17 @@ public interface ITorrentService
 
     Task<ITorrent> AddTorrentFileAsync(string torrentPath, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Adds a torrent published at an http address, by fetching it and handing the engine the bytes.
+    ///
+    /// <para>
+    /// Search results are not files on this machine. Sources that carry a link rather than a magnet
+    /// - the Internet Archive and Academic Torrents both do - point at a .torrent on someone's
+    /// server, and the engine's loader only reads local paths.
+    /// </para>
+    /// </summary>
+    Task<ITorrent> AddTorrentFromUrlAsync(string url, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
+
     Task SaveSessionAsync(CancellationToken cancellationToken = default);
 
     Task RemoveAsync(ITorrent torrent, RemoveOptions options = RemoveOptions.None, CancellationToken cancellationToken = default);

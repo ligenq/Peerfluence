@@ -1211,7 +1211,7 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
     <value>Tutte le fonti sono disattivate</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Riattiva Internet Archive, oppure collega Prowlarr o Jackett, applicazioni separate che installi e avvii tu.</value>
+    <value>Riattiva una fonte integrata, oppure collega Prowlarr o Jackett, applicazioni separate che installi e avvii tu.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Nessun risultato per questa ricerca.</value>
@@ -1241,7 +1241,7 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
     <value>Ricerca</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence non ha un indice proprio. Cerca in Internet Archive fin da subito e in qualsiasi endpoint Torznab gestito da te, come Prowlarr o Jackett.</value>
+    <value>Peerfluence non ha un indice proprio. Cerca in Internet Archive e Academic Torrents fin da subito e in qualsiasi endpoint Torznab gestito da te, come Prowlarr o Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Usa Prowlarr</value>
@@ -1323,5 +1323,11 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} ha chiesto un momento. Riprova tra poco.</value>
+  </data>
+  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
+    <value>Cerca in Academic Torrents</value>
+  </data>
+  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
+    <value>Set di dati di ricerca, articoli e materiale didattico, condivisi da chi li ha prodotti. Anch'esso integrato.</value>
   </data>
 </root>

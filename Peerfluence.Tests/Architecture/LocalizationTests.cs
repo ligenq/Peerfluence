@@ -158,6 +158,8 @@ public class LocalizationTests
     [InlineData("Settings_Search_InternetArchiveHint")]
     [InlineData("Settings_Search_YourOwnIndexer")]
     [InlineData("Find_Failure_RateLimited")]
+    [InlineData("Settings_Search_UseAcademicTorrents")]
+    [InlineData("Settings_Search_AcademicTorrentsHint")]
     public void RecentlyAddedStrings_DifferFromEnglishInEveryLanguage(string key)
     {
         var english = Resources.ResourceManager.GetString(key, CultureInfo.InvariantCulture);

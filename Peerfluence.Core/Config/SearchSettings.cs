@@ -31,6 +31,12 @@ public sealed class SearchSettings
     /// </summary>
     public bool UseInternetArchive { get; set; } = true;
 
+    /// <summary>
+    /// Whether to search Academic Torrents: research datasets, papers and courses. On by default and
+    /// needs nothing installed, like the archive above it.
+    /// </summary>
+    public bool UseAcademicTorrents { get; set; } = true;
+
     public string TorznabUrl { get; set; } = string.Empty;
 
     public string ApiKey { get; set; } = string.Empty;
