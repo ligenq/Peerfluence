@@ -1208,10 +1208,10 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
     <value>Alter</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Kein Index verbunden</value>
+    <value>Alle Quellen sind ausgeschaltet</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence hat keinen eigenen Index. Es sucht über Prowlarr oder Jackett - eigenständige Anwendungen, die Sie selbst installieren und betreiben.</value>
+    <value>Schalten Sie das Internet Archive wieder ein oder verbinden Sie Prowlarr oder Jackett - eigenständige Anwendungen, die Sie selbst installieren und betreiben.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Keine Treffer für diese Suche.</value>
@@ -1241,7 +1241,7 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
     <value>Suche</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence betreibt keinen eigenen Index. Es fragt einen Torznab-Endpunkt ab, den Sie selbst betreiben, etwa Prowlarr oder Jackett, und zeigt, was zurückkommt.</value>
+    <value>Peerfluence hat keinen eigenen Index. Es durchsucht ab Werk das Internet Archive sowie jeden Torznab-Endpunkt, den Sie selbst betreiben, etwa Prowlarr oder Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Prowlarr verwenden</value>
@@ -1283,13 +1283,13 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
     <value>Der Endpunkt hat nicht geantwortet: {0}</value>
   </data>
   <data name="Find_SetUpIndexer" xml:space="preserve">
-    <value>Index einrichten</value>
+    <value>Sucheinstellungen öffnen</value>
   </data>
   <data name="Find_OpenSearchSettings" xml:space="preserve">
     <value>Sucheinstellungen öffnen</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Es wurde noch kein Index eingerichtet.</value>
+    <value>Alle Suchquellen sind ausgeschaltet.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Unter {0} hat nichts geantwortet. Vermutlich läuft Prowlarr oder Jackett nicht.</value>
@@ -1311,5 +1311,17 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   </data>
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Etwas hat geantwortet, aber es war kein Torznab-Feed. Prüfen Sie die Adresse.</value>
+  </data>
+  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
+    <value>Im Internet Archive suchen</value>
+  </data>
+  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
+    <value>Eingebaut und ohne Installation nutzbar. Das Archiv veröffentlicht für alles, was es enthält, einen Torrent - das funktioniert also sofort.</value>
+  </data>
+  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
+    <value>Ihr eigener Index</value>
+  </data>
+  <data name="Find_Failure_RateLimited" xml:space="preserve">
+    <value>{0} hat um einen Moment gebeten. Versuchen Sie es gleich noch einmal.</value>
   </data>
 </root>

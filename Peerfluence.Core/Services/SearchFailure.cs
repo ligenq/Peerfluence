@@ -32,6 +32,12 @@ public enum SearchFailure
     /// <summary>Something answered, but it was not a Torznab feed. Usually the wrong path.</summary>
     NotTorznab,
 
+    /// <summary>
+    /// The source asked to be left alone for a while. Not a fault and not something to fix - the
+    /// answer is to wait, so it is worth distinguishing from a source that is actually broken.
+    /// </summary>
+    RateLimited,
+
     /// <summary>Anything else. The detail is carried alongside, because there is nothing better to say.</summary>
     Other
 }

@@ -1208,10 +1208,10 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>Ålder</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Ingen indexerare ansluten</value>
+    <value>Alla källor är avstängda</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence har inget eget index. Det söker via Prowlarr eller Jackett - fristående program som du installerar och kör själv.</value>
+    <value>Slå på Internet Archive igen, eller anslut Prowlarr eller Jackett - fristående program som du installerar och kör själv.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Sökningen gav inga träffar.</value>
@@ -1241,7 +1241,7 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>Sök</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence har inget eget index. Det frågar en Torznab-slutpunkt som du själv kör, till exempel Prowlarr eller Jackett, och visar vad som kommer tillbaka.</value>
+    <value>Peerfluence har inget eget index. Det söker i Internet Archive direkt, och i valfri Torznab-slutpunkt som du själv kör, till exempel Prowlarr eller Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Använd Prowlarr</value>
@@ -1283,13 +1283,13 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>Slutpunkten svarade inte: {0}</value>
   </data>
   <data name="Find_SetUpIndexer" xml:space="preserve">
-    <value>Konfigurera en indexerare</value>
+    <value>Öppna sökinställningarna</value>
   </data>
   <data name="Find_OpenSearchSettings" xml:space="preserve">
     <value>Öppna sökinställningarna</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Ingen indexerare har konfigurerats än.</value>
+    <value>Alla sökkällor är avstängda.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Inget svarade på {0}. Prowlarr eller Jackett är förmodligen inte igång.</value>
@@ -1311,5 +1311,17 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   </data>
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Något svarade, men det var inget Torznab-flöde. Kontrollera adressen.</value>
+  </data>
+  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
+    <value>Sök i Internet Archive</value>
+  </data>
+  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
+    <value>Inbyggt och kräver ingen installation. Arkivet publicerar en torrent för allt det innehåller, så det fungerar direkt.</value>
+  </data>
+  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
+    <value>Din egen indexerare</value>
+  </data>
+  <data name="Find_Failure_RateLimited" xml:space="preserve">
+    <value>{0} bad om ett ögonblick. Försök igen strax.</value>
   </data>
 </root>

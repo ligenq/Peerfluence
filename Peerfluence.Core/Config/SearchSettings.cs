@@ -25,6 +25,12 @@ public sealed class SearchSettings
     /// </summary>
     public const string ProwlarrTemplate = "http://127.0.0.1:9696/api/v1/indexers/all/results/torznab";
 
+    /// <summary>
+    /// Whether to search the Internet Archive, which is built in and needs nothing installed. On by
+    /// default: it is what makes the search screen work the first time it is opened.
+    /// </summary>
+    public bool UseInternetArchive { get; set; } = true;
+
     public string TorznabUrl { get; set; } = string.Empty;
 
     public string ApiKey { get; set; } = string.Empty;

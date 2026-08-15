@@ -217,6 +217,9 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
                 response.FailureDetail ?? string.Empty),
             SearchFailure.Rejected => Resources.Find_Failure_Rejected,
             SearchFailure.NotTorznab => Resources.Find_Failure_NotTorznab,
+            SearchFailure.RateLimited => string.Format(
+                Resources.Find_Failure_RateLimited,
+                response.FailureDetail ?? string.Empty),
             _ => string.Format(Resources.Find_SearchFailed, response.FailureDetail ?? string.Empty)
         };
     }

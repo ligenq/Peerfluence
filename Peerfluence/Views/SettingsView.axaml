@@ -480,6 +480,23 @@
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
+                                <!-- The one source that needs nothing installed, so it comes first
+                                     and it is on by default. -->
+                                <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                    <ToggleSwitch IsChecked="{Binding UseInternetArchive}"
+                                                  Content="{m:L Settings_Search_UseInternetArchive}"/>
+                                    <TextBlock Text="{m:L Settings_Search_InternetArchiveHint}"
+                                               Opacity="0.55"
+                                               FontSize="{StaticResource FontSizeSmall}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <Separator/>
+
+                                <TextBlock Text="{m:L Settings_Search_YourOwnIndexer}"
+                                           FontWeight="SemiBold"
+                                           FontSize="{StaticResource FontSizeNormal}"/>
+
                                 <!--
                                     The two indexer managers people actually run, so the endpoint
                                     does not have to be typed or looked up. Neither names a torrent
