@@ -94,6 +94,20 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         {
             IsSimpleMode = msg.Mode == InterfaceMode.Simple;
         });
+
+        // Sent by the Find torrents screen when the problem it is reporting lives in the settings.
+        // The settings view model selects the Search tab off the same message; this only has to get
+        // the user onto the page.
+        WeakReferenceMessenger.Default.Register<ShowSearchSettingsMessage>(this, (_, _) => ShowSettings());
+    }
+
+    private void ShowSettings()
+    {
+        var settings = NavigationItems.FirstOrDefault(item => ReferenceEquals(item.ViewModel, SettingsPage));
+        if (settings != null)
+        {
+            SelectedNavigationItem = settings;
+        }
     }
 
     /// <summary>

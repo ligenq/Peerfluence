@@ -34,11 +34,24 @@
                 out is a different problem from one that found nothing, and only the user can tell
                 which they care about.
             -->
-            <suki:InfoBar Grid.Row="1"
-                          IsVisible="{Binding HasStatusMessage}"
-                          IsClosable="False"
-                          Message="{Binding StatusMessage}"
-                          Margin="{StaticResource StandardBottomMargin}"/>
+            <StackPanel Grid.Row="1"
+                        IsVisible="{Binding HasStatusMessage}"
+                        Spacing="{StaticResource SpacingSmall}"
+                        Margin="{StaticResource StandardBottomMargin}">
+                <suki:InfoBar IsClosable="False" Message="{Binding StatusMessage}"/>
+                <!-- Only where it would help: a timeout on someone else's tracker is not a settings
+                     problem, and offering the settings for it wastes the trip. -->
+                <Button x:Name="FixInSettingsButton"
+                        Classes="Flat"
+                        HorizontalAlignment="Left"
+                        IsVisible="{Binding CanFixInSettings}"
+                        Command="{Binding OpenSearchSettingsCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                        <TextBlock Text="{m:L Find_OpenSearchSettings}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
 
             <suki:GlassCard Grid.Row="2"
                             x:Name="ResultsCard"
@@ -100,6 +113,13 @@
                            Opacity="0.6"
                            TextWrapping="Wrap"
                            TextAlignment="Center"/>
+                <!-- Naming the settings and leaving the user to find them is half an answer. -->
+                <Button x:Name="SetUpIndexerButton"
+                        Classes="Flat"
+                        HorizontalAlignment="Center"
+                        Margin="{StaticResource SmallTopMargin}"
+                        Command="{Binding OpenSearchSettingsCommand}"
+                        Content="{m:L Find_SetUpIndexer}"/>
             </StackPanel>
         </Grid>
     </suki:BusyArea>

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Properties;
 using PeerSharp.Config;
@@ -30,6 +32,8 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
 
         SearchCommand = new AsyncRelayCommand(SearchAsync, () => !string.IsNullOrWhiteSpace(Query));
         AddCommand = new AsyncRelayCommand<TorrentSearchResultViewModel?>(AddAsync);
+        OpenSearchSettingsCommand = new RelayCommand(
+            () => WeakReferenceMessenger.Default.Send(new ShowSearchSettingsMessage()));
     }
 
     // IFeatureViewModel
@@ -95,6 +99,22 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
+    /// <summary>
+    /// Whether the thing that went wrong is one the settings could fix, so the offer to go there is
+    /// only made when it would actually help.
+    /// </summary>
+    public bool CanFixInSettings
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// The way out of both dead ends on this screen: never having set up an indexer, and having one
+    /// that is not answering.
+    /// </summary>
+    public IRelayCommand OpenSearchSettingsCommand { get; }
+
     public IAsyncRelayCommand SearchCommand { get; }
 
     public IAsyncRelayCommand<TorrentSearchResultViewModel?> AddCommand { get; }
@@ -125,6 +145,7 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
 
         IsSearching = true;
         StatusMessage = string.Empty;
+        CanFixInSettings = false;
 
         try
         {
@@ -144,6 +165,7 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
             }
 
             StatusMessage = DescribeOutcome(response);
+            CanFixInSettings = response.IsSettingsFixable;
         }
         catch (OperationCanceledException) when (cts.Token.IsCancellationRequested)
         {
@@ -161,7 +183,7 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
     {
         if (response.HasFailure)
         {
-            return string.Format(Resources.Find_SearchFailed, response.FailureMessage);
+            return Describe(response);
         }
 
         // Said plainly rather than hidden: an empty list because two indexers timed out is a
@@ -173,6 +195,30 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
         }
 
         return response.Results.Count == 0 ? Resources.Find_NoResults : string.Empty;
+    }
+
+    /// <summary>
+    /// Says what went wrong in terms of what the user did, not in terms of what the socket did.
+    ///
+    /// <para>
+    /// The case that matters is Unreachable. Pressing "Use Jackett" writes an address for software
+    /// the user may never have installed, so the overwhelmingly common failure is not a broken
+    /// setup - it is a setup that was never finished, reported by Windows as "the target machine
+    /// actively refused it". That sentence tells someone nothing they can act on.
+    /// </para>
+    /// </summary>
+    private static string Describe(TorrentSearchResponse response)
+    {
+        return response.Failure switch
+        {
+            SearchFailure.NotConfigured => Resources.Find_Failure_NotConfigured,
+            SearchFailure.Unreachable => string.Format(
+                Resources.Find_Failure_Unreachable,
+                response.FailureDetail ?? string.Empty),
+            SearchFailure.Rejected => Resources.Find_Failure_Rejected,
+            SearchFailure.NotTorznab => Resources.Find_Failure_NotTorznab,
+            _ => string.Format(Resources.Find_SearchFailed, response.FailureDetail ?? string.Empty)
+        };
     }
 
     private async Task AddAsync(TorrentSearchResultViewModel? result)
@@ -197,6 +243,7 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
         catch (Exception ex)
         {
             StatusMessage = string.Format(Resources.Find_AddFailed, ex.Message);
+            CanFixInSettings = false;
         }
     }
 }

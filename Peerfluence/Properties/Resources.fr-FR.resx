@@ -1211,7 +1211,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Aucun indexeur connecté</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence interroge les indexeurs que vous lui connectez. Connectez-en un dans Paramètres, Recherche.</value>
+    <value>Peerfluence n'a pas d'index à lui. Il cherche via Prowlarr ou Jackett, des applications distinctes que vous installez et lancez vous-même.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Aucun résultat pour cette recherche.</value>
@@ -1262,7 +1262,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Tester</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Adresse renseignée. Ajoutez la clé d'API depuis les paramètres de cette application.</value>
+    <value>Adresse renseignée. Vérification de sa réponse...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Recherche d'un gestionnaire d'indexeurs sur cette machine...</value>
@@ -1281,5 +1281,35 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>Le point d'accès n'a pas répondu : {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Configurer un indexeur</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Ouvrir les paramètres de recherche</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>Aucun indexeur n'a encore été configuré.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>Rien n'a répondu à {0}. Prowlarr ou Jackett n'est probablement pas démarré.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>L'indexeur a refusé la requête. Vérifiez la clé d'API.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>Cette adresse a répondu, mais pas avec un flux Torznab. Vérifiez le point d'accès.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Renseignez d'abord une adresse.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>Rien n'a répondu à {0}. Démarrez Prowlarr ou Jackett, puis réessayez.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>L'indexeur a répondu mais a refusé la clé. Copiez-la à nouveau depuis les paramètres de cette application.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Quelque chose a répondu, mais ce n'était pas un flux Torznab. Vérifiez l'adresse.</value>
   </data>
 </root>

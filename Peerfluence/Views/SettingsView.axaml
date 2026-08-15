@@ -32,7 +32,7 @@
             </StackPanel>
         </suki:GlassCard>
 
-        <TabControl x:Name="SettingsTabs" Grid.Row="1">
+        <TabControl x:Name="SettingsTabs" Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
             <TabItem Header="{m:L Settings_Appearance}">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">

@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Config;
+using Peerfluence.Core.Messaging;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
@@ -206,6 +208,23 @@ public class SettingsViewTests
         prowlarr.Command!.Execute(prowlarr.CommandParameter);
 
         Assert.Equal(SearchSettings.ProwlarrTemplate, vm.TorznabUrl);
+    }
+
+    /// <summary>
+    /// Arriving from the Find torrents screen has to land on Search, not on whichever tab happened
+    /// to be open. Bound to the tab rather than to an index, so this survives tabs being reordered
+    /// or hidden by the current mode - which is exactly what an index would not.
+    /// </summary>
+    [AvaloniaFact]
+    public void ArrivingFromTheSearchScreen_SelectsTheSearchTab()
+    {
+        var (view, _) = CreateView();
+        var tabs = view.FindControl<TabControl>("SettingsTabs")!;
+        Assert.NotEqual(Peerfluence.Properties.Resources.Settings_Search, (tabs.SelectedItem as TabItem)?.Header);
+
+        WeakReferenceMessenger.Default.Send(new ShowSearchSettingsMessage());
+
+        Assert.Equal(Peerfluence.Properties.Resources.Settings_Search, (tabs.SelectedItem as TabItem)?.Header);
     }
 
     [AvaloniaFact]

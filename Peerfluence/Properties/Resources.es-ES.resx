@@ -1211,7 +1211,7 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
     <value>Ningún indexador conectado</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence busca en los indexadores que le conectes. Conecta uno en Ajustes, Búsqueda.</value>
+    <value>Peerfluence no tiene índice propio. Busca a través de Prowlarr o Jackett, aplicaciones aparte que instalas y ejecutas tú.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>La búsqueda no encontró nada.</value>
@@ -1262,7 +1262,7 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
     <value>Probar</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Dirección rellenada. Añade la clave de API desde los ajustes de esa aplicación.</value>
+    <value>Dirección rellenada. Comprobando si responde...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Buscando un gestor de indexadores en este equipo...</value>
@@ -1281,5 +1281,35 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>El extremo no respondió: {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Configurar un indexador</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Abrir los ajustes de búsqueda</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>Todavía no se ha configurado ningún indexador.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>Nada respondió en {0}. Probablemente Prowlarr o Jackett no esté en marcha.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>El indexador rechazó la petición. Comprueba la clave de API.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>Esa dirección respondió, pero no con un canal Torznab. Comprueba el extremo.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Introduce primero una dirección.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>Nada respondió en {0}. Inicia Prowlarr o Jackett y vuelve a probar.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>El indexador respondió pero rechazó la clave. Cópiala de nuevo desde los ajustes de esa aplicación.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Algo respondió, pero no era un canal Torznab. Comprueba la dirección.</value>
   </data>
 </root>

@@ -1211,7 +1211,7 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
     <value>Kein Index verbunden</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Peerfluence durchsucht die Indizes, die Sie damit verbinden. Verbinden Sie einen unter Einstellungen, Suche.</value>
+    <value>Peerfluence hat keinen eigenen Index. Es sucht über Prowlarr oder Jackett - eigenständige Anwendungen, die Sie selbst installieren und betreiben.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Keine Treffer für diese Suche.</value>
@@ -1262,7 +1262,7 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
     <value>Testen</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
-    <value>Adresse eingetragen. Fügen Sie den API-Schlüssel aus den Einstellungen jener Anwendung hinzu.</value>
+    <value>Adresse eingetragen. Es wird geprüft, ob sie antwortet...</value>
   </data>
   <data name="Settings_Search_Detecting" xml:space="preserve">
     <value>Suche nach einer Index-Verwaltung auf diesem Rechner...</value>
@@ -1281,5 +1281,35 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   </data>
   <data name="Settings_Search_TestFailed" xml:space="preserve">
     <value>Der Endpunkt hat nicht geantwortet: {0}</value>
+  </data>
+  <data name="Find_SetUpIndexer" xml:space="preserve">
+    <value>Index einrichten</value>
+  </data>
+  <data name="Find_OpenSearchSettings" xml:space="preserve">
+    <value>Sucheinstellungen öffnen</value>
+  </data>
+  <data name="Find_Failure_NotConfigured" xml:space="preserve">
+    <value>Es wurde noch kein Index eingerichtet.</value>
+  </data>
+  <data name="Find_Failure_Unreachable" xml:space="preserve">
+    <value>Unter {0} hat nichts geantwortet. Vermutlich läuft Prowlarr oder Jackett nicht.</value>
+  </data>
+  <data name="Find_Failure_Rejected" xml:space="preserve">
+    <value>Der Index hat die Anfrage abgelehnt. Prüfen Sie den API-Schlüssel.</value>
+  </data>
+  <data name="Find_Failure_NotTorznab" xml:space="preserve">
+    <value>Diese Adresse hat geantwortet, aber nicht mit einem Torznab-Feed. Prüfen Sie den Endpunkt.</value>
+  </data>
+  <data name="Settings_Search_TestNotConfigured" xml:space="preserve">
+    <value>Geben Sie zuerst eine Adresse ein.</value>
+  </data>
+  <data name="Settings_Search_TestUnreachable" xml:space="preserve">
+    <value>Unter {0} hat nichts geantwortet. Starten Sie Prowlarr oder Jackett und testen Sie erneut.</value>
+  </data>
+  <data name="Settings_Search_TestRejected" xml:space="preserve">
+    <value>Der Index hat geantwortet, den Schlüssel aber abgelehnt. Kopieren Sie ihn erneut aus den Einstellungen jener Anwendung.</value>
+  </data>
+  <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
+    <value>Etwas hat geantwortet, aber es war kein Torznab-Feed. Prüfen Sie die Adresse.</value>
   </data>
 </root>

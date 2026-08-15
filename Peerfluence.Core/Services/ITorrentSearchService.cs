@@ -18,10 +18,10 @@ public interface ITorrentSearchService
     Task<TorrentSearchResponse> SearchAsync(string query, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Checks the configured endpoint answers, without running a search. Returns null when it does,
-    /// and the reason when it does not.
+    /// Checks the configured endpoint answers, without running a search. Fails in exactly the ways
+    /// a real search would, so what it reports is what the user would have hit anyway.
     /// </summary>
-    Task<string?> TestAsync(CancellationToken cancellationToken = default);
+    Task<TorrentSearchResponse> TestAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Looks for an indexer manager already running on this machine, so the common case needs no

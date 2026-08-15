@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
@@ -5,6 +7,11 @@ using PeerSharp.Config;
 
 namespace Peerfluence.Tests.ViewModels;
 
+/// <summary>
+/// In the messenger collection: this class both sends on the shared default messenger and registers
+/// on it, and a class doing that in parallel with another sees the other's traffic.
+/// </summary>
+[Collection("Messenger")]
 public class FindTorrentsViewModelTests
 {
     private readonly ITorrentSearchService _searchService = Substitute.For<ITorrentSearchService>();
@@ -121,19 +128,95 @@ public class FindTorrentsViewModelTests
         Assert.Single(sut.Results);
     }
 
+    /// <summary>
+    /// The reported case. What the user must not see is the socket message; what they must see is
+    /// the address, and a way to get to the settings.
+    /// </summary>
     [Fact]
-    public async Task Search_ReportsAFailureRatherThanThrowing()
+    public async Task Search_ExplainsAnUnreachableIndexer_AndOffersTheSettings()
     {
         _searchService.IsConfigured.Returns(true);
         _searchService.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(TorrentSearchResponse.Failed("Connection refused"));
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Unreachable, "127.0.0.1:9117"));
         var sut = Create();
         sut.Query = "ubuntu";
 
         await sut.SearchCommand.ExecuteAsync(null);
 
-        Assert.Contains("Connection refused", sut.StatusMessage);
+        Assert.Contains("127.0.0.1:9117", sut.StatusMessage);
+        Assert.Contains("Jackett", sut.StatusMessage);
+        Assert.True(sut.CanFixInSettings);
         Assert.Empty(sut.Results);
+    }
+
+    [Fact]
+    public async Task Search_SaysToCheckTheKey_WhenTheIndexerRefuses()
+    {
+        _searchService.IsConfigured.Returns(true);
+        _searchService.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Rejected, "401 Unauthorized"));
+        var sut = Create();
+        sut.Query = "ubuntu";
+
+        await sut.SearchCommand.ExecuteAsync(null);
+
+        Assert.Equal(Peerfluence.Properties.Resources.Find_Failure_Rejected, sut.StatusMessage);
+        Assert.True(sut.CanFixInSettings);
+    }
+
+    /// <summary>
+    /// Offering the settings for something the settings cannot fix sends the user on a wasted trip.
+    /// </summary>
+    [Fact]
+    public async Task Search_DoesNotOfferTheSettings_ForAProblemTheyCannotFix()
+    {
+        _searchService.IsConfigured.Returns(true);
+        _searchService.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Other, "The feed was truncated"));
+        var sut = Create();
+        sut.Query = "ubuntu";
+
+        await sut.SearchCommand.ExecuteAsync(null);
+
+        Assert.False(sut.CanFixInSettings);
+    }
+
+    [Fact]
+    public async Task TheOfferOfSettings_IsWithdrawn_OnceASearchWorks()
+    {
+        _searchService.IsConfigured.Returns(true);
+        _searchService.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Failed(SearchFailure.Unreachable, "127.0.0.1:9117"));
+        var sut = Create();
+        sut.Query = "ubuntu";
+        await sut.SearchCommand.ExecuteAsync(null);
+
+        _searchService.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(TorrentSearchResponse.Succeeded([Result("ubuntu", 5)], 1, 0));
+        await sut.SearchCommand.ExecuteAsync(null);
+
+        Assert.False(sut.CanFixInSettings);
+        Assert.False(sut.HasStatusMessage);
+    }
+
+    [Fact]
+    public void OpenSearchSettings_AsksTheShellToGoThere()
+    {
+        var sut = Create();
+        var received = 0;
+        var recipient = new object();
+        WeakReferenceMessenger.Default.Register<ShowSearchSettingsMessage>(recipient, (_, _) => received++);
+
+        try
+        {
+            sut.OpenSearchSettingsCommand.Execute(null);
+        }
+        finally
+        {
+            WeakReferenceMessenger.Default.UnregisterAll(recipient);
+        }
+
+        Assert.Equal(1, received);
     }
 
     [Fact]
