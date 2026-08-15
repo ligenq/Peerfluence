@@ -1363,4 +1363,31 @@
   <data name="AddTorrent_Category" xml:space="preserve">
     <value>Category</value>
   </data>
+  <data name="Settings_Remote" xml:space="preserve">
+    <value>Remote control</value>
+  </data>
+  <data name="Settings_RemoteHint" xml:space="preserve">
+    <value>Lets other programs drive Peerfluence over the Transmission protocol, which is what Sonarr, Radarr and similar tools speak. Off by default, and reachable only from this machine unless you say otherwise.</value>
+  </data>
+  <data name="Settings_Remote_Enable" xml:space="preserve">
+    <value>Allow remote control</value>
+  </data>
+  <data name="Settings_Remote_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Settings_Remote_AllowRemote" xml:space="preserve">
+    <value>Reachable from other machines</value>
+  </data>
+  <data name="Settings_Remote_Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Settings_Remote_Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Settings_Remote_NeedsCredentials" xml:space="preserve">
+    <value>Reaching this from another machine needs a username and password. Without them, remote control will not start.</value>
+  </data>
+  <data name="Settings_Remote_RestartHint" xml:space="preserve">
+    <value>Changes here take effect the next time Peerfluence starts.</value>
+  </data>
 </root>

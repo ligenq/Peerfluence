@@ -1369,4 +1369,31 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="AddTorrent_Category" xml:space="preserve">
     <value>Kategoria</value>
   </data>
+  <data name="Settings_Remote" xml:space="preserve">
+    <value>Zdalne sterowanie</value>
+  </data>
+  <data name="Settings_RemoteHint" xml:space="preserve">
+    <value>Pozwala innym programom sterować Peerfluence przez protokół Transmission, którym posługują się Sonarr, Radarr i podobne narzędzia. Domyślnie wyłączone i dostępne tylko z tego komputera, o ile nie wskażesz inaczej.</value>
+  </data>
+  <data name="Settings_Remote_Enable" xml:space="preserve">
+    <value>Zezwól na zdalne sterowanie</value>
+  </data>
+  <data name="Settings_Remote_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Settings_Remote_AllowRemote" xml:space="preserve">
+    <value>Dostępne z innych komputerów</value>
+  </data>
+  <data name="Settings_Remote_Username" xml:space="preserve">
+    <value>Nazwa użytkownika</value>
+  </data>
+  <data name="Settings_Remote_Password" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="Settings_Remote_NeedsCredentials" xml:space="preserve">
+    <value>Dostęp z innego komputera wymaga nazwy użytkownika i hasła. Bez nich zdalne sterowanie się nie uruchomi.</value>
+  </data>
+  <data name="Settings_Remote_RestartHint" xml:space="preserve">
+    <value>Zmiany tutaj zaczną obowiązywać przy następnym uruchomieniu Peerfluence.</value>
+  </data>
 </root>

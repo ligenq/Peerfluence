@@ -1369,4 +1369,31 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
   <data name="AddTorrent_Category" xml:space="preserve">
     <value>Categoria</value>
   </data>
+  <data name="Settings_Remote" xml:space="preserve">
+    <value>Controlo remoto</value>
+  </data>
+  <data name="Settings_RemoteHint" xml:space="preserve">
+    <value>Permite que outros programas controlem o Peerfluence através do protocolo do Transmission, que é o que o Sonarr, o Radarr e ferramentas semelhantes falam. Desligado por predefinição e acessível apenas a partir deste computador salvo indicação em contrário.</value>
+  </data>
+  <data name="Settings_Remote_Enable" xml:space="preserve">
+    <value>Permitir o controlo remoto</value>
+  </data>
+  <data name="Settings_Remote_Port" xml:space="preserve">
+    <value>Porta</value>
+  </data>
+  <data name="Settings_Remote_AllowRemote" xml:space="preserve">
+    <value>Acessível a partir de outros computadores</value>
+  </data>
+  <data name="Settings_Remote_Username" xml:space="preserve">
+    <value>Nome de utilizador</value>
+  </data>
+  <data name="Settings_Remote_Password" xml:space="preserve">
+    <value>Palavra-passe</value>
+  </data>
+  <data name="Settings_Remote_NeedsCredentials" xml:space="preserve">
+    <value>Aceder a partir de outro computador exige um nome de utilizador e uma palavra-passe. Sem eles, o controlo remoto não arrancará.</value>
+  </data>
+  <data name="Settings_Remote_RestartHint" xml:space="preserve">
+    <value>As alterações aqui têm efeito no próximo arranque do Peerfluence.</value>
+  </data>
 </root>

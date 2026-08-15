@@ -1369,4 +1369,31 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="AddTorrent_Category" xml:space="preserve">
     <value>Категорія</value>
   </data>
+  <data name="Settings_Remote" xml:space="preserve">
+    <value>Віддалене керування</value>
+  </data>
+  <data name="Settings_RemoteHint" xml:space="preserve">
+    <value>Дозволяє іншим програмам керувати Peerfluence через протокол Transmission — ним послуговуються Sonarr, Radarr та подібні інструменти. Типово вимкнено й доступно лише з цього комп'ютера, якщо ви не вкажете інше.</value>
+  </data>
+  <data name="Settings_Remote_Enable" xml:space="preserve">
+    <value>Дозволити віддалене керування</value>
+  </data>
+  <data name="Settings_Remote_Port" xml:space="preserve">
+    <value>Порт</value>
+  </data>
+  <data name="Settings_Remote_AllowRemote" xml:space="preserve">
+    <value>Доступно з інших комп'ютерів</value>
+  </data>
+  <data name="Settings_Remote_Username" xml:space="preserve">
+    <value>Ім'я користувача</value>
+  </data>
+  <data name="Settings_Remote_Password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="Settings_Remote_NeedsCredentials" xml:space="preserve">
+    <value>Для доступу з іншого комп'ютера потрібні ім'я користувача та пароль. Без них віддалене керування не запуститься.</value>
+  </data>
+  <data name="Settings_Remote_RestartHint" xml:space="preserve">
+    <value>Зміни тут набудуть чинності під час наступного запуску Peerfluence.</value>
+  </data>
 </root>

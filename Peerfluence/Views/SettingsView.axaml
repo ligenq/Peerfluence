@@ -482,6 +482,64 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}">
+                <ScrollViewer>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                        <suki:GlassCard>
+                            <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <materialIcons:MaterialIcon Kind="RemoteDesktop" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <TextBlock Text="{m:L Settings_Remote}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <TextBlock Text="{m:L Settings_RemoteHint}"
+                                           Opacity="0.6"
+                                           FontSize="{StaticResource FontSizeSmall}"
+                                           TextWrapping="Wrap"/>
+
+                                <ToggleSwitch x:Name="RemoteEnabledToggle"
+                                              IsChecked="{Binding RemoteEnabled}"
+                                              Content="{m:L Settings_Remote_Enable}"/>
+
+                                <StackPanel Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding RemoteEnabled}">
+                                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                        <TextBlock Text="{m:L Settings_Remote_Port}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <NumericUpDown Value="{Binding RemotePort}" Minimum="1" Maximum="65535" Increment="1"/>
+                                    </StackPanel>
+
+                                    <ToggleSwitch IsChecked="{Binding RemoteAllowRemoteConnections}"
+                                                  Content="{m:L Settings_Remote_AllowRemote}"/>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_Remote_Username}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding RemoteUsername, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_Remote_Password}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding RemotePassword, Mode=TwoWay}" PasswordChar="*"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Said here rather than left to a log nobody reads: this
+                                         combination is refused at startup. -->
+                                    <suki:InfoBar x:Name="RemoteCredentialsWarning"
+                                                  IsVisible="{Binding RemoteNeedsCredentials}"
+                                                  IsClosable="False"
+                                                  Severity="Warning"
+                                                  Message="{m:L Settings_Remote_NeedsCredentials}"/>
+
+                                    <TextBlock Text="{m:L Settings_Remote_RestartHint}"
+                                               Opacity="0.55"
+                                               FontSize="{StaticResource FontSizeSmall}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </suki:GlassCard>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">

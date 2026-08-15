@@ -172,6 +172,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(SearchStatusMessage),
         nameof(HasSearchStatusMessage),
         nameof(SelectedTabIndex),
+        nameof(RemoteNeedsCredentials),
         nameof(NewCategoryName),
         nameof(NewCategoryPath),
         nameof(ThemeVariantOptions),
@@ -193,6 +194,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// </summary>
     private void OnSettingChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is nameof(RemoteEnabled) or nameof(RemoteAllowRemoteConnections) or nameof(RemoteUsername))
+        {
+            OnPropertyChanged(nameof(RemoteNeedsCredentials));
+        }
+
         if (_suspendAutoSave || e.PropertyName is null || NotSettings.Contains(e.PropertyName))
         {
             return;
@@ -345,6 +351,45 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool IsAdvancedMode => !IsSimpleMode;
 
+    // Remote control
+    public bool RemoteEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public int RemotePort
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 1, 65535));
+    } = RemoteSettings.DefaultPort;
+
+    public bool RemoteAllowRemoteConnections
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string RemoteUsername
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    public string RemotePassword
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    /// <summary>
+    /// Whether the combination chosen would be refused at startup. Said here rather than discovered
+    /// later in a log nobody reads: opening the port to the network without a password would hand
+    /// anyone who can reach it the ability to add and delete downloads.
+    /// </summary>
+    public bool RemoteNeedsCredentials =>
+        RemoteEnabled && RemoteAllowRemoteConnections && string.IsNullOrWhiteSpace(RemoteUsername);
+
     // Categories
     public ObservableCollection<TorrentCategory> CategoryList { get; } = new();
 
@@ -471,7 +516,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// removed when the mode changes, so the positions do not shift - and if anyone reorders them,
     /// the headless test that checks the selected tab's header says so.
     /// </summary>
-    public const int SearchTabIndex = 5;
+    public const int SearchTabIndex = 6;
 
     /// <summary>
     /// Which tab is showing. Settable so that arriving here from somewhere that knows what it came
@@ -980,6 +1025,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         CheckForUpdatesOnStartup = settings.Update.CheckForUpdatesOnStartup;
 
         // Search
+        RemoteEnabled = settings.Remote.Enabled;
+        RemotePort = settings.Remote.Port;
+        RemoteAllowRemoteConnections = settings.Remote.AllowRemoteConnections;
+        RemoteUsername = settings.Remote.Username;
+        RemotePassword = settings.Remote.Password;
         UseInternetArchive = settings.Search.UseInternetArchive;
         UseAcademicTorrents = settings.Search.UseAcademicTorrents;
         TorznabUrl = settings.Search.TorznabUrl;
@@ -1070,6 +1120,11 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Update.CheckForUpdatesOnStartup = CheckForUpdatesOnStartup;
 
             // Search
+            settings.Remote.Enabled = RemoteEnabled;
+            settings.Remote.Port = RemotePort;
+            settings.Remote.AllowRemoteConnections = RemoteAllowRemoteConnections;
+            settings.Remote.Username = RemoteUsername.Trim();
+            settings.Remote.Password = RemotePassword;
             settings.Search.UseInternetArchive = UseInternetArchive;
             settings.Search.UseAcademicTorrents = UseAcademicTorrents;
             settings.Search.TorznabUrl = TorznabUrl;

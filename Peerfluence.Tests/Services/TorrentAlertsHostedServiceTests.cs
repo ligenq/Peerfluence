@@ -1,5 +1,6 @@
-using Peerfluence.Services;
+﻿using Peerfluence.Services;
 using Peerfluence.Core.Services;
+using Peerfluence.Core.Services.Rpc;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
@@ -22,7 +23,7 @@ public sealed class TorrentAlertsHostedServiceTests
         torrentService.GetAlertsAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => StreamAlerts(alert, callInfo.ArgAt<CancellationToken>(1)));
 
-        var sut = new TorrentAlertsHostedService(torrentService);
+        var sut = new TorrentAlertsHostedService(torrentService, Substitute.For<ITorrentTransferSnapshots>());
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
         await Task.Delay(50, TestContext.Current.CancellationToken);
@@ -39,7 +40,7 @@ public sealed class TorrentAlertsHostedServiceTests
         torrentService.GetAlertsAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => CancelWhenStopped(callInfo.ArgAt<CancellationToken>(1)));
 
-        var sut = new TorrentAlertsHostedService(torrentService);
+        var sut = new TorrentAlertsHostedService(torrentService, Substitute.For<ITorrentTransferSnapshots>());
 
         await sut.StartAsync(TestContext.Current.CancellationToken);
 

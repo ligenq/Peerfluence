@@ -169,6 +169,15 @@ public class LocalizationTests
     [InlineData("Downloads_Grid_Category")]
     [InlineData("Downloads_Category_None")]
     [InlineData("Downloads_Category_All")]
+    [InlineData("Settings_Remote")]
+    [InlineData("Settings_RemoteHint")]
+    [InlineData("Settings_Remote_Enable")]
+    [InlineData("Settings_Remote_AllowRemote")]
+    [InlineData("Settings_Remote_Username")]
+    [InlineData("Settings_Remote_NeedsCredentials")]
+    [InlineData("Settings_Remote_RestartHint")]
+    // Settings_Remote_Port and Settings_Remote_Password are absent: "Port" and "Password" are the
+    // same word in several of these languages.
     // Settings_Categories_NameWatermark, Settings_Categories_Add, Downloads_Category and
     // AddTorrent_Category are deliberately absent: "Name", "Add" and "Category" are the same word in
     // German or Portuguese, so this guard cannot tell a translation from a missing one. Their
