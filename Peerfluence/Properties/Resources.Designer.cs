@@ -3107,6 +3107,15 @@ namespace Peerfluence.Properties {
             }
         }
         
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address filled in, but replace the 1 with your indexer's id - Prowlarr gives each indexer its own address and has no combined one. The id is in the address bar when you open an indexer in Prowlarr..
+        /// </summary>
+        public static string Settings_Search_ProwlarrNeedsIndexerId {
+            get {
+                return ResourceManager.GetString("Settings_Search_ProwlarrNeedsIndexerId", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to Test.
         /// </summary>

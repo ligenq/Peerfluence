@@ -1396,4 +1396,7 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Settings_Remote_RestartHint" xml:space="preserve">
     <value>Ändringar här träder i kraft nästa gång Peerfluence startar.</value>
   </data>
+  <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
+    <value>Adressen ifylld, men ersätt 1:an med din indexerares id - Prowlarr ger varje indexerare en egen adress och har ingen gemensam. Id:t syns i adressfältet när du öppnar en indexerare i Prowlarr.</value>
+  </data>
 </root>

@@ -20,10 +20,18 @@ public sealed class SearchSettings
     public const string JackettTemplate = "http://127.0.0.1:9117/api/v2.0/indexers/all/results/torznab/api";
 
     /// <summary>
-    /// Prowlarr's equivalent. Its per-indexer feeds live at <c>/{id}/api</c> instead, so anyone
-    /// pointing at a single indexer will need to edit this - which is what Test is for.
+    /// Prowlarr, which unlike Jackett has no aggregate feed at all: its routes are
+    /// <c>{id}/api</c> and <c>/api/v1/indexer/{id}/newznab</c>, and the id is a required part of the
+    /// path rather than something that can be left out or set to "all".
+    ///
+    /// <para>
+    /// So this template is incomplete by nature, and the number in it has to be replaced with the
+    /// id of the indexer being pointed at. An earlier version of this constant invented an
+    /// "all indexers" path by analogy with Jackett. That path does not exist, and whatever Prowlarr
+    /// answers a request for it with, it is not a feed - which is what the user saw.
+    /// </para>
     /// </summary>
-    public const string ProwlarrTemplate = "http://127.0.0.1:9696/api/v1/indexers/all/results/torznab";
+    public const string ProwlarrTemplate = "http://127.0.0.1:9696/1/api";
 
     /// <summary>
     /// Whether to search the Internet Archive, which is built in and needs nothing installed. On by

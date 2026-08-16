@@ -547,7 +547,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         }
 
         TorznabUrl = template;
-        SearchStatusMessage = Properties.Resources.Settings_Search_PresetApplied;
+
+        // Prowlarr's address is not usable as handed over: the number in it names one indexer, and
+        // only the user knows which. Saying so beats letting the test fail and leaving them to
+        // wonder which part was wrong.
+        SearchStatusMessage = template == SearchSettings.ProwlarrTemplate
+            ? Properties.Resources.Settings_Search_ProwlarrNeedsIndexerId
+            : Properties.Resources.Settings_Search_PresetApplied;
 
         // Checked straight away rather than left for the user to discover on the search screen. A
         // preset fills in an address for software they may not have installed, and finding that out

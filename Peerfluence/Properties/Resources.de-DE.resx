@@ -1396,4 +1396,7 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   <data name="Settings_Remote_RestartHint" xml:space="preserve">
     <value>Änderungen hier wirken sich beim nächsten Start von Peerfluence aus.</value>
   </data>
+  <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
+    <value>Adresse eingetragen, ersetzen Sie aber die 1 durch die ID Ihres Index: Prowlarr gibt jedem Index eine eigene Adresse und hat keine gemeinsame. Die ID steht in der Adresszeile, wenn Sie einen Index in Prowlarr öffnen.</value>
+  </data>
 </root>
