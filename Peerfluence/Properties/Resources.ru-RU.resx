@@ -1396,4 +1396,7 @@ Peerfluence распространяется по MIT License. Устанавл�
   <data name="Settings_Remote_RestartHint" xml:space="preserve">
     <value>Изменения здесь вступят в силу при следующем запуске Peerfluence.</value>
   </data>
+  <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
+    <value>Адрес заполнен, но замените 1 на идентификатор вашего индексатора: Prowlarr даёт каждому индексатору свой адрес и не имеет общего. Идентификатор виден в адресной строке, когда вы открываете индексатор в Prowlarr.</value>
+  </data>
 </root>

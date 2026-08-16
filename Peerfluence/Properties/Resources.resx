@@ -1390,4 +1390,7 @@
   <data name="Settings_Remote_RestartHint" xml:space="preserve">
     <value>Changes here take effect the next time Peerfluence starts.</value>
   </data>
+  <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
+    <value>Address filled in, but replace the 1 with your indexer's id - Prowlarr gives each indexer its own address and has no combined one. The id is in the address bar when you open an indexer in Prowlarr.</value>
+  </data>
 </root>
