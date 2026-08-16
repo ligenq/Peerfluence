@@ -368,3 +368,6 @@ FodyWeavers.xsd
 
 # Mutation testing output (see the notes on Stryker in the history)
 StrykerOutput/
+
+# Local-only configuration for the on-demand live contract tests. Holds an API key.
+*.local.json

@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
@@ -247,15 +247,110 @@ public sealed class TorznabSearchServiceTests
         Assert.Contains("t=search", sent);
     }
 
+    /// <summary>
+    /// The document a real server answers t=caps with, trimmed but otherwise as Prowlarr sent it.
+    ///
+    /// <para>
+    /// This test used to hand the caps call a result feed, because that was the fixture already to
+    /// hand. It passed, and it was worthless: no server answers caps with an rss document, and the
+    /// real one - a caps root, with no channel and no items - was being classified as "not a Torznab
+    /// feed". The Test button reported a healthy Prowlarr as broken, and nothing noticed until it was
+    /// pointed at one.
+    /// </para>
+    /// </summary>
+    private const string CapsDocument = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <caps>
+          <server title="Prowlarr" />
+          <limits default="100" max="100" />
+          <searching>
+            <search available="yes" supportedParams="q" />
+            <tv-search available="no" supportedParams="q" />
+            <movie-search available="yes" supportedParams="q,imdbid" />
+          </searching>
+        </caps>
+        """;
+
+
+    /// <summary>
+    /// A Prowlarr feed, shortened but otherwise as Prowlarr sent it. The element naming the indexer
+    /// is <c>prowlarrindexer</c>; Jackett calls the same thing <c>jackettindexer</c>, and neither
+    /// appears in any specification. Reading only Jackett's spelling left the Indexer column empty
+    /// for every Prowlarr result, which is how it looked the first time one was pointed at.
+    /// </summary>
+    private const string ProwlarrFeed = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="1.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:torznab="http://torznab.com/schemas/2015/feed">
+          <channel>
+            <atom:link rel="self" type="application/rss+xml" />
+            <title>Prowlarr</title>
+            <item>
+              <title>Example Release (2015) 720p</title>
+              <guid>https://example.invalid/torrent/DC3A651718821A8A9CD00B67C00B30C654B23893</guid>
+              <prowlarrindexer id="1" type="public">YTS</prowlarrindexer>
+              <comments>https://example.invalid/movies/example</comments>
+              <pubDate>Thu, 12 Nov 2015 18:05:58 +0100</pubDate>
+              <size>728886149</size>
+              <link>http://localhost:9696/1/download?apikey=redacted&amp;link=abc&amp;file=Example</link>
+              <torznab:attr name="seeders" value="12" />
+              <torznab:attr name="peers" value="15" />
+            </item>
+          </channel>
+        </rss>
+        """;
+
+    [Fact]
+    public async Task AProwlarrFeed_NamesTheIndexerItCameFrom()
+    {
+        var sut = Create(ProwlarrFeed, out _);
+
+        var response = await sut.SearchAsync("example", TestContext.Current.CancellationToken);
+
+        var result = Assert.Single(response.Results);
+        Assert.Equal("YTS", result.IndexerName);
+    }
+
+    [Fact]
+    public async Task AProwlarrFeed_ParsesTheRestOfTheRowToo()
+    {
+        var sut = Create(ProwlarrFeed, out _);
+
+        var response = await sut.SearchAsync("example", TestContext.Current.CancellationToken);
+
+        var result = Assert.Single(response.Results);
+        Assert.Equal("Example Release (2015) 720p", result.Title);
+        Assert.Equal(728886149, result.SizeBytes);
+        Assert.Equal(12, result.Seeders);
+        Assert.Equal(15, result.Peers);
+        // Prowlarr proxies the download through itself, so this is an http link rather than a magnet.
+        Assert.False(result.IsMagnet);
+        Assert.StartsWith("http://localhost:9696/1/download", result.Link, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task Test_AsksTheEndpointToDescribeItself()
     {
-        var sut = Create(JackettFeed, out var handler);
+        var sut = Create(CapsDocument, out var handler);
 
         var response = await sut.TestAsync(TestContext.Current.CancellationToken);
 
         Assert.False(response.HasFailure);
         Assert.Contains("t=caps", Assert.Single(handler.Requests).AbsoluteUri);
+    }
+
+    /// <summary>
+    /// A caps document is a Torznab answer, not a malformed feed. Saying otherwise is what made a
+    /// working endpoint look broken.
+    /// </summary>
+    [Fact]
+    public async Task ACapsDocument_IsNotMistakenForSomethingThatIsNotTorznab()
+    {
+        var sut = Create(CapsDocument, out _);
+
+        var response = await sut.TestAsync(TestContext.Current.CancellationToken);
+
+        Assert.NotEqual(SearchFailure.NotTorznab, response.Failure);
+        Assert.Empty(response.Results);
     }
 
     [Fact]

@@ -211,6 +211,15 @@ public sealed class TorznabSearchService : ITorznabIndexer
                 description);
         }
 
+        // "caps" is a Torznab server describing itself, and it is what Test asks for. It is a
+        // different document from a result feed - no channel, no items - so it lands here and has to
+        // be recognised, or the one call whose job is to say "this endpoint is fine" reports that a
+        // working Prowlarr is not a Torznab endpoint. Which is what it did.
+        if (document.Root?.Name.LocalName == "caps")
+        {
+            return TorrentSearchResponse.Succeeded([]);
+        }
+
         // A wrong URL usually answers with an HTML error page, and HTML parses as XML perfectly
         // well - so without this check a mistyped endpoint reads as "no results" rather than as the
         // mistake it is.
@@ -264,7 +273,12 @@ public sealed class TorznabSearchService : ITorznabIndexer
             SizeBytes: ParseLong(item.Element("size")?.Value ?? Attribute(item, "size")),
             Seeders: ParseInt(Attribute(item, "seeders")),
             Peers: ParseInt(Attribute(item, "peers") ?? Attribute(item, "leechers")),
+            // Each aggregator names the indexer in its own element - Jackett's jackettindexer,
+            // Prowlarr's prowlarrindexer - and neither is in any specification. Reading only one of
+            // them left the Indexer column empty for every result from the other, which was how
+            // Prowlarr looked when first pointed at.
             IndexerName: item.Element("jackettindexer")?.Value
+                ?? item.Element("prowlarrindexer")?.Value
                 ?? Attribute(item, "indexer")
                 ?? string.Empty,
             PublishedAt: ParseDate(item.Element("pubDate")?.Value),
