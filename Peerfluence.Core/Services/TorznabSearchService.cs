@@ -9,7 +9,7 @@ namespace Peerfluence.Core.Services;
 /// Talks Torznab: a query string in, an RSS document out, with the numbers that matter carried in
 /// <c>torznab:attr</c> elements alongside each item.
 /// </summary>
-public sealed class TorznabSearchService : ITorznabIndexer
+public sealed class TorznabSearchService : ITorrentSearchService
 {
     private static readonly XNamespace Torznab = "http://torznab.com/schemas/2015/feed";
 
@@ -31,14 +31,6 @@ public sealed class TorznabSearchService : ITorznabIndexer
         _settingsService = settingsService;
         _httpClient = httpClient;
     }
-
-    public string Name => "Torznab";
-
-    /// <summary>
-    /// Queried only once an address exists. Before that there is nothing to ask, and asking would
-    /// report a failure the user has not caused yet.
-    /// </summary>
-    public bool IsEnabled => IsConfigured;
 
     public bool IsConfigured => _settingsService.Current.Search.IsConfigured;
 
@@ -149,6 +141,8 @@ public sealed class TorznabSearchService : ITorznabIndexer
                 => TorrentSearchResponse.Failed(SearchFailure.Rejected, detail),
             HttpStatusCode.NotFound
                 => TorrentSearchResponse.Failed(SearchFailure.NotTorznab, detail),
+            HttpStatusCode.TooManyRequests
+                => TorrentSearchResponse.Failed(SearchFailure.RateLimited, Authority(uri)),
             // A gateway that cannot reach what it fronts is the same problem one hop further out.
             HttpStatusCode.BadGateway or HttpStatusCode.ServiceUnavailable
                 => TorrentSearchResponse.Failed(SearchFailure.Unreachable, Authority(uri)),

@@ -12,9 +12,6 @@
     ],
     "mutate": [
       "**/Services/TorznabSearchService.cs",
-      "**/Services/InternetArchiveSearchSource.cs",
-      "**/Services/AcademicTorrentsSearchSource.cs",
-      "**/Services/AggregateTorrentSearchService.cs",
       "**/Services/TorrentCategoryService.cs",
       "**/Services/TorrentIdentity.cs",
       "**/Services/TorrentSearchResponse.cs",

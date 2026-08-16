@@ -3035,15 +3035,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Research datasets, papers and course material, shared by the people who produced them. Also built in..
-        /// </summary>
-        public static string Settings_Search_AcademicTorrentsHint {
-            get {
-                return ResourceManager.GetString("Settings_Search_AcademicTorrentsHint", resourceCulture);
-            }
-        }
         /// <summary>
         ///   Looks up a localized string similar to API key.
         /// </summary>
@@ -3080,15 +3071,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Built in, and needs nothing installed. The archive publishes a torrent for everything it holds, so this works straight away..
-        /// </summary>
-        public static string Settings_Search_InternetArchiveHint {
-            get {
-                return ResourceManager.GetString("Settings_Search_InternetArchiveHint", resourceCulture);
-            }
-        }
         /// <summary>
         ///   Looks up a localized string similar to Nothing answered on the usual ports. Enter the address yourself..
         /// </summary>
@@ -3198,23 +3180,6 @@ namespace Peerfluence.Properties {
         }
         
         
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Search Academic Torrents.
-        /// </summary>
-        public static string Settings_Search_UseAcademicTorrents {
-            get {
-                return ResourceManager.GetString("Settings_Search_UseAcademicTorrents", resourceCulture);
-            }
-        }
-        /// <summary>
-        ///   Looks up a localized string similar to Search the Internet Archive.
-        /// </summary>
-        public static string Settings_Search_UseInternetArchive {
-            get {
-                return ResourceManager.GetString("Settings_Search_UseInternetArchive", resourceCulture);
-            }
-        }
         /// <summary>
         ///   Looks up a localized string similar to Use Jackett.
         /// </summary>
@@ -3233,15 +3198,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your own indexer.
-        /// </summary>
-        public static string Settings_Search_YourOwnIndexer {
-            get {
-                return ResourceManager.GetString("Settings_Search_YourOwnIndexer", resourceCulture);
-            }
-        }
         /// <summary>
         ///   Looks up a localized string similar to Peerfluence does not host an index. It queries a Torznab endpoint you run yourself, such as Prowlarr or Jackett, and shows what comes back..
         /// </summary>

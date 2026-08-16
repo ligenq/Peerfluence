@@ -1208,10 +1208,10 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
     <value>Wiek</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Wszystkie źródła są wyłączone</value>
+    <value>Brak podłączonego indeksera</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Włącz ponownie wbudowane źródło albo podłącz Prowlarr lub Jackett - osobne aplikacje, które instalujesz i uruchamiasz samodzielnie.</value>
+    <value>Peerfluence nie ma własnego indeksu. Szuka przez Prowlarr lub Jackett - osobne aplikacje, które instalujesz i uruchamiasz samodzielnie.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Brak wyników tego wyszukiwania.</value>
@@ -1241,7 +1241,7 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
     <value>Wyszukiwanie</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence nie ma własnego indeksu. Od razu przeszukuje Internet Archive i Academic Torrents oraz dowolny punkt końcowy Torznab, który sam uruchamiasz, na przykład Prowlarr lub Jackett.</value>
+    <value>Peerfluence nie ma własnego indeksu. Szuka przez punkt końcowy Torznab, który sam uruchamiasz, na przykład Prowlarr lub Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Użyj Prowlarr</value>
@@ -1289,7 +1289,7 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
     <value>Otwórz ustawienia wyszukiwania</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Wszystkie źródła wyszukiwania są wyłączone.</value>
+    <value>Nie skonfigurowano jeszcze żadnego indeksera.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Nic nie odpowiedziało pod adresem {0}. Prawdopodobnie Prowlarr lub Jackett nie jest uruchomiony.</value>
@@ -1312,23 +1312,8 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Coś odpowiedziało, ale nie był to kanał Torznab. Sprawdź adres.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Szukaj w Internet Archive</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Wbudowane i nie wymaga niczego instalować. Archiwum publikuje torrent dla wszystkiego, co przechowuje, więc działa od razu.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>Twój własny indekser</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} poprosił o chwilę. Spróbuj ponownie za moment.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Szukaj w Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Zbiory danych badawczych, artykuły i materiały kursowe, udostępniane przez tych, którzy je stworzyli. Również wbudowane.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Limit pobierania (KiB/s)</value>

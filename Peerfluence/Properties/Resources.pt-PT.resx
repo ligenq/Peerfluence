@@ -1208,10 +1208,10 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
     <value>Idade</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Todas as fontes estão desligadas</value>
+    <value>Nenhum indexador ligado</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Volte a ligar uma fonte integrada, ou ligue o Prowlarr ou o Jackett, aplicações à parte que o utilizador instala e executa.</value>
+    <value>O Peerfluence não tem um índice próprio. Procura através do Prowlarr ou do Jackett, aplicações à parte que o utilizador instala e executa.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>A procura não encontrou nada.</value>
@@ -1241,7 +1241,7 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
     <value>Procura</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>O Peerfluence não tem um índice próprio. Procura no Internet Archive e no Academic Torrents desde o início e em qualquer ponto de acesso Torznab que o utilizador execute, como o Prowlarr ou o Jackett.</value>
+    <value>O Peerfluence não tem um índice próprio. Procura através de um ponto de acesso Torznab que o utilizador executa, como o Prowlarr ou o Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Utilizar o Prowlarr</value>
@@ -1289,7 +1289,7 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
     <value>Abrir as definições de procura</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Todas as fontes de procura estão desligadas.</value>
+    <value>Ainda não foi configurado qualquer indexador.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Nada respondeu em {0}. Provavelmente o Prowlarr ou o Jackett não está a ser executado.</value>
@@ -1312,23 +1312,8 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Algo respondeu, mas não era um canal Torznab. Verifique o endereço.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Procurar no Internet Archive</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Integrado e sem nada para instalar. O arquivo publica um torrent para tudo o que aloja, por isso funciona de imediato.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>O seu próprio indexador</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>O {0} pediu um momento. Tente novamente em breve.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Procurar no Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Conjuntos de dados de investigação, artigos e material de cursos, partilhados por quem os produziu. Também integrado.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Limite de transferência (KiB/s)</value>

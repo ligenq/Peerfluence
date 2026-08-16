@@ -1202,10 +1202,10 @@
     <value>Age</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Every source is switched off</value>
+    <value>No indexer connected</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Turn a built-in source back on, or connect Prowlarr or Jackett - separate applications you install and run yourself.</value>
+    <value>Peerfluence has no index of its own. It searches through Prowlarr or Jackett - separate applications you install and run yourself.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Nothing matched that search.</value>
@@ -1235,7 +1235,7 @@
     <value>Search</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence has no index of its own. It searches the Internet Archive and Academic Torrents out of the box, and any Torznab endpoint you run yourself, such as Prowlarr or Jackett.</value>
+    <value>Peerfluence has no index of its own. It searches through a Torznab endpoint you run yourself, such as Prowlarr or Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Use Prowlarr</value>
@@ -1283,7 +1283,7 @@
     <value>Open search settings</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Every search source is switched off.</value>
+    <value>No indexer has been set up yet.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Nothing answered at {0}. Prowlarr or Jackett is probably not running.</value>
@@ -1306,23 +1306,8 @@
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Something answered, but it was not a Torznab feed. Check the address.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Search the Internet Archive</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Built in, and needs nothing installed. The archive publishes a torrent for everything it holds, so this works straight away.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>Your own indexer</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} asked to be given a moment. Try again shortly.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Search Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Research datasets, papers and course material, shared by the people who produced them. Also built in.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Download limit (KiB/s)</value>
