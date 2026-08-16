@@ -1208,10 +1208,10 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Возраст</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Все источники выключены</value>
+    <value>Индексатор не подключён</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Снова включите встроенный источник или подключите Prowlarr либо Jackett — отдельные приложения, которые вы устанавливаете и запускаете сами.</value>
+    <value>У Peerfluence нет собственного индекса. Он ищет через Prowlarr или Jackett — отдельные приложения, которые вы устанавливаете и запускаете сами.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>По этому запросу ничего не найдено.</value>
@@ -1241,7 +1241,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Поиск</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>У Peerfluence нет собственного индекса. Он сразу ищет в «Архиве Интернета» и Academic Torrents, а также в любой точке Torznab, которую вы запускаете сами, например Prowlarr или Jackett.</value>
+    <value>У Peerfluence нет собственного индекса. Он ищет через точку Torznab, которую вы запускаете сами, например Prowlarr или Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Использовать Prowlarr</value>
@@ -1289,7 +1289,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Открыть настройки поиска</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Все источники поиска выключены.</value>
+    <value>Индексатор ещё не настроен.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>По адресу {0} никто не ответил. Скорее всего, Prowlarr или Jackett не запущен.</value>
@@ -1312,23 +1312,8 @@ Peerfluence распространяется по MIT License. Устанавл�
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Что-то ответило, но это не лента Torznab. Проверьте адрес.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Искать в «Архиве Интернета»</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Встроено и ничего не нужно устанавливать. Архив публикует торрент для всего, что хранит, поэтому это работает сразу.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>Ваш собственный индексатор</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} просит подождать. Повторите попытку чуть позже.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Искать в Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Исследовательские наборы данных, статьи и учебные материалы от тех, кто их создал. Тоже встроено.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Ограничение загрузки (КиБ/с)</value>

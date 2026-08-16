@@ -1208,10 +1208,10 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
     <value>Antigüedad</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Todas las fuentes están desactivadas</value>
+    <value>Ningún indexador conectado</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Vuelve a activar una fuente incorporada, o conecta Prowlarr o Jackett, aplicaciones aparte que instalas y ejecutas tú.</value>
+    <value>Peerfluence no tiene índice propio. Busca a través de Prowlarr o Jackett, aplicaciones aparte que instalas y ejecutas tú.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>La búsqueda no encontró nada.</value>
@@ -1241,7 +1241,7 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
     <value>Búsqueda</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence no tiene índice propio. Busca en Internet Archive y Academic Torrents desde el principio, y en cualquier extremo Torznab que ejecutes tú, como Prowlarr o Jackett.</value>
+    <value>Peerfluence no tiene índice propio. Busca a través de un extremo Torznab que ejecutas tú, como Prowlarr o Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Usar Prowlarr</value>
@@ -1289,7 +1289,7 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
     <value>Abrir los ajustes de búsqueda</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Todas las fuentes de búsqueda están desactivadas.</value>
+    <value>Todavía no se ha configurado ningún indexador.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Nada respondió en {0}. Probablemente Prowlarr o Jackett no esté en marcha.</value>
@@ -1312,23 +1312,8 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Algo respondió, pero no era un canal Torznab. Comprueba la dirección.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Buscar en Internet Archive</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Incorporado y sin nada que instalar. El archivo publica un torrent de todo lo que aloja, así que esto funciona de inmediato.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>Tu propio indexador</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} pidió un momento. Inténtalo de nuevo en breve.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Buscar en Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Conjuntos de datos de investigación, artículos y material de cursos, compartidos por quienes los produjeron. También incorporado.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Límite de descarga (KiB/s)</value>

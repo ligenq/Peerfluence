@@ -1208,10 +1208,10 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Âge</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Toutes les sources sont désactivées</value>
+    <value>Aucun indexeur connecté</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Réactivez une source intégrée, ou connectez Prowlarr ou Jackett, des applications distinctes que vous installez et lancez vous-même.</value>
+    <value>Peerfluence n'a pas d'index à lui. Il cherche via Prowlarr ou Jackett, des applications distinctes que vous installez et lancez vous-même.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>Aucun résultat pour cette recherche.</value>
@@ -1241,7 +1241,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Recherche</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence n'a pas d'index à lui. Il cherche dans Internet Archive et Academic Torrents dès le départ, ainsi que dans tout point d'accès Torznab que vous hébergez, comme Prowlarr ou Jackett.</value>
+    <value>Peerfluence n'a pas d'index à lui. Il cherche via un point d'accès Torznab que vous hébergez vous-même, comme Prowlarr ou Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Utiliser Prowlarr</value>
@@ -1289,7 +1289,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Ouvrir les paramètres de recherche</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Toutes les sources de recherche sont désactivées.</value>
+    <value>Aucun indexeur n'a encore été configuré.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>Rien n'a répondu à {0}. Prowlarr ou Jackett n'est probablement pas démarré.</value>
@@ -1312,23 +1312,8 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Quelque chose a répondu, mais ce n'était pas un flux Torznab. Vérifiez l'adresse.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Rechercher dans Internet Archive</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Intégré, sans rien à installer. L'archive publie un torrent pour tout ce qu'elle héberge, donc cela fonctionne immédiatement.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>Votre propre indexeur</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} a demandé un moment. Réessayez dans un instant.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Rechercher dans Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Jeux de données de recherche, articles et supports de cours, partagés par ceux qui les ont produits. Également intégré.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Limite de téléchargement (Kio/s)</value>

@@ -68,9 +68,8 @@ public static class ServiceCollectionExtensions
         // seconds because a Torznab endpoint is normally on this machine, and one that has not
         // answered by then is not going to.
         //
-        // The user agent is not decoration. The Internet Archive's guidance for automated access
-        // requires one that names the tool and its version, and this is the client that talks to
-        // them.
+        // Named rather than anonymous: an indexer being asked questions by this is entitled to
+        // know what is asking, and a bare .NET user agent tells whoever runs it nothing.
         services.AddSingleton(_ =>
         {
             var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
@@ -79,11 +78,7 @@ public static class ServiceCollectionExtensions
             return client;
         });
 
-        services.AddSingleton<ITorznabIndexer, TorznabSearchService>();
-        services.AddSingleton<ITorrentSearchSource>(sp => sp.GetRequiredService<ITorznabIndexer>());
-        services.AddSingleton<ITorrentSearchSource, InternetArchiveSearchSource>();
-        services.AddSingleton<ITorrentSearchSource, AcademicTorrentsSearchSource>();
-        services.AddSingleton<ITorrentSearchService, AggregateTorrentSearchService>();
+        services.AddSingleton<ITorrentSearchService, TorznabSearchService>();
         services.AddSingleton<ITorrentService, TorrentService>();
         services.AddSingleton<IUpdateService, UpdateService>();
         services.AddSingleton<IWindowsAssociationService, WindowsAssociationService>();

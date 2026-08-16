@@ -465,23 +465,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     // Search
-    /// <summary>
-    /// The built-in source. On by default, and the reason the search screen works before anything
-    /// has been installed.
-    /// </summary>
-    public bool UseInternetArchive
-    {
-        get;
-        set => SetProperty(ref field, value);
-    } = true;
-
-    /// <summary>Research datasets, papers and courses. On by default.</summary>
-    public bool UseAcademicTorrents
-    {
-        get;
-        set => SetProperty(ref field, value);
-    } = true;
-
     public string TorznabUrl
     {
         get;
@@ -1036,8 +1019,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         RemoteAllowRemoteConnections = settings.Remote.AllowRemoteConnections;
         RemoteUsername = settings.Remote.Username;
         RemotePassword = settings.Remote.Password;
-        UseInternetArchive = settings.Search.UseInternetArchive;
-        UseAcademicTorrents = settings.Search.UseAcademicTorrents;
         TorznabUrl = settings.Search.TorznabUrl;
         TorznabApiKey = settings.Search.ApiKey;
     }
@@ -1131,8 +1112,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Remote.AllowRemoteConnections = RemoteAllowRemoteConnections;
             settings.Remote.Username = RemoteUsername.Trim();
             settings.Remote.Password = RemotePassword;
-            settings.Search.UseInternetArchive = UseInternetArchive;
-            settings.Search.UseAcademicTorrents = UseAcademicTorrents;
             settings.Search.TorznabUrl = TorznabUrl;
             settings.Search.ApiKey = TorznabApiKey;
         }

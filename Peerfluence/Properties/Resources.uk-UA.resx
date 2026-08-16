@@ -1208,10 +1208,10 @@ Peerfluence поширюється за MIT License. Установлюючи а
     <value>Вік</value>
   </data>
   <data name="Find_NotConfiguredTitle" xml:space="preserve">
-    <value>Усі джерела вимкнено</value>
+    <value>Індексатор не підключено</value>
   </data>
   <data name="Find_NotConfiguredBody" xml:space="preserve">
-    <value>Увімкніть вбудоване джерело знову або під'єднайте Prowlarr чи Jackett — окремі застосунки, які ви встановлюєте та запускаєте самі.</value>
+    <value>Peerfluence не має власного індексу. Він шукає через Prowlarr або Jackett — окремі застосунки, які ви встановлюєте та запускаєте самі.</value>
   </data>
   <data name="Find_NoResults" xml:space="preserve">
     <value>За цим запитом нічого не знайдено.</value>
@@ -1241,7 +1241,7 @@ Peerfluence поширюється за MIT License. Установлюючи а
     <value>Пошук</value>
   </data>
   <data name="Settings_SearchHint" xml:space="preserve">
-    <value>Peerfluence не має власного індексу. Він одразу шукає в «Архіві Інтернету» та Academic Torrents, а також у будь-якій точці Torznab, яку ви запускаєте самі, наприклад Prowlarr або Jackett.</value>
+    <value>Peerfluence не має власного індексу. Він шукає через точку Torznab, яку ви запускаєте самі, наприклад Prowlarr або Jackett.</value>
   </data>
   <data name="Settings_Search_UseProwlarr" xml:space="preserve">
     <value>Використати Prowlarr</value>
@@ -1289,7 +1289,7 @@ Peerfluence поширюється за MIT License. Установлюючи а
     <value>Відкрити налаштування пошуку</value>
   </data>
   <data name="Find_Failure_NotConfigured" xml:space="preserve">
-    <value>Усі джерела пошуку вимкнено.</value>
+    <value>Індексатор ще не налаштовано.</value>
   </data>
   <data name="Find_Failure_Unreachable" xml:space="preserve">
     <value>За адресою {0} ніхто не відповів. Найімовірніше, Prowlarr або Jackett не запущено.</value>
@@ -1312,23 +1312,8 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="Settings_Search_TestNotTorznab" xml:space="preserve">
     <value>Щось відповіло, але це не стрічка Torznab. Перевірте адресу.</value>
   </data>
-  <data name="Settings_Search_UseInternetArchive" xml:space="preserve">
-    <value>Шукати в «Архіві Інтернету»</value>
-  </data>
-  <data name="Settings_Search_InternetArchiveHint" xml:space="preserve">
-    <value>Вбудовано і нічого не треба встановлювати. Архів публікує торент для всього, що зберігає, тож це працює одразу.</value>
-  </data>
-  <data name="Settings_Search_YourOwnIndexer" xml:space="preserve">
-    <value>Ваш власний індексатор</value>
-  </data>
   <data name="Find_Failure_RateLimited" xml:space="preserve">
     <value>{0} просить зачекати. Спробуйте ще раз незабаром.</value>
-  </data>
-  <data name="Settings_Search_UseAcademicTorrents" xml:space="preserve">
-    <value>Шукати в Academic Torrents</value>
-  </data>
-  <data name="Settings_Search_AcademicTorrentsHint" xml:space="preserve">
-    <value>Дослідницькі набори даних, статті та навчальні матеріали від тих, хто їх створив. Також вбудовано.</value>
   </data>
   <data name="Settings_DownloadLimit" xml:space="preserve">
     <value>Обмеження завантаження (КіБ/с)</value>
