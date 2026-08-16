@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-net/master/src/Stryker.Core/Stryker.Core/Schemas/stryker-schema.json",
+  "stryker-config": {
+    "project": "Peerfluence.Core.csproj",
+    "test-projects": [
+      "Peerfluence.Tests/Peerfluence.Tests.csproj"
+    ],
+    "test-runner": "mtp",
+    "reporters": [
+      "html",
+      "progress"
+    ],
+    "mutate": [
+      "**/Services/TorznabSearchService.cs",
+      "**/Services/InternetArchiveSearchSource.cs",
+      "**/Services/AcademicTorrentsSearchSource.cs",
+      "**/Services/AggregateTorrentSearchService.cs",
+      "**/Services/TorrentCategoryService.cs",
+      "**/Services/TorrentIdentity.cs",
+      "**/Services/TorrentSearchResponse.cs",
+      "**/Services/Rpc/TransmissionRpcHandler.cs",
+      "**/Services/Rpc/TorrentTransferSnapshots.cs"
+    ],
+    "thresholds": {
+      "high": 100,
+      "low": 90,
+      "break": 80
+    },
+    "concurrency": 4,
+    "coverage-analysis": "off"
+  }
+}

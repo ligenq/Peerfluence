@@ -304,6 +304,229 @@ public sealed class TransmissionRpcHandlerTests
         Assert.Equal(-1, response.GetProperty("arguments").GetProperty("torrents")[0].GetProperty("eta").GetInt32());
     }
 
+
+    // ---------------------------------------------------------------------------------------------
+    // Everything below was added because mutation testing reported it unreached. session-stats and
+    // free-space had no test at all; most torrent-get fields were never asked for, so the code that
+    // writes them never ran; and torrent-set, integer ids and the non-magnet add branches were in
+    // the same position.
+    // ---------------------------------------------------------------------------------------------
+
+    [Fact]
+    public async Task SessionStats_AddsUpWhatTheTorrentsAreDoing()
+    {
+        var running = Torrent();
+        var stopped = Torrent(name: "stopped", started: false, state: TorrentState.Stopped);
+        _torrentService.GetTorrents().Returns([running, stopped]);
+        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(1000, 250, 0, 0, 3));
+
+        var response = await CallAsync("""{"method":"session-stats"}""");
+
+        var arguments = response.GetProperty("arguments");
+        Assert.Equal(2, arguments.GetProperty("torrentCount").GetInt32());
+        Assert.Equal(1, arguments.GetProperty("activeTorrentCount").GetInt32());
+        Assert.Equal(1, arguments.GetProperty("pausedTorrentCount").GetInt32());
+        // Both fixtures carry the same hash, so both read the same snapshot.
+        Assert.Equal(2000, arguments.GetProperty("downloadSpeed").GetInt64());
+        Assert.Equal(500, arguments.GetProperty("uploadSpeed").GetInt64());
+    }
+
+    /// <summary>
+    /// Clients check there is room before sending something large, so this has to answer with the
+    /// real figure rather than a guess they would ignore.
+    /// </summary>
+    [Fact]
+    public async Task FreeSpace_AnswersForARealPath()
+    {
+        var response = await CallAsync(
+            """{"method":"free-space","arguments":{"path":"PATH"}}"""
+                .Replace("PATH", Path.GetTempPath().Replace(@"\", @"\\")));
+
+        var arguments = response.GetProperty("arguments");
+        Assert.True(arguments.GetProperty("size-bytes").GetInt64() > 0);
+        Assert.False(string.IsNullOrEmpty(arguments.GetProperty("path").GetString()));
+    }
+
+    [Fact]
+    public async Task FreeSpace_ForSomewhereThatCannotBeMeasured_IsMinusOne()
+    {
+        var response = await CallAsync("""{"method":"free-space","arguments":{"path":"::not a path"}}""");
+
+        Assert.Equal(-1, response.GetProperty("arguments").GetProperty("size-bytes").GetInt64());
+    }
+
+    /// <summary>
+    /// One test asking for everything supported, because a field is only written when it is asked
+    /// for - so a field nobody requests is a branch nobody runs.
+    /// </summary>
+    [Fact]
+    public async Task EverySupportedField_IsWrittenWhenAskedFor()
+    {
+        var torrent = Torrent(finished: true);
+        torrent.RatioLimit.Returns(1.5f);
+        torrent.LastException.Returns(new InvalidOperationException("disk full"));
+        _torrentService.GetTorrents().Returns([torrent]);
+        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(10, 20, 30, 40, 5));
+
+        var response = await CallAsync("""
+            {"method":"torrent-get","arguments":{"fields":[
+              "id","hashString","name","status","totalSize","sizeWhenDone","leftUntilDone",
+              "percentDone","isFinished","downloadDir","rateDownload","rateUpload","downloadedEver",
+              "uploadedEver","peersConnected","eta","errorString","error","fileCount","addedDate",
+              "isPrivate","labels","seedRatioLimit","seedRatioMode"]}}
+            """);
+
+        var row = response.GetProperty("arguments").GetProperty("torrents")[0];
+        Assert.Equal(4096, row.GetProperty("totalSize").GetInt64());
+        Assert.Equal(4096, row.GetProperty("sizeWhenDone").GetInt64());
+        Assert.Equal(2048, row.GetProperty("leftUntilDone").GetInt64());
+        Assert.Equal(0.5, row.GetProperty("percentDone").GetDouble(), 3);
+        Assert.True(row.GetProperty("isFinished").GetBoolean());
+        Assert.Equal(30, row.GetProperty("downloadedEver").GetInt64());
+        Assert.Equal(40, row.GetProperty("uploadedEver").GetInt64());
+        Assert.Equal("disk full", row.GetProperty("errorString").GetString());
+        Assert.Equal(3, row.GetProperty("error").GetInt32());
+        Assert.Equal(1, row.GetProperty("fileCount").GetInt32());
+        Assert.Equal(0, row.GetProperty("addedDate").GetInt64());
+        Assert.False(row.GetProperty("isPrivate").GetBoolean());
+        Assert.Equal(1.5, row.GetProperty("seedRatioLimit").GetDouble(), 3);
+        Assert.Equal(1, row.GetProperty("seedRatioMode").GetInt32());
+        // Finished, so there is nothing left to wait for.
+        Assert.Equal(0, row.GetProperty("eta").GetInt32());
+    }
+
+    [Fact]
+    public async Task NoRatioLimit_IsReportedAsTheModeBeingOff()
+    {
+        var torrent = Torrent();
+        torrent.RatioLimit.Returns((float?)null);
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        var response = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["seedRatioLimit","seedRatioMode"]}}""");
+
+        var row = response.GetProperty("arguments").GetProperty("torrents")[0];
+        Assert.Equal(0, row.GetProperty("seedRatioLimit").GetDouble());
+        Assert.Equal(0, row.GetProperty("seedRatioMode").GetInt32());
+    }
+
+    /// <summary>
+    /// Clients remember the integer between calls, so selecting by it has to work as well as
+    /// selecting by hash does.
+    /// </summary>
+    [Fact]
+    public async Task Ids_SelectByTheIntegerTheClientWasGiven()
+    {
+        var wanted = Torrent();
+        var other = Torrent(hash: InfoHash.FromHex("FFFF6666AAAA7777BBBB8888CCCC9999DDDD0000"), name: "other");
+        _torrentService.GetTorrents().Returns([wanted, other]);
+
+        // The first call is what hands the numbers out.
+        var all = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["id","name"]}}""");
+        var firstId = all.GetProperty("arguments").GetProperty("torrents")[0].GetProperty("id").GetInt32();
+
+        var response = await CallAsync(
+            """{"method":"torrent-get","arguments":{"fields":["name"],"ids":[ID]}}"""
+                .Replace("ID", firstId.ToString()));
+
+        var torrents = response.GetProperty("arguments").GetProperty("torrents");
+        Assert.Equal(1, torrents.GetArrayLength());
+        Assert.Equal("ubuntu.iso", torrents[0].GetProperty("name").GetString());
+    }
+
+    [Fact]
+    public async Task RecentlyActive_MeansEverything()
+    {
+        var first = Torrent();
+        var second = Torrent(name: "second");
+        _torrentService.GetTorrents().Returns([first, second]);
+
+        var response = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["name"],"ids":"recently-active"}}""");
+
+        Assert.Equal(2, response.GetProperty("arguments").GetProperty("torrents").GetArrayLength());
+    }
+
+    [Fact]
+    public async Task TorrentSet_FilesAndUnfilesByLabel()
+    {
+        var torrent = Torrent();
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        await CallAsync("""{"method":"torrent-set","arguments":{"labels":["radarr"]}}""");
+        await _categoryService.Received(1).AssignAsync(Hash, "radarr", Arg.Any<CancellationToken>());
+
+        // An empty array is how a client clears one.
+        await CallAsync("""{"method":"torrent-set","arguments":{"labels":[]}}""");
+        await _categoryService.Received(1).AssignAsync(Hash, null, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task TorrentSet_CarriesARatioLimitThrough()
+    {
+        var torrent = Torrent();
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        await CallAsync("""{"method":"torrent-set","arguments":{"seedRatioLimit":2.5}}""");
+
+        Assert.Equal(2.5f, torrent.RatioLimit);
+    }
+
+    [Fact]
+    public async Task ARatioLimitOfZero_TurnsTheLimitOff()
+    {
+        var torrent = Torrent();
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        await CallAsync("""{"method":"torrent-set","arguments":{"seedRatioLimit":0}}""");
+
+        Assert.Null(torrent.RatioLimit);
+    }
+
+    [Fact]
+    public async Task TorrentAdd_TakesAnHttpLinkToATorrentFile()
+    {
+        var added = Torrent();
+        _torrentService.AddTorrentFromUrlAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns(added);
+
+        await CallAsync("""{"method":"torrent-add","arguments":{"filename":"https://example.invalid/a.torrent"}}""");
+
+        await _torrentService.Received(1).AddTorrentFromUrlAsync(
+            "https://example.invalid/a.torrent", Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task TorrentAdd_TakesALocalPath()
+    {
+        var added = Torrent();
+        _torrentService.AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns(added);
+
+        await CallAsync("""{"method":"torrent-add","arguments":{"filename":"local-file.torrent"}}""");
+
+        await _torrentService.Received(1).AddTorrentFileAsync(
+            "local-file.torrent", Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// The engine holds a path including the torrent's own folder; clients want the directory it
+    /// sits in, which is the parent.
+    /// </summary>
+    [Fact]
+    public async Task DownloadDir_IsTheFolderTheDownloadSitsIn()
+    {
+        var torrent = Torrent();
+        var files = Substitute.For<PeerSharp.Interfaces.IFiles>();
+        files.DownloadPath.Returns(Path.Combine("D:", "Downloads", "ubuntu.iso"));
+        torrent.Files.Returns(files);
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        var response = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["downloadDir"]}}""");
+
+        var reported = response.GetProperty("arguments").GetProperty("torrents")[0]
+            .GetProperty("downloadDir").GetString();
+        Assert.Equal(Path.Combine("D:", "Downloads"), reported);
+    }
+
     private async Task<JsonElement> CallAsync(string request)
     {
         var handler = new TransmissionRpcHandler(_torrentService, _settingsService, _snapshots, _categoryService, "1.2.3");
