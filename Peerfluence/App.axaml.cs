@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -103,6 +103,21 @@ public class App : Application
             try
             {
                 var engineService = _services.GetRequiredService<ITorrentEngineService>();
+
+                // Raised here rather than where it is decided, which is engine construction: that
+                // happens before there is a window, and a notification with nowhere to appear is
+                // the same as no notification.
+                if (engineService.ProxyRestrictionApplied)
+                {
+                    _services.GetRequiredService<INotificationService>().Publish(
+                        new NotificationItem(
+                            Properties.Resources.Notification_ProxyRestricted,
+                            Properties.Resources.Notification_ProxyRestrictedBody,
+                            NotificationType.Warning,
+                            Material.Icons.MaterialIconKind.ShieldAlertOutline.ToString()),
+                        TimeSpan.FromSeconds(15));
+                }
+
                 await Task.Run(
                     () => engineService.LoadOptionalDataAsync(_optionalStartupCts.Token),
                     _optionalStartupCts.Token);

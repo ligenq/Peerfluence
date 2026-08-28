@@ -306,7 +306,7 @@ public class SettingsViewModelTests
         Assert.Equal(UpdateSettings.DefaultUpdateUrl, _sut.UpdateUrl);
         Assert.True(_sut.EnableDht);
         Assert.False(_sut.UseAutomaticListeningPort);
-        Assert.Equal(55125, _sut.ListeningPort);
+        Assert.Equal(6881, _sut.ListeningPort);
         Assert.True(_sut.ShowRemoveTorrentOptions);
     }
 

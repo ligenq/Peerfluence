@@ -1378,4 +1378,94 @@
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Address filled in, but replace the 1 with your indexer's id - Prowlarr gives each indexer its own address and has no combined one. The id is in the address bar when you open an indexer in Prowlarr.</value>
   </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Metadata is not arriving</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Listening port changed</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>Port {0} could not be bound, so {1} is in use instead. Update your router’s port forwarding to match.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>Proxy cannot carry UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>An HTTP proxy is configured, so DHT and uTP are off for this session. Use a SOCKS5 proxy to keep them.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Download path changed and the data moved</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Scrape</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>Scrape failed: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Web seeds</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Add web seed</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>That is not a usable web seed address, or the torrent already has it.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>This torrent has no web seeds.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>Rename failed: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Super-seed (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>For one seed introducing new content to an empty swarm. Turn it off afterwards: against an established swarm it holds back peers that could download freely.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Max connections</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Max upload slots</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 uses the global setting</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Pause all</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Resume all</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>All torrents paused</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Torrents resumed</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Bind to address</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Send everything from one local address, such as your VPN’s. Traffic stops rather than leaving by another route if that address goes away, which is what makes it a kill switch. Leave blank to use every interface. Port mapping is turned off while this is set.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>Connections per address</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>How many connections one address may hold on a single torrent. 0 is unlimited. A single peer briefly holds more than one while a dial tries both transports, so set this from what your network looks like rather than low on principle.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>Not an address this can bind to. Use one of your machine’s own addresses, not 0.0.0.0.</value>
+  </data>
 </root>

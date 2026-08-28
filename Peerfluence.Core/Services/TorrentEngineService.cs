@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Config;
 using PeerSharp.Clients;
 using PeerSharp.Config;
@@ -22,6 +22,12 @@ public sealed class TorrentEngineService : ITorrentEngineService
     }
 
     public IClientEngine Engine => _engine ?? throw new InvalidOperationException("Torrent engine is not initialized.");
+
+    /// <summary>
+    /// Whether the configured proxy cost this session DHT or uTP. Read once the engine is built, so
+    /// the user can be told rather than left wondering why no peers arrive.
+    /// </summary>
+    public bool ProxyRestrictionApplied { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -100,18 +106,30 @@ public sealed class TorrentEngineService : ITorrentEngineService
     {
         var settings = _settingsService.Current;
 
+        var udpPlan = ProxyUdpPolicy.Decide(settings.Proxy, settings.Network.EnableDht);
+        if (udpPlan.RestrictedByProxy)
+        {
+            // Warned rather than thrown. The engine would refuse to start at all, and an application
+            // that will not open is a worse answer to "your proxy cannot carry UDP" than one that
+            // opens with less of the network available and says so.
+            _logger.LogWarning(
+                "An HTTP proxy is configured, which cannot carry UDP. DHT is off for this session and uTP is {UtpState}. Use a SOCKS5 proxy to keep them.",
+                udpPlan.EnableUtp ? "on" : "off");
+            ProxyRestrictionApplied = true;
+        }
+
         var clientSettings = new Settings
         {
             Dht = new DhtSettings
             {
-                Enabled = settings.Network.EnableDht,
+                Enabled = udpPlan.EnableDht,
                 AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling
             },
             Files = new FilesSettings
             {
                 DefaultDownloadPath = settings.Storage.DownloadPath,
-                MaxDiskReadSpeed = (uint)Math.Max(0, settings.Network.MaxDiskReadSpeedBytesPerSecond),
-                MaxDiskWriteSpeed = (uint)Math.Max(0, settings.Network.MaxDiskWriteSpeedBytesPerSecond)
+                MaxDiskReadSpeed = ToSpeed(settings.Network.MaxDiskReadSpeedBytesPerSecond),
+                MaxDiskWriteSpeed = ToSpeed(settings.Network.MaxDiskWriteSpeedBytesPerSecond)
             },
             Connection = new ConnectionSettings
             {
@@ -120,6 +138,10 @@ public sealed class TorrentEngineService : ITorrentEngineService
                 NatPmpPortMapping = settings.Network.EnableNatPmp,
                 UpnpPortMapping = settings.Network.EnableUpnp,
                 AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp,
+                MaxConnectionsPerIp = Math.Max(0, settings.Network.MaxConnectionsPerIp),
+                BindAddress = ParseBindAddress(settings.Network.BindAddress),
+                EnableUtpIn = udpPlan.EnableUtp,
+                EnableUtpOut = udpPlan.EnableUtp,
                 Encryption = ParseEncryption(settings.EncryptionMode)
             },
             Session = new SessionSettings
@@ -167,13 +189,18 @@ public sealed class TorrentEngineService : ITorrentEngineService
     }
 
     /// <summary>
-    /// Clamps a stored limit into what the engine takes. A negative value is meaningless and would
-    /// wrap into an enormous limit rather than an absent one, which is the opposite of what someone
-    /// typing a minus sign meant.
+    /// Clamps a stored limit into what the engine takes. A negative value is meaningless, and the
+    /// engine now rejects one with <see cref="ArgumentOutOfRangeException"/> rather than clamping it,
+    /// so a stored minus sign would otherwise stop the engine being built at all.
     /// </summary>
-    private static uint ToSpeed(long bytesPerSecond)
+    /// <remarks>
+    /// The ceiling used to be <c>uint.MaxValue</c>, because the engine took a <c>uint</c>. PeerSharp
+    /// 3.2.0 widened every limit to <c>long</c>, so there is no ceiling to clamp to any more: a limit
+    /// above 4 GB/s is now carried rather than quietly becoming 4 GB/s.
+    /// </remarks>
+    private static long ToSpeed(long bytesPerSecond)
     {
-        return (uint)Math.Clamp(bytesPerSecond, 0, uint.MaxValue);
+        return Math.Max(0, bytesPerSecond);
     }
 
     private static ushort GetListeningPort(NetworkSettings settings)
@@ -205,12 +232,39 @@ public sealed class TorrentEngineService : ITorrentEngineService
         _ => Encryption.Allow
     };
 
-    private static ProxyType ParseProxyType(string type) => type switch
+    private static ProxyType ParseProxyType(string type) => ProxyUdpPolicy.ParseProxyType(type) switch
     {
-        "Socks5" => ProxyType.Socks5,
-        "Http" => ProxyType.Http,
+        ProxyKind.Socks5 => ProxyType.Socks5,
+        ProxyKind.Http => ProxyType.Http,
         _ => ProxyType.None
     };
+
+    /// <summary>
+    /// Reads the address the engine should bind to, which is what makes a VPN a kill switch rather
+    /// than a preference: PeerSharp fails socket creation instead of falling back to an unbound one.
+    /// </summary>
+    /// <remarks>
+    /// Blank means "listen on everything", which the engine spells <see langword="null"/> - passing
+    /// it <see cref="System.Net.IPAddress.Any"/> throws, because that is not a single-address
+    /// guarantee it could keep. An unparseable address is treated the same as blank rather than
+    /// stopping startup, and is warned about where it is entered.
+    /// </remarks>
+    private static System.Net.IPAddress? ParseBindAddress(string? address)
+    {
+        if (string.IsNullOrWhiteSpace(address))
+        {
+            return null;
+        }
+
+        if (!System.Net.IPAddress.TryParse(address, out var parsed))
+        {
+            return null;
+        }
+
+        return parsed.Equals(System.Net.IPAddress.Any) || parsed.Equals(System.Net.IPAddress.IPv6Any)
+            ? null
+            : parsed;
+    }
 
     private async Task LoadBlocklistAsync(CancellationToken cancellationToken)
     {

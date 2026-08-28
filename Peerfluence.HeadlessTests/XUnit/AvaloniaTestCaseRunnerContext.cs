@@ -1,4 +1,4 @@
-// Ported from Avalonia 12.0 source (MIT License)
+﻿// Ported from Avalonia 12.0 source (MIT License)
 
 using Avalonia.Headless;
 using Xunit.Sdk;
@@ -16,17 +16,23 @@ internal sealed class AvaloniaTestCaseRunnerContext(
     string? skipReason,
     ExplicitOption explicitOption,
     object?[] constructorArguments,
+    ParallelMode parallelMode,
+    ExecutionScheduler scheduler,
+    FixtureMappingManager methodFixtureMappings,
     HeadlessUnitTestSession session)
     : XunitTestCaseRunnerContext(
         testCase,
         tests,
+        explicitOption,
         messageBus,
         aggregator,
-        cancellationTokenSource,
         displayName,
         skipReason,
-        explicitOption,
-        constructorArguments)
+        cancellationTokenSource,
+        parallelMode,
+        scheduler,
+        constructorArguments,
+        methodFixtureMappings)
 {
     public HeadlessUnitTestSession Session { get; } = session;
 }

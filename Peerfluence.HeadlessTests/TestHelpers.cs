@@ -44,10 +44,10 @@ internal static class TestHelpers
         fields.First(f => f.Name == "_dialogService").SetValue(vm, dialogService);
         fields.First(f => f.Name == "_settingsService").SetValue(vm, settingsService);
 
-        if (detailsViewModel != null)
-        {
-            fields.First(f => f.Name == "<SelectedTorrentDetailViewModel>k__BackingField").SetValue(vm, detailsViewModel);
-        }
+        // Always set, not only when the caller supplied one: the real constructor always assigns it,
+        // and MainWindowViewModel reaches through it to hand the details pane the dialog manager.
+        detailsViewModel ??= CreateDetailsViewModel();
+        fields.First(f => f.Name == "<SelectedTorrentDetailViewModel>k__BackingField").SetValue(vm, detailsViewModel);
 
         fields.First(f => f.Name == "<Torrents>k__BackingField").SetValue(vm, new ObservableCollection<TorrentListItemViewModel>());
 

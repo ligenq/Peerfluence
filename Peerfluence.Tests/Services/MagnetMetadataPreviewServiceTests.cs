@@ -1,4 +1,4 @@
-using Peerfluence.Core.Services;
+﻿using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
@@ -30,7 +30,7 @@ public sealed class MagnetMetadataPreviewServiceTests
         var result = await sut.FetchAsync(
             magnetUri,
             TimeSpan.FromSeconds(5),
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         result = Assert.IsType<MagnetMetadataPreview>(result);
         Assert.Equal("Preview", result.Name);
@@ -64,7 +64,7 @@ public sealed class MagnetMetadataPreviewServiceTests
         var result = await sut.FetchAsync(
             $"magnet:?xt=urn:btih:{new string('a', 40)}",
             TimeSpan.Zero,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }

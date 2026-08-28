@@ -313,6 +313,54 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     }
 
+    /// <summary>
+    /// How many connections one address may hold on a single torrent. Zero is unlimited, and is the
+    /// middle ground <see cref="AllowMultipleConnectionsPerIp"/> lacked - that could only allow one
+    /// per address or as many as turned up.
+    /// </summary>
+    public int MaxConnectionsPerIp
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    /// <summary>
+    /// A single local address every socket is bound to, or blank for all interfaces. Kept as typed
+    /// rather than validated into an <see cref="System.Net.IPAddress"/> here, so a half-typed address
+    /// is not rejected mid-keystroke; <see cref="IsBindAddressValid"/> reports on it instead.
+    /// </summary>
+    public string BindAddress
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(IsBindAddressValid));
+            }
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Whether what is typed is an address the engine can bind to. Blank is valid and means every
+    /// interface. <c>0.0.0.0</c> and <c>::</c> are not: the engine rejects them outright, because
+    /// "any address" is not a single-address guarantee it could keep.
+    /// </summary>
+    public bool IsBindAddressValid
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(BindAddress))
+            {
+                return true;
+            }
+
+            return System.Net.IPAddress.TryParse(BindAddress, out var parsed)
+                && !parsed.Equals(System.Net.IPAddress.Any)
+                && !parsed.Equals(System.Net.IPAddress.IPv6Any);
+        }
+    }
+
     public bool EnableNatPmp
     {
         get;
@@ -601,7 +649,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         get;
         set => SetProperty(ref field, Math.Clamp(value, 1, 65535));
-    } = 55125;
+    } = NetworkSettings.DefaultListeningPort;
 
     /// <summary>
     /// The download limit in kibibytes per second, which is the unit every other client uses and the
@@ -966,6 +1014,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableDht = settings.Network.EnableDht;
         AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling;
         AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp;
+        MaxConnectionsPerIp = settings.Network.MaxConnectionsPerIp;
+        BindAddress = settings.Network.BindAddress;
         EnableNatPmp = settings.Network.EnableNatPmp;
         EnableUpnp = settings.Network.EnableUpnp;
         UseAutomaticListeningPort = settings.Network.UseAutomaticListeningPort;
@@ -1059,6 +1109,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Network.EnableDht = EnableDht;
             settings.Network.AnswerInfoHashSampling = AnswerInfoHashSampling;
             settings.Network.AllowMultipleConnectionsPerIp = AllowMultipleConnectionsPerIp;
+            settings.Network.MaxConnectionsPerIp = MaxConnectionsPerIp;
+
+            // Only stored once it parses. A half-typed address saved as it stands would be read back
+            // as "no bind address" on the next start, which is the opposite of what a kill switch is
+            // for - it would silently go back to leaving by the default route.
+            settings.Network.BindAddress = IsBindAddressValid ? BindAddress.Trim() : settings.Network.BindAddress;
             settings.Network.EnableNatPmp = EnableNatPmp;
             settings.Network.EnableUpnp = EnableUpnp;
             settings.Network.UseAutomaticListeningPort = UseAutomaticListeningPort;
@@ -1197,6 +1253,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableDht = defaults.Network.EnableDht;
         AnswerInfoHashSampling = defaults.Network.AnswerInfoHashSampling;
         AllowMultipleConnectionsPerIp = defaults.Network.AllowMultipleConnectionsPerIp;
+        MaxConnectionsPerIp = defaults.Network.MaxConnectionsPerIp;
+        BindAddress = defaults.Network.BindAddress;
         EnableNatPmp = defaults.Network.EnableNatPmp;
         EnableUpnp = defaults.Network.EnableUpnp;
         UseAutomaticListeningPort = defaults.Network.UseAutomaticListeningPort;

@@ -1384,4 +1384,94 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Dirección rellenada, pero sustituye el 1 por el id de tu indexador: Prowlarr da a cada indexador su propia dirección y no tiene una combinada. El id aparece en la barra de direcciones al abrir un indexador en Prowlarr.</value>
   </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Los metadatos no llegan</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Puerto de escucha cambiado</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>No se pudo enlazar el puerto {0}, por lo que se usa {1}. Actualice la redirección de puertos de su router.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>El proxy no puede transportar UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>Hay un proxy HTTP configurado, por lo que DHT y uTP están desactivados en esta sesión. Use un proxy SOCKS5 para conservarlos.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Ruta de descarga cambiada y datos movidos</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Consultar</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>La consulta falló: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Semillas web</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Añadir semilla web</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>Esa no es una dirección de semilla web utilizable, o el torrent ya la tiene.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>Este torrent no tiene semillas web.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Renombrar</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>No se pudo renombrar: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Supersiembra (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>Para una única semilla que introduce contenido nuevo en un enjambre vacío. Desactívelo después: en un enjambre establecido frena a pares que podrían descargar libremente.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Conexiones máximas</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Ranuras de subida máximas</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 usa el ajuste global</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Pausar todo</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Reanudar todo</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>Todos los torrents en pausa</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Torrents reanudados</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Vincular a la dirección</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Enviar todo desde una única dirección local, como la de su VPN. Si esa dirección desaparece, el tráfico se detiene en lugar de salir por otra ruta: eso lo convierte en un interruptor de emergencia. Déjelo en blanco para usar todas las interfaces. La asignación de puertos se desactiva mientras esté definido.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>Conexiones por dirección</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>Cuántas conexiones puede mantener una dirección en un mismo torrent. 0 es ilimitado. Un mismo par mantiene brevemente más de una mientras se prueban ambos transportes, así que ajústelo según su red y no bajo por principio.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>No es una dirección a la que se pueda vincular. Use una dirección propia de este equipo, no 0.0.0.0.</value>
+  </data>
 </root>

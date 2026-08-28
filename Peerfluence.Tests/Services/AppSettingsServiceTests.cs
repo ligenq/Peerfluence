@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using Peerfluence.Core.Services;
 using Peerfluence.Core.Config;
 
@@ -54,7 +54,7 @@ public sealed class AppSettingsServiceTests : IDisposable
         Assert.Equal("RemoveOnly", sut.Current.DefaultRemoveTorrentAction);
         Assert.Equal(0, sut.Current.Network.MaxDiskReadSpeedBytesPerSecond);
         Assert.Equal(0, sut.Current.Network.MaxDiskWriteSpeedBytesPerSecond);
-        Assert.Equal(55125, sut.Current.Network.ListeningPort);
+        Assert.Equal(6881, sut.Current.Network.ListeningPort);
         Assert.True(Directory.Exists(paths.DefaultDownloadDirectory));
         Assert.True(Directory.Exists(paths.SessionDirectory));
 
@@ -64,7 +64,7 @@ public sealed class AppSettingsServiceTests : IDisposable
             settings.Storage.SessionPath == paths.SessionDirectory &&
             settings.Language == "en-US" &&
             settings.DefaultRemoveTorrentAction == "RemoveOnly" &&
-            settings.Network.ListeningPort == 55125 &&
+            settings.Network.ListeningPort == 6881 &&
             settings.Network.MaxDiskReadSpeedBytesPerSecond == 0 &&
             settings.Network.MaxDiskWriteSpeedBytesPerSecond == 0),
             Arg.Any<CancellationToken>());
@@ -91,6 +91,9 @@ public sealed class AppSettingsServiceTests : IDisposable
             Language = "en-US",
             DefaultRemoveTorrentAction = "RemoveOnly",
         };
+        // Deliberately the old default rather than the current one: an existing profile's port
+        // must survive the change to 6881, along with whatever the user forwarded through a router
+        // for it.
         loaded.Network.ListeningPort = 55125;
         loaded.CompletionAction.TimeoutSeconds = 300;
         loaded.CompletionAction.WorkingDirectoryTemplate = "{downloadPath}";
@@ -133,7 +136,7 @@ public sealed class AppSettingsServiceTests : IDisposable
         Assert.True(defaults.Storage.EnableSessionPersistence);
         Assert.True(defaults.Network.EnableDht);
         Assert.False(defaults.Network.UseAutomaticListeningPort);
-        Assert.Equal(55125, defaults.Network.ListeningPort);
+        Assert.Equal(6881, defaults.Network.ListeningPort);
         Assert.True(defaults.ShowRemoveTorrentOptions);
         Assert.Equal("RemoveOnly", defaults.DefaultRemoveTorrentAction);
     }

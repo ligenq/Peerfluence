@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using System.Reflection;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -47,6 +48,12 @@ public class MainWindowViewModelTests
 #pragma warning disable SYSLIB0050
         var downloadsVm = (DownloadsViewModel)FormatterServices.GetUninitializedObject(typeof(DownloadsViewModel));
 #pragma warning restore SYSLIB0050
+
+        // The real constructor always assigns this, and MainWindowViewModel reaches through it to
+        // hand the details pane the dialog manager, so an uninitialized object needs it set.
+        typeof(DownloadsViewModel)
+            .GetField("<SelectedTorrentDetailViewModel>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .SetValue(downloadsVm, _detailsVm);
 
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 

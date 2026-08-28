@@ -85,6 +85,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ToggleTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(ToggleTorrentAsync);
         OpenTorrentFolderCommand = new RelayCommand<TorrentListItemViewModel?>(OpenFolderFor);
         RemoveTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(RemoveTorrentAsync);
+        ToggleSessionPauseCommand = new AsyncRelayCommand(ToggleSessionPauseAsync);
 
         IsDetailsPaneVisible = _settingsService.Current.ShowDetailsPane;
 
@@ -376,13 +377,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         set => SetProperty(ref field, value);
     }
 
-    public int TotalDownloadSpeedBytesPerSecond
+    public long TotalDownloadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
     }
 
-    public int TotalUploadSpeedBytesPerSecond
+    public long TotalUploadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
@@ -430,6 +431,19 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     public IRelayCommand<TorrentListItemViewModel?> OpenTorrentFolderCommand { get; }
 
     public IAsyncRelayCommand<TorrentListItemViewModel?> RemoveTorrentCommand { get; }
+
+    /// <summary>Stops everything that is running, or starts back exactly what it stopped.</summary>
+    public IAsyncRelayCommand ToggleSessionPauseCommand { get; }
+
+    /// <summary>
+    /// Whether the session is paused. Drives the toolbar button's label and icon, so it is a
+    /// property rather than a read straight through to the engine on each bind.
+    /// </summary>
+    public bool IsSessionPaused
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
 
     public ISukiDialogManager? SukiDialogManager { get; set; }
 
@@ -588,6 +602,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             ref _totalUploadSpeedSamples);
         ActiveTorrents = stats.ActiveTorrents;
         TotalPeers = stats.TotalPeers;
+        IsSessionPaused = _torrentService.IsSessionPaused;
     }
 
 
@@ -597,7 +612,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     private int _totalDownloadSpeedSamples;
     private int _totalUploadSpeedSamples;
 
-    private static int UpdateSmoothedSpeed(int current, ref double smoothed, ref int samples)
+    private static long UpdateSmoothedSpeed(long current, ref double smoothed, ref int samples)
     {
         if (samples == 0)
         {
@@ -614,13 +629,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
                 smoothed = 0;
             }
             samples++;
-            return (int)Math.Round(smoothed);
+            return (long)Math.Round(smoothed);
         }
 
         double alpha = 2.0 / (SpeedSmoothingWindow + 1);
         smoothed = (alpha * current) + ((1.0 - alpha) * smoothed);
         samples++;
-        return (int)Math.Round(smoothed);
+        return (long)Math.Round(smoothed);
     }
 
     private async Task AddMagnetAsync()
@@ -644,6 +659,36 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         }
 
         await AddMagnetUriAsync(magnet);
+    }
+
+    /// <summary>
+    /// Stops every running torrent, or starts back the ones a previous pause stopped.
+    /// </summary>
+    /// <remarks>
+    /// The engine keeps running either way - the DHT node, the listeners and the port mappings all
+    /// stay up - so this is not a way of going offline, it is a way of stopping the transfers.
+    /// </remarks>
+    private async Task ToggleSessionPauseAsync()
+    {
+        try
+        {
+            if (_torrentService.IsSessionPaused)
+            {
+                await _torrentService.ResumeSessionAsync();
+                SetStatusMessage(Resources.Status_SessionResumed, autoClear: true);
+            }
+            else
+            {
+                await _torrentService.PauseSessionAsync();
+                SetStatusMessage(Resources.Status_SessionPaused, autoClear: true);
+            }
+
+            IsSessionPaused = _torrentService.IsSessionPaused;
+        }
+        catch (Exception ex)
+        {
+            SetStatusMessage(ex.Message);
+        }
     }
 
     private void SetStatusMessage(string message, bool autoClear = false)

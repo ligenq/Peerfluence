@@ -1384,4 +1384,94 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Endereço preenchido, mas substitua o 1 pelo id do seu indexador: o Prowlarr dá a cada indexador o seu próprio endereço e não tem um combinado. O id aparece na barra de endereço ao abrir um indexador no Prowlarr.</value>
   </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Os metadados não estão a chegar</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Porta de escuta alterada</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>Não foi possível vincular a porta {0}, pelo que está a ser usada a {1}. Atualize o encaminhamento de portas do seu router.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>O proxy não consegue transportar UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>Está configurado um proxy HTTP, pelo que o DHT e o uTP estão desligados nesta sessão. Use um proxy SOCKS5 para os manter.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Caminho de transferência alterado e dados movidos</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Consultar</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>A consulta falhou: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Sementes web</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Adicionar semente web</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>Esse não é um endereço de semente web utilizável, ou o torrent já o tem.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>Este torrent não tem sementes web.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Mudar o nome</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>Falha ao mudar o nome: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Super-seed (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>Para uma única semente que introduz conteúdo novo num enxame vazio. Desligue depois: num enxame estabelecido trava pares que podiam transferir livremente.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Ligações máximas</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Ranhuras de envio máximas</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 usa a definição global</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Pausar tudo</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Retomar tudo</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>Todos os torrents em pausa</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Torrents retomados</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Vincular ao endereço</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Enviar tudo a partir de um único endereço local, como o da sua VPN. Se esse endereço desaparecer, o tráfego para em vez de sair por outra rota - é isso que o torna um kill switch. Deixe em branco para usar todas as interfaces. O mapeamento de portas fica desligado enquanto estiver definido.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>Ligações por endereço</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>Quantas ligações um endereço pode manter num único torrent. 0 é ilimitado. Um mesmo par mantém brevemente mais do que uma enquanto uma tentativa experimenta ambos os transportes, por isso defina conforme a sua rede e não baixo por princípio.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>Não é um endereço ao qual seja possível vincular. Use um endereço próprio desta máquina, não 0.0.0.0.</value>
+  </data>
 </root>

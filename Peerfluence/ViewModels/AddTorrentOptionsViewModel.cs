@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -134,6 +134,23 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     public bool IsMagnet => _isMagnet;
 
     public bool IsMetadataPending => IsMagnet && !HasFiles;
+
+    /// <summary>How much of the magnet's metadata has arrived, from 0 to 1.</summary>
+    public double MetadataProgress
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// Whether anything has arrived yet. Until it has there is nothing to show a proportion of, so
+    /// the bar stays indeterminate rather than sitting at a confident zero.
+    /// </summary>
+    public bool HasMetadataProgress
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
@@ -418,7 +435,16 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
 
         try
         {
-            var preview = await previewService.FetchAsync(_source, timeout, cancellationToken).ConfigureAwait(false);
+            // Reported straight onto the UI thread rather than through RunOnUiThreadAsync per
+            // update: Progress<T> already captures the context it was created on, and the fetch
+            // sends one of these per metadata piece.
+            var progress = new Progress<double>(value =>
+            {
+                MetadataProgress = value;
+                HasMetadataProgress = value > 0;
+            });
+
+            var preview = await previewService.FetchAsync(_source, timeout, progress, cancellationToken).ConfigureAwait(false);
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
@@ -493,9 +519,20 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             .ToList();
     }
 
-    private static int? ToBytesPerSecond(int kibPerSecond)
+    /// <summary>
+    /// Turns the kibibytes-per-second the dialog shows into the bytes the engine takes. Null is
+    /// "no per-torrent limit", which is what zero and below mean here.
+    /// </summary>
+    /// <remarks>
+    /// Multiplied in <see langword="long"/> space. It used to be <c>checked</c> <see langword="int"/>
+    /// arithmetic, which was right while the engine took an <c>int</c>: anything above about 2 GiB/s
+    /// had nowhere to go, so throwing beat wrapping. PeerSharp 3.2 widened these to <c>long</c>, and
+    /// an overflow at that point would now be this method inventing a ceiling the engine does not
+    /// have - out of a number the user typed into a box.
+    /// </remarks>
+    private static long? ToBytesPerSecond(int kibPerSecond)
     {
-        return kibPerSecond > 0 ? checked(kibPerSecond * 1024) : null;
+        return kibPerSecond > 0 ? (long)kibPerSecond * 1024 : null;
     }
 
     private static string GetDefaultDownloadPath(IAppSettingsService settingsService)
