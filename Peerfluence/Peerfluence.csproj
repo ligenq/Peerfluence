@@ -48,7 +48,7 @@
 		<PackageReference Include="Material.Icons.Avalonia" Version="3.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
-		<PackageReference Include="ModelContextProtocol" Version="2.1.0" />
+		<PackageReference Include="ModelContextProtocol" Version="2.2.0" />
 		<PackageReference Include="PeerSharp" Version="$(PeerSharpPackageVersion)" />
 		<PackageReference Include="Velopack" Version="1.2.0" />
 	</ItemGroup>

@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -86,6 +86,22 @@
                     </Button>
 
                     <Separator Width="1" Height="24" Background="{DynamicResource SukiBorderBrush}" Margin="{StaticResource XXSmallLeftRightMargin}"/>
+
+                    <!--
+                        Session-wide, unlike Start and Stop beside it, which act on what is selected.
+                        Two buttons rather than one that relabels itself: which one is showing is then
+                        also the answer to "is anything running?".
+                    -->
+                    <Button Command="{Binding ToggleSessionPauseCommand}"
+                            ToolTip.Tip="{m:L Downloads_PauseAll}"
+                            IsVisible="{Binding !IsSessionPaused}">
+                        <materialIcons:MaterialIcon Kind="PauseCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                    </Button>
+                    <Button Command="{Binding ToggleSessionPauseCommand}"
+                            ToolTip.Tip="{m:L Downloads_ResumeAll}"
+                            IsVisible="{Binding IsSessionPaused}">
+                        <materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                    </Button>
 
                     <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}">
                         <materialIcons:MaterialIcon Kind="File" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>

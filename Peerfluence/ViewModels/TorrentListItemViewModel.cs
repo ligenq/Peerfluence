@@ -76,13 +76,13 @@ public sealed class TorrentListItemViewModel : ViewModelBase
         set => SetProperty(ref field, value);
     }
 
-    public int DownloadSpeedBytesPerSecond
+    public long DownloadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
     }
 
-    public int UploadSpeedBytesPerSecond
+    public long UploadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
@@ -227,7 +227,7 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     private int _downloadSpeedSamples;
     private int _uploadSpeedSamples;
 
-    private static int UpdateSmoothedSpeed(int current, ref double smoothed, ref int samples)
+    private static long UpdateSmoothedSpeed(long current, ref double smoothed, ref int samples)
     {
         if (samples == 0)
         {
@@ -244,12 +244,12 @@ public sealed class TorrentListItemViewModel : ViewModelBase
                 smoothed = 0;
             }
             samples++;
-            return (int)Math.Round(smoothed);
+            return (long)Math.Round(smoothed);
         }
 
         double alpha = 2.0 / (SpeedSmoothingWindow + 1);
         smoothed = (alpha * current) + ((1.0 - alpha) * smoothed);
         samples++;
-        return (int)Math.Round(smoothed);
+        return (long)Math.Round(smoothed);
     }
 }

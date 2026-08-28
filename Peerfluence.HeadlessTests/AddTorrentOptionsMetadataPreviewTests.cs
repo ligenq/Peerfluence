@@ -20,7 +20,7 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
         var previewReleased = false;
         var previewService = Substitute.For<IMagnetMetadataPreviewService>();
         previewService
-            .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<IProgress<double>?>(), Arg.Any<CancellationToken>())
             .Returns(call => FetchUntilCancelled(call.Arg<CancellationToken>(), () => previewReleased = true));
 
         var previewHadUnwoundWhenAddRan = true;
@@ -49,7 +49,7 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
     {
         var previewService = Substitute.For<IMagnetMetadataPreviewService>();
         previewService
-            .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<IProgress<double>?>(), Arg.Any<CancellationToken>())
             .Returns<Task<MagnetMetadataPreview?>>(_ => throw new InvalidOperationException("the fetch failed"));
 
         var sut = CreateMagnetViewModel(Substitute.For<ITorrentService>());

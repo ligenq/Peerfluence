@@ -1,4 +1,4 @@
-using Peerfluence.Core.Config;
+﻿using Peerfluence.Core.Config;
 using System.IO.Abstractions;
 
 namespace Peerfluence.Core.Services;
@@ -61,7 +61,7 @@ public sealed class AppSettingsService : IAppSettingsService
                 EnableNatPmp = true,
                 EnableUpnp = false,
                 UseAutomaticListeningPort = false,
-                ListeningPort = 55125,
+                ListeningPort = NetworkSettings.DefaultListeningPort,
                 MaxDiskReadSpeedBytesPerSecond = 0,
                 MaxDiskWriteSpeedBytesPerSecond = 0
             },
@@ -169,7 +169,7 @@ public sealed class AppSettingsService : IAppSettingsService
         }
 
         var listeningPort = settings.Network.ListeningPort <= 0
-            ? 55125
+            ? NetworkSettings.DefaultListeningPort
             : Math.Clamp(settings.Network.ListeningPort, 1, 65535);
         if (settings.Network.ListeningPort != listeningPort)
         {

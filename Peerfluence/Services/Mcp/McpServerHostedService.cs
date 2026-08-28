@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Security.AccessControl;
@@ -126,6 +126,26 @@ public class McpServerHostedService : BackgroundService
                     options.ToolCollection.Add(McpServerTool.Create(
                         _toolHandler.SetFilePriorityAsync,
                         new McpServerToolCreateOptions { Name = McpConstants.ToolSetFilePriority, Description = McpConstants.ToolSetFilePriorityDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.ConfigureTorrentAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolConfigureTorrent, Description = McpConstants.ToolConfigureTorrentDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.ManageWebSeedsAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolManageWebSeeds, Description = McpConstants.ToolManageWebSeedsDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.ScrapeTrackersAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolScrapeTrackers, Description = McpConstants.ToolScrapeTrackersDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.RenameTorrentFileAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolRenameTorrentFile, Description = McpConstants.ToolRenameTorrentFileDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.MoveTorrentStorageAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolMoveTorrentStorage, Description = McpConstants.ToolMoveTorrentStorageDescription }));
 
                     if (_runtimeOptions.EnableUiAgentTools)
                     {

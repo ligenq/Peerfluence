@@ -1,4 +1,4 @@
-using Peerfluence.Core.Config;
+﻿using Peerfluence.Core.Config;
 
 namespace Peerfluence.Tests.Services;
 
@@ -16,7 +16,7 @@ public class AppSettingsTests
         Assert.True(settings.Network.EnableNatPmp);
         Assert.False(settings.Network.EnableUpnp);
         Assert.False(settings.Network.UseAutomaticListeningPort);
-        Assert.Equal(55125, settings.Network.ListeningPort);
+        Assert.Equal(6881, settings.Network.ListeningPort);
         Assert.Equal(0, settings.Network.MaxDiskReadSpeedBytesPerSecond);
         Assert.Equal(0, settings.Network.MaxDiskWriteSpeedBytesPerSecond);
         Assert.Equal("System", settings.Theme.ThemeVariant);

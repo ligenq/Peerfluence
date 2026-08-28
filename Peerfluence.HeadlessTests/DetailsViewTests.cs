@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
@@ -34,8 +34,8 @@ public class DetailsViewTests
 
         var tabControl = view.GetLogicalDescendants().OfType<TabControl>().FirstOrDefault();
         Assert.NotNull(tabControl);
-        // Files, Trackers, Peers, Pieces, Settings
-        Assert.Equal(5, tabControl.Items.Count);
+        // Files, Trackers, Peers, Web seeds, Pieces, Settings
+        Assert.Equal(6, tabControl.Items.Count);
     }
 
     [AvaloniaFact]

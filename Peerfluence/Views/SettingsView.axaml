@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -293,6 +293,29 @@
                         <ToggleSwitch IsChecked="{Binding AllowMultipleConnectionsPerIp, Mode=TwoWay}"
                                       Content="{m:L Settings_AllowMultipleConnectionsPerIp}"/>
                         <TextBlock Text="{m:L Settings_AllowMultipleConnectionsPerIpHint}"
+                                   Opacity="0.55"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Settings_MaxConnectionsPerIp}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <NumericUpDown Value="{Binding MaxConnectionsPerIp}" Minimum="0" Increment="1"/>
+                        <TextBlock Text="{m:L Settings_MaxConnectionsPerIpHint}"
+                                   Opacity="0.55"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Settings_BindAddress}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBox Text="{Binding BindAddress, Mode=TwoWay}" PlaceholderText="192.168.1.50"/>
+                        <TextBlock Text="{m:L Settings_BindAddressInvalid}"
+                                   Foreground="{StaticResource ErrorColor}"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding !IsBindAddressValid}"/>
+                        <TextBlock Text="{m:L Settings_BindAddressHint}"
                                    Opacity="0.55"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>

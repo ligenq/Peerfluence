@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO.Abstractions;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITopLevelService, TopLevelService>();
         services.AddSingleton<ICompletionActionRunner, CompletionActionRunner>();
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
+        services.AddSingleton<IEngineMetricsReader, EngineMetricsReader>();
         services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
         services.AddSingleton<ITorrentCategoryService, TorrentCategoryService>();

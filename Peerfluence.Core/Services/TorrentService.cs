@@ -1,4 +1,4 @@
-using Peerfluence.Core.Messaging;
+﻿using Peerfluence.Core.Messaging;
 using PeerSharp.Config;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
@@ -133,6 +133,32 @@ public sealed class TorrentService : ITorrentService
         return _engineService.Engine.RemoveTorrentAsync(torrent, options, cancellationToken);
     }
 
+    public bool IsSessionPaused
+    {
+        get
+        {
+            try
+            {
+                return _engineService.Engine.IsPaused;
+            }
+            catch (InvalidOperationException)
+            {
+                // Asked before the engine exists, which the toolbar does on the first bind.
+                return false;
+            }
+        }
+    }
+
+    public Task PauseSessionAsync(CancellationToken cancellationToken = default)
+    {
+        return _engineService.Engine.PauseAsync(cancellationToken);
+    }
+
+    public Task ResumeSessionAsync(CancellationToken cancellationToken = default)
+    {
+        return _engineService.Engine.ResumeAsync(cancellationToken);
+    }
+
     public void RegisterAlertMask(uint alertMask)
     {
         _engineService.Engine.Alerts.RegisterAlerts(alertMask);
@@ -156,6 +182,13 @@ public sealed class TorrentService : ITorrentService
                     _ = EnsureUniqueDownloadPathAsync(metadataAlert.Torrent, cancellationToken);
                 }
                 _messenger.Publish(new TorrentAlertMessage(metadataAlert.Torrent, alert));
+                break;
+
+            // Everything that is about the session rather than a torrent - the listener that could
+            // not bind the configured port, so far. Dropped entirely before there was anywhere to
+            // put it.
+            default:
+                _messenger.Publish(new EngineAlertMessage(alert));
                 break;
         }
     }

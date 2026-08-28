@@ -1384,4 +1384,94 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Адресу заповнено, але замініть 1 на ідентифікатор вашого індексатора: Prowlarr дає кожному індексатору власну адресу й не має спільної. Ідентифікатор видно в рядку адреси, коли ви відкриваєте індексатор у Prowlarr.</value>
   </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Метадані не надходять</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Порт прослуховування змінено</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>Не вдалося зайняти порт {0}, тому використовується {1}. Оновіть переспрямування портів на маршрутизаторі.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>Проксі не може передавати UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>Налаштовано HTTP-проксі, тому DHT і uTP вимкнено в цьому сеансі. Використовуйте SOCKS5-проксі, щоб зберегти їх.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Шлях завантаження змінено, дані переміщено</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Запитати</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>Не вдалося виконати запит: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Веб-сіди</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Додати веб-сід</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>Це не придатна адреса веб-сіда, або торент уже її має.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>Цей торент не має веб-сідів.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Перейменувати</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>Не вдалося перейменувати: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Суперроздача (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>Для одного сіда, що вводить новий вміст у порожній рій. Потім вимкніть: у сталому рої це гальмує пірів, які могли б завантажувати вільно.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Макс. з’єднань</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Макс. слотів віддачі</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 — використовувати загальне налаштування</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Призупинити все</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Відновити все</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>Усі торенти призупинено</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Торенти відновлено</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Прив’язати до адреси</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Надсилати все з однієї локальної адреси, наприклад адреси VPN. Якщо ця адреса зникне, трафік зупиниться, а не піде іншим маршрутом — саме це робить її аварійним вимикачем. Залиште порожнім, щоб використовувати всі інтерфейси. Поки задано, зіставлення портів вимкнено.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>З’єднань на адресу</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>Скільки з’єднань одна адреса може тримати в межах одного торента. 0 — без обмежень. Один пір ненадовго тримає кілька, поки спроба з’єднання пробує обидва транспорти, тому задавайте значення відповідно до своєї мережі, а не низьким з принципу.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>До цієї адреси прив’язатися не можна. Вкажіть власну адресу цієї машини, а не 0.0.0.0.</value>
+  </data>
 </root>

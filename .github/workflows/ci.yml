@@ -35,11 +35,28 @@ jobs:
       - name: Build
         run: dotnet build Peerfluence.slnx --no-restore --configuration Release
 
+      # xunit.v3 4.0 is Microsoft.Testing.Platform only - it dropped VSTest, which is what the
+      # --logger options above spoke. global.json opts `dotnet test` into MTP; everything after the
+      # bare -- is passed to the test executable itself, which is where the reporting options moved.
       - name: Unit tests
-        run: dotnet test Peerfluence.Tests/Peerfluence.Tests.csproj --no-build --configuration Release --logger "console;verbosity=minimal" --logger "trx;LogFileName=unit-${{ matrix.os }}.trx" --results-directory TestResults
+        run: >
+          dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj
+          --no-build
+          --configuration Release
+          --
+          --report-trx
+          --report-trx-filename unit-${{ matrix.os }}.trx
+          --results-directory TestResults
 
       - name: Headless UI tests
-        run: dotnet test Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --no-build --configuration Release --logger "console;verbosity=minimal" --logger "trx;LogFileName=headless-${{ matrix.os }}.trx" --results-directory TestResults
+        run: >
+          dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
+          --no-build
+          --configuration Release
+          --
+          --report-trx
+          --report-trx-filename headless-${{ matrix.os }}.trx
+          --results-directory TestResults
 
       # The part no unit test reaches: that the dependency graph resolves, that every hosted service
       # starts and stops without throwing, and that settings survive a round trip on a machine that

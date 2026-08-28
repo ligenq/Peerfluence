@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -67,6 +67,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
             {
                 DownloadsViewModel = dvm;
                 dvm.SukiDialogManager = DialogManager;
+
+                // The details pane needs it too, for the file rename prompt. It is not a navigation
+                // feature of its own, so this is the only place that has both.
+                dvm.SelectedTorrentDetailViewModel.SukiDialogManager = DialogManager;
             }
 
             if (feature is SettingsViewModel svm)

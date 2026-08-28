@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,9 +8,21 @@ namespace Peerfluence.Services;
 
 public interface IMagnetMetadataPreviewService
 {
+    /// <summary>
+    /// Fetches a magnet's metadata without adding it to the engine.
+    /// </summary>
+    /// <param name="magnetUri">The magnet to resolve.</param>
+    /// <param name="timeout">How long to wait before giving up.</param>
+    /// <param name="progress">
+    /// Receives how much of the metadata has arrived, from 0 to 1. Optional: the fetch used to be
+    /// unobservable, so a caller that only wants the result passes nothing and gets what it always
+    /// got.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the fetch.</param>
     Task<MagnetMetadataPreview?> FetchAsync(
         string magnetUri,
         TimeSpan timeout,
+        IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }
 

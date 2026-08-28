@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:services="using:Peerfluence.Services"
@@ -100,13 +100,22 @@
 								<DataGridTemplateColumn Width="120">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
-											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).StreamFileCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    IsVisible="{Binding IsStreamable}"
-                                                    Classes="Flat"
-                                                    Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
-												<materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-											</Button>
+											<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+												<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).StreamFileCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding IsStreamable}"
+                                                        Classes="Flat"
+                                                        Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
+													<materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+												</Button>
+												<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RenameFileCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip.Tip="{m:L Details_Files_Rename}"
+                                                        Classes="Flat"
+                                                        Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
+													<materialIcons:MaterialIcon Kind="RenameOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+												</Button>
+											</StackPanel>
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
@@ -122,13 +131,16 @@
 				<!-- Trackers Tab -->
 				<TabItem Header="{m:L Details_TrackersTab}">
 					<Grid RowDefinitions="Auto,*">
-						<Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
+						<Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}"/>
 							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
-							<Button Grid.Column="2" Command="{Binding AnnounceCommand}">
+							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}">
 								<materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+							</Button>
+							<Button Grid.Column="3" Command="{Binding ScrapeCommand}" ToolTip.Tip="{m:L Details_Trackers_Scrape}">
+								<materialIcons:MaterialIcon Kind="AccountSearchOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
 						<DataGrid Grid.Row="1" ItemsSource="{Binding Trackers}" AutoGenerateColumns="False" IsReadOnly="True">
@@ -176,6 +188,40 @@
 					</Grid>
 				</TabItem>
 
+				<!-- Web Seeds Tab -->
+				<TabItem Header="{m:L Details_WebSeedsTab}">
+					<Grid RowDefinitions="Auto,*">
+						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
+							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}"/>
+							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat">
+								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+							</Button>
+						</Grid>
+						<TextBlock Grid.Row="1"
+                                   Text="{m:L Details_WebSeeds_Empty}"
+                                   Opacity="0.6"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding !HasWebSeeds}"/>
+						<DataGrid Grid.Row="1" ItemsSource="{Binding WebSeeds}" AutoGenerateColumns="False" IsReadOnly="True" IsVisible="{Binding HasWebSeeds}">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="{m:L Details_WebSeeds_Url}" Binding="{Binding}" Width="*"/>
+								<DataGridTemplateColumn Width="40">
+									<DataGridTemplateColumn.CellTemplate>
+										<DataTemplate x:DataType="x:String">
+											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveWebSeedCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Classes="Flat" Padding="{StaticResource TinyLeftTopRightBottomMargin}">
+												<materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{StaticResource ErrorColor}"/>
+											</Button>
+										</DataTemplate>
+									</DataGridTemplateColumn.CellTemplate>
+								</DataGridTemplateColumn>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</TabItem>
+
 				<!-- Pieces Tab -->
 				<TabItem Header="{m:L Details_PiecesTab}">
 					<StackPanel Spacing="{StaticResource SpacingMedium}">
@@ -209,7 +255,7 @@
 				<!-- Settings Tab -->
 				<TabItem Header="{m:L Details_SettingsTab}">
 					<ScrollViewer>
-						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
+						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
 							<StackPanel Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DownloadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
@@ -252,7 +298,23 @@
 								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}"/>
 							</StackPanel>
 
-							<Button Grid.Row="5" Grid.ColumnSpan="2" Content="{m:L Details_Apply}"
+							<StackPanel Grid.Row="4" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_MaxConnections}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding MaxConnections}" Minimum="0"/>
+								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="0.55" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
+							</StackPanel>
+							<StackPanel Grid.Row="4" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+								<TextBlock Text="{m:L Details_MaxUploadSlots}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<NumericUpDown Value="{Binding MaxUploadSlots}" Minimum="0"/>
+								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="0.55" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
+							</StackPanel>
+
+							<StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="{StaticResource SpacingXSmall}">
+								<CheckBox IsChecked="{Binding SuperSeeding, Mode=TwoWay}" Content="{m:L Details_SuperSeeding}"/>
+								<TextBlock Text="{m:L Details_SuperSeedingHint}" Opacity="0.55" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
+							</StackPanel>
+
+							<Button Grid.Row="6" Grid.ColumnSpan="2" Content="{m:L Details_Apply}"
                                     Command="{Binding ApplyTorrentSettingsCommand}"
                                     Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}"/>
 						</Grid>

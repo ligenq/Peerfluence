@@ -1,4 +1,4 @@
-// Ported from Avalonia 12.0 source (MIT License)
+﻿// Ported from Avalonia 12.0 source (MIT License)
 
 using System.ComponentModel;
 using Xunit.Sdk;
@@ -52,7 +52,10 @@ internal sealed class AvaloniaTestCase : XunitTestCase, ISelfExecutingXunitTestC
         IMessageBus messageBus,
         object?[] constructorArguments,
         ExceptionAggregator aggregator,
-        CancellationTokenSource cancellationTokenSource)
+        CancellationTokenSource cancellationTokenSource,
+        ParallelMode parallelMode,
+        ExecutionScheduler scheduler,
+        FixtureMappingManager methodFixtureMappings)
     {
         var tests = await aggregator.RunAsync(CreateTests, []);
 
@@ -65,7 +68,10 @@ internal sealed class AvaloniaTestCase : XunitTestCase, ISelfExecutingXunitTestC
                 TestCaseDisplayName,
                 SkipReason,
                 explicitOption,
-                constructorArguments))
+                constructorArguments,
+                parallelMode,
+                scheduler,
+                methodFixtureMappings))
             .GetAwaiter()
             .GetResult();
 

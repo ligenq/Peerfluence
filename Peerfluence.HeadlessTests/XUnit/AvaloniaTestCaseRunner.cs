@@ -1,4 +1,4 @@
-// Ported from Avalonia 12.0 source (MIT License)
+﻿// Ported from Avalonia 12.0 source (MIT License)
 
 using Avalonia.Headless;
 using Xunit.Sdk;
@@ -24,7 +24,10 @@ internal sealed class AvaloniaTestCaseRunner
         string displayName,
         string? skipReason,
         ExplicitOption explicitOption,
-        object?[] constructorArguments)
+        object?[] constructorArguments,
+        ParallelMode parallelMode,
+        ExecutionScheduler scheduler,
+        FixtureMappingManager methodFixtureMappings)
     {
         var session = HeadlessUnitTestSession.GetOrStartForAssembly(testCase.TestClass.Class.Assembly);
 
@@ -38,6 +41,9 @@ internal sealed class AvaloniaTestCaseRunner
             skipReason,
             explicitOption,
             constructorArguments,
+            parallelMode,
+            scheduler,
+            methodFixtureMappings,
             session);
         await ctxt.InitializeAsync();
 
@@ -55,5 +61,8 @@ internal sealed class AvaloniaTestCaseRunner
             ctxt.Aggregator.Clone(),
             ctxt.CancellationTokenSource,
             ctxt.BeforeAfterTestAttributes,
+            ctxt.ParallelMode,
+            ctxt.Scheduler,
+            ctxt.CaseFixtureMappings,
             ctxt.Session);
 }
