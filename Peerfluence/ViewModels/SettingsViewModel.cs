@@ -132,6 +132,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         IsSimpleMode = mode == InterfaceMode.Simple;
         OnPropertyChanged(nameof(IsAdvancedMode));
+        OnPropertyChanged(nameof(SimpleModeSelected));
+        OnPropertyChanged(nameof(AdvancedModeSelected));
     }
 
     /// <summary>
@@ -169,6 +171,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(Title),
         nameof(IsSimpleMode),
         nameof(IsAdvancedMode),
+        nameof(SimpleModeSelected),
+        nameof(AdvancedModeSelected),
         nameof(SearchStatusMessage),
         nameof(HasSearchStatusMessage),
         nameof(SelectedTabIndex),
@@ -398,6 +402,45 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     public bool IsAdvancedMode => !IsSimpleMode;
+
+    /// <summary>
+    /// The two interface mode chips as a radio button sees them: reading says which dot to fill,
+    /// writing is somebody choosing.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <see cref="IsSimpleMode"/>, which reports the mode in force and is assigned
+    /// whenever it changes - including by the link in simple mode, which is not this screen. A
+    /// property that both reported the mode and changed it would answer its own assignment.
+    /// </remarks>
+    public bool SimpleModeSelected
+    {
+        get => IsSimpleMode;
+        set => ChooseWhenChecked(value, InterfaceMode.Simple);
+    }
+
+    /// <inheritdoc cref="SimpleModeSelected"/>
+    public bool AdvancedModeSelected
+    {
+        get => IsAdvancedMode;
+        set => ChooseWhenChecked(value, InterfaceMode.Advanced);
+    }
+
+    /// <summary>
+    /// Switches to the mode a chip stands for, when that chip is the one being checked.
+    /// </summary>
+    /// <remarks>
+    /// Only when checked, because choosing one member of a radio group unchecks the rest and both
+    /// arrive here in no guaranteed order.
+    /// </remarks>
+    private void ChooseWhenChecked(bool isChecked, InterfaceMode mode)
+    {
+        if (isChecked && Current() != mode)
+        {
+            SetInterfaceModeCommand.Execute(mode);
+        }
+
+        InterfaceMode Current() => IsSimpleMode ? InterfaceMode.Simple : InterfaceMode.Advanced;
+    }
 
     // Remote control
     public bool RemoteEnabled

@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Peerfluence.Tests.Architecture;
@@ -16,6 +17,61 @@ public sealed class XamlInteractionTests
     [
         "Content", "Header", "PlaceholderText", "Text", "Title", "ToolTip.Tip"
     ];
+
+    /// <summary>
+    /// The one choice chip still doing its work in a command.
+    /// </summary>
+    /// <remarks>
+    /// It sits in a DataTemplate over a bare string, so there is nothing for a two way IsChecked to
+    /// bind to; it needs an item view model of its own first. Listed here rather than passed over,
+    /// so the gap is visible and this rule stays honest about what it does not yet cover.
+    /// </remarks>
+    private const string TheCategoryChipStillToDo = "SetCategoryFilterCommand";
+
+    [Fact]
+    public void NoChoiceChip_DoesItsWorkInACommand()
+    {
+        // A RadioButton bound to a Command only acts when it is clicked. Avalonia answers a
+        // selection made through the accessibility API - which is how a screen reader chooses one -
+        // by moving the dot without raising Click, so the interface ends up showing a choice that
+        // was never made. Driving it from a two way IsChecked binding instead means every way of
+        // choosing arrives in the same place.
+        //
+        // Verified against the running application rather than assumed: see the end to end test
+        // AChoiceChip_CanBeMadeTheWayAssistiveTechnologyMakesIt.
+        var offences = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(ViewsDirectory(), "*.axaml", SearchOption.AllDirectories))
+        {
+            var markup = File.ReadAllText(file);
+
+            foreach (Match match in Regex.Matches(markup, @"<RadioButton[^>]*>", RegexOptions.Singleline))
+            {
+                if (!match.Value.Contains("Command=", StringComparison.Ordinal)
+                    || match.Value.Contains(TheCategoryChipStillToDo, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                offences.Add(
+                    $"  {Path.GetFileName(file)}: a RadioButton acts through a Command, so it cannot "
+                        + "be chosen through the accessibility API. Bind IsChecked TwoWay instead.");
+            }
+
+            foreach (Match match in Regex.Matches(markup, @"<RadioButton[^>]*>", RegexOptions.Singleline))
+            {
+                if (match.Value.Contains("IsChecked=", StringComparison.Ordinal)
+                    && match.Value.Contains("Mode=OneWay", StringComparison.Ordinal))
+                {
+                    offences.Add(
+                        $"  {Path.GetFileName(file)}: a RadioButton binds IsChecked one way, so "
+                            + "choosing it cannot reach the view model.");
+                }
+            }
+        }
+
+        Assert.True(offences.Count == 0, string.Join(Environment.NewLine, offences));
+    }
 
     [Fact]
     public void EveryModalWindow_HasOneKeyboardDefaultAndCancelAction()

@@ -272,7 +272,17 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     public bool HasCategoryFilter => CategoryFilter.Length > 0;
 
     /// <summary>Whether the list is showing every category, which is the state of the "All" chip.</summary>
-    public bool IsAllCategories => CategoryFilter.Length == 0;
+    public bool IsAllCategories
+    {
+        get => CategoryFilter.Length == 0;
+        set
+        {
+            if (value)
+            {
+                SetCategoryFilter(null);
+            }
+        }
+    }
 
     /// <summary>
     /// Whether there is anything to filter by. Nobody who has not defined a category should be shown
@@ -323,13 +333,50 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ApplyFilter();
     }
 
-    public bool IsFilterAll => Filter == TorrentFilter.All;
+    // These are written to as well as read, so that checking a chip is what changes the filter.
+    // They used to be read only, with the work done by a command bound to the button's click, and
+    // that left the chips unusable by anything that selects a radio button without clicking it -
+    // which is how assistive technology selects one. See ChooseWhenChecked.
 
-    public bool IsFilterDownloading => Filter == TorrentFilter.Downloading;
+    public bool IsFilterAll
+    {
+        get => Filter == TorrentFilter.All;
+        set => ChooseWhenChecked(value, TorrentFilter.All);
+    }
 
-    public bool IsFilterSeeding => Filter == TorrentFilter.Seeding;
+    public bool IsFilterDownloading
+    {
+        get => Filter == TorrentFilter.Downloading;
+        set => ChooseWhenChecked(value, TorrentFilter.Downloading);
+    }
 
-    public bool IsFilterCompleted => Filter == TorrentFilter.Completed;
+    public bool IsFilterSeeding
+    {
+        get => Filter == TorrentFilter.Seeding;
+        set => ChooseWhenChecked(value, TorrentFilter.Seeding);
+    }
+
+    public bool IsFilterCompleted
+    {
+        get => Filter == TorrentFilter.Completed;
+        set => ChooseWhenChecked(value, TorrentFilter.Completed);
+    }
+
+    /// <summary>
+    /// Applies the filter a chip stands for, when that chip is the one being checked.
+    /// </summary>
+    /// <remarks>
+    /// Only when checked. Choosing one member of a radio group unchecks the rest, so every choice
+    /// arrives here as one true and one false, in no guaranteed order. Acting on the false would
+    /// mean acting on the chip being left behind.
+    /// </remarks>
+    private void ChooseWhenChecked(bool isChecked, TorrentFilter filter)
+    {
+        if (isChecked)
+        {
+            Filter = filter;
+        }
+    }
 
     private void ApplyFilter()
     {

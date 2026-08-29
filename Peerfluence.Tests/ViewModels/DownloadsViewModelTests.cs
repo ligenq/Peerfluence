@@ -407,6 +407,70 @@ public class DownloadsViewModelTests
         }
     }
 
+    [Fact]
+    public void CheckingAFilterChip_AppliesThatFilter()
+    {
+        // The chips bind IsChecked two ways rather than doing their work in a click handler, so that
+        // every way of choosing one - a mouse, a keyboard, a screen reader going through the
+        // accessibility API - arrives in the same place. Driven here as a binding would drive it.
+        var sut = CreateViewModelWithTorrents(
+            ("downloading", Complete: false, Running: true),
+            ("seeding", Complete: true, Running: true));
+
+        try
+        {
+            sut.IsFilterSeeding = true;
+
+            Assert.Equal(TorrentFilter.Seeding, sut.Filter);
+            Assert.Equal(["seeding"], sut.VisibleTorrents.Select(item => item.Name));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void UncheckingAFilterChip_ChangesNothing()
+    {
+        // Choosing one member of a radio group unchecks the rest, so a choice arrives as one true
+        // and one false in no guaranteed order. Acting on the false would apply the filter that was
+        // just left behind.
+        var sut = CreateViewModelWithTorrents(("downloading", Complete: false, Running: true));
+
+        try
+        {
+            sut.IsFilterSeeding = true;
+            sut.IsFilterSeeding = false;
+
+            Assert.Equal(TorrentFilter.Seeding, sut.Filter);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void CheckingTheAllCategoriesChip_ClearsTheCategoryFilter()
+    {
+        var sut = CreateViewModelWithTorrents(("downloading", Complete: false, Running: true));
+
+        try
+        {
+            sut.SetCategoryFilterCommand.Execute("films");
+            Assert.False(sut.IsAllCategories);
+
+            sut.IsAllCategories = true;
+
+            Assert.Equal(string.Empty, sut.CategoryFilter);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
     private DownloadsViewModel CreateViewModelWithTorrents(params (string Name, bool Complete, bool Running)[] torrents)
     {
         var torrentService = Substitute.For<ITorrentService>();
