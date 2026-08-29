@@ -133,7 +133,7 @@
 				<TabItem Header="{m:L Details_TrackersTab}" AutomationProperties.AutomationId="TrackersTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
-							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}" AutomationProperties.AutomationId="NewTrackerUrlTextBox"/>
+							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}" AutomationProperties.Name="{m:L Details_Trackers_AddWatermark}" AutomationProperties.AutomationId="NewTrackerUrlTextBox"/>
 							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Trackers_Add}" AutomationProperties.AutomationId="AddTrackerButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
@@ -172,7 +172,7 @@
 				<TabItem Header="{m:L Details_PeersTab}" AutomationProperties.AutomationId="PeersTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
-							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}" AutomationProperties.AutomationId="NewPeerAddressesTextBox"/>
+							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}" AutomationProperties.Name="{m:L Details_Peers_AddWatermark}" AutomationProperties.AutomationId="NewPeerAddressesTextBox"/>
 							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Peers_AddTitle}" AutomationProperties.AutomationId="AddPeersButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
@@ -194,7 +194,7 @@
 				<TabItem Header="{m:L Details_WebSeedsTab}" AutomationProperties.AutomationId="WebSeedsTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
-							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}" AutomationProperties.AutomationId="NewWebSeedUrlTextBox"/>
+							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}" AutomationProperties.Name="{m:L Details_WebSeeds_Watermark}" AutomationProperties.AutomationId="NewWebSeedUrlTextBox"/>
 							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat" AutomationProperties.AutomationId="AddWebSeedButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
@@ -261,25 +261,25 @@
 						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
 							<StackPanel Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240" AutomationProperties.AutomationId="DownloadLimitInput"/>
+								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240" AutomationProperties.Name="{m:L Details_DownloadLimit}" AutomationProperties.AutomationId="DownloadLimitInput"/>
 							</StackPanel>
 							<StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding UploadLimitBytesPerSecond}" Minimum="0" Increment="10240" AutomationProperties.AutomationId="UploadLimitInput"/>
+								<NumericUpDown Value="{Binding UploadLimitBytesPerSecond}" Minimum="0" Increment="10240" AutomationProperties.Name="{m:L Details_UploadLimit}" AutomationProperties.AutomationId="UploadLimitInput"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DiskReadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding DiskReadLimitBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.AutomationId="DiskReadLimitInput"/>
+								<NumericUpDown Value="{Binding DiskReadLimitBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.Name="{m:L Details_DiskReadLimit}" AutomationProperties.AutomationId="DiskReadLimitInput"/>
 							</StackPanel>
 							<StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DiskWriteLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding DiskWriteLimitBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.AutomationId="DiskWriteLimitInput"/>
+								<NumericUpDown Value="{Binding DiskWriteLimitBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.Name="{m:L Details_DiskWriteLimit}" AutomationProperties.AutomationId="DiskWriteLimitInput"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="2" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_Strategy}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="DownloadStrategyComboBox">
+								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Details_Strategy}" AutomationProperties.AutomationId="DownloadStrategyComboBox">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding DisplayName}"/>
@@ -289,26 +289,26 @@
 							</StackPanel>
 							<StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_QueuePriority}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding QueuePriority}" Minimum="0" PlaceholderText="{m:L Details_QueuePriorityWatermark}" AutomationProperties.AutomationId="DetailsQueuePriorityInput"/>
+								<NumericUpDown Value="{Binding QueuePriority}" Minimum="0" PlaceholderText="{m:L Details_QueuePriorityWatermark}" AutomationProperties.Name="{m:L Details_QueuePriority}" AutomationProperties.AutomationId="DetailsQueuePriorityInput"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="3" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_RatioLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<TextBox Text="{Binding RatioLimit, Mode=TwoWay}" PlaceholderText="{m:L Details_RatioLimitWatermark}" AutomationProperties.AutomationId="RatioLimitTextBox"/>
+								<TextBox Text="{Binding RatioLimit, Mode=TwoWay}" PlaceholderText="{m:L Details_RatioLimitWatermark}" AutomationProperties.Name="{m:L Details_RatioLimit}" AutomationProperties.AutomationId="RatioLimitTextBox"/>
 							</StackPanel>
 							<StackPanel Grid.Row="3" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_SeedTimeMinutes}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}" AutomationProperties.AutomationId="SeedTimeLimitMinutesTextBox"/>
+								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}" AutomationProperties.Name="{m:L Details_SeedTimeMinutes}" AutomationProperties.AutomationId="SeedTimeLimitMinutesTextBox"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="4" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_MaxConnections}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding MaxConnections}" Minimum="0" AutomationProperties.AutomationId="MaxConnectionsInput"/>
+								<NumericUpDown Value="{Binding MaxConnections}" Minimum="0" AutomationProperties.Name="{m:L Details_MaxConnections}" AutomationProperties.AutomationId="MaxConnectionsInput"/>
 								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 							<StackPanel Grid.Row="4" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_MaxUploadSlots}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding MaxUploadSlots}" Minimum="0" AutomationProperties.AutomationId="MaxUploadSlotsInput"/>
+								<NumericUpDown Value="{Binding MaxUploadSlots}" Minimum="0" AutomationProperties.Name="{m:L Details_MaxUploadSlots}" AutomationProperties.AutomationId="MaxUploadSlotsInput"/>
 								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 

@@ -28,6 +28,9 @@ internal sealed class CallGraph
 {
     private readonly Dictionary<string, HashSet<string>> _callsFrom = new(StringComparer.Ordinal);
 
+    /// <summary>Every method the graph knows about, whether or not it calls anything.</summary>
+    public HashSet<string> Methods { get; } = new(StringComparer.Ordinal);
+
     /// <summary>Methods carrying a test attribute, which is where a reachability walk starts.</summary>
     public HashSet<string> TestEntryPoints { get; } = new(StringComparer.Ordinal);
 
@@ -81,6 +84,8 @@ internal sealed class CallGraph
             var definition = metadata.GetMethodDefinition(handle);
             var declaringType = TypeName(metadata, definition.GetDeclaringType());
             var caller = Key(declaringType, metadata.GetString(definition.Name));
+
+            Methods.Add(caller);
 
             if (HasTestAttribute(metadata, definition))
             {

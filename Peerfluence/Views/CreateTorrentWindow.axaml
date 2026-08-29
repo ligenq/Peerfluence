@@ -22,7 +22,7 @@
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
                         <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}" AutomationProperties.AutomationId="SourcePathTextBox"/>
+                            <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Source}" AutomationProperties.AutomationId="SourcePathTextBox"/>
                             <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}" AutomationProperties.AutomationId="BrowseSourceFileButton">
                                 <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
@@ -36,7 +36,7 @@
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingNormal}">
                             <TextBlock Text="{m:L CreateTorrent_PieceSize}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding PieceSizes}" SelectedIndex="{Binding SelectedPieceSizeIndex}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="PieceSizesComboBox"/>
+                            <ComboBox ItemsSource="{Binding PieceSizes}" SelectedIndex="{Binding SelectedPieceSizeIndex}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L CreateTorrent_PieceSize}" AutomationProperties.AutomationId="PieceSizesComboBox"/>
                         </StackPanel>
                         <CheckBox Grid.Column="1" Content="{m:L CreateTorrent_Private}" IsChecked="{Binding IsPrivate}" VerticalAlignment="Bottom" Margin="{StaticResource XXSmallBottomMargin}" AutomationProperties.AutomationId="CreateTorrentPrivateCheckBox"/>
                     </Grid>
@@ -48,19 +48,19 @@
                     <!-- Trackers -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
                         <TextBlock Text="{m:L CreateTorrent_Trackers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding Trackers}" Height="120" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_TrackersWatermark}" AutomationProperties.AutomationId="TrackersTextBox"/>
+                        <TextBox Text="{Binding Trackers}" Height="120" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_TrackersWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Trackers}" AutomationProperties.AutomationId="TrackersTextBox"/>
                     </StackPanel>
 
                     <!-- Web Seeds -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
                         <TextBlock Text="{m:L CreateTorrent_WebSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding WebSeeds}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_WebSeedsHint}" AutomationProperties.AutomationId="WebSeedsTextBox"/>
+                        <TextBox Text="{Binding WebSeeds}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_WebSeedsHint}" AutomationProperties.Name="{m:L CreateTorrent_WebSeeds}" AutomationProperties.AutomationId="WebSeedsTextBox"/>
                     </StackPanel>
 
                     <!-- Comment -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
                         <TextBlock Text="{m:L CreateTorrent_Comment}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding Comment, Mode=TwoWay}" AutomationProperties.AutomationId="CommentTextBox"/>
+                        <TextBox Text="{Binding Comment, Mode=TwoWay}" AutomationProperties.Name="{m:L CreateTorrent_Comment}" AutomationProperties.AutomationId="CommentTextBox"/>
                     </StackPanel>
                 </StackPanel>
             </suki:GlassCard>

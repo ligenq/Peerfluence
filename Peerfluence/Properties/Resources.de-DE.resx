@@ -560,7 +560,7 @@
     <value>Kommentar</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Erstellen</value>
+    <value>Erstellen...</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>Datei...</value>
@@ -662,7 +662,7 @@
     <value>Pfad zur Sperrlistendatei (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Durchsuchen</value>
+    <value>Durchsuchen...</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Aussehen</value>
