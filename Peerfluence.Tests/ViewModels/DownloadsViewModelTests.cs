@@ -45,7 +45,7 @@ public class DownloadsViewModelTests
             _localizationService,
             notificationService,
             _topLevelService,
-            settingsService);
+            settingsService,Substitute.For<IDialogService>());
 
         // Workaround for Dispatcher dependencies in constructor
 #pragma warning disable SYSLIB0050
@@ -554,10 +554,10 @@ public class DownloadsViewModelTests
     [Fact]
     public void ToRemoveOptions_MapsActionToPeerSharpOptions()
     {
-        Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.RemoveOnly));
-        Assert.Equal(RemoveOptions.DeleteFiles, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.DeleteFiles));
-        Assert.Equal(RemoveOptions.DeleteTorrentFile, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.DeleteMetadata));
-        Assert.Equal(RemoveOptions.DeleteAll, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.DeleteAll));
+        Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.RemoveOnly));
+        Assert.Equal(RemoveOptions.DeleteFiles, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.DeleteFiles));
+        Assert.Equal(RemoveOptions.DeleteTorrentFile, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.DeleteMetadata));
+        Assert.Equal(RemoveOptions.DeleteAll, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.DeleteAll));
     }
 
     [Fact]

@@ -24,6 +24,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly INotificationService _notificationService;
     private readonly AboutViewModel _aboutViewModel;
     private readonly IInterfaceModeService _interfaceModeService;
+    private readonly IDialogService _dialogService;
     private readonly List<NavigationItem> _featureItems = new();
     private bool _startupUpdateCheckStarted;
     private bool _disposed;
@@ -34,17 +35,24 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         INotificationService notificationService,
         IAppSettingsService settingsService,
         IUpdateService updateService,
-        IInterfaceModeService interfaceModeService)
+        IInterfaceModeService interfaceModeService,
+        IDialogService dialogService,
+        IDialogHost dialogHost)
     {
         _settingsService = settingsService;
         _updateService = updateService;
         _notificationService = notificationService;
         _aboutViewModel = aboutViewModel;
         _interfaceModeService = interfaceModeService;
+        _dialogService = dialogService;
 
         // Create SukiUI managers here (after UI thread is available)
         ToastManager = new SukiToastManager();
         DialogManager = new SukiDialogManager();
+
+        // The prompts are the dialog service's to build; this is the only place that knows where
+        // they should appear, because the manager cannot be created until the UI thread exists.
+        dialogHost.DialogManager = DialogManager;
 
         // Wire toast manager into notification service
         if (notificationService is NotificationService ns)
@@ -66,11 +74,6 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
             if (feature is DownloadsViewModel dvm)
             {
                 DownloadsViewModel = dvm;
-                dvm.SukiDialogManager = DialogManager;
-
-                // The details pane needs it too, for the file rename prompt. It is not a navigation
-                // feature of its own, so this is the only place that has both.
-                dvm.SelectedTorrentDetailViewModel.SukiDialogManager = DialogManager;
             }
 
             if (feature is SettingsViewModel svm)
@@ -273,33 +276,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private async Task<bool> PromptForStartupUpdateAsync()
+    private Task<bool> PromptForStartupUpdateAsync()
     {
         var version = _updateService.AvailableVersion;
         var title = string.IsNullOrWhiteSpace(version)
             ? Resources.UpdatePrompt_Title_Generic
             : string.Format(Resources.UpdatePrompt_Title, version);
 
-        var content = new TextBlock
-        {
-            Text = Resources.UpdatePrompt_Message,
-            TextWrapping = TextWrapping.Wrap,
-            MaxWidth = 420
-        };
-
-        var result = new TaskCompletionSource<bool>();
-        await DialogManager
-            .CreateDialog()
-            .OfType(Avalonia.Controls.Notifications.NotificationType.Information)
-            .WithTitle(title)
-            .WithContent(content)
-            .Dismiss().ByClickingBackground()
-            .OnDismissed(_ => result.TrySetResult(false))
-            .WithActionButton(Resources.Common_Later, _ => result.TrySetResult(false), true)
-            .WithActionButton(Resources.UpdatePrompt_Install, _ => result.TrySetResult(true), true, "Flat")
-            .TryShowAsync();
-
-        return result.Task.IsCompletedSuccessfully && result.Task.Result;
+        return _dialogService.ConfirmAsync(new ConfirmPrompt(
+            title,
+            Resources.UpdatePrompt_Message,
+            Resources.UpdatePrompt_Install,
+            Resources.Common_Later,
+            PromptSeverity.Information));
     }
 
     public void Dispose()

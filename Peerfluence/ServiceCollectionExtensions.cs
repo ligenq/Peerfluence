@@ -42,7 +42,11 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
-        services.AddSingleton<IDialogService, DialogService>();
+        // One instance behind two interfaces: the window sets the host, everything else asks for
+        // a prompt.
+        services.AddSingleton<DialogService>();
+        services.AddSingleton<IDialogService>(sp => sp.GetRequiredService<DialogService>());
+        services.AddSingleton<IDialogHost>(sp => sp.GetRequiredService<DialogService>());
         services.AddSingleton<IAddTorrentDialogService, AddTorrentDialogService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IMagnetMetadataPreviewService, MagnetMetadataPreviewService>();

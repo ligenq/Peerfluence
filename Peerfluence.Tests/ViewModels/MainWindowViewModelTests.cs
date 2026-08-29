@@ -39,7 +39,7 @@ public class MainWindowViewModelTests
         var localizationService = new LocalizationService();
         var themeService = new ThemeService();
 
-        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService);
+        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService,Substitute.For<IDialogService>());
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
         _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>(), Substitute.For<ITorrentCategoryService>());
@@ -70,7 +70,7 @@ public class MainWindowViewModelTests
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 
         var features = new IFeatureViewModel[] { downloadsVm, _settingsVm };
-        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>());
+        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class MainWindowViewModelTests
             _notificationService,
             settings,
             updateService,
-            Substitute.For<IInterfaceModeService>());
+            Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -151,7 +151,7 @@ public class MainWindowViewModelTests
             _notificationService,
             settings,
             updateService,
-            Substitute.For<IInterfaceModeService>());
+            Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
