@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -7,7 +7,7 @@
              x:Class="Peerfluence.Views.SimpleDownloadsView"
              x:DataType="vm:DownloadsViewModel">
     <suki:BusyArea IsBusy="{Binding IsBusy}">
-        <Grid RowDefinitions="Auto,Auto,*" MaxWidth="900" HorizontalAlignment="Stretch">
+        <Grid RowDefinitions="Auto,Auto,*" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Stretch">
 
             <!-- One action, said in words. Everything else lives on the rows. -->
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}"
@@ -44,7 +44,7 @@
             <TextBlock Grid.Row="2"
                        Text="{m:L Simple_EmptyBody}"
                        IsVisible="{Binding HasNoTorrents}"
-                       Opacity="0.6"
+                       Opacity="{StaticResource OpacitySecondary}"
                        TextWrapping="Wrap"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
@@ -87,18 +87,18 @@
                                                    FontWeight="SemiBold"
                                                    FontSize="{StaticResource FontSizeNormal}"
                                                    TextTrimming="CharacterEllipsis"/>
-                                        <ProgressBar Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="6"/>
+                                        <ProgressBar Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="{StaticResource ProgressBarHeight}"/>
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                                            <TextBlock Text="{Binding State}" Opacity="0.65" FontSize="{StaticResource FontSizeSmall}"/>
+                                            <TextBlock Text="{Binding State}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeSmall}"/>
                                             <TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}"
-                                                       Opacity="0.65"
+                                                       Opacity="{StaticResource OpacitySecondary}"
                                                        FontSize="{StaticResource FontSizeSmall}"/>
                                             <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}"
-                                                       Opacity="0.65"
+                                                       Opacity="{StaticResource OpacitySecondary}"
                                                        FontSize="{StaticResource FontSizeSmall}"
                                                        IsVisible="{Binding !IsComplete}"/>
                                             <TextBlock Text="{Binding Eta}"
-                                                       Opacity="0.65"
+                                                       Opacity="{StaticResource OpacitySecondary}"
                                                        FontSize="{StaticResource FontSizeSmall}"
                                                        IsVisible="{Binding !IsComplete}"/>
                                         </StackPanel>

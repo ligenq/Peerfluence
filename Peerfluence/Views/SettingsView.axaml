@@ -14,7 +14,7 @@
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold"/>
                         <!-- No Save button: changes apply as they are made, so say that instead. -->
-                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Right">
                         <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent">
@@ -35,7 +35,7 @@
         <TabControl x:Name="SettingsTabs" Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
             <TabItem Header="{m:L Settings_Appearance}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
 
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
@@ -58,7 +58,7 @@
                                      Content="{m:L Settings_InterfaceMode_Advanced}"/>
                     </StackPanel>
                     <TextBlock Text="{m:L Settings_InterfaceModeHint}"
-                               Opacity="0.55"
+                               Opacity="{StaticResource OpacityHint}"
                                FontSize="{StaticResource FontSizeSmall}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
@@ -73,7 +73,7 @@
 
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding ThemeVariantOptions}" SelectedValue="{Binding SelectedThemeVariant}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -83,7 +83,7 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ColorTheme}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_ColorTheme}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding ColorThemeOptions}" SelectedValue="{Binding SelectedColorTheme}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -93,7 +93,7 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -103,7 +103,7 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_Language}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_Language}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -121,7 +121,7 @@
 
             <TabItem Header="{m:L Settings_StorageAndSession}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -130,7 +130,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding DownloadPath, Mode=TwoWay}"/>
                             <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}">
@@ -140,7 +140,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding SessionPath, Mode=TwoWay}"/>
                             <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}">
@@ -164,7 +164,7 @@
                     <ToggleSwitch IsChecked="{Binding AssociateTorrentFiles, Mode=TwoWay}" Content="{m:L Settings_AssociateTorrentFiles}"/>
                     <ToggleSwitch IsChecked="{Binding AssociateMagnetLinks, Mode=TwoWay}" Content="{m:L Settings_AssociateMagnetLinks}"/>
                     <TextBlock Text="{m:L Settings_WindowsAssociationsHint}"
-                               Opacity="0.55"
+                               Opacity="{StaticResource OpacityHint}"
                                FontSize="{StaticResource FontSizeSmall}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
@@ -177,7 +177,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}"/>
                             <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}">
@@ -198,7 +198,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingStandard}" IsEnabled="{Binding CompletionActionEnabled}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                                 <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}"/>
                                 <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}">
@@ -208,28 +208,28 @@
                         </StackPanel>
 
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionArguments}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_CompletionActionArguments}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <TextBox Text="{Binding CompletionActionArgumentsTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionArgumentsWatermark}"/>
                         </StackPanel>
 
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionWorkingDirectory}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_CompletionActionWorkingDirectory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <TextBox Text="{Binding CompletionActionWorkingDirectoryTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionWorkingDirectoryWatermark}"/>
                         </StackPanel>
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                <TextBlock Text="{m:L Settings_CompletionActionTimeoutSeconds}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBlock Text="{m:L Settings_CompletionActionTimeoutSeconds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                 <NumericUpDown Value="{Binding CompletionActionTimeoutSeconds}" Minimum="1"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                <TextBlock Text="{m:L Settings_CompletionActionWindow}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBlock Text="{m:L Settings_CompletionActionWindow}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                 <ToggleSwitch IsChecked="{Binding CompletionActionRunHidden, Mode=TwoWay}" Content="{m:L Settings_CompletionActionRunHidden}"/>
                             </StackPanel>
                         </Grid>
 
                         <TextBlock Text="{m:L Settings_CompletionActionTokens}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
@@ -241,7 +241,7 @@
 
             <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -250,7 +250,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <TextBlock Text="{m:L Settings_PortMapping}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_PortMapping}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Button Command="{Binding RefreshPortMappingCommand}" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                                 <materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}"/>
@@ -261,13 +261,13 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:PortMappingStatusViewModel">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}" Margin="{StaticResource MicroTopBottomMargin}">
-                                        <Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusNormal}">
+                                        <Border Width="{StaticResource StatusDotSize}" Height="{StaticResource StatusDotSize}" CornerRadius="{StaticResource CornerRadiusNormal}">
                                             <Border.Background>
                                                 <SolidColorBrush Color="{Binding StatusColor}"/>
                                             </Border.Background>
                                         </Border>
                                         <TextBlock Text="{Binding Protocol}" FontWeight="SemiBold" Width="80"/>
-                                        <TextBlock Text="{Binding DisplayText}" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding DisplayText}" Opacity="{StaticResource OpacitySecondary}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -284,7 +284,7 @@
                         <ToggleSwitch IsChecked="{Binding AnswerInfoHashSampling, Mode=TwoWay}"
                                       Content="{m:L Settings_AnswerInfoHashSampling}"/>
                         <TextBlock Text="{m:L Settings_AnswerInfoHashSamplingHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
@@ -293,22 +293,22 @@
                         <ToggleSwitch IsChecked="{Binding AllowMultipleConnectionsPerIp, Mode=TwoWay}"
                                       Content="{m:L Settings_AllowMultipleConnectionsPerIp}"/>
                         <TextBlock Text="{m:L Settings_AllowMultipleConnectionsPerIpHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_MaxConnectionsPerIp}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_MaxConnectionsPerIp}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <NumericUpDown Value="{Binding MaxConnectionsPerIp}" Minimum="0" Increment="1"/>
                         <TextBlock Text="{m:L Settings_MaxConnectionsPerIpHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_BindAddress}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_BindAddress}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding BindAddress, Mode=TwoWay}" PlaceholderText="192.168.1.50"/>
                         <TextBlock Text="{m:L Settings_BindAddressInvalid}"
                                    Foreground="{StaticResource ErrorColor}"
@@ -316,7 +316,7 @@
                                    TextWrapping="Wrap"
                                    IsVisible="{Binding !IsBindAddressValid}"/>
                         <TextBlock Text="{m:L Settings_BindAddressHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
@@ -325,18 +325,18 @@
                         <ToggleSwitch IsChecked="{Binding UseAutomaticListeningPort, Mode=TwoWay}" Content="{m:L Settings_UseAutomaticListeningPort}"/>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding IsFixedListeningPortEnabled}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                <TextBlock Text="{m:L Settings_ListeningPort}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBlock Text="{m:L Settings_ListeningPort}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                 <NumericUpDown Value="{Binding ListeningPort}" Minimum="1" Maximum="65535" Increment="1"/>
                             </StackPanel>
                             <TextBlock Grid.Column="1"
                                        Text="{m:L Settings_ListeningPortHint}"
-                                       Opacity="0.55"
+                                       Opacity="{StaticResource OpacityHint}"
                                        FontSize="{StaticResource FontSizeSmall}"
                                        TextWrapping="Wrap"
                                        VerticalAlignment="Center"/>
                         </Grid>
                         <TextBlock Text="{m:L Settings_PortRestartHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
@@ -353,26 +353,26 @@
                          disk throttles rather than below them. Applied to the running engine at once. -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <NumericUpDown x:Name="DownloadLimitBox" Value="{Binding MaxDownloadSpeedKibibytesPerSecond}" Minimum="0" Increment="128"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <NumericUpDown x:Name="UploadLimitBox" Value="{Binding MaxUploadSpeedKibibytesPerSecond}" Minimum="0" Increment="128"/>
                         </StackPanel>
                     </Grid>
                     <TextBlock Text="{m:L Settings_SpeedLimitHint}"
-                               Opacity="0.55"
+                               Opacity="{StaticResource OpacityHint}"
                                FontSize="{StaticResource FontSizeSmall}"
                                TextWrapping="Wrap"/>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_DiskReadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_DiskReadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <NumericUpDown Value="{Binding MaxDiskReadSpeedBytesPerSecond}" Minimum="0" Increment="1048576"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_DiskWriteLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_DiskWriteLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <NumericUpDown Value="{Binding MaxDiskWriteSpeedBytesPerSecond}" Minimum="0" Increment="1048576"/>
                         </StackPanel>
                     </Grid>
@@ -389,11 +389,11 @@
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding EnableQueueManagement}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_MaxActiveDownloads}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_MaxActiveDownloads}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <NumericUpDown Value="{Binding MaxActiveDownloads}" Minimum="1"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_MaxActiveSeeds}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_MaxActiveSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <NumericUpDown Value="{Binding MaxActiveSeeds}" Minimum="0"/>
                         </StackPanel>
                     </Grid>
@@ -405,7 +405,7 @@
 
             <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -414,7 +414,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_EncryptionMode}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_EncryptionMode}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <ComboBox ItemsSource="{Binding EncryptionModeOptions}" SelectedValue="{Binding SelectedEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -445,7 +445,7 @@
                     <ToggleSwitch IsChecked="{Binding EnableGeoIp, Mode=TwoWay}" Content="{m:L Settings_EnableGeoIp}"/>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsEnabled="{Binding EnableGeoIp}">
-                        <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}"/>
                             <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}">
@@ -463,7 +463,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_ProxyType}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_ProxyType}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <ComboBox ItemsSource="{Binding ProxyTypeOptions}" SelectedValue="{Binding SelectedProxyType}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -475,22 +475,22 @@
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyHost}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_ProxyHost}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <TextBox Text="{Binding ProxyHost, Mode=TwoWay}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyPort}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_ProxyPort}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <TextBox Text="{Binding ProxyPort, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyUsername}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_ProxyUsername}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <TextBox Text="{Binding ProxyUsername, Mode=TwoWay}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyPassword}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_ProxyPassword}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <TextBox Text="{Binding ProxyPassword, Mode=TwoWay}" PasswordChar="*"/>
                         </StackPanel>
                     </Grid>
@@ -507,7 +507,7 @@
 
             <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -516,7 +516,7 @@
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_RemoteHint}"
-                                           Opacity="0.6"
+                                           Opacity="{StaticResource OpacitySecondary}"
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
@@ -526,7 +526,7 @@
 
                                 <StackPanel Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding RemoteEnabled}">
                                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                        <TextBlock Text="{m:L Settings_Remote_Port}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBlock Text="{m:L Settings_Remote_Port}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                         <NumericUpDown Value="{Binding RemotePort}" Minimum="1" Maximum="65535" Increment="1"/>
                                     </StackPanel>
 
@@ -535,11 +535,11 @@
 
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Settings_Remote_Username}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBlock Text="{m:L Settings_Remote_Username}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                             <TextBox Text="{Binding RemoteUsername, Mode=TwoWay}"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Settings_Remote_Password}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBlock Text="{m:L Settings_Remote_Password}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                             <TextBox Text="{Binding RemotePassword, Mode=TwoWay}" PasswordChar="*"/>
                                         </StackPanel>
                                     </Grid>
@@ -553,7 +553,7 @@
                                                   Message="{m:L Settings_Remote_NeedsCredentials}"/>
 
                                     <TextBlock Text="{m:L Settings_Remote_RestartHint}"
-                                               Opacity="0.55"
+                                               Opacity="{StaticResource OpacityHint}"
                                                FontSize="{StaticResource FontSizeSmall}"
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
@@ -565,7 +565,7 @@
 
             <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -574,7 +574,7 @@
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_CategoriesHint}"
-                                           Opacity="0.6"
+                                           Opacity="{StaticResource OpacitySecondary}"
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
@@ -583,7 +583,7 @@
                                         <DataTemplate x:DataType="config:TorrentCategory">
                                             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource XXSmallBottomMargin}">
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" MinWidth="120"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding SavePath}" Opacity="0.6" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding SavePath}" Opacity="{StaticResource OpacitySecondary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                                 <Button Grid.Column="2"
                                                         Classes="Basic"
                                                         Command="{Binding $parent[ItemsControl].((vm:SettingsViewModel)DataContext).RemoveCategoryCommand}"
@@ -609,7 +609,7 @@
 
             <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -618,7 +618,7 @@
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_SearchHint}"
-                                           Opacity="0.6"
+                                           Opacity="{StaticResource OpacitySecondary}"
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
@@ -644,13 +644,13 @@
                                 </StackPanel>
 
                                 <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                    <TextBlock Text="{m:L Settings_Search_Url}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                    <TextBlock Text="{m:L Settings_Search_Url}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                     <TextBox Text="{Binding TorznabUrl, Mode=TwoWay}" PlaceholderText="{x:Static config:SearchSettings.JackettTemplate}"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
                                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                        <TextBlock Text="{m:L Settings_Search_ApiKey}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBlock Text="{m:L Settings_Search_ApiKey}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                         <TextBox Text="{Binding TorznabApiKey, Mode=TwoWay}" PasswordChar="*"/>
                                     </StackPanel>
                                     <Button Grid.Column="1"
@@ -670,7 +670,7 @@
 
             <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -679,12 +679,12 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding ApplicationVersion}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L AddTorrent_Version}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding ApplicationVersion}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
-                        <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}"/>
                     </StackPanel>
 
@@ -705,7 +705,7 @@
                         </Button>
                     </StackPanel>
 
-                    <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="0.5" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding ShouldShowUpdateNotInstalled}"/>
+                    <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="{StaticResource OpacityDisabled}" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding ShouldShowUpdateNotInstalled}"/>
                 </StackPanel>
             </suki:GlassCard>
                     </StackPanel>

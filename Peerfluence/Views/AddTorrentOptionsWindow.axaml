@@ -27,16 +27,16 @@
                                                         VerticalAlignment="Top"/>
                             <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                 <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                <TextBlock Text="{Binding SourceLabel}" Opacity="0.65" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding SourceLabel}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap"/>
                             </StackPanel>
 
                             <UniformGrid Grid.Row="1" Grid.Column="1" Columns="2" Margin="{StaticResource SmallTopMargin}">
                                 <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                    <TextBlock Text="{m:L Details_Size}" Opacity="0.65"/>
+                                    <TextBlock Text="{m:L Details_Size}" Opacity="{StaticResource OpacitySecondary}"/>
                                     <TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold"/>
                                 </StackPanel>
                                 <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                    <TextBlock Text="{m:L Details_FilesTab}" Opacity="0.65"/>
+                                    <TextBlock Text="{m:L Details_FilesTab}" Opacity="{StaticResource OpacitySecondary}"/>
                                     <TextBlock Text="{Binding FileCount}" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </UniformGrid>
@@ -49,7 +49,7 @@
                             <!-- Above the folder, because choosing a category is what fills the folder
                                  in. Absent entirely for anyone who has not defined one. -->
                             <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding HasCategories}">
-                                <TextBlock Text="{m:L AddTorrent_Category}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBlock Text="{m:L AddTorrent_Category}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                                 <ComboBox x:Name="CategoryPicker"
                                           ItemsSource="{Binding Categories}"
                                           SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
@@ -69,17 +69,17 @@
                         <StackPanel Spacing="{StaticResource SpacingNormal}">
                             <TextBlock Text="{m:L AddTorrent_MetadataPendingTitle}" FontWeight="SemiBold"/>
                             <TextBlock Text="{m:L AddTorrent_MetadataPendingBody}"
-                                       Opacity="0.7"
+                                       Opacity="{StaticResource OpacitySecondary}"
                                        TextWrapping="Wrap"/>
                             <TextBlock Text="{Binding MetadataStatusText}"
-                                       Opacity="0.7"
+                                       Opacity="{StaticResource OpacitySecondary}"
                                        TextWrapping="Wrap"/>
                             <ProgressBar IsIndeterminate="{Binding !HasMetadataProgress}"
                                          Value="{Binding MetadataProgress}"
                                          Minimum="0"
                                          Maximum="1"
                                          IsVisible="{Binding IsFetchingMetadata}"
-                                         Height="4"/>
+                                         Height="{StaticResource ProgressBarHeightSlim}"/>
                         </StackPanel>
                     </suki:GlassCard>
 
@@ -128,19 +128,19 @@
                                     <TextBlock Text="{m:L AddTorrent_Metadata}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                     <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
                                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L AddTorrent_Hash}" Opacity="0.65"/>
+                                            <TextBlock Text="{m:L AddTorrent_Hash}" Opacity="{StaticResource OpacitySecondary}"/>
                                             <TextBlock Text="{Binding Hash}" TextWrapping="Wrap"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.65"/>
+                                            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="{StaticResource OpacitySecondary}"/>
                                             <TextBlock Text="{Binding VersionLabel}"/>
                                         </StackPanel>
                                         <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Details_PiecesTab}" Opacity="0.65"/>
+                                            <TextBlock Text="{m:L Details_PiecesTab}" Opacity="{StaticResource OpacitySecondary}"/>
                                             <TextBlock Text="{Binding PieceCount}"/>
                                         </StackPanel>
                                         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L AddTorrent_PieceSize}" Opacity="0.65"/>
+                                            <TextBlock Text="{m:L AddTorrent_PieceSize}" Opacity="{StaticResource OpacitySecondary}"/>
                                             <TextBlock Text="{Binding PieceSizeBytes, Converter={StaticResource ByteSizeConverter}}"/>
                                         </StackPanel>
                                         <CheckBox Grid.Row="2"
@@ -158,23 +158,23 @@
                                         <TextBlock Text="{m:L AddTorrent_Limits}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                         <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingNormal}">
                                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                                <TextBlock Text="{m:L AddTorrent_DownloadLimitKib}" Opacity="0.65"/>
+                                                <TextBlock Text="{m:L AddTorrent_DownloadLimitKib}" Opacity="{StaticResource OpacitySecondary}"/>
                                                 <NumericUpDown Value="{Binding DownloadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                                <TextBlock Text="{m:L AddTorrent_UploadLimitKib}" Opacity="0.65"/>
+                                                <TextBlock Text="{m:L AddTorrent_UploadLimitKib}" Opacity="{StaticResource OpacitySecondary}"/>
                                                 <NumericUpDown Value="{Binding UploadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
-                                                <TextBlock Text="{m:L Details_QueuePriority}" Opacity="0.65"/>
+                                                <TextBlock Text="{m:L Details_QueuePriority}" Opacity="{StaticResource OpacitySecondary}"/>
                                                 <NumericUpDown Value="{Binding QueuePriority}" Increment="1"/>
                                             </StackPanel>
                                             <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                                <TextBlock Text="{m:L Details_RatioLimit}" Opacity="0.65"/>
+                                                <TextBlock Text="{m:L Details_RatioLimit}" Opacity="{StaticResource OpacitySecondary}"/>
                                                 <NumericUpDown Value="{Binding RatioLimit}" Minimum="0" Increment="0.25" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="{StaticResource SpacingXSmall}">
-                                                <TextBlock Text="{m:L AddTorrent_SeedTimeLimitMinutes}" Opacity="0.65"/>
+                                                <TextBlock Text="{m:L AddTorrent_SeedTimeLimitMinutes}" Opacity="{StaticResource OpacitySecondary}"/>
                                                 <NumericUpDown Value="{Binding SeedTimeLimitMinutes}" Minimum="0" Increment="15" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}"/>
                                             </StackPanel>
                                         </Grid>

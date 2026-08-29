@@ -26,10 +26,20 @@ public sealed class XamlResourceTests
     /// Properties that must come from a resource, and the dictionary they belong to.
     /// </summary>
     /// <remarks>
-    /// <c>BorderThickness</c> is deliberately absent. It is a line weight rather than a spacing,
+    /// <para>
+    /// <c>_Dimensions.axaml</c> has no entry here on purpose. <c>ContentMaxWidth</c>,
+    /// <c>ProgressBarHeight</c> and <c>StatusDotSize</c> are real shared decisions and are used as
+    /// such, but <c>MaxWidth</c>, <c>Height</c> and <c>Width</c> also carry the width of one grid's
+    /// column and the size of one particular window - values that mean something only where they
+    /// are written. A blanket rule on those properties would be wrong more often than right.
+    /// </para>
+    /// <para>
+    /// <c>BorderThickness</c> is deliberately absent for a different reason. It is a line weight
+    /// rather than a spacing,
     /// <c>_Thickness.axaml</c> is a vocabulary of margins - every key in it is named one - and there
     /// is no sensible key for the hairline <c>0,0,0,1</c> that separates rows. Adding one would
     /// muddle the vocabulary to satisfy the rule rather than the other way round.
+    /// </para>
     /// </remarks>
     private static readonly (string Property, string Dictionary)[] MustComeFromResources =
     [
@@ -40,7 +50,9 @@ public sealed class XamlResourceTests
         ("RowSpacing", "_Spacings.axaml"),
         ("CornerRadius", "_CornerRadii.axaml"),
         ("FontSize", "_FontSizes.axaml"),
+        ("Opacity", "_Opacities.axaml"),
     ];
+
 
     /// <summary>
     /// A value that resolves at runtime rather than being written down here. Bindings are allowed

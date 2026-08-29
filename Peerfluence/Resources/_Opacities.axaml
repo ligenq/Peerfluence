@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+	<!--
+		How far text recedes behind the thing it describes. Three steps, because on screen there
+		were only ever three: the values these replaced ran 0.5, 0.55, 0.6, 0.65, 0.7 and 0.8, and
+		MainWindowView alone used three of them for the same kind of label.
+	-->
+
+	<!--A label beside a value, a column heading, a caption. The great majority of dimmed text.-->
+	<sys:Double x:Key="OpacitySecondary">0.7</sys:Double>
+
+	<!--Explanatory text under a control, saying what the setting above it does.-->
+	<sys:Double x:Key="OpacityHint">0.55</sys:Double>
+
+	<!--Something switched off, or standing in for content that is not there yet.-->
+	<sys:Double x:Key="OpacityDisabled">0.5</sys:Double>
+
+</ResourceDictionary>

@@ -8,10 +8,10 @@
              x:DataType="vm:AboutViewModel">
     <StackPanel Spacing="{StaticResource SpacingStandard}" MaxWidth="600">
         <TextBlock Text="{m:L About_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"/>
-        <TextBlock Text="{m:L App_Tagline}" Opacity="0.7"/>
+        <TextBlock Text="{m:L App_Tagline}" Opacity="{StaticResource OpacitySecondary}"/>
         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.7"/>
-            <TextBlock Text="{Binding ApplicationVersion}" Opacity="0.7"/>
+            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="{StaticResource OpacitySecondary}"/>
+            <TextBlock Text="{Binding ApplicationVersion}" Opacity="{StaticResource OpacitySecondary}"/>
         </StackPanel>
 
         <Separator Background="{DynamicResource SukiBorderBrush}"/>
@@ -26,7 +26,7 @@
         <Expander Header="{m:L About_LegalNotice}">
             <TextBlock Text="{m:L About_LegalNoticeText}"
                        TextWrapping="Wrap"
-                       Opacity="0.8"
+                       Opacity="{StaticResource OpacitySecondary}"
                        Margin="{StaticResource SmallTopMargin}"/>
         </Expander>
 
@@ -35,7 +35,7 @@
             <ItemsControl ItemsSource="{Binding Packages}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" Margin="{StaticResource XXSmallBottomMargin}" Opacity="0.8"/>
+                        <TextBlock Text="{Binding}" Margin="{StaticResource XXSmallBottomMargin}" Opacity="{StaticResource OpacitySecondary}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
