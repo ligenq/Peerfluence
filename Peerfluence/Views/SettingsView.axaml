@@ -47,14 +47,10 @@
                     <!-- The only way back to simple mode once advanced has been chosen. -->
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <RadioButton Classes="Chips" GroupName="InterfaceMode"
-                                     IsChecked="{Binding IsSimpleMode, Mode=OneWay}"
-                                     Command="{Binding SetInterfaceModeCommand}"
-                                     CommandParameter="{x:Static config:InterfaceMode.Simple}"
+                                     IsChecked="{Binding SimpleModeSelected, Mode=TwoWay}"
                                      Content="{m:L Settings_InterfaceMode_Simple}" AutomationProperties.AutomationId="InterfaceModeSimpleRadioButton"/>
                         <RadioButton Classes="Chips" GroupName="InterfaceMode"
-                                     IsChecked="{Binding IsAdvancedMode, Mode=OneWay}"
-                                     Command="{Binding SetInterfaceModeCommand}"
-                                     CommandParameter="{x:Static config:InterfaceMode.Advanced}"
+                                     IsChecked="{Binding AdvancedModeSelected, Mode=TwoWay}"
                                      Content="{m:L Settings_InterfaceMode_Advanced}" AutomationProperties.AutomationId="InterfaceModeAdvancedRadioButton"/>
                     </StackPanel>
                     <TextBlock Text="{m:L Settings_InterfaceModeHint}"

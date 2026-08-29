@@ -1,3 +1,4 @@
+﻿using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using CommunityToolkit.Mvvm.Messaging;
@@ -163,10 +164,19 @@ public class SettingsViewTests
 
         var modeChoices = view.GetLogicalDescendants()
             .OfType<RadioButton>()
-            .Where(radio => ReferenceEquals(radio.Command, vm.SetInterfaceModeCommand))
+            .Where(radio => AutomationProperties.GetAutomationId(radio)?.StartsWith("InterfaceMode", StringComparison.Ordinal) == true)
             .ToList();
 
         Assert.Equal(2, modeChoices.Count);
+
+        // Checked rather than clicked. The chips carry no command any more: they bind IsChecked both
+        // ways, so that choosing one through the accessibility API - which fills the dot without
+        // raising a click - switches the mode as surely as the mouse does.
+        var simple = modeChoices.Single(radio =>
+            AutomationProperties.GetAutomationId(radio) == "InterfaceModeSimpleRadioButton");
+        simple.IsChecked = true;
+
+        Assert.True(vm.IsSimpleMode);
     }
 
     [AvaloniaFact]

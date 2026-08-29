@@ -143,21 +143,15 @@
                 </ItemsControl>
                 <RadioButton Classes="Chips" GroupName="CategoryFilter"
                              IsVisible="{Binding HasCategories}"
-                             IsChecked="{Binding IsAllCategories, Mode=OneWay}"
-                             Command="{Binding SetCategoryFilterCommand}"
-                             CommandParameter="{x:Null}"
+                             IsChecked="{Binding IsAllCategories, Mode=TwoWay}"
                              Content="{m:L Downloads_Category_All}" AutomationProperties.AutomationId="CategoryFilterAllRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=OneWay}"
-                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.All}"
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_All}" AutomationProperties.AutomationId="FilterAllRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterDownloading, Mode=OneWay}"
-                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Downloading}"
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterDownloading, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_Downloading}" AutomationProperties.AutomationId="FilterDownloadingRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterSeeding, Mode=OneWay}"
-                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Seeding}"
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterSeeding, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_Seeding}" AutomationProperties.AutomationId="FilterSeedingRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterCompleted, Mode=OneWay}"
-                             Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Completed}"
+                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterCompleted, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_Completed}" AutomationProperties.AutomationId="FilterCompletedRadioButton"/>
             </StackPanel>
             <TextBox Grid.Column="1"

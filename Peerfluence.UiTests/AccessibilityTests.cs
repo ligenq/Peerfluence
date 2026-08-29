@@ -71,6 +71,25 @@ public sealed class AccessibilityTests
             || name.StartsWith("Peerfluence.", StringComparison.Ordinal);
 
     [Fact]
+    public void AChoiceChip_CanBeMadeTheWayAssistiveTechnologyMakesIt()
+    {
+        // Select(), not a click. A screen reader chooses a radio button through the accessibility
+        // API, and Avalonia answers that by moving the dot without raising Click. While these chips
+        // did their work in a Command bound to the click, choosing "Simple" here filled in the dot
+        // and left the application in advanced mode: the interface said one thing and meant another.
+        using var app = new RunningApplication();
+        app.Find("ChooseAdvancedModeButton").AsButton().Invoke();
+        RunningApplication.Until(() => app.Exists("AddMagnetButton"), "the downloads screen");
+        app.GoToSettings();
+
+        app.Find("InterfaceModeSimpleRadioButton").Patterns.SelectionItem.Pattern.Select();
+
+        RunningApplication.Until(
+            () => app.Exists("SwitchToAdvancedModeButton"),
+            "the simple interface, chosen without a mouse");
+    }
+
+    [Fact]
     public void TheNavigation_CanBeReadAloud()
     {
         // The side menu items are generated from a template, so they carry no automation id and are

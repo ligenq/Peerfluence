@@ -588,6 +588,52 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void CheckingAModeChip_SwitchesToThatMode()
+    {
+        // The chips bind IsChecked two ways rather than doing their work in a click handler, so that
+        // choosing one through the accessibility API - which moves the dot without raising a click -
+        // switches the mode as well as filling in the dot.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(false);
+        var sut = Create(_settingsService, interfaceModeService);
+        Assert.True(sut.AdvancedModeSelected);
+
+        sut.SimpleModeSelected = true;
+
+        Assert.True(sut.IsSimpleMode);
+        Assert.True(sut.SimpleModeSelected);
+        Assert.False(sut.AdvancedModeSelected);
+    }
+
+    [Fact]
+    public void UncheckingAModeChip_ChangesNothing()
+    {
+        // A choice arrives as one chip becoming true and the other false, in no guaranteed order.
+        // Acting on the false would switch to the mode being left behind.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+        var sut = Create(_settingsService, interfaceModeService);
+
+        sut.AdvancedModeSelected = false;
+
+        Assert.True(sut.IsSimpleMode);
+    }
+
+    [Fact]
+    public void CheckingTheModeAlreadyInForce_DoesNotSaveItAgain()
+    {
+        // The binding writes the property back whenever the dot moves, including when the mode was
+        // changed somewhere else and this screen is only catching up.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+        var sut = Create(_settingsService, interfaceModeService);
+
+        sut.SimpleModeSelected = true;
+
+        interfaceModeService.DidNotReceive().SetAsync(Arg.Any<InterfaceMode>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public void SimpleMode_HidesTheAdvancedSettings()
     {
         var interfaceModeService = Substitute.For<IInterfaceModeService>();
