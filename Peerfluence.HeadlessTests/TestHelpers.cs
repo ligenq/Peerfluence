@@ -101,7 +101,7 @@ internal static class TestHelpers
             localizationService,
             notificationService,
             topLevelService,
-            settingsService);
+            settingsService,Substitute.For<IDialogService>());
 
         // Replace Dispatcher call with synchronous execution for tests
         vm.UIDispatcher = action => action();
@@ -167,6 +167,6 @@ internal static class TestHelpers
             notificationService,
             settingsService,
             updateService,
-            Substitute.For<IInterfaceModeService>());
+            Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
     }
 }

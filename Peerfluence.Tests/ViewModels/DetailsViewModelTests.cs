@@ -41,7 +41,7 @@ public class DetailsViewModelTests
             _localizationService,
             _notificationService,
             _topLevelService,
-            settingsService);
+            settingsService,Substitute.For<IDialogService>());
         _sut.UIDispatcher = action => action();
     }
 

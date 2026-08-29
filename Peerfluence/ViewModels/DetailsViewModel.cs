@@ -14,7 +14,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Interfaces;
 using PeerSharp.Streaming;
-using SukiUI.Dialogs;
 
 namespace Peerfluence.ViewModels;
 
@@ -27,6 +26,7 @@ public sealed class DetailsViewModel : ViewModelBase
     private readonly INotificationService _notificationService;
     private readonly ITopLevelService _topLevelService;
     private readonly IAppSettingsService _settingsService;
+    private readonly IDialogService _dialogService;
 
     private CancellationTokenSource? _streamingCts;
     private HttpStreamServer? _streamServer;
@@ -56,7 +56,8 @@ public sealed class DetailsViewModel : ViewModelBase
         ILocalizationService localizationService,
         INotificationService notificationService,
         ITopLevelService topLevelService,
-        IAppSettingsService settingsService)
+        IAppSettingsService settingsService,
+        IDialogService dialogService)
     {
         _selectionService = selectionService;
         _torrentService = torrentService;
@@ -64,6 +65,7 @@ public sealed class DetailsViewModel : ViewModelBase
         _notificationService = notificationService;
         _topLevelService = topLevelService;
         _settingsService = settingsService;
+        _dialogService = dialogService;
 
         Files = new ObservableCollection<TorrentFileItemViewModel>();
         Trackers = new ObservableCollection<TrackerStatusItemViewModel>();
@@ -121,11 +123,6 @@ public sealed class DetailsViewModel : ViewModelBase
         get;
         private set => SetProperty(ref field, value);
     }
-
-    /// <summary>
-    /// Set by <see cref="MainWindowViewModel"/> once the UI thread exists, for the rename prompt.
-    /// </summary>
-    public ISukiDialogManager? SukiDialogManager { get; set; }
 
     public IReadOnlyList<EnumDisplayOption<DownloadStrategy>> DownloadStrategies => PriorityOptions.DownloadStrategies;
 
@@ -1098,35 +1095,16 @@ public sealed class DetailsViewModel : ViewModelBase
     private async Task RenameFileAsync(TorrentFileItemViewModel? file)
     {
         var torrent = _selectionService.SelectedTorrent;
-        if (file == null || torrent == null || SukiDialogManager == null)
+        if (file == null || torrent == null)
         {
             return;
         }
 
-        var textBox = new Avalonia.Controls.TextBox
-        {
-            Width = 420,
-            MinWidth = 320,
-            Text = file.Path
-        };
+        var newPath = await _dialogService.PromptForTextAsync(new TextPrompt(
+            Properties.Resources.Details_Files_Rename,
+            Properties.Resources.Details_Files_Rename,
+            InitialText: file.Path));
 
-        var confirmed = new TaskCompletionSource<bool>();
-        await SukiDialogManager
-            .CreateDialog()
-            .WithTitle(Properties.Resources.Details_Files_Rename)
-            .WithContent(textBox)
-            .Dismiss().ByClickingBackground()
-            .OnDismissed(_ => confirmed.TrySetResult(false))
-            .WithActionButton(Properties.Resources.Common_Cancel, _ => confirmed.TrySetResult(false), true)
-            .WithActionButton(Properties.Resources.Details_Files_Rename, _ => confirmed.TrySetResult(true), true, "Flat")
-            .TryShowAsync();
-
-        if (!confirmed.Task.IsCompletedSuccessfully || !confirmed.Task.Result)
-        {
-            return;
-        }
-
-        var newPath = textBox.Text?.Trim();
         if (string.IsNullOrEmpty(newPath) || string.Equals(newPath, file.Path, StringComparison.Ordinal))
         {
             return;
