@@ -16,13 +16,13 @@
                            FontSize="{StaticResource FontSizeHeader}"
                            FontWeight="Bold"
                            VerticalAlignment="Center"/>
-                <Button Grid.Column="1" Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}">
+                <Button Grid.Column="1" Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="SimpleDownloadsAddTorrentButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Downloads_AddTorrent}"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="2" Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}">
+                <Button Grid.Column="2" Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}" AutomationProperties.AutomationId="SimpleDownloadsAddMagnetButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Downloads_PasteMagnet}"/>

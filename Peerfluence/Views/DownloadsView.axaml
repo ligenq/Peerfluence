@@ -49,7 +49,7 @@
         <suki:GlassCard Grid.Row="1" Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
             <DockPanel>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Left">
-                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}">
+                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="AddTorrentButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddTorrent}"/>
@@ -57,7 +57,7 @@
                     </Button>
 
                     <!-- Same weight as Add Torrent: two ways to start the same thing. -->
-                    <Button Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}">
+                    <Button Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}" AutomationProperties.AutomationId="AddMagnetButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddMagnet}"/>
@@ -66,19 +66,19 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Right" HorizontalAlignment="Right">
-                    <Button Command="{Binding StartSelectedCommand}" ToolTip.Tip="{m:L Downloads_Start}">
+                    <Button Command="{Binding StartSelectedCommand}" ToolTip.Tip="{m:L Downloads_Start}" AutomationProperties.AutomationId="StartSelectedButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Play" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_Start}"/>
                         </StackPanel>
                     </Button>
-                    <Button Command="{Binding StopSelectedCommand}" ToolTip.Tip="{m:L Downloads_Stop}">
+                    <Button Command="{Binding StopSelectedCommand}" ToolTip.Tip="{m:L Downloads_Stop}" AutomationProperties.AutomationId="StopSelectedButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Stop" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_Stop}"/>
                         </StackPanel>
                     </Button>
-                    <Button Command="{Binding RemoveSelectedCommand}" ToolTip.Tip="{m:L Downloads_Remove}" Foreground="{StaticResource ErrorColor}">
+                    <Button Command="{Binding RemoveSelectedCommand}" ToolTip.Tip="{m:L Downloads_Remove}" Foreground="{StaticResource ErrorColor}" AutomationProperties.AutomationId="RemoveSelectedButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Delete" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_Remove}"/>
@@ -94,23 +94,23 @@
                     -->
                     <Button Command="{Binding ToggleSessionPauseCommand}"
                             ToolTip.Tip="{m:L Downloads_PauseAll}"
-                            IsVisible="{Binding !IsSessionPaused}">
+                            IsVisible="{Binding !IsSessionPaused}" AutomationProperties.AutomationId="PauseAllButton">
                         <materialIcons:MaterialIcon Kind="PauseCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
                     <Button Command="{Binding ToggleSessionPauseCommand}"
                             ToolTip.Tip="{m:L Downloads_ResumeAll}"
-                            IsVisible="{Binding IsSessionPaused}">
+                            IsVisible="{Binding IsSessionPaused}" AutomationProperties.AutomationId="ResumeAllButton">
                         <materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" Foreground="{DynamicResource SukiPrimaryColor}"/>
                     </Button>
 
-                    <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}">
+                    <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}" AutomationProperties.AutomationId="CreateTorrentButton">
                         <materialIcons:MaterialIcon Kind="File" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
 
                     <ToggleButton x:Name="DetailsPaneToggle"
                                   IsChecked="{Binding IsDetailsPaneVisible, Mode=OneWay}"
                                   Command="{Binding ToggleDetailsPaneCommand}"
-                                  ToolTip.Tip="{m:L Downloads_ToggleDetails}">
+                                  ToolTip.Tip="{m:L Downloads_ToggleDetails}" AutomationProperties.AutomationId="ToggleDetailsPaneToggle">
                         <materialIcons:MaterialIcon Kind="DockBottom" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </ToggleButton>
                 </StackPanel>
@@ -146,25 +146,25 @@
                              IsChecked="{Binding IsAllCategories, Mode=OneWay}"
                              Command="{Binding SetCategoryFilterCommand}"
                              CommandParameter="{x:Null}"
-                             Content="{m:L Downloads_Category_All}"/>
+                             Content="{m:L Downloads_Category_All}" AutomationProperties.AutomationId="CategoryFilterAllRadioButton"/>
                 <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=OneWay}"
                              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.All}"
-                             Content="{m:L Downloads_Filter_All}"/>
+                             Content="{m:L Downloads_Filter_All}" AutomationProperties.AutomationId="FilterAllRadioButton"/>
                 <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterDownloading, Mode=OneWay}"
                              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Downloading}"
-                             Content="{m:L Downloads_Filter_Downloading}"/>
+                             Content="{m:L Downloads_Filter_Downloading}" AutomationProperties.AutomationId="FilterDownloadingRadioButton"/>
                 <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterSeeding, Mode=OneWay}"
                              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Seeding}"
-                             Content="{m:L Downloads_Filter_Seeding}"/>
+                             Content="{m:L Downloads_Filter_Seeding}" AutomationProperties.AutomationId="FilterSeedingRadioButton"/>
                 <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterCompleted, Mode=OneWay}"
                              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:TorrentFilter.Completed}"
-                             Content="{m:L Downloads_Filter_Completed}"/>
+                             Content="{m:L Downloads_Filter_Completed}" AutomationProperties.AutomationId="FilterCompletedRadioButton"/>
             </StackPanel>
             <TextBox Grid.Column="1"
                      Text="{Binding SearchText, Mode=TwoWay}"
                      PlaceholderText="{m:L Downloads_Search}"
                      MaxWidth="320"
-                     HorizontalAlignment="Right"/>
+                     HorizontalAlignment="Right" AutomationProperties.AutomationId="SearchTextTextBox"/>
         </Grid>
 
         <suki:InfoBar x:Name="DownloadsStatusInfoBar"
@@ -199,49 +199,49 @@
                       CanUserReorderColumns="False"
                       CanUserResizeColumns="True"
                       GridLinesVisibility="None"
-                      BorderThickness="0">
+                      BorderThickness="0" AutomationProperties.AutomationId="TorrentGrid">
                 <DataGrid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{m:L Downloads_Start}" Command="{Binding StartSelectedCommand}">
+                        <MenuItem Header="{m:L Downloads_Start}" Command="{Binding StartSelectedCommand}" AutomationProperties.AutomationId="StartSelectedMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="Play" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="{m:L Downloads_Stop}" Command="{Binding StopSelectedCommand}">
+                        <MenuItem Header="{m:L Downloads_Stop}" Command="{Binding StopSelectedCommand}" AutomationProperties.AutomationId="StopSelectedMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="Stop" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="{m:L Downloads_OpenFolder}" Command="{Binding OpenFolderCommand}">
+                        <MenuItem Header="{m:L Downloads_OpenFolder}" Command="{Binding OpenFolderCommand}" AutomationProperties.AutomationId="OpenFolderMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="FolderOpen" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="{m:L Downloads_ForceRecheck}" Command="{Binding ForceRecheckCommand}">
+                        <MenuItem Header="{m:L Downloads_ForceRecheck}" Command="{Binding ForceRecheckCommand}" AutomationProperties.AutomationId="ForceRecheckMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="FileFind" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="{m:L Downloads_CopyHash}" Command="{Binding CopyHashCommand}">
+                        <MenuItem Header="{m:L Downloads_CopyHash}" Command="{Binding CopyHashCommand}" AutomationProperties.AutomationId="CopyHashMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="ContentCopy" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="{m:L Downloads_CopyMagnet}" Command="{Binding CopyMagnetCommand}">
+                        <MenuItem Header="{m:L Downloads_CopyMagnet}" Command="{Binding CopyMagnetCommand}" AutomationProperties.AutomationId="CopyMagnetMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="Magnet" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="{m:L Downloads_Remove}" Command="{Binding RemoveSelectedCommand}" Foreground="{StaticResource ErrorColor}">
+                        <MenuItem Header="{m:L Downloads_Remove}" Command="{Binding RemoveSelectedCommand}" Foreground="{StaticResource ErrorColor}" AutomationProperties.AutomationId="RemoveSelectedMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="Delete" Foreground="{StaticResource ErrorColor}" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <Separator/>
-                        <MenuItem Header="{m:L Downloads_Category}" ItemsSource="{Binding Categories}">
+                        <MenuItem Header="{m:L Downloads_Category}" ItemsSource="{Binding Categories}" AutomationProperties.AutomationId="CategoriesMenuItem">
                             <MenuItem.Icon>
                                 <materialIcons:MaterialIcon Kind="FolderMultipleOutline" />
                             </MenuItem.Icon>
@@ -259,7 +259,7 @@
                         </MenuItem>
                         <MenuItem Header="{m:L Downloads_Category_None}"
                                   Command="{Binding AssignCategoryCommand}"
-                                  CommandParameter="{x:Null}"/>
+                                  CommandParameter="{x:Null}" AutomationProperties.AutomationId="AssignCategoryMenuItem"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
