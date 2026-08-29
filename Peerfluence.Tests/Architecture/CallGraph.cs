@@ -185,6 +185,76 @@ internal sealed class CallGraph
         }
     }
 
+    /// <summary>
+    /// The methods in an assembly whose bodies cannot return - they only throw.
+    /// </summary>
+    /// <remarks>
+    /// A member that does nothing but throw is a declaration that it is not implemented, usually to
+    /// satisfy an interface the type only half wants. There is nothing in one to test but the throw,
+    /// and a test asserting that would pin the gap rather than any behaviour.
+    /// </remarks>
+    public static HashSet<string> MethodsThatOnlyThrow(string assemblyPath)
+    {
+        var result = new HashSet<string>(StringComparer.Ordinal);
+
+        using var stream = File.OpenRead(assemblyPath);
+        using var peReader = new PEReader(stream);
+        var metadata = peReader.GetMetadataReader();
+
+        foreach (var handle in metadata.MethodDefinitions)
+        {
+            var definition = metadata.GetMethodDefinition(handle);
+            if (definition.RelativeVirtualAddress == 0)
+            {
+                continue;
+            }
+
+            var il = peReader.GetMethodBody(definition.RelativeVirtualAddress).GetILBytes();
+            if (il is { Length: > 0 } && !CanReturn(il))
+            {
+                result.Add(Key(
+                    TypeName(metadata, definition.GetDeclaringType()),
+                    metadata.GetString(definition.Name)));
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>Whether a method body contains any <c>ret</c> at all.</summary>
+    private static bool CanReturn(byte[] il)
+    {
+        int offset = 0;
+
+        while (offset < il.Length)
+        {
+            short opCodeValue = il[offset];
+            offset++;
+
+            if (opCodeValue == 0xFE && offset < il.Length)
+            {
+                opCodeValue = (short)(0xFE00 | il[offset]);
+                offset++;
+            }
+
+            if (!OperandSizes.TryGetValue(opCodeValue, out var operandType))
+            {
+                // Lost the thread of the instruction stream, so nothing can be concluded. Saying it
+                // can return is the answer that keeps the member in scope rather than excusing it.
+                return true;
+            }
+
+            if (opCodeValue == OpCodes.Ret.Value)
+            {
+                return true;
+            }
+
+            offset += OperandLength(operandType, il, offset);
+        }
+
+        return false;
+    }
+
     private static bool HasTestAttribute(MetadataReader metadata, MethodDefinition definition)
     {
         foreach (var attributeHandle in definition.GetCustomAttributes())

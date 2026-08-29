@@ -1,4 +1,4 @@
-using Peerfluence.Services;
+﻿using Peerfluence.Services;
 
 namespace Peerfluence.Tests.Services;
 
@@ -56,4 +56,6 @@ public sealed class UninstallCleanupTests : IDisposable
     {
         Directory.Delete(_root, recursive: true);
     }
+
+
 }

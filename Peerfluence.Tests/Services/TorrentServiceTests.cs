@@ -121,4 +121,21 @@ public sealed class TorrentServiceTests
         await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
         messenger.Received(1).Publish(Arg.Is<TorrentAlertMessage>(message => ReferenceEquals(message.Torrent, torrent)));
     }
+
+    [Fact]
+    public async Task SavingTheSession_AsksTheEngineToWriteIt()
+    {
+        // Called on shutdown and on a timer. It is the only thing that makes a restart resume
+        // rather than start over, so it must reach the engine rather than be swallowed.
+        var engine = Substitute.For<IClientEngine>();
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+
+        await sut.SaveSessionAsync(TestContext.Current.CancellationToken);
+
+        await engine.Received(1).SaveSessionAsync(Arg.Any<CancellationToken>());
+    }
+
 }
