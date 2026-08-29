@@ -1,4 +1,4 @@
-<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -20,7 +20,7 @@
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <!-- Source -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}"/>
                             <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}">
@@ -35,7 +35,7 @@
                     <!-- Piece Size & Private -->
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingNormal}">
-                            <TextBlock Text="{m:L CreateTorrent_PieceSize}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L CreateTorrent_PieceSize}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding PieceSizes}" SelectedIndex="{Binding SelectedPieceSizeIndex}" HorizontalAlignment="Stretch"/>
                         </StackPanel>
                         <CheckBox Grid.Column="1" Content="{m:L CreateTorrent_Private}" IsChecked="{Binding IsPrivate}" VerticalAlignment="Bottom" Margin="{StaticResource XXSmallBottomMargin}"/>
@@ -47,19 +47,19 @@
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <!-- Trackers -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_Trackers}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L CreateTorrent_Trackers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding Trackers}" Height="120" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_TrackersWatermark}"/>
                     </StackPanel>
 
                     <!-- Web Seeds -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_WebSeeds}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L CreateTorrent_WebSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding WebSeeds}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_WebSeedsHint}"/>
                     </StackPanel>
 
                     <!-- Comment -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_Comment}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L CreateTorrent_Comment}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding Comment, Mode=TwoWay}"/>
                     </StackPanel>
                 </StackPanel>

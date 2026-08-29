@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -110,7 +110,7 @@
                            FontWeight="SemiBold"
                            HorizontalAlignment="Center"/>
                 <TextBlock Text="{m:L Find_NotConfiguredBody}"
-                           Opacity="0.6"
+                           Opacity="{StaticResource OpacitySecondary}"
                            TextWrapping="Wrap"
                            TextAlignment="Center"/>
                 <!-- Naming the settings and leaving the user to find them is half an answer. -->

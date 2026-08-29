@@ -32,11 +32,11 @@
                         <TextBlock Text="{Binding TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <TextBlock Text="{m:L Downloads_Active}" Opacity="0.6" VerticalAlignment="Center"/>
+                        <TextBlock Text="{m:L Downloads_Active}" Opacity="{StaticResource OpacitySecondary}" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding ActiveTorrents}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <TextBlock Text="{m:L Downloads_Peers}" Opacity="0.6" VerticalAlignment="Center"/>
+                        <TextBlock Text="{m:L Downloads_Peers}" Opacity="{StaticResource OpacitySecondary}" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding TotalPeers}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
@@ -178,7 +178,7 @@
         <TextBlock Grid.Row="4"
                    Text="{m:L Downloads_NoMatches}"
                    IsVisible="{Binding HasNoMatches}"
-                   Opacity="0.6"
+                   Opacity="{StaticResource OpacitySecondary}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
 
@@ -267,7 +267,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalLeftRightMargin}">
-                                    <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}" Opacity="0.6"/>
+                                    <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -278,8 +278,8 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel VerticalAlignment="Center" Margin="{StaticResource NormalLeftRightMargin}" Spacing="{StaticResource SpacingTiny}">
-                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="6" CornerRadius="{StaticResource CornerRadiusSmall}" />
-                                    <TextBlock Text="{Binding ProgressPercent, StringFormat='{}{0:F1}%'}" FontSize="{StaticResource FontSizeTiny}" HorizontalAlignment="Right" Opacity="0.7"/>
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource CornerRadiusSmall}" />
+                                    <TextBlock Text="{Binding ProgressPercent, StringFormat='{}{0:F1}%'}" FontSize="{StaticResource FontSizeTiny}" HorizontalAlignment="Right" Opacity="{StaticResource OpacitySecondary}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -338,7 +338,7 @@
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center"/>
             <TextBlock Text="{m:L Downloads_EmptyBody}"
-                       Opacity="0.6"
+                       Opacity="{StaticResource OpacitySecondary}"
                        TextWrapping="Wrap"
                        TextAlignment="Center"/>
         </StackPanel>

@@ -33,7 +33,7 @@
         <suki:SukiSideMenu.HeaderContent>
             <StackPanel Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource LargeLeftRightTopBottomMargin}">
                 <TextBlock Text="{m:L App_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource SukiPrimaryColor}" />
-                <TextBlock Text="{m:L App_Tagline}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource SukiLowText}"/>
+                <TextBlock Text="{m:L App_Tagline}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource SukiLowText}"/>
             </StackPanel>
         </suki:SukiSideMenu.HeaderContent>
         <suki:SukiSideMenu.ItemTemplate>
@@ -53,8 +53,8 @@
             <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
                 <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.5"/>
-                        <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.5"/>
+                        <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacityDisabled}"/>
+                        <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacityDisabled}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -81,22 +81,22 @@
                         Command="{Binding ShowSimpleSettingsCommand}"
                         IsVisible="{Binding !IsSimpleSettingsOpen}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
-                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="Basic"
                         Command="{Binding CloseSimpleSettingsCommand}"
                         IsVisible="{Binding IsSimpleSettingsOpen}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
-                        <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                        <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
-                        <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                        <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -123,7 +123,7 @@
                            FontSize="{StaticResource FontSizeLarge}"
                            FontWeight="SemiBold"/>
                 <TextBlock Text="{m:L Welcome_Subtitle}"
-                           Opacity="0.65"
+                           Opacity="{StaticResource OpacitySecondary}"
                            TextWrapping="Wrap"
                            Margin="{StaticResource StandardBottomMargin}"/>
 
@@ -133,7 +133,7 @@
                         Padding="{StaticResource NormalLeftTopRightBottomMargin}">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Simple_Title}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="0.65" TextWrapping="Wrap" MaxWidth="360"/>
+                        <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
                     </StackPanel>
                 </Button>
 
@@ -143,7 +143,7 @@
                         Padding="{StaticResource NormalLeftTopRightBottomMargin}">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Advanced_Title}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="0.65" TextWrapping="Wrap" MaxWidth="360"/>
+                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
                     </StackPanel>
                 </Button>
             </StackPanel>

@@ -14,37 +14,37 @@
 			<Grid ColumnDefinitions="*,Auto" Margin="{StaticResource NormalBottomMargin}">
 				<StackPanel Spacing="{StaticResource SpacingXSmall}">
 					<TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
-					<ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="6" CornerRadius="{StaticResource CornerRadiusSmall}" Margin="{StaticResource MicroTopBottomMargin}"/>
+					<ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource CornerRadiusSmall}" Margin="{StaticResource MicroTopBottomMargin}"/>
 					<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}">
 						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-							<TextBlock Text="{m:L Details_State}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{m:L Details_State}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 							<TextBlock Text="{Binding State}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-							<TextBlock Text="{m:L Details_Size}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{m:L Details_Size}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 							<TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-							<TextBlock Text="{m:L Details_Downloaded}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{m:L Details_Downloaded}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 							<TextBlock Text="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-							<TextBlock Text="{m:L Details_Peers}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{m:L Details_Peers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 							<TextBlock Text="{Binding ConnectedPeers}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeNormal}"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-							<TextBlock Text="{m:L Details_Hash}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+							<TextBlock Text="{m:L Details_Hash}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 							<TextBlock Text="{Binding InfoHash}" FontSize="{StaticResource FontSizeTiny}" VerticalAlignment="Center"/>
 						</StackPanel>
 					</StackPanel>
 					<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-						<TextBlock Text="{m:L Details_Path}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+						<TextBlock Text="{m:L Details_Path}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 						<TextBlock Text="{Binding DownloadPath}" FontSize="{StaticResource FontSizeNormal}" TextTrimming="CharacterEllipsis"/>
 					</StackPanel>
 					<!-- Recheck progress -->
 					<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}" IsVisible="{Binding IsRechecking}">
-						<ProgressBar Minimum="0" Maximum="1" Value="{Binding RecheckProgress}" Height="4" Width="150" CornerRadius="{StaticResource CornerRadiusTiny}"/>
-						<TextBlock Text="{Binding RecheckStatus}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.7"/>
+						<ProgressBar Minimum="0" Maximum="1" Value="{Binding RecheckProgress}" Height="{StaticResource ProgressBarHeightSlim}" Width="150" CornerRadius="{StaticResource CornerRadiusTiny}"/>
+						<TextBlock Text="{Binding RecheckStatus}" FontSize="{StaticResource FontSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
 					</StackPanel>
 				</StackPanel>
 
@@ -199,7 +199,7 @@
 						</Grid>
 						<TextBlock Grid.Row="1"
                                    Text="{m:L Details_WebSeeds_Empty}"
-                                   Opacity="0.6"
+                                   Opacity="{StaticResource OpacitySecondary}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    IsVisible="{Binding !HasWebSeeds}"/>
@@ -227,20 +227,20 @@
 					<StackPanel Spacing="{StaticResource SpacingMedium}">
 						<WrapPanel Orientation="Horizontal">
 							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
-								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource SuccessColor}"/>
-								<TextBlock Text="{m:L Details_Pieces_Have}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+								<Border Width="{StaticResource StatusDotSize}" Height="{StaticResource StatusDotSize}" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource SuccessColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_Have}" FontSize="{StaticResource FontSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
 							</StackPanel>
 							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
-								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource DhtColor}"/>
-								<TextBlock Text="{m:L Details_Pieces_HighAvail}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+								<Border Width="{StaticResource StatusDotSize}" Height="{StaticResource StatusDotSize}" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource DhtColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_HighAvail}" FontSize="{StaticResource FontSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
 							</StackPanel>
 							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
-								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource InfoColor}"/>
-								<TextBlock Text="{m:L Details_Pieces_Available}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+								<Border Width="{StaticResource StatusDotSize}" Height="{StaticResource StatusDotSize}" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource InfoColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_Available}" FontSize="{StaticResource FontSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
 							</StackPanel>
 							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-								<Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource MissingColor}"/>
-								<TextBlock Text="{m:L Details_Pieces_Missing}" FontSize="{StaticResource FontSizeSmall}" Opacity="0.8"/>
+								<Border Width="{StaticResource StatusDotSize}" Height="{StaticResource StatusDotSize}" CornerRadius="{StaticResource CornerRadiusTiny}" Background="{StaticResource MissingColor}"/>
+								<TextBlock Text="{m:L Details_Pieces_Missing}" FontSize="{StaticResource FontSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
 							</StackPanel>
 						</WrapPanel>
 						<controls:PieceMapControl
@@ -257,25 +257,25 @@
 					<ScrollViewer>
 						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
 							<StackPanel Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_DownloadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
 							</StackPanel>
 							<StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_UploadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding UploadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_DiskReadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_DiskReadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding DiskReadLimitBytesPerSecond}" Minimum="0" Increment="1048576"/>
 							</StackPanel>
 							<StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_DiskWriteLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_DiskWriteLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding DiskWriteLimitBytesPerSecond}" Minimum="0" Increment="1048576"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="2" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_Strategy}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_Strategy}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
@@ -285,33 +285,33 @@
                                 </ComboBox>
 							</StackPanel>
 							<StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_QueuePriority}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_QueuePriority}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding QueuePriority}" Minimum="0" PlaceholderText="{m:L Details_QueuePriorityWatermark}"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="3" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_RatioLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_RatioLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<TextBox Text="{Binding RatioLimit, Mode=TwoWay}" PlaceholderText="{m:L Details_RatioLimitWatermark}"/>
 							</StackPanel>
 							<StackPanel Grid.Row="3" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_SeedTimeMinutes}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_SeedTimeMinutes}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="4" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_MaxConnections}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_MaxConnections}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding MaxConnections}" Minimum="0"/>
-								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="0.55" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
+								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 							<StackPanel Grid.Row="4" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-								<TextBlock Text="{m:L Details_MaxUploadSlots}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+								<TextBlock Text="{m:L Details_MaxUploadSlots}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<NumericUpDown Value="{Binding MaxUploadSlots}" Minimum="0"/>
-								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="0.55" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
+								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="{StaticResource SpacingXSmall}">
 								<CheckBox IsChecked="{Binding SuperSeeding, Mode=TwoWay}" Content="{m:L Details_SuperSeeding}"/>
-								<TextBlock Text="{m:L Details_SuperSeedingHint}" Opacity="0.55" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
+								<TextBlock Text="{m:L Details_SuperSeedingHint}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 
 							<Button Grid.Row="6" Grid.ColumnSpan="2" Content="{m:L Details_Apply}"
