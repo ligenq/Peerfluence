@@ -4,22 +4,49 @@
     End to end tests that drive the real, running application through the Windows accessibility
     tree: the same tree a screen reader reads and an AI agent would drive.
 
-    Deliberately not in Peerfluence.slnx, and deliberately not in CI. UI Automation is a Windows API
-    that needs an interactive desktop session, and these tests start a real process and wait on real
-    rendering, so they are slower and less certain than everything else here. They are for running on
-    a developer machine when the interface changes; the fast suites remain the gate.
+    In the solution so it keeps compiling and cannot quietly rot, but never run by CI. UI Automation
+    is a Windows API that needs an interactive desktop session, and these tests start a real process
+    and wait on real rendering, so they are slower and less certain than everything else here. They
+    are for a developer machine when the interface changes; the fast suites remain the gate.
 
       Run them with dotnet test on this project.
   -->
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      Windows only, because UI Automation is. Everywhere else this builds an empty assembly: the
+      solution is built on Linux in CI, and a project that fails to restore there would break a leg
+      that has nothing to do with these tests.
+
+      A property rather than the platform check written into every condition, so that the shape this
+      takes on Linux can be built and checked from Windows:
+
+        dotnet build Peerfluence.UiTests/Peerfluence.UiTests.csproj -p:IsWindowsBuild=false
+    -->
+    <IsWindowsBuild Condition="'$(IsWindowsBuild)' == ''">$([MSBuild]::IsOSPlatform('Windows'))</IsWindowsBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(IsWindowsBuild)' == 'true'">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(IsWindowsBuild)' != 'true'">net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!--
+    Nothing to compile off Windows, which csc warns about. The warning is the intent here, and
+    warnings are errors in this repository.
+  -->
+  <ItemGroup Condition="'$(IsWindowsBuild)' != 'true'">
+    <Compile Remove="**/*.cs" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsWindowsBuild)' != 'true'">
+    <NoWarn>$(NoWarn);CS2008</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
     <PackageReference Include="FlaUI.Core" Version="4.0.0" />
 
     <!--
@@ -37,7 +64,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
     <Using Include="Xunit" />
   </ItemGroup>
 
@@ -45,7 +72,7 @@
     A reference rather than a copy: the tests name automation ids that the application declares as
     constants, so renaming one breaks the build instead of a test at run time.
   -->
-  <ItemGroup>
+  <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
     <ProjectReference Include="..\Peerfluence\Peerfluence.csproj" />
   </ItemGroup>
 
