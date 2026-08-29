@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
+using Peerfluence.Services.Mcp;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -79,5 +81,50 @@ public sealed class ServiceCollectionExtensionsTests
             .ToList();
 
         Assert.True(duplicated.Count == 0, $"registered more than once: {string.Join(", ", duplicated)}");
+    }
+
+    [Fact]
+    public void HostedServices_AreRegisteredAfterEverythingTheyConsume()
+    {
+        // The generic host starts services in registration order. Settings have to exist before
+        // anyone reads them; notification consumers must subscribe before the engine restores its
+        // session; and servers must not accept work until the engine's alert stream is running.
+        var provider = Build();
+        var order = provider.GetServices<IHostedService>()
+            .Select(service => service.GetType())
+            .ToList();
+
+        AssertBefore<AppSettingsHostedService, TorrentNotificationHostedService>(order);
+        AssertBefore<AppSettingsHostedService, TorrentCompletionActionHostedService>(order);
+        AssertBefore<AppSettingsHostedService, TorrentEngineHostedService>(order);
+        AssertBefore<TorrentNotificationHostedService, TorrentEngineHostedService>(order);
+        AssertBefore<TorrentCompletionActionHostedService, TorrentEngineHostedService>(order);
+        AssertBefore<TorrentEngineHostedService, TorrentAlertsHostedService>(order);
+        AssertBefore<TorrentAlertsHostedService, McpServerHostedService>(order);
+        AssertBefore<TorrentAlertsHostedService, TransmissionRpcHostedService>(order);
+    }
+
+    [Fact]
+    public void HostedServices_RunSequentially_SoTheirDependencyOrderIsKept()
+    {
+        // Registration order is a guarantee only while concurrent lifecycle execution remains off.
+        // The host also stops sequentially in reverse order, taking servers down before the engine.
+        var provider = Build();
+        var options = provider.GetRequiredService<IOptions<HostOptions>>().Value;
+
+        Assert.False(options.ServicesStartConcurrently);
+        Assert.False(options.ServicesStopConcurrently);
+    }
+
+    private static void AssertBefore<TFirst, TSecond>(IList<Type> order)
+    {
+        var first = order.IndexOf(typeof(TFirst));
+        var second = order.IndexOf(typeof(TSecond));
+
+        Assert.True(first >= 0, $"{typeof(TFirst).Name} is not registered as a hosted service");
+        Assert.True(second >= 0, $"{typeof(TSecond).Name} is not registered as a hosted service");
+        Assert.True(
+            first < second,
+            $"{typeof(TFirst).Name} must start before {typeof(TSecond).Name}; actual order: {string.Join(" -> ", order.Select(type => type.Name))}");
     }
 }

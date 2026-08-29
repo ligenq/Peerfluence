@@ -108,7 +108,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DetailsViewModel>();
 
         // Transients
-        services.AddTransient<SettingsViewModel>();
+        services.AddSingleton<SettingsViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<CreateTorrentViewModel>();
         services.AddSingleton<FindTorrentsViewModel>();
@@ -116,7 +116,7 @@ public static class ServiceCollectionExtensions
         // IFeatureViewModel discovery (order matters for navigation)
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<DownloadsViewModel>());
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<FindTorrentsViewModel>());
-        services.AddTransient<IFeatureViewModel>(sp => sp.GetRequiredService<SettingsViewModel>());
+        services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<SettingsViewModel>());
 
         return services;
     }

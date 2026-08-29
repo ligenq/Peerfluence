@@ -872,7 +872,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         {
             // Cannot ask which files to delete, so delete none of them: remove the torrent and
             // leave what it downloaded alone.
-            await _torrentService.RemoveAsync(torrent, ToRemoveOptions(removeAction));
+            await _torrentService.RemoveAsync(torrent, RemoveOptions.None);
             return;
         }
 
@@ -897,7 +897,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             await _settingsService.SaveAsync(default);
         }
 
-        await _torrentService.RemoveAsync(torrent, ToRemoveOptions(removeAction));
+        await _torrentService.RemoveAsync(torrent, ToRemoveOptions(choice.Action));
     }
 
     private void OpenFolder()

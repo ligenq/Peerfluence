@@ -81,4 +81,22 @@ public class DependencyInjectionTests
         var hostedServices = provider.GetServices<IHostedService>().ToList();
         Assert.True(hostedServices.Count >= 5);
     }
+
+    [Fact]
+    public void EveryRegisteredConstructionPath_IsValid()
+    {
+        // Host validation defaults vary with environment. Make it unconditional here so a missing
+        // dependency in a lazily-created page, dialog or server fails this test rather than the
+        // first time somebody opens or enables it.
+        var builder = Host.CreateApplicationBuilder();
+        builder.Services.AddPeerfluenceServices();
+
+        using var provider = builder.Services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true
+        });
+
+        Assert.NotNull(provider);
+    }
 }

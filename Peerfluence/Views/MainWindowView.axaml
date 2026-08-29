@@ -26,7 +26,8 @@
     -->
     <primitives:VisualLayerManager>
     <Panel>
-    <suki:SukiSideMenu ItemsSource="{Binding NavigationItems}"
+    <suki:SukiSideMenu ZIndex="0"
+                       ItemsSource="{Binding NavigationItems}"
                        SelectedItem="{Binding SelectedNavigationItem}"
                        IsVisible="{Binding !IsSimpleMode}"
                        UseCustomContent="True">
@@ -68,7 +69,7 @@
             Simple mode: the one screen, and a quiet way back to everything else. No side menu,
             because there is nowhere else to navigate to.
         -->
-        <Grid RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+        <Grid ZIndex="0" RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
             <!--
                 The only chrome simple mode gets: a way into settings and a way out to advanced,
                 muted and out of the way of the one thing the screen is for.
@@ -114,7 +115,7 @@
             hero and no decoration. The thing being chosen is which interface to show, not a product
             to be sold.
         -->
-        <Border IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
+        <Border ZIndex="10" IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
             <StackPanel VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Spacing="{StaticResource SpacingStandard}"
