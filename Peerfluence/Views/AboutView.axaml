@@ -18,7 +18,7 @@
 
         <StackPanel Spacing="{StaticResource SpacingXSmall}">
             <TextBlock Text="{m:L About_GitHub}" FontWeight="SemiBold"/>
-            <Button Command="{Binding OpenGitHubCommand}" Classes="Basic" Padding="{StaticResource ZeroThickness}" AutomationProperties.AutomationId="OpenGitHubButton">
+            <Button Command="{Binding OpenGitHubCommand}" Classes="Basic" Padding="{StaticResource ZeroThickness}" AutomationProperties.Name="{m:L About_GitHub}" AutomationProperties.AutomationId="OpenGitHubButton">
                 <TextBlock Text="{Binding GitHubUrl}" Foreground="{DynamicResource SukiPrimaryColor}" Cursor="Hand"/>
             </Button>
         </StackPanel>

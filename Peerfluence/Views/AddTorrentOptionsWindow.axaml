@@ -57,7 +57,7 @@
                             </StackPanel>
                             <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                                 <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" PlaceholderText="{m:L AddTorrent_DownloadFolderWatermark}" AutomationProperties.Name="{m:L AddTorrent_Destination}" AutomationProperties.AutomationId="DownloadPathTextBox"/>
-                                <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseDownloadPathButton">
+                                <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseDownloadPathButton">
                                     <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 </Button>
                             </Grid>

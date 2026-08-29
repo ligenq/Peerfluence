@@ -23,10 +23,10 @@
                         <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Source}" AutomationProperties.AutomationId="SourcePathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}" AutomationProperties.AutomationId="BrowseSourceFileButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}" AutomationProperties.Name="{m:L CreateTorrent_BrowseFile}" AutomationProperties.AutomationId="BrowseSourceFileButton">
                                 <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
-                            <Button Grid.Column="2" Command="{Binding BrowseSourceCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.AutomationId="BrowseSourceButton">
+                            <Button Grid.Column="2" Command="{Binding BrowseSourceCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.Name="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.AutomationId="BrowseSourceButton">
                                 <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>

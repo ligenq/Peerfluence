@@ -26,10 +26,17 @@ public sealed class RunningApplication : IDisposable
     private readonly FlaUI.Core.Application _application;
     private readonly UIA3Automation _automation;
 
+    private bool _ownsProfile = true;
+    private bool _disposed;
+
     public RunningApplication()
+        : this(Path.Combine(Path.GetTempPath(), "peerfluence-uitests", Guid.NewGuid().ToString("n")))
     {
-        ProfileDirectory = Path.Combine(
-            Path.GetTempPath(), "peerfluence-uitests", Guid.NewGuid().ToString("n"));
+    }
+
+    private RunningApplication(string profileDirectory)
+    {
+        ProfileDirectory = profileDirectory;
         Directory.CreateDirectory(ProfileDirectory);
 
         var start = new ProcessStartInfo(ExecutablePath())
@@ -52,6 +59,24 @@ public sealed class RunningApplication : IDisposable
 
     /// <summary>The throwaway directory this instance keeps everything in.</summary>
     public string ProfileDirectory { get; }
+
+    /// <summary>
+    /// Stops the application and starts it again on the same profile.
+    /// </summary>
+    /// <remarks>
+    /// The only way to ask whether something was actually saved. A view model can be inspected for
+    /// what it holds and a file can be read for what it contains, but neither answers whether the
+    /// application reads back what it wrote, which is the part that breaks.
+    /// </remarks>
+    public RunningApplication Restart()
+    {
+        _ownsProfile = false;
+        Dispose();
+        return new RunningApplication(ProfileDirectory);
+    }
+
+    /// <summary>The modal windows this one has opened.</summary>
+    public Window[] ModalWindows => Window.ModalWindows;
 
     /// <summary>
     /// The element carrying <paramref name="automationId"/>, once it exists.
@@ -80,6 +105,47 @@ public sealed class RunningApplication : IDisposable
         throw new InvalidOperationException(
             $"no element with the automation id '{automationId}' appeared within {withinSeconds}s. "
                 + $"What was there: {Environment.NewLine}{Describe()}");
+    }
+
+    /// <summary>
+    /// The side menu destinations, in the order they are shown.
+    /// </summary>
+    /// <remarks>
+    /// Found by control type rather than by an id: they come from a template, so one id would name
+    /// every one of them. Position is the only stable handle, and it is the same in every language.
+    /// </remarks>
+    public AutomationElement[] NavigationItems() =>
+        Window.FindAllDescendants(by => by.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem));
+
+    /// <summary>Selects an element, by the pattern it offers rather than by aiming the mouse at it.</summary>
+    public void Activate(AutomationElement element)
+    {
+        if (element.Patterns.SelectionItem.IsSupported)
+        {
+            element.Patterns.SelectionItem.Pattern.Select();
+            return;
+        }
+
+        element.Click();
+    }
+
+    /// <summary>
+    /// Navigates to the settings destination, whichever position it occupies.
+    /// </summary>
+    public void GoToSettings()
+    {
+        foreach (var destination in NavigationItems())
+        {
+            Activate(destination);
+
+            if (Exists("AppearanceTab"))
+            {
+                return;
+            }
+        }
+
+        throw new InvalidOperationException(
+            $"no navigation destination led to the settings. What was there:{Environment.NewLine}{Describe()}");
     }
 
     public bool Exists(string automationId) =>
@@ -118,6 +184,13 @@ public sealed class RunningApplication : IDisposable
 
     public void Dispose()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+
         // Kill rather than Close: a graceful close waits for the application to agree, and a test
         // that has just left a modal dialog open would hang here rather than fail.
         try { _application.Kill(); } catch (Exception) { /* already gone */ }
@@ -125,8 +198,14 @@ public sealed class RunningApplication : IDisposable
         _application.Dispose();
         _automation.Dispose();
 
+        if (!_ownsProfile)
+        {
+            // Handed to the instance that restarted onto it, which will clear it up.
+            return;
+        }
+
         try { Directory.Delete(ProfileDirectory, recursive: true); }
-        catch (IOException) { /* a log file still held open; the temp directory is disposable */ }
+        catch (Exception) { /* a log file still held open; the temp directory is disposable */ }
     }
 
     /// <summary>

@@ -9,7 +9,8 @@
     and wait on real rendering, so they are slower and less certain than everything else here. They
     are for a developer machine when the interface changes; the fast suites remain the gate.
 
-      Run them with dotnet test on this project.
+      Run them with dotnet test on this project. Building with IsWindowsBuild=false rewrites obj/
+      for the empty shape, so build once more without it before running the tests again.
   -->
 
   <PropertyGroup>

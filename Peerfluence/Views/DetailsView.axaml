@@ -49,13 +49,13 @@
 				</StackPanel>
 
 				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource XSmallLeftMargin}">
-					<Button Command="{Binding ChangeDownloadPathCommand}" ToolTip.Tip="{m:L Details_ChangeDownloadPath}" AutomationProperties.AutomationId="ChangeDownloadPathButton">
+					<Button Command="{Binding ChangeDownloadPathCommand}" ToolTip.Tip="{m:L Details_ChangeDownloadPath}" AutomationProperties.Name="{m:L Details_ChangeDownloadPath}" AutomationProperties.AutomationId="ChangeDownloadPathButton">
 						<materialIcons:MaterialIcon Kind="FolderMoveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 					</Button>
-					<Button Command="{Binding ForceRecheckCommand}" ToolTip.Tip="{m:L Details_VerifyFiles}" AutomationProperties.AutomationId="ForceRecheckButton">
+					<Button Command="{Binding ForceRecheckCommand}" ToolTip.Tip="{m:L Details_VerifyFiles}" AutomationProperties.Name="{m:L Details_VerifyFiles}" AutomationProperties.AutomationId="ForceRecheckButton">
 						<materialIcons:MaterialIcon Kind="ShieldCheckOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 					</Button>
-					<Button Command="{Binding SaveResumeDataCommand}" ToolTip.Tip="{m:L Details_SaveResumeData}" AutomationProperties.AutomationId="SaveResumeDataButton">
+					<Button Command="{Binding SaveResumeDataCommand}" ToolTip.Tip="{m:L Details_SaveResumeData}" AutomationProperties.Name="{m:L Details_SaveResumeData}" AutomationProperties.AutomationId="SaveResumeDataButton">
 						<materialIcons:MaterialIcon Kind="ContentSaveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 					</Button>
 				</StackPanel>
@@ -63,7 +63,7 @@
 
 			<TabControl Grid.Row="1">
 				<!-- Files Tab -->
-				<TabItem Header="{m:L Details_FilesTab}" AutomationProperties.AutomationId="FilesTabTab">
+				<TabItem Header="{m:L Details_FilesTab}" AutomationProperties.Name="{m:L Details_FilesTab}" AutomationProperties.AutomationId="FilesTabTab">
 					<Grid RowDefinitions="*,Auto">
 						<DataGrid ItemsSource="{Binding Files}"
                                   AutoGenerateColumns="False"
@@ -130,17 +130,17 @@
 				</TabItem>
 
 				<!-- Trackers Tab -->
-				<TabItem Header="{m:L Details_TrackersTab}" AutomationProperties.AutomationId="TrackersTabTab">
+				<TabItem Header="{m:L Details_TrackersTab}" AutomationProperties.Name="{m:L Details_TrackersTab}" AutomationProperties.AutomationId="TrackersTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}" AutomationProperties.Name="{m:L Details_Trackers_AddWatermark}" AutomationProperties.AutomationId="NewTrackerUrlTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Trackers_Add}" AutomationProperties.AutomationId="AddTrackerButton">
+							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Trackers_Add}" AutomationProperties.Name="{m:L Details_Trackers_Add}" AutomationProperties.AutomationId="AddTrackerButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
-							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}" AutomationProperties.AutomationId="AnnounceButton">
+							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}" AutomationProperties.Name="{m:L Details_Trackers_Announce}" AutomationProperties.AutomationId="AnnounceButton">
 								<materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
-							<Button Grid.Column="3" Command="{Binding ScrapeCommand}" ToolTip.Tip="{m:L Details_Trackers_Scrape}" AutomationProperties.AutomationId="ScrapeButton">
+							<Button Grid.Column="3" Command="{Binding ScrapeCommand}" ToolTip.Tip="{m:L Details_Trackers_Scrape}" AutomationProperties.Name="{m:L Details_Trackers_Scrape}" AutomationProperties.AutomationId="ScrapeButton">
 								<materialIcons:MaterialIcon Kind="AccountSearchOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -169,11 +169,11 @@
 				</TabItem>
 
 				<!-- Peers Tab -->
-				<TabItem Header="{m:L Details_PeersTab}" AutomationProperties.AutomationId="PeersTabTab">
+				<TabItem Header="{m:L Details_PeersTab}" AutomationProperties.Name="{m:L Details_PeersTab}" AutomationProperties.AutomationId="PeersTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}" AutomationProperties.Name="{m:L Details_Peers_AddWatermark}" AutomationProperties.AutomationId="NewPeerAddressesTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Peers_AddTitle}" AutomationProperties.AutomationId="AddPeersButton">
+							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Peers_AddTitle}" AutomationProperties.Name="{m:L Details_Peers_AddTitle}" AutomationProperties.AutomationId="AddPeersButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -191,11 +191,11 @@
 				</TabItem>
 
 				<!-- Web Seeds Tab -->
-				<TabItem Header="{m:L Details_WebSeedsTab}" AutomationProperties.AutomationId="WebSeedsTabTab">
+				<TabItem Header="{m:L Details_WebSeedsTab}" AutomationProperties.Name="{m:L Details_WebSeedsTab}" AutomationProperties.AutomationId="WebSeedsTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}" AutomationProperties.Name="{m:L Details_WebSeeds_Watermark}" AutomationProperties.AutomationId="NewWebSeedUrlTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat" AutomationProperties.AutomationId="AddWebSeedButton">
+							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat" AutomationProperties.Name="{m:L Details_WebSeeds_Add}" AutomationProperties.AutomationId="AddWebSeedButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -226,7 +226,7 @@
 				</TabItem>
 
 				<!-- Pieces Tab -->
-				<TabItem Header="{m:L Details_PiecesTab}" AutomationProperties.AutomationId="PiecesTabTab">
+				<TabItem Header="{m:L Details_PiecesTab}" AutomationProperties.Name="{m:L Details_PiecesTab}" AutomationProperties.AutomationId="PiecesTabTab">
 					<StackPanel Spacing="{StaticResource SpacingMedium}">
 						<WrapPanel Orientation="Horizontal">
 							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
@@ -256,7 +256,7 @@
 				</TabItem>
 
 				<!-- Settings Tab -->
-				<TabItem Header="{m:L Details_SettingsTab}" AutomationProperties.AutomationId="SettingsTabTab">
+				<TabItem Header="{m:L Details_SettingsTab}" AutomationProperties.Name="{m:L Details_SettingsTab}" AutomationProperties.AutomationId="SettingsTabTab">
 					<ScrollViewer>
 						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
 							<StackPanel Spacing="{StaticResource SpacingXSmall}">

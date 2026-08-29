@@ -39,7 +39,7 @@
         </suki:SukiSideMenu.HeaderContent>
         <suki:SukiSideMenu.ItemTemplate>
             <DataTemplate x:DataType="vm:NavigationItem">
-                <suki:SukiSideMenuItem Header="{Binding Title}">
+                <suki:SukiSideMenuItem Header="{Binding Title}" AutomationProperties.Name="{Binding Title}">
                     <suki:SukiSideMenuItem.Icon>
                         <materialIcons:MaterialIcon Kind="{Binding Icon}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}" />
                     </suki:SukiSideMenuItem.Icon>
@@ -52,7 +52,7 @@
                 the status strip now, where the rest of the numbers are.
             -->
             <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
-                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}" AutomationProperties.AutomationId="ShowAboutButton">
+                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}" AutomationProperties.Name="{m:L Nav_About}" AutomationProperties.AutomationId="ShowAboutButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacityDisabled}"/>
                         <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacityDisabled}"/>
@@ -80,7 +80,7 @@
                         HorizontalAlignment="Right">
                 <Button Classes="Basic"
                         Command="{Binding ShowSimpleSettingsCommand}"
-                        IsVisible="{Binding !IsSimpleSettingsOpen}" AutomationProperties.AutomationId="ShowSimpleSettingsButton">
+                        IsVisible="{Binding !IsSimpleSettingsOpen}" AutomationProperties.Name="{m:L Settings_Title}" AutomationProperties.AutomationId="ShowSimpleSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
                         <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
@@ -88,13 +88,13 @@
                 </Button>
                 <Button Classes="Basic"
                         Command="{Binding CloseSimpleSettingsCommand}"
-                        IsVisible="{Binding IsSimpleSettingsOpen}" AutomationProperties.AutomationId="CloseSimpleSettingsButton">
+                        IsVisible="{Binding IsSimpleSettingsOpen}" AutomationProperties.Name="{m:L Nav_Downloads}" AutomationProperties.AutomationId="CloseSimpleSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
                         <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}" AutomationProperties.AutomationId="SwitchToAdvancedModeButton">
+                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}" AutomationProperties.Name="{m:L Simple_SwitchToAdvanced}" AutomationProperties.AutomationId="SwitchToAdvancedModeButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
                         <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
@@ -131,7 +131,7 @@
                 <Button Command="{Binding ChooseSimpleModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.AutomationId="ChooseSimpleModeButton">
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.Name="{m:L Welcome_Simple_Title}" AutomationProperties.AutomationId="ChooseSimpleModeButton">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Simple_Title}" FontWeight="SemiBold"/>
                         <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
@@ -141,7 +141,7 @@
                 <Button Command="{Binding ChooseAdvancedModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.AutomationId="ChooseAdvancedModeButton">
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.Name="{m:L Welcome_Advanced_Title}" AutomationProperties.AutomationId="ChooseAdvancedModeButton">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Advanced_Title}" FontWeight="SemiBold"/>
                         <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
