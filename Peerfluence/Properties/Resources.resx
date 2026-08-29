@@ -77,28 +77,28 @@
     <value>Downloads</value>
   </data>
   <data name="Downloads_TotalDown" xml:space="preserve">
-    <value>Total Down</value>
+    <value>Total down</value>
   </data>
   <data name="Downloads_TotalUp" xml:space="preserve">
-    <value>Total Up</value>
+    <value>Total up</value>
   </data>
   <data name="Downloads_Active" xml:space="preserve">
-    <value>Active Torrents</value>
+    <value>Active torrents</value>
   </data>
   <data name="Downloads_Peers" xml:space="preserve">
     <value>Peers</value>
   </data>
   <data name="Downloads_AddTorrent" xml:space="preserve">
-    <value>Add Torrent</value>
+    <value>Add torrent</value>
   </data>
   <data name="Downloads_MagnetWatermark" xml:space="preserve">
     <value>Paste magnet link</value>
   </data>
   <data name="Downloads_AddMagnet" xml:space="preserve">
-    <value>Add Magnet</value>
+    <value>Add magnet</value>
   </data>
   <data name="Downloads_PasteMagnet" xml:space="preserve">
-    <value>Paste Magnet</value>
+    <value>Paste magnet</value>
   </data>
   <data name="Downloads_Start" xml:space="preserve">
     <value>Start</value>
@@ -179,16 +179,16 @@
     <value>Remove</value>
   </data>
   <data name="Downloads_OpenFolder" xml:space="preserve">
-    <value>Open Folder</value>
+    <value>Open folder</value>
   </data>
   <data name="Downloads_CopyHash" xml:space="preserve">
-    <value>Copy Hash</value>
+    <value>Copy hash</value>
   </data>
   <data name="Downloads_CopyMagnet" xml:space="preserve">
-    <value>Copy Magnet Link</value>
+    <value>Copy magnet link</value>
   </data>
   <data name="Downloads_ForceRecheck" xml:space="preserve">
-    <value>Force Recheck</value>
+    <value>Force recheck</value>
   </data>
   <data name="Downloads_Grid_Name" xml:space="preserve">
     <value>Name</value>
@@ -209,7 +209,7 @@
     <value>Peers</value>
   </data>
   <data name="Downloads_FilePicker_Title" xml:space="preserve">
-    <value>Open Torrent</value>
+    <value>Open torrent</value>
   </data>
   <data name="Downloads_FilePicker_Filter" xml:space="preserve">
     <value>Torrent files</value>
@@ -263,7 +263,7 @@
     <value>Peers</value>
   </data>
   <data name="Details_ApplyFileSelection" xml:space="preserve">
-    <value>Apply File Selection</value>
+    <value>Apply file selection</value>
   </data>
   <data name="Details_Grid_Selected" xml:space="preserve">
     <value>Selected</value>
@@ -308,7 +308,7 @@
     <value>Leeches</value>
   </data>
   <data name="Details_Trackers_LastError" xml:space="preserve">
-    <value>Last Error</value>
+    <value>Last error</value>
   </data>
   <data name="TrackerStatus_Working" xml:space="preserve">
     <value>Working</value>
@@ -536,10 +536,10 @@
     <value>{0}d {1}h left</value>
   </data>
   <data name="CreateTorrent_Title" xml:space="preserve">
-    <value>Create Torrent</value>
+    <value>Create torrent</value>
   </data>
   <data name="CreateTorrent_Source" xml:space="preserve">
-    <value>Source Path</value>
+    <value>Source path</value>
   </data>
   <data name="CreateTorrent_SourceWatermark" xml:space="preserve">
     <value>Select a file or folder...</value>
@@ -551,16 +551,16 @@
     <value>Enter tracker URLs, one per line...</value>
   </data>
   <data name="CreateTorrent_PieceSize" xml:space="preserve">
-    <value>Piece Size</value>
+    <value>Piece size</value>
   </data>
   <data name="CreateTorrent_Private" xml:space="preserve">
-    <value>Private Torrent</value>
+    <value>Private torrent</value>
   </data>
   <data name="CreateTorrent_Comment" xml:space="preserve">
     <value>Comment</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Create</value>
+    <value>Create...</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>File...</value>
@@ -569,16 +569,16 @@
     <value>Folder...</value>
   </data>
   <data name="CreateTorrent_SelectSourceFolder" xml:space="preserve">
-    <value>Select Source Folder</value>
+    <value>Select source folder</value>
   </data>
   <data name="CreateTorrent_SelectSourceFile" xml:space="preserve">
-    <value>Select Source File</value>
+    <value>Select source file</value>
   </data>
   <data name="CreateTorrent_SaveTorrentFile" xml:space="preserve">
-    <value>Save Torrent File</value>
+    <value>Save torrent file</value>
   </data>
   <data name="CreateTorrent_TorrentFileType" xml:space="preserve">
-    <value>Torrent File</value>
+    <value>Torrent file</value>
   </data>
   <data name="CreateTorrent_ErrorNoSource" xml:space="preserve">
     <value>Please select a source file or folder.</value>
@@ -605,7 +605,7 @@
     <value>Queue priority</value>
   </data>
   <data name="Details_VerifyFiles" xml:space="preserve">
-    <value>Verify Files</value>
+    <value>Verify files</value>
   </data>
   <data name="Details_Stream" xml:space="preserve">
     <value>Stream</value>
@@ -638,7 +638,7 @@
     <value>Streaming failed</value>
   </data>
   <data name="Settings_QueueManagement" xml:space="preserve">
-    <value>Queue Management</value>
+    <value>Queue management</value>
   </data>
   <data name="Settings_EnableQueueManagement" xml:space="preserve">
     <value>Enable queue management</value>
@@ -650,7 +650,7 @@
     <value>Max active seeds</value>
   </data>
   <data name="Settings_IpBlocklist" xml:space="preserve">
-    <value>IP Blocklist</value>
+    <value>IP blocklist</value>
   </data>
   <data name="Settings_EnableBlocklist" xml:space="preserve">
     <value>Enable IP blocklist</value>
@@ -662,13 +662,13 @@
     <value>Path to blocklist file (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>Browse...</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Appearance</value>
   </data>
   <data name="Settings_BlocklistPicker_Title" xml:space="preserve">
-    <value>Select Blocklist File</value>
+    <value>Select blocklist file</value>
   </data>
   <data name="Settings_BlocklistPicker_Filter" xml:space="preserve">
     <value>Blocklist files</value>
@@ -701,7 +701,7 @@
     <value>Missing</value>
   </data>
   <data name="Settings_GeoIp" xml:space="preserve">
-    <value>GeoIP Database</value>
+    <value>GeoIP database</value>
   </data>
   <data name="Settings_EnableGeoIp" xml:space="preserve">
     <value>Enable GeoIP lookup</value>
@@ -713,13 +713,13 @@
     <value>Path to GeoIP database (.mmdb)</value>
   </data>
   <data name="Settings_GeoIpPicker_Title" xml:space="preserve">
-    <value>Select GeoIP Database</value>
+    <value>Select GeoIP database</value>
   </data>
   <data name="Settings_GeoIpPicker_Filter" xml:space="preserve">
     <value>GeoIP databases</value>
   </data>
   <data name="Settings_MediaPlayer" xml:space="preserve">
-    <value>Media Player</value>
+    <value>Media player</value>
   </data>
   <data name="Settings_MediaPlayerPath" xml:space="preserve">
     <value>Media player path</value>
@@ -728,7 +728,7 @@
     <value>Path to executable (e.g. VLC)</value>
   </data>
   <data name="Settings_MediaPlayerPicker_Title" xml:space="preserve">
-    <value>Select Media Player</value>
+    <value>Select media player</value>
   </data>
   <data name="Settings_MediaPlayerPicker_Filter" xml:space="preserve">
     <value>Executable files</value>
@@ -782,13 +782,13 @@
     <value>Proxy tracker connections</value>
   </data>
   <data name="CreateTorrent_WebSeeds" xml:space="preserve">
-    <value>Web Seeds (one URL per line)</value>
+    <value>Web seeds (one URL per line)</value>
   </data>
   <data name="CreateTorrent_WebSeedsHint" xml:space="preserve">
     <value>HTTP/HTTPS URLs for web seeding (BEP 19)</value>
   </data>
   <data name="Settings_PortMapping" xml:space="preserve">
-    <value>Port Mapping Status</value>
+    <value>Port mapping status</value>
   </data>
   <data name="Settings_PortMapping_Refresh" xml:space="preserve">
     <value>Refresh</value>
@@ -818,7 +818,7 @@
     <value>Failed</value>
   </data>
   <data name="Details_EndGameMode" xml:space="preserve">
-    <value>End Game</value>
+    <value>End game</value>
   </data>
   <data name="Details_DiskReadLimit" xml:space="preserve">
     <value>Disk read limit (B/s)</value>
@@ -827,13 +827,13 @@
     <value>Disk write limit (B/s)</value>
   </data>
   <data name="Details_SaveResumeData" xml:space="preserve">
-    <value>Save Resume Data</value>
+    <value>Save resume data</value>
   </data>
   <data name="Details_SaveResumeData_Title" xml:space="preserve">
-    <value>Save Resume Data</value>
+    <value>Save resume data</value>
   </data>
   <data name="Details_SaveResumeData_FileType" xml:space="preserve">
-    <value>Resume Data</value>
+    <value>Resume data</value>
   </data>
   <data name="Details_SaveResumeData_Success" xml:space="preserve">
     <value>Resume data saved.</value>
@@ -842,10 +842,10 @@
     <value>Failed to save resume data: {0}</value>
   </data>
   <data name="Details_ChangeDownloadPath" xml:space="preserve">
-    <value>Change Path</value>
+    <value>Change path</value>
   </data>
   <data name="Details_ChangeDownloadPath_Title" xml:space="preserve">
-    <value>Select New Download Path</value>
+    <value>Select new download path</value>
   </data>
   <data name="Details_ChangeDownloadPath_Success" xml:space="preserve">
     <value>Download path changed.</value>
@@ -854,16 +854,16 @@
     <value>Failed to change download path: {0}</value>
   </data>
   <data name="Settings_DownloadFolderPicker_Title" xml:space="preserve">
-    <value>Select Download Folder</value>
+    <value>Select download folder</value>
   </data>
   <data name="Settings_SessionFolderPicker_Title" xml:space="preserve">
-    <value>Select Session Data Folder</value>
+    <value>Select session data folder</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
     <value>Remove {0} downloads from the list?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
-    <value>Remove Torrent</value>
+    <value>Remove torrent</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
     <value>Remove "{0}" from the download list?</value>
@@ -995,7 +995,7 @@
     <value>Associations are registered for the current Windows user. If Windows keeps another default app, choose Peerfluence from Windows Default Apps.</value>
   </data>
   <data name="Settings_CompletionAction" xml:space="preserve">
-    <value>Completion Action</value>
+    <value>Completion action</value>
   </data>
   <data name="Settings_CompletionActionEnabled" xml:space="preserve">
     <value>Run a program when a torrent finishes</value>
@@ -1040,10 +1040,10 @@
     <value>Settings</value>
   </data>
   <data name="Settings_StorageAndSession" xml:space="preserve">
-    <value>Storage &amp; Session</value>
+    <value>Storage &amp; session</value>
   </data>
   <data name="Settings_NetworkAndConnectivity" xml:space="preserve">
-    <value>Network &amp; Connectivity</value>
+    <value>Network &amp; connectivity</value>
   </data>
   <data name="Nav_About" xml:space="preserve">
     <value>About</value>
@@ -1052,19 +1052,19 @@
     <value>About Peerfluence</value>
   </data>
   <data name="About_GitHub" xml:space="preserve">
-    <value>GitHub Repository</value>
+    <value>GitHub repository</value>
   </data>
   <data name="About_Packages" xml:space="preserve">
     <value>Third-party packages</value>
   </data>
   <data name="About_LegalNotice" xml:space="preserve">
-    <value>Legal Notice</value>
+    <value>Legal notice</value>
   </data>
   <data name="About_LegalNoticeText" xml:space="preserve">
     <value>Peerfluence is free and open-source software.&#x0a;&#x0a;Peerfluence is provided &quot;as is&quot;, without warranty of any kind. To the fullest extent permitted by law, the author(s), contributors, and copyright holders are not liable for any damages, data loss, network issues, legal claims, downloaded content, shared content, or other consequences arising from the installation or use of the application.&#x0a;&#x0a;You are solely responsible for how you use Peerfluence, including ensuring that any content you download, upload, seed, share, or distribute complies with applicable laws, rights, licenses, and permissions. The author(s), contributors, and copyright holders are not responsible for your use of the application or for any third-party content accessed through it.&#x0a;&#x0a;Peerfluence is licensed under the MIT License. By installing or using Peerfluence, you acknowledge and accept this notice.</value>
   </data>
   <data name="Settings_SecurityAndPrivacy" xml:space="preserve">
-    <value>Security &amp; Privacy</value>
+    <value>Security &amp; privacy</value>
   </data>
   <data name="Settings_Updates" xml:space="preserve">
     <value>Updates</value>
@@ -1172,7 +1172,7 @@
     <value>Peerfluence encountered an unexpected error and needs to close.</value>
   </data>
   <data name="Crash_Title" xml:space="preserve">
-    <value>Peerfluence - Fatal Error</value>
+    <value>Peerfluence - fatal error</value>
   </data>
   <data name="Crash_ReportSaved" xml:space="preserve">
     <value>A crash report has been saved to:</value>

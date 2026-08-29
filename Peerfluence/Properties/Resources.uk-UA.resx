@@ -560,7 +560,7 @@
     <value>коментар</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Створити</value>
+    <value>Створити...</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>Файл...</value>
@@ -662,7 +662,7 @@
     <value>Шлях до файлу списку блокувань (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Огляд</value>
+    <value>Огляд...</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Зовнішній вигляд</value>

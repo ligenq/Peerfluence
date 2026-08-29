@@ -164,7 +164,7 @@
                      Text="{Binding SearchText, Mode=TwoWay}"
                      PlaceholderText="{m:L Downloads_Search}"
                      MaxWidth="320"
-                     HorizontalAlignment="Right" AutomationProperties.AutomationId="SearchTextTextBox"/>
+                     HorizontalAlignment="Right" AutomationProperties.Name="{m:L Downloads_Search}" AutomationProperties.AutomationId="SearchTextTextBox"/>
         </Grid>
 
         <suki:InfoBar x:Name="DownloadsStatusInfoBar"

@@ -16,7 +16,7 @@
                   IsVisible="{Binding IsConfigured}"
                   Margin="{StaticResource StandardBottomMargin}">
                 <TextBox Text="{Binding Query, Mode=TwoWay}"
-                         PlaceholderText="{m:L Find_QueryWatermark}" AutomationProperties.AutomationId="QueryTextBox">
+                         PlaceholderText="{m:L Find_QueryWatermark}" AutomationProperties.Name="{m:L Find_QueryWatermark}" AutomationProperties.AutomationId="QueryTextBox">
                     <TextBox.KeyBindings>
                         <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}"/>
                     </TextBox.KeyBindings>

@@ -74,7 +74,7 @@
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding ThemeVariantOptions}" SelectedValue="{Binding SelectedThemeVariant}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="ThemeVariantComboBox">
+                            <ComboBox ItemsSource="{Binding ThemeVariantOptions}" SelectedValue="{Binding SelectedThemeVariant}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ThemeVariant}" AutomationProperties.AutomationId="ThemeVariantComboBox">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding DisplayName}"/>
@@ -84,7 +84,7 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ColorTheme}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding ColorThemeOptions}" SelectedValue="{Binding SelectedColorTheme}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="ColorThemeComboBox">
+                            <ComboBox ItemsSource="{Binding ColorThemeOptions}" SelectedValue="{Binding SelectedColorTheme}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ColorTheme}" AutomationProperties.AutomationId="ColorThemeComboBox">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding DisplayName}"/>
@@ -94,7 +94,7 @@
                         </StackPanel>
                         <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="BackgroundStyleComboBox">
+                            <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_BackgroundStyle}" AutomationProperties.AutomationId="BackgroundStyleComboBox">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding DisplayName}"/>
@@ -104,7 +104,7 @@
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_Language}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="LanguageComboBox">
+                            <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_Language}" AutomationProperties.AutomationId="LanguageComboBox">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding DisplayName}"/>
@@ -132,7 +132,7 @@
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" AutomationProperties.AutomationId="SettingsDownloadPathTextBox"/>
+                            <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_DownloadFolder}" AutomationProperties.AutomationId="SettingsDownloadPathTextBox"/>
                             <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="SettingsBrowseDownloadPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
@@ -142,7 +142,7 @@
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding SessionPath, Mode=TwoWay}" AutomationProperties.AutomationId="SessionPathTextBox"/>
+                            <TextBox Text="{Binding SessionPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_SessionFolder}" AutomationProperties.AutomationId="SessionPathTextBox"/>
                             <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSessionPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
@@ -179,7 +179,7 @@
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}" AutomationProperties.AutomationId="MediaPlayerPathTextBox"/>
+                            <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}" AutomationProperties.Name="{m:L Settings_MediaPlayerPath}" AutomationProperties.AutomationId="MediaPlayerPathTextBox"/>
                             <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseMediaPlayerButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
@@ -200,7 +200,7 @@
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                                <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}" AutomationProperties.AutomationId="CompletionActionProgramPathTextBox"/>
+                                <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionProgram}" AutomationProperties.AutomationId="CompletionActionProgramPathTextBox"/>
                                 <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCompletionActionProgramButton">
                                     <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 </Button>
@@ -209,18 +209,18 @@
 
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_CompletionActionArguments}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding CompletionActionArgumentsTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionArgumentsWatermark}" AutomationProperties.AutomationId="CompletionActionArgumentsTemplateTextBox"/>
+                            <TextBox Text="{Binding CompletionActionArgumentsTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionArgumentsWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionArguments}" AutomationProperties.AutomationId="CompletionActionArgumentsTemplateTextBox"/>
                         </StackPanel>
 
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_CompletionActionWorkingDirectory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding CompletionActionWorkingDirectoryTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionWorkingDirectoryWatermark}" AutomationProperties.AutomationId="CompletionActionWorkingDirectoryTemplateTextBox"/>
+                            <TextBox Text="{Binding CompletionActionWorkingDirectoryTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionWorkingDirectoryWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionWorkingDirectory}" AutomationProperties.AutomationId="CompletionActionWorkingDirectoryTemplateTextBox"/>
                         </StackPanel>
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                 <TextBlock Text="{m:L Settings_CompletionActionTimeoutSeconds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                <NumericUpDown Value="{Binding CompletionActionTimeoutSeconds}" Minimum="1" AutomationProperties.AutomationId="CompletionActionTimeoutSecondsInput"/>
+                                <NumericUpDown Value="{Binding CompletionActionTimeoutSeconds}" Minimum="1" AutomationProperties.Name="{m:L Settings_CompletionActionTimeoutSeconds}" AutomationProperties.AutomationId="CompletionActionTimeoutSecondsInput"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                 <TextBlock Text="{m:L Settings_CompletionActionWindow}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
@@ -300,7 +300,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_MaxConnectionsPerIp}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <NumericUpDown Value="{Binding MaxConnectionsPerIp}" Minimum="0" Increment="1" AutomationProperties.AutomationId="MaxConnectionsPerIpInput"/>
+                        <NumericUpDown Value="{Binding MaxConnectionsPerIp}" Minimum="0" Increment="1" AutomationProperties.Name="{m:L Settings_MaxConnectionsPerIp}" AutomationProperties.AutomationId="MaxConnectionsPerIpInput"/>
                         <TextBlock Text="{m:L Settings_MaxConnectionsPerIpHint}"
                                    Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
@@ -309,7 +309,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_BindAddress}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding BindAddress, Mode=TwoWay}" PlaceholderText="192.168.1.50" AutomationProperties.AutomationId="BindAddressTextBox"/>
+                        <TextBox Text="{Binding BindAddress, Mode=TwoWay}" PlaceholderText="192.168.1.50" AutomationProperties.Name="{m:L Settings_BindAddress}" AutomationProperties.AutomationId="BindAddressTextBox"/>
                         <TextBlock Text="{m:L Settings_BindAddressInvalid}"
                                    Foreground="{StaticResource ErrorColor}"
                                    FontSize="{StaticResource FontSizeSmall}"
@@ -326,7 +326,7 @@
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding IsFixedListeningPortEnabled}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                 <TextBlock Text="{m:L Settings_ListeningPort}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                <NumericUpDown Value="{Binding ListeningPort}" Minimum="1" Maximum="65535" Increment="1" AutomationProperties.AutomationId="ListeningPortInput"/>
+                                <NumericUpDown Value="{Binding ListeningPort}" Minimum="1" Maximum="65535" Increment="1" AutomationProperties.Name="{m:L Settings_ListeningPort}" AutomationProperties.AutomationId="ListeningPortInput"/>
                             </StackPanel>
                             <TextBlock Grid.Column="1"
                                        Text="{m:L Settings_ListeningPortHint}"
@@ -354,11 +354,11 @@
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown x:Name="DownloadLimitBox" Value="{Binding MaxDownloadSpeedKibibytesPerSecond}" Minimum="0" Increment="128" AutomationProperties.AutomationId="MaxDownloadSpeedKibibytesPerSecondInput"/>
+                            <NumericUpDown x:Name="DownloadLimitBox" Value="{Binding MaxDownloadSpeedKibibytesPerSecond}" Minimum="0" Increment="128" AutomationProperties.Name="{m:L Settings_DownloadLimit}" AutomationProperties.AutomationId="MaxDownloadSpeedKibibytesPerSecondInput"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown x:Name="UploadLimitBox" Value="{Binding MaxUploadSpeedKibibytesPerSecond}" Minimum="0" Increment="128" AutomationProperties.AutomationId="MaxUploadSpeedKibibytesPerSecondInput"/>
+                            <NumericUpDown x:Name="UploadLimitBox" Value="{Binding MaxUploadSpeedKibibytesPerSecond}" Minimum="0" Increment="128" AutomationProperties.Name="{m:L Settings_UploadLimit}" AutomationProperties.AutomationId="MaxUploadSpeedKibibytesPerSecondInput"/>
                         </StackPanel>
                     </Grid>
                     <TextBlock Text="{m:L Settings_SpeedLimitHint}"
@@ -369,11 +369,11 @@
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_DiskReadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxDiskReadSpeedBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.AutomationId="MaxDiskReadSpeedInput"/>
+                            <NumericUpDown Value="{Binding MaxDiskReadSpeedBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.Name="{m:L Settings_DiskReadLimit}" AutomationProperties.AutomationId="MaxDiskReadSpeedInput"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_DiskWriteLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxDiskWriteSpeedBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.AutomationId="MaxDiskWriteSpeedInput"/>
+                            <NumericUpDown Value="{Binding MaxDiskWriteSpeedBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.Name="{m:L Settings_DiskWriteLimit}" AutomationProperties.AutomationId="MaxDiskWriteSpeedInput"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -390,11 +390,11 @@
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding EnableQueueManagement}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_MaxActiveDownloads}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxActiveDownloads}" Minimum="1" AutomationProperties.AutomationId="MaxActiveDownloadsInput"/>
+                            <NumericUpDown Value="{Binding MaxActiveDownloads}" Minimum="1" AutomationProperties.Name="{m:L Settings_MaxActiveDownloads}" AutomationProperties.AutomationId="MaxActiveDownloadsInput"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_MaxActiveSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxActiveSeeds}" Minimum="0" AutomationProperties.AutomationId="MaxActiveSeedsInput"/>
+                            <NumericUpDown Value="{Binding MaxActiveSeeds}" Minimum="0" AutomationProperties.Name="{m:L Settings_MaxActiveSeeds}" AutomationProperties.AutomationId="MaxActiveSeedsInput"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -415,7 +415,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_EncryptionMode}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <ComboBox ItemsSource="{Binding EncryptionModeOptions}" SelectedValue="{Binding SelectedEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="EncryptionModeComboBox">
+                        <ComboBox ItemsSource="{Binding EncryptionModeOptions}" SelectedValue="{Binding SelectedEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_EncryptionMode}" AutomationProperties.AutomationId="EncryptionModeComboBox">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding DisplayName}"/>
@@ -427,7 +427,7 @@
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
-                            <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>
+                            <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.Name="{m:L Settings_BlocklistFile}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>
                             <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseBlocklistButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
@@ -447,7 +447,7 @@
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsEnabled="{Binding EnableGeoIp}">
                         <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}" AutomationProperties.AutomationId="GeoIpPathTextBox"/>
+                            <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}" AutomationProperties.Name="{m:L Settings_GeoIpFile}" AutomationProperties.AutomationId="GeoIpPathTextBox"/>
                             <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseGeoIpButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
@@ -464,7 +464,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_ProxyType}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <ComboBox ItemsSource="{Binding ProxyTypeOptions}" SelectedValue="{Binding SelectedProxyType}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="ProxyTypeComboBox">
+                        <ComboBox ItemsSource="{Binding ProxyTypeOptions}" SelectedValue="{Binding SelectedProxyType}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ProxyType}" AutomationProperties.AutomationId="ProxyTypeComboBox">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding DisplayName}"/>
@@ -476,22 +476,22 @@
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ProxyHost}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyHost, Mode=TwoWay}" AutomationProperties.AutomationId="ProxyHostTextBox"/>
+                            <TextBox Text="{Binding ProxyHost, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ProxyHost}" AutomationProperties.AutomationId="ProxyHostTextBox"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ProxyPort}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyPort, Mode=TwoWay}" AutomationProperties.AutomationId="ProxyPortTextBox"/>
+                            <TextBox Text="{Binding ProxyPort, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ProxyPort}" AutomationProperties.AutomationId="ProxyPortTextBox"/>
                         </StackPanel>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ProxyUsername}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyUsername, Mode=TwoWay}" AutomationProperties.AutomationId="ProxyUsernameTextBox"/>
+                            <TextBox Text="{Binding ProxyUsername, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ProxyUsername}" AutomationProperties.AutomationId="ProxyUsernameTextBox"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_ProxyPassword}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyPassword, Mode=TwoWay}" PasswordChar="*" AutomationProperties.AutomationId="ProxyPasswordTextBox"/>
+                            <TextBox Text="{Binding ProxyPassword, Mode=TwoWay}" PasswordChar="*" AutomationProperties.Name="{m:L Settings_ProxyPassword}" AutomationProperties.AutomationId="ProxyPasswordTextBox"/>
                         </StackPanel>
                     </Grid>
 
@@ -527,7 +527,7 @@
                                 <StackPanel Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding RemoteEnabled}">
                                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                         <TextBlock Text="{m:L Settings_Remote_Port}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                        <NumericUpDown Value="{Binding RemotePort}" Minimum="1" Maximum="65535" Increment="1" AutomationProperties.AutomationId="RemotePortInput"/>
+                                        <NumericUpDown Value="{Binding RemotePort}" Minimum="1" Maximum="65535" Increment="1" AutomationProperties.Name="{m:L Settings_Remote_Port}" AutomationProperties.AutomationId="RemotePortInput"/>
                                     </StackPanel>
 
                                     <ToggleSwitch IsChecked="{Binding RemoteAllowRemoteConnections}"
@@ -536,11 +536,11 @@
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                             <TextBlock Text="{m:L Settings_Remote_Username}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                            <TextBox Text="{Binding RemoteUsername, Mode=TwoWay}" AutomationProperties.AutomationId="RemoteUsernameTextBox"/>
+                                            <TextBox Text="{Binding RemoteUsername, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_Remote_Username}" AutomationProperties.AutomationId="RemoteUsernameTextBox"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                             <TextBlock Text="{m:L Settings_Remote_Password}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                            <TextBox Text="{Binding RemotePassword, Mode=TwoWay}" PasswordChar="*" AutomationProperties.AutomationId="RemotePasswordTextBox"/>
+                                            <TextBox Text="{Binding RemotePassword, Mode=TwoWay}" PasswordChar="*" AutomationProperties.Name="{m:L Settings_Remote_Password}" AutomationProperties.AutomationId="RemotePasswordTextBox"/>
                                         </StackPanel>
                                     </Grid>
 
@@ -597,8 +597,8 @@
                                 </ItemsControl>
 
                                 <Grid ColumnDefinitions="*,2*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
-                                    <TextBox Text="{Binding NewCategoryName, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_NameWatermark}" AutomationProperties.AutomationId="NewCategoryNameTextBox"/>
-                                    <TextBox Grid.Column="1" Text="{Binding NewCategoryPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_PathWatermark}" AutomationProperties.AutomationId="NewCategoryPathTextBox"/>
+                                    <TextBox Text="{Binding NewCategoryName, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_NameWatermark}" AutomationProperties.Name="{m:L Settings_CategoriesHint}" AutomationProperties.AutomationId="NewCategoryNameTextBox"/>
+                                    <TextBox Grid.Column="1" Text="{Binding NewCategoryPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_PathWatermark}" AutomationProperties.Name="{m:L Settings_CategoriesHint}" AutomationProperties.AutomationId="NewCategoryPathTextBox"/>
                                     <Button Grid.Column="2" Command="{Binding BrowseCategoryPathCommand}" Content="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCategoryPathButton"/>
                                     <Button Grid.Column="3" Command="{Binding AddCategoryCommand}" Content="{m:L Settings_Categories_Add}" AutomationProperties.AutomationId="AddCategoryButton"/>
                                 </Grid>
@@ -646,13 +646,13 @@
 
                                 <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                     <TextBlock Text="{m:L Settings_Search_Url}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                    <TextBox Text="{Binding TorznabUrl, Mode=TwoWay}" PlaceholderText="{x:Static config:SearchSettings.JackettTemplate}" AutomationProperties.AutomationId="TorznabUrlTextBox"/>
+                                    <TextBox Text="{Binding TorznabUrl, Mode=TwoWay}" PlaceholderText="{x:Static config:SearchSettings.JackettTemplate}" AutomationProperties.Name="{m:L Settings_Search_Url}" AutomationProperties.AutomationId="TorznabUrlTextBox"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
                                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                         <TextBlock Text="{m:L Settings_Search_ApiKey}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                        <TextBox Text="{Binding TorznabApiKey, Mode=TwoWay}" PasswordChar="*" AutomationProperties.AutomationId="TorznabApiKeyTextBox"/>
+                                        <TextBox Text="{Binding TorznabApiKey, Mode=TwoWay}" PasswordChar="*" AutomationProperties.Name="{m:L Settings_Search_ApiKey}" AutomationProperties.AutomationId="TorznabApiKeyTextBox"/>
                                     </StackPanel>
                                     <Button Grid.Column="1"
                                             Command="{Binding TestIndexerCommand}"
@@ -686,7 +686,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
                         <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}" AutomationProperties.AutomationId="UpdateUrlTextBox"/>
+                        <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}" AutomationProperties.Name="{m:L Settings_UpdateUrl}" AutomationProperties.AutomationId="UpdateUrlTextBox"/>
                     </StackPanel>
 
                     <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}" AutomationProperties.AutomationId="CheckForUpdatesOnStartupSwitch"/>

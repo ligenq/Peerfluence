@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -97,6 +97,72 @@ public sealed class AutomationIdTests
             clashes.Count == 0,
             $"{clashes.Count} automation ids are not unique:{Environment.NewLine}"
                 + string.Join(Environment.NewLine, clashes));
+    }
+
+    /// <summary>
+    /// Controls with no label of their own. A ToggleSwitch or CheckBox carries its own Content,
+    /// which Avalonia already exposes as the accessible name; a text box has nothing.
+    /// </summary>
+    private static readonly HashSet<string> NeedsAnAccessibleName =
+    [
+        "TextBox", "ComboBox", "NumericUpDown", "AutoCompleteBox", "Slider",
+    ];
+
+    [Fact]
+    public void EveryInputWithoutALabelOfItsOwn_HasAnAccessibleName()
+    {
+        // AutomationId is for tests; this is for people. Avalonia's accessibility documentation
+        // calls Name "the most important accessibility property ... the text that a screen reader
+        // announces when the control receives focus", and a text box beside a separate TextBlock
+        // has no programmatic connection to it - the label is read out when nothing is focused on
+        // it, and the box announces itself as an edit box and nothing else.
+        //
+        // Localized, because it is read aloud: the name comes from the same resource key as the
+        // visible label rather than being written out here.
+        var missing = new List<string>();
+
+        foreach (var file in XamlFiles())
+        {
+            foreach (var element in InteractiveElements(File.ReadAllText(file)))
+            {
+                if (!NeedsAnAccessibleName.Contains(element.Tag)
+                    || element.Raw.Contains("AutomationProperties.Name", StringComparison.Ordinal)
+                    || element.Raw.Contains("AutomationProperties.LabeledBy", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                missing.Add(
+                    $"  {Relative(file)}:{element.Line}  <{element.Tag}> has no AutomationProperties.Name, "
+                        + "so a screen reader announces it without saying what it is for");
+            }
+        }
+
+        Assert.True(missing.Count == 0, string.Join(Environment.NewLine, missing));
+    }
+
+    [Fact]
+    public void EveryAccessibleName_IsLocalized()
+    {
+        // A name that is read aloud has to be read aloud in the user's language.
+        var literal = new List<string>();
+
+        foreach (var file in XamlFiles())
+        {
+            var lines = File.ReadAllLines(file);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                foreach (Match match in Regex.Matches(lines[i], @"AutomationProperties\.Name\s*=\s*""([^""]*)"""))
+                {
+                    if (!match.Groups[1].Value.TrimStart().StartsWith('{'))
+                    {
+                        literal.Add($"  {Relative(file)}:{i + 1} names a control \"{match.Groups[1].Value}\" in English only");
+                    }
+                }
+            }
+        }
+
+        Assert.True(literal.Count == 0, string.Join(Environment.NewLine, literal));
     }
 
     [Fact]
