@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Media;
 using SukiUI.Dialogs;
@@ -78,6 +79,16 @@ public sealed class DialogService : IDialogService, IDialogHost
             Text = prompt.InitialText ?? string.Empty,
             PlaceholderText = prompt.Watermark
         };
+
+        // The markup carries an automation id on everything a person can act on, checked by an
+        // architecture test that reads .axaml files - which cannot see a control built here. These
+        // prompts were already missed twice that way, once for button order and once for the
+        // keyboard, so the ids are set explicitly rather than left to a rule that cannot reach them.
+        textBox.SetValue(AutomationProperties.AutomationIdProperty, PromptTextBoxId);
+
+        // Read aloud when the box takes focus. The placeholder is an example of what to type rather
+        // than a name for the field, and is empty for the magnet prompt, so the title is the name.
+        textBox.SetValue(AutomationProperties.NameProperty, prompt.Title);
 
         var accepted = await ShowAsync(
             builder => builder.WithTitle(prompt.Title).WithContent(textBox),
@@ -191,6 +202,7 @@ public sealed class DialogService : IDialogService, IDialogHost
 
         var buttons = builder.Dialog.ActionButtons.OfType<Button>().ToList();
         GiveTheKeyboardItsTwoAnswers(buttons);
+        NameTheButtonsForAutomation(buttons);
 
         if (buttons.Count > 0)
         {
@@ -254,6 +266,34 @@ public sealed class DialogService : IDialogService, IDialogHost
 
         // The magnet prompt opens with whatever was on the clipboard, which may be nothing.
         Sync();
+    }
+
+    /// <summary>The automation id of the text box in a prompt that asks for a value.</summary>
+    public const string PromptTextBoxId = "PromptTextBox";
+
+    /// <summary>The automation id of the accepting button on any prompt built here.</summary>
+    public const string PromptConfirmButtonId = "PromptConfirmButton";
+
+    /// <summary>The automation id of the dismissing button on any prompt built here.</summary>
+    public const string PromptCancelButtonId = "PromptCancelButton";
+
+    /// <summary>
+    /// Gives the two action buttons ids a test or a screen reader can find them by.
+    /// </summary>
+    /// <remarks>
+    /// By position rather than by label, because the label is translated into ten languages and the
+    /// position is not: the affirmative button is added first everywhere, which is the same fact the
+    /// button order and the keyboard defaults rest on.
+    /// </remarks>
+    private static void NameTheButtonsForAutomation(List<Button> buttons)
+    {
+        if (buttons.Count != 2)
+        {
+            return;
+        }
+
+        buttons[0].SetValue(AutomationProperties.AutomationIdProperty, PromptConfirmButtonId);
+        buttons[1].SetValue(AutomationProperties.AutomationIdProperty, PromptCancelButtonId);
     }
 
     private static TextBlock Wrapped(string text) =>
