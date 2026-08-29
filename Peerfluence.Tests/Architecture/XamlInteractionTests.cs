@@ -53,16 +53,21 @@ public sealed class XamlInteractionTests
     }
 
     [Fact]
-    public void EveryModalWindow_PresentsCancelBeforeItsDefaultAction()
+    public void EveryModalWindow_PresentsItsDefaultActionBeforeCancel()
     {
-        // A house convention rather than a correctness rule, and worth saying so: Microsoft's own
-        // Win32 guidance puts the affirmative button first, and this puts it last. Both dialogs
-        // already did it this way, every other row in the application reads left to right towards
-        // the action being committed, and one order applied everywhere is worth more than the
-        // choice between them. Flipping it is this comment and two lines of markup.
+        // Windows puts the affirmative action on the left and the safe one on the right, and this
+        // is current guidance rather than inherited Win32 lore. Microsoft's dialog documentation for
+        // the Windows App SDK says it twice: "the 'do it' action button(s) should appear as the
+        // leftmost buttons. The safe, nondestructive action should appear as the rightmost button",
+        // and of ContentDialog's own buttons, "CloseButton ... appears as the rightmost button.
+        // PrimaryButton ... appears as the leftmost button".
         //
-        // Source order is also visual and keyboard traversal order for the horizontal action
-        // panels Peerfluence uses.
+        // macOS is the other way round, which is why the opposite arrangement looks reasonable and
+        // why both dialogs here were written that way before anybody checked. Peerfluence installs
+        // and associates itself on Windows, so it follows Windows.
+        //
+        // Source order is also visual and keyboard traversal order for the horizontal action panels
+        // Peerfluence uses, so this fixes all three at once.
         var problems = new List<string>();
 
         foreach (var file in ModalWindows())
@@ -71,9 +76,9 @@ public sealed class XamlInteractionTests
             var cancel = buttons.FindIndex(button => IsTrue(button, "IsCancel"));
             var primary = buttons.FindIndex(button => IsTrue(button, "IsDefault"));
 
-            if (cancel >= 0 && primary >= 0 && cancel > primary)
+            if (cancel >= 0 && primary >= 0 && primary > cancel)
             {
-                problems.Add($"  {Relative(file)} declares its default action before Cancel");
+                problems.Add($"  {Relative(file)} declares Cancel before its default action");
             }
         }
 

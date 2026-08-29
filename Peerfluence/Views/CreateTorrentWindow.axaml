@@ -69,8 +69,8 @@
 
             <!-- Actions -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource NormalTopMargin}">
-                <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" Width="120" AutomationProperties.AutomationId="CreateTorrentCancelButton"/>
                 <Button Content="{m:L CreateTorrent_Create}" Classes="Flat" Command="{Binding CreateCommand}" IsDefault="True" Width="120" AutomationProperties.AutomationId="CreateButton"/>
+                <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" Width="120" AutomationProperties.AutomationId="CreateTorrentCancelButton"/>
             </StackPanel>
         </StackPanel>
     </suki:BusyArea>
