@@ -213,6 +213,12 @@ public partial class CreateTorrentViewModel : ViewModelBase
         return !IsCreating && !string.IsNullOrWhiteSpace(SourcePath);
     }
 
+    [RelayCommand]
+    private void Cancel()
+    {
+        OnRequestClose?.Invoke();
+    }
+
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
     partial void OnSourcePathChanged(string value)

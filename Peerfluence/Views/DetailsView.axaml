@@ -104,6 +104,7 @@
 												<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).StreamFileCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding IsStreamable}"
+                                                        ToolTip.Tip="{m:L Details_Stream}"
                                                         Classes="Flat"
                                                         Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
 													<materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
@@ -133,7 +134,7 @@
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}" AutomationProperties.AutomationId="NewTrackerUrlTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" AutomationProperties.AutomationId="AddTrackerButton">
+							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Trackers_Add}" AutomationProperties.AutomationId="AddTrackerButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}" AutomationProperties.AutomationId="AnnounceButton">
@@ -155,6 +156,7 @@
 										<DataTemplate x:DataType="vm:TrackerStatusItemViewModel">
 											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveTrackerCommand}"
                                                     CommandParameter="{Binding}"
+                                                    ToolTip.Tip="{m:L Downloads_Remove}"
                                                     Classes="Flat" Padding="{StaticResource TinyLeftTopRightBottomMargin}">
 												<materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{StaticResource ErrorColor}"/>
 											</Button>
@@ -171,7 +173,7 @@
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}" AutomationProperties.AutomationId="NewPeerAddressesTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" AutomationProperties.AutomationId="AddPeersButton">
+							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Peers_AddTitle}" AutomationProperties.AutomationId="AddPeersButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -211,6 +213,7 @@
 										<DataTemplate x:DataType="x:String">
 											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveWebSeedCommand}"
                                                     CommandParameter="{Binding}"
+                                                    ToolTip.Tip="{m:L Downloads_Remove}"
                                                     Classes="Flat" Padding="{StaticResource TinyLeftTopRightBottomMargin}">
 												<materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{StaticResource ErrorColor}"/>
 											</Button>

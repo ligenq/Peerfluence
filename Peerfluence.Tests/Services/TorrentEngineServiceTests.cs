@@ -158,4 +158,24 @@ public class TorrentEngineServiceTests
 
         await sut.DisposeAsync();
     }
+
+    [Fact]
+    public async Task InitializeAsync_WithABindAddress_DisablesBothPortMappers()
+    {
+        var settings = BaseSettings(s =>
+        {
+            s.Network.BindAddress = System.Net.IPAddress.Loopback.ToString();
+            s.Network.EnableNatPmp = true;
+            s.Network.EnableUpnp = true;
+        });
+        var sut = CreateSut(settings);
+
+        await sut.InitializeAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(System.Net.IPAddress.Loopback, sut.Engine.Settings.Connection.BindAddress);
+        Assert.False(sut.Engine.Settings.Connection.NatPmpPortMapping);
+        Assert.False(sut.Engine.Settings.Connection.UpnpPortMapping);
+
+        await sut.DisposeAsync();
+    }
 }

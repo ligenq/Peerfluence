@@ -263,6 +263,32 @@ public class DetailsViewModelTests
         Assert.Equal("Selected", _sut.Name);
     }
 
+    [Fact]
+    public async Task TorrentStateChange_RefreshesRenameFileAvailability()
+    {
+        var state = TorrentState.Active;
+        var torrent = CreateRefreshableTorrent("Selected", 1);
+        torrent.State.Returns(_ => state);
+        var file = new TorrentFileItemViewModel(
+            new TorrentFileInfo("file.bin", 100, 0, 0),
+            new FileSelection());
+
+        _selectionService.SelectedTorrent = torrent;
+        _sut.RefreshFromSelection();
+        await WaitForNameAsync("Selected");
+        Assert.False(_sut.RenameFileCommand.CanExecute(file));
+
+        var notified = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _sut.RenameFileCommand.CanExecuteChanged += (_, _) => notified.TrySetResult();
+        state = TorrentState.Stopped;
+
+        WeakReferenceMessenger.Default.Send(
+            new TorrentAlertMessage(torrent, new SimpleTorrentAlert { Id = AlertId.TorrentStateChanged, Torrent = torrent }));
+        await notified.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
+
+        Assert.True(_sut.RenameFileCommand.CanExecute(file));
+    }
+
     private static ITorrent CreateRefreshableTorrent(string name, byte hashSeed)
     {
         var torrent = Substitute.For<ITorrent>();

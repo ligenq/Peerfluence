@@ -133,7 +133,7 @@
                         <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" AutomationProperties.AutomationId="SettingsDownloadPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" AutomationProperties.AutomationId="SettingsBrowseDownloadPathButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="SettingsBrowseDownloadPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -143,7 +143,7 @@
                         <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding SessionPath, Mode=TwoWay}" AutomationProperties.AutomationId="SessionPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}" AutomationProperties.AutomationId="BrowseSessionPathButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSessionPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -180,7 +180,7 @@
                         <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}" AutomationProperties.AutomationId="MediaPlayerPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}" AutomationProperties.AutomationId="BrowseMediaPlayerButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseMediaPlayerButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -201,7 +201,7 @@
                             <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                                 <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}" AutomationProperties.AutomationId="CompletionActionProgramPathTextBox"/>
-                                <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}" AutomationProperties.AutomationId="BrowseCompletionActionProgramButton">
+                                <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCompletionActionProgramButton">
                                     <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 </Button>
                             </Grid>
@@ -428,7 +428,7 @@
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
                             <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}" AutomationProperties.AutomationId="BrowseBlocklistButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseBlocklistButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -448,7 +448,7 @@
                         <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}" AutomationProperties.AutomationId="GeoIpPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}" AutomationProperties.AutomationId="BrowseGeoIpButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseGeoIpButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -587,6 +587,7 @@
                                                 <Button Grid.Column="2"
                                                         Classes="Basic"
                                                         Command="{Binding $parent[ItemsControl].((vm:SettingsViewModel)DataContext).RemoveCategoryCommand}"
+                                                        ToolTip.Tip="{m:L Downloads_Remove}"
                                                         CommandParameter="{Binding Name}">
                                                     <materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                                 </Button>

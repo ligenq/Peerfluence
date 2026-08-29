@@ -296,7 +296,26 @@ public class McpToolHandler : IMcpToolHandler
             case "answerinfohashsampling": current.Network.AnswerInfoHashSampling = value.GetBoolean(); break;
             case "allowmultipleconnectionsperip": current.Network.AllowMultipleConnectionsPerIp = value.GetBoolean(); break;
             case "maxconnectionsperip": current.Network.MaxConnectionsPerIp = value.GetInt32(); break;
-            case "bindaddress": current.Network.BindAddress = value.GetString() ?? current.Network.BindAddress; break;
+            case "bindaddress":
+                var bindAddress = value.GetString();
+                if (bindAddress is null)
+                {
+                    break;
+                }
+
+                bindAddress = bindAddress.Trim();
+                if (bindAddress.Length > 0
+                    && (!System.Net.IPAddress.TryParse(bindAddress, out var parsed)
+                        || parsed.Equals(System.Net.IPAddress.Any)
+                        || parsed.Equals(System.Net.IPAddress.IPv6Any)))
+                {
+                    throw new ArgumentException(
+                        "Bind address must be a specific IPv4 or IPv6 address, or blank to use every interface.",
+                        nameof(value));
+                }
+
+                current.Network.BindAddress = bindAddress;
+                break;
             case "enablenatpmp": current.Network.EnableNatPmp = value.GetBoolean(); break;
             case "enableupnp": current.Network.EnableUpnp = value.GetBoolean(); break;
             case "useautomaticlisteningport": current.Network.UseAutomaticListeningPort = value.GetBoolean(); break;

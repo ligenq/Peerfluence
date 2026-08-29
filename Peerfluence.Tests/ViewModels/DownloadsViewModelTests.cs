@@ -617,7 +617,9 @@ public class DownloadsViewModelTests
         settingsService.Current.Returns(new Peerfluence.Core.Config.AppSettings
         {
             ShowRemoveTorrentOptions = true,
-            DefaultRemoveTorrentAction = "RemoveOnly"
+            // A previously remembered destructive choice must not be used when there is nowhere
+            // to ask. The safe fallback is always to leave data on disk.
+            DefaultRemoveTorrentAction = "DeleteAll"
         });
 
         var sut = new DownloadsViewModel(
@@ -645,6 +647,59 @@ public class DownloadsViewModelTests
             await sut.RemoveSelectedCommand.ExecuteAsync(null);
 
             await torrentService.Received(1).RemoveAsync(torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task RemoveSelectedCommand_UsesTheDialogsChoiceInsteadOfTheRememberedDefault()
+    {
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns(Array.Empty<ITorrent>());
+        torrentService.GetStats().Returns(new EngineStats());
+
+        var settingsService = Substitute.For<IAppSettingsService>();
+        settingsService.Current.Returns(new Peerfluence.Core.Config.AppSettings
+        {
+            ShowRemoveTorrentOptions = true,
+            DefaultRemoveTorrentAction = "DeleteAll"
+        });
+
+        var dialogService = Substitute.For<IDialogService>();
+        dialogService.CanPrompt.Returns(true);
+        dialogService.PromptForRemoveOptionsAsync(Arg.Any<RemoveTorrentPrompt>())
+            .Returns(new RemoveTorrentChoice(RemoveTorrentAction.RemoveOnly, RememberChoice: false));
+
+        var sut = new DownloadsViewModel(
+            torrentService,
+            new TorrentSelectionService(Substitute.For<IAppMessenger>()),
+            new LocalizationService(),
+            Substitute.For<ITopLevelService>(),
+            dialogService,
+            Substitute.For<IAddTorrentDialogService>(),
+            settingsService,
+            Substitute.For<ITorrentCategoryService>(),
+            _detailsVm);
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Name.Returns("Test");
+        torrent.Hash.Returns(InfoHash.CreateRandom());
+        torrent.HashV2.Returns(InfoHash.EmptyV2);
+        torrent.State.Returns(TorrentState.Stopped);
+        torrent.TotalSize.Returns(100);
+        torrent.HasMetadata.Returns(true);
+        sut.SelectedTorrent = new TorrentListItemViewModel(torrent);
+
+        try
+        {
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            await torrentService.Received(1).RemoveAsync(
+                torrent,
+                RemoveOptions.None,
+                Arg.Any<CancellationToken>());
         }
         finally
         {

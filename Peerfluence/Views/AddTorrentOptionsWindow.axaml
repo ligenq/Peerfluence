@@ -218,8 +218,8 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             Spacing="{StaticResource SpacingStandard}">
-                    <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
-                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
+                    <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
+                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
                 </StackPanel>
             </Grid>
         </Grid>

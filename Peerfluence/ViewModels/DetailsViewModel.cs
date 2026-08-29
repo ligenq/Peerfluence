@@ -47,6 +47,7 @@ public sealed class DetailsViewModel : ViewModelBase
     private bool _lastServerSuperSeeding;
     private int _lastServerMaxConnections;
     private int _lastServerMaxUploadSlots;
+    private TorrentState? _lastServerState;
 
     internal Action<Action> UIDispatcher { get; set; } = action => Dispatcher.UIThread.Post(action);
 
@@ -455,7 +456,8 @@ public sealed class DetailsViewModel : ViewModelBase
         // 1. Capture basic info (fast)
         var name = torrent.Name;
         var infoHash = torrent.Hash.ToString();
-        var state = torrent.State.ToDisplayString();
+        var torrentState = torrent.State;
+        var state = torrentState.ToDisplayString();
         var progress = torrent.Progress;
         var downloadPath = torrent.Files.DownloadPath;
         var totalSizeBytes = torrent.TotalSize;
@@ -491,7 +493,7 @@ public sealed class DetailsViewModel : ViewModelBase
         var webSeeds = torrent.WebSeeds.GetAll();
 
         List<PeerInfo>? connectedPeers = null;
-        if (torrent.State is not (TorrentState.Stopped or TorrentState.Stopping))
+        if (torrentState is not (TorrentState.Stopped or TorrentState.Stopping))
         {
             connectedPeers = await Task.Run(() => torrent.Peers.GetConnectedPeers().ToList(), ct).ConfigureAwait(false);
         }
@@ -507,6 +509,11 @@ public sealed class DetailsViewModel : ViewModelBase
             Name = name;
             InfoHash = infoHash;
             State = state;
+            if (_lastServerState != torrentState)
+            {
+                _lastServerState = torrentState;
+                RenameFileCommand.NotifyCanExecuteChanged();
+            }
             Progress = progress;
             DownloadPath = downloadPath;
             TotalSizeBytes = totalSizeBytes;
@@ -556,7 +563,7 @@ public sealed class DetailsViewModel : ViewModelBase
             UpdateTrackers(trackers);
             UpdateWebSeeds(webSeeds);
 
-            if (torrent.State is TorrentState.Stopped or TorrentState.Stopping)
+            if (torrentState is TorrentState.Stopped or TorrentState.Stopping)
             {
                 ConnectedPeers = 0;
                 Peers.Clear();
@@ -710,6 +717,7 @@ public sealed class DetailsViewModel : ViewModelBase
         _lastServerSuperSeeding = false;
         _lastServerMaxConnections = 0;
         _lastServerMaxUploadSlots = 0;
+        _lastServerState = null;
     }
 
     private void UpdateEmptyStateText()

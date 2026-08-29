@@ -84,6 +84,32 @@ public class McpToolHandlerTests
         Assert.Equal("https://updates.example/feed", settingsService.Current.Update.UpdateUrl);
     }
 
+    [Theory]
+    [InlineData("not an address")]
+    [InlineData("0.0.0.0")]
+    [InlineData("::")]
+    public async Task UpdateSettingsAsync_RejectsABindAddressThatWouldDisableTheKillSwitch(string invalidAddress)
+    {
+        var store = Substitute.For<IAppSettingsStore>();
+        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        settingsService.Current.Mcp.AllowDestructiveTools = true;
+        settingsService.Current.Network.BindAddress = "127.0.0.1";
+        var handler = new McpToolHandler(
+            Substitute.For<ITorrentService>(),
+            Substitute.For<ITopLevelService>(),
+            settingsService,
+            Substitute.For<IHostApplicationLifetime>());
+
+        var result = await handler.UpdateSettingsAsync(
+            $$"""{ "network": { "bindAddress": "{{invalidAddress}}" } }""",
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsError);
+        Assert.Contains("Bind address must be", Text(result));
+        Assert.Equal("127.0.0.1", settingsService.Current.Network.BindAddress);
+        await store.DidNotReceive().SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task AddTorrentAsync_DeletesTemporaryTorrentFileAfterBase64Import()
     {

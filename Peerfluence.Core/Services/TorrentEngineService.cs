@@ -107,6 +107,7 @@ public sealed class TorrentEngineService : ITorrentEngineService
         var settings = _settingsService.Current;
 
         var udpPlan = ProxyUdpPolicy.Decide(settings.Proxy, settings.Network.EnableDht);
+        var bindAddress = ParseBindAddress(settings.Network.BindAddress);
         if (udpPlan.RestrictedByProxy)
         {
             // Warned rather than thrown. The engine would refuse to start at all, and an application
@@ -135,11 +136,13 @@ public sealed class TorrentEngineService : ITorrentEngineService
             {
                 TcpPort = GetListeningPort(settings.Network),
                 UdpPort = GetListeningPort(settings.Network),
-                NatPmpPortMapping = settings.Network.EnableNatPmp,
-                UpnpPortMapping = settings.Network.EnableUpnp,
+                // Port mapping discovers the interface independently and opens its own sockets, so
+                // it cannot honour a single-address kill switch.
+                NatPmpPortMapping = bindAddress is null && settings.Network.EnableNatPmp,
+                UpnpPortMapping = bindAddress is null && settings.Network.EnableUpnp,
                 AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp,
                 MaxConnectionsPerIp = Math.Max(0, settings.Network.MaxConnectionsPerIp),
-                BindAddress = ParseBindAddress(settings.Network.BindAddress),
+                BindAddress = bindAddress,
                 EnableUtpIn = udpPlan.EnableUtp,
                 EnableUtpOut = udpPlan.EnableUtp,
                 Encryption = ParseEncryption(settings.EncryptionMode)

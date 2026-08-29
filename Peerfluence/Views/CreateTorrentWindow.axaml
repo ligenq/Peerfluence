@@ -64,12 +64,13 @@
                     </StackPanel>
                 </StackPanel>
             </suki:GlassCard>
-            
+
             <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="{StaticResource ErrorColor}" TextWrapping="Wrap" FontSize="{StaticResource FontSizeNormal}"/>
 
             <!-- Actions -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource NormalTopMargin}">
-                <Button Content="{m:L CreateTorrent_Create}" Classes="Flat" Command="{Binding CreateCommand}" Width="120" AutomationProperties.AutomationId="CreateButton"/>
+                <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" Width="120" AutomationProperties.AutomationId="CreateTorrentCancelButton"/>
+                <Button Content="{m:L CreateTorrent_Create}" Classes="Flat" Command="{Binding CreateCommand}" IsDefault="True" Width="120" AutomationProperties.AutomationId="CreateButton"/>
             </StackPanel>
         </StackPanel>
     </suki:BusyArea>
