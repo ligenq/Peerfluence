@@ -31,11 +31,11 @@
                             </StackPanel>
 
                             <UniformGrid Grid.Row="1" Grid.Column="1" Columns="2" Margin="{StaticResource SmallTopMargin}">
-                                <StackPanel Spacing="{StaticResource SpacingXXSmall}">
+                                <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                     <TextBlock Text="{m:L Details_Size}" Opacity="0.65"/>
                                     <TextBlock Text="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}" FontWeight="SemiBold"/>
                                 </StackPanel>
-                                <StackPanel Spacing="{StaticResource SpacingXXSmall}">
+                                <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                     <TextBlock Text="{m:L Details_FilesTab}" Opacity="0.65"/>
                                     <TextBlock Text="{Binding FileCount}" FontWeight="SemiBold"/>
                                 </StackPanel>
@@ -127,19 +127,19 @@
                                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                                     <TextBlock Text="{m:L AddTorrent_Metadata}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                     <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
-                                        <StackPanel Spacing="{StaticResource SpacingXXSmall}">
+                                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                             <TextBlock Text="{m:L AddTorrent_Hash}" Opacity="0.65"/>
                                             <TextBlock Text="{Binding Hash}" TextWrapping="Wrap"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXXSmall}">
+                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                             <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.65"/>
                                             <TextBlock Text="{Binding VersionLabel}"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXXSmall}">
+                                        <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
                                             <TextBlock Text="{m:L Details_PiecesTab}" Opacity="0.65"/>
                                             <TextBlock Text="{Binding PieceCount}"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXXSmall}">
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                             <TextBlock Text="{m:L AddTorrent_PieceSize}" Opacity="0.65"/>
                                             <TextBlock Text="{Binding PieceSizeBytes, Converter={StaticResource ByteSizeConverter}}"/>
                                         </StackPanel>

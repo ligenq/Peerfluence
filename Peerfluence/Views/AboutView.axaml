@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:vm="using:Peerfluence.ViewModels"
@@ -18,7 +18,7 @@
 
         <StackPanel Spacing="{StaticResource SpacingXSmall}">
             <TextBlock Text="{m:L About_GitHub}" FontWeight="SemiBold"/>
-            <Button Command="{Binding OpenGitHubCommand}" Classes="Basic" Padding="0">
+            <Button Command="{Binding OpenGitHubCommand}" Classes="Basic" Padding="{StaticResource ZeroThickness}">
                 <TextBlock Text="{Binding GitHubUrl}" Foreground="{DynamicResource SukiPrimaryColor}" Cursor="Hand"/>
             </Button>
         </StackPanel>
