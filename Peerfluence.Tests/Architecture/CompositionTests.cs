@@ -193,6 +193,25 @@ public sealed class CompositionTests
     }
 
     [Fact]
+    public void EveryPromptIsBuiltInOnePlace_SoOneThingDecidesItsButtonOrder()
+    {
+        // Dialogs written in markup have their button order read out of the markup, and the ones
+        // built in code are all assembled by DialogService, whose order is pinned by a headless
+        // test. A dialog put together anywhere else would be covered by neither, and the failure
+        // would be a Cancel button on the wrong side that nobody notices until it is shipped.
+        var offenders = Directory
+            .EnumerateFiles(ProjectDirectory(), "*.cs", SearchOption.AllDirectories)
+            .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Where(file => File.ReadAllText(file).Contains("WithActionButton", StringComparison.Ordinal))
+            .Where(file => Path.GetFileName(file) != "DialogService.cs")
+            .Select(file => $"  {Path.GetFileName(file)} builds a dialog of its own; use IDialogService instead")
+            .ToList();
+
+        Assert.True(offenders.Count == 0, string.Join(Environment.NewLine, offenders));
+    }
+
+    [Fact]
     public void TheCoreLibrary_KnowsNothingOfTheUserInterface()
     {
         // Peerfluence.Core is what the Transmission RPC server and the engine run on, and it has to
@@ -212,6 +231,25 @@ public sealed class CompositionTests
     }
 
     // -------------------------------------------------------------------------------- reading --
+
+    private static string ProjectDirectory()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (directory is not null)
+        {
+            var candidate = Path.Combine(directory.FullName, "Peerfluence", "Peerfluence.csproj");
+            if (File.Exists(candidate))
+            {
+                return Path.GetDirectoryName(candidate)!;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new DirectoryNotFoundException(
+            $"Could not find the Peerfluence project directory above {AppContext.BaseDirectory}.");
+    }
 
     private static IEnumerable<Type> FeatureViewModels()
     {

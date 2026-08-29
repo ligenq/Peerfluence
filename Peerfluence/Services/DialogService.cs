@@ -180,8 +180,12 @@ public sealed class DialogService : IDialogService, IDialogHost
         await describe(DialogManager!.CreateDialog())
             .Dismiss().ByClickingBackground()
             .OnDismissed(_ => answered.TrySetResult(false))
-            .WithActionButton(cancelLabel, _ => answered.TrySetResult(false), true)
+            // The affirmative action first, so it sits on the left. Same order as the two dialogs
+            // written in markup, and the same reason: Windows puts the "do it" button leftmost and
+            // the safe one rightmost. Every prompt in the application is built here, so this is the
+            // only place that decides it.
             .WithActionButton(confirmLabel, _ => answered.TrySetResult(true), true, "Flat")
+            .WithActionButton(cancelLabel, _ => answered.TrySetResult(false), true)
             .TryShowAsync();
 
         return answered.Task.IsCompletedSuccessfully && answered.Task.Result;
