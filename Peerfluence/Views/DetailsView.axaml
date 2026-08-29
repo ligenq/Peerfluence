@@ -94,8 +94,8 @@
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
 								<DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
-								<DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}" Width="100" IsReadOnly="True"/>
-								<DataGridTextColumn Header="{m:L Details_Grid_Downloaded}" Binding="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}}" Width="140" IsReadOnly="True"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="100" IsReadOnly="True"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Downloaded}" Binding="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="140" IsReadOnly="True"/>
 								<DataGridTextColumn Header="{m:L Details_Grid_Progress}" Binding="{Binding Progress, StringFormat='{}{0:P1}'}" Width="120" IsReadOnly="True"/>
 								<DataGridTemplateColumn Width="120">
 									<DataGridTemplateColumn.CellTemplate>
@@ -182,8 +182,8 @@
 								<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*"/>
 								<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*"/>
 								<DataGridTextColumn Header="{m:L Details_Peers_Country}" Binding="{Binding Country}" Width="80"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" Width="100"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" Width="100"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" Width="100"/>
 								<DataGridTextColumn Header="{m:L Details_Peers_Progress}" Binding="{Binding ProgressText}" Width="80"/>
 							</DataGrid.Columns>
 						</DataGrid>

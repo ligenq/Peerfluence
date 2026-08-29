@@ -29,6 +29,52 @@ public sealed class XamlInteractionTests
     private const string TheCategoryChipStillToDo = "SetCategoryFilterCommand";
 
     [Fact]
+    public void EveryColumnThatFormatsItsValue_BindsOneWay()
+    {
+        // A DataGridTextColumn binds two ways unless told otherwise, and the grid asks the converter
+        // for the way back merely to show a row - on a grid that is read only, with nobody editing
+        // anything. The display converters have nothing to answer with, so a size column left at the
+        // default mode used to write a display string into the source, and later throw.
+        //
+        // Reproduced rather than reasoned about: ByteSizeConverterBindingTests shows the default
+        // binding asking and the one way binding not asking.
+        var offences = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(ViewsDirectory(), "*.axaml", SearchOption.AllDirectories))
+        {
+            var lines = File.ReadAllLines(file);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                var start = line.IndexOf("Binding=\"{Binding ", StringComparison.Ordinal);
+                if (start < 0)
+                {
+                    continue;
+                }
+
+                var end = line.IndexOf("}\"", start, StringComparison.Ordinal);
+                if (end < 0)
+                {
+                    continue;
+                }
+
+                var binding = line[start..end];
+                if (!binding.Contains("Converter=", StringComparison.Ordinal)
+                    || binding.Contains("Mode=OneWay", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                offences.Add(
+                    $"  {Path.GetFileName(file)}:{i + 1} binds a column through a converter without "
+                        + "Mode=OneWay, so the grid will ask that converter to convert back.");
+            }
+        }
+
+        Assert.True(offences.Count == 0, string.Join(Environment.NewLine, offences));
+    }
+
+    [Fact]
     public void NoChoiceChip_DoesItsWorkInACommand()
     {
         // A RadioButton bound to a Command only acts when it is clicked. Avalonia answers a

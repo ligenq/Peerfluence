@@ -280,7 +280,7 @@
                     </DataGridTemplateColumn>
 
                     <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
-                                        Binding="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}}"
+                                        Binding="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}"
                                         SortMemberPath="TotalSizeBytes"
                                         Width="100"/>
                     <DataGridTextColumn Header="{m:L Downloads_Grid_Category}" Binding="{Binding Category}" Width="120"/>
