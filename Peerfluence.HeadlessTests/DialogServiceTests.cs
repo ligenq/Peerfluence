@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Headless;
+using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Peerfluence.Core.Services;
 using Peerfluence.HeadlessTests.XUnit;
@@ -77,6 +79,56 @@ public class DialogServiceTests
         // The option the caller said was current is the one already selected, so accepting without
         // touching anything does what the settings say.
         Assert.True(options.Single(option => (option.Content as string) == "Delete files").IsChecked);
+    }
+
+    [AvaloniaFact]
+    public async Task Enter_AcceptsAPromptBuiltInCode()
+    {
+        // Until these two tests existed the prompts answered neither key: a magnet could be pasted
+        // and only added with the mouse. They work because a Suki dialog is an overlay inside the
+        // main window, so its buttons share that window's key handling - which is why these do not
+        // have to become windows of their own to behave like dialogs.
+        var (window, answered) = ShowConfirm();
+
+        window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(await Answer(answered), "Enter must accept the dialog");
+    }
+
+    [AvaloniaFact]
+    public async Task Escape_DismissesAPromptBuiltInCode()
+    {
+        var (window, answered) = ShowConfirm();
+
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.False(await Answer(answered), "Escape must dismiss the dialog without accepting it");
+    }
+
+    private static async Task<bool> Answer(Task<bool> answered)
+    {
+        Assert.True(answered.IsCompleted, "the key press left the dialog waiting");
+        return await answered;
+    }
+
+    /// <summary>
+    /// A confirmation shown in a real window, so key presses have somewhere to land.
+    /// </summary>
+    private static (Window Window, Task<bool> Answered) ShowConfirm()
+    {
+        var manager = new SukiDialogManager();
+        var service = new DialogService(Substitute.For<ITopLevelService>(), []);
+        ((IDialogHost)service).DialogManager = manager;
+
+        var window = new Window { Content = new SukiDialogHost { Manager = manager }, Width = 600, Height = 400 };
+        window.Show();
+
+        var answered = service.ConfirmAsync(new ConfirmPrompt("Title", "Message", "Remove", "Cancel"));
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        return (window, answered);
     }
 
     private static List<string> ShowConfirmAndReadButtons(ConfirmPrompt prompt)

@@ -177,7 +177,7 @@ public sealed class DialogService : IDialogService, IDialogHost
     {
         var answered = new TaskCompletionSource<bool>();
 
-        await describe(DialogManager!.CreateDialog())
+        var builder = describe(DialogManager!.CreateDialog())
             .Dismiss().ByClickingBackground()
             .OnDismissed(_ => answered.TrySetResult(false))
             // The affirmative action first, so it sits on the left. Same order as the two dialogs
@@ -185,10 +185,43 @@ public sealed class DialogService : IDialogService, IDialogHost
             // the safe one rightmost. Every prompt in the application is built here, so this is the
             // only place that decides it.
             .WithActionButton(confirmLabel, _ => answered.TrySetResult(true), true, "Flat")
-            .WithActionButton(cancelLabel, _ => answered.TrySetResult(false), true)
-            .TryShowAsync();
+            .WithActionButton(cancelLabel, _ => answered.TrySetResult(false), true);
+
+        GiveTheKeyboardItsTwoAnswers(builder.Dialog);
+
+        await builder.TryShowAsync();
 
         return answered.Task.IsCompletedSuccessfully && answered.Task.Result;
+    }
+
+    /// <summary>
+    /// Makes Enter accept the dialog and Escape dismiss it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// These are the two keys every dialog is expected to answer, and until this was added the
+    /// prompts built here answered neither - they could only be dismissed with the mouse. The
+    /// dialogs written in markup get it from <c>IsDefault</c> and <c>IsCancel</c> in the markup;
+    /// this is the same two properties, set on the buttons Suki built.
+    /// </para>
+    /// <para>
+    /// It works because a Suki dialog is an overlay inside the main window rather than a window of
+    /// its own, so its buttons are in that window's top level and are reached by the same key
+    /// handling. That is worth stating because it is not obvious, and because it is the reason
+    /// these prompts do not need to become windows to behave like dialogs.
+    /// </para>
+    /// </remarks>
+    private static void GiveTheKeyboardItsTwoAnswers(ISukiDialog dialog)
+    {
+        var buttons = dialog.ActionButtons.OfType<Button>().ToList();
+        if (buttons.Count != 2)
+        {
+            return;
+        }
+
+        // Confirm is added first so that it renders leftmost, which makes it the default.
+        buttons[0].IsDefault = true;
+        buttons[1].IsCancel = true;
     }
 
     private static TextBlock Wrapped(string text) =>
