@@ -1,4 +1,4 @@
-<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:vm="using:Peerfluence.ViewModels"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -51,7 +51,7 @@
                 the status strip now, where the rest of the numbers are.
             -->
             <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
-                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="0" Margin="0,4,0,0">
+                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.5"/>
                         <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.5"/>
