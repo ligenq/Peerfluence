@@ -81,7 +81,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{m:L Find_Column_Name}" Binding="{Binding Title}" Width="*"/>
                         <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
-                                            Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}"
+                                            Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}"
                                             SortMemberPath="SizeBytes"
                                             Width="100"/>
                         <DataGridTextColumn Header="{m:L Find_Column_Seeds}"

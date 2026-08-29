@@ -102,7 +102,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}" Width="120" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="120" IsReadOnly="True"/>
                                     <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="vm:AddTorrentFileOptionViewModel">
