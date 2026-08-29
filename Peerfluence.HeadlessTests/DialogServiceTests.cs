@@ -56,6 +56,77 @@ public class DialogServiceTests
     }
 
     [AvaloniaFact]
+    public void ATextPrompt_CannotBeAcceptedWhileItIsEmpty()
+    {
+        // Adding a blank magnet and renaming a file to nothing are both refused further in. A button
+        // that looks available and then does nothing is a worse way to say so.
+        var dialog = Show(service => service.PromptForTextAsync(new TextPrompt("Add magnet", "Add magnet")));
+
+        Assert.False(Confirm(dialog).IsEnabled);
+    }
+
+    [AvaloniaFact]
+    public void ATextPrompt_CanBeAcceptedOnceSomethingIsTyped()
+    {
+        var dialog = Show(service => service.PromptForTextAsync(new TextPrompt("Add magnet", "Add magnet")));
+        var box = Box(dialog);
+
+        box.Text = "magnet:?xt=urn:btih:abc";
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.True(Confirm(dialog).IsEnabled);
+
+        // And off again, because a prompt can be emptied as easily as it is filled.
+        box.Text = "   ";
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.False(Confirm(dialog).IsEnabled);
+    }
+
+    [AvaloniaFact]
+    public void ATextPrompt_OpensReadyWhenItWasGivenSomethingToStartWith()
+    {
+        // The rename prompt opens on the file's current path, and the magnet prompt on whatever was
+        // on the clipboard.
+        var dialog = Show(service => service.PromptForTextAsync(
+            new TextPrompt("Rename", "Rename", InitialText: "folder/file.bin")));
+
+        Assert.True(Confirm(dialog).IsEnabled);
+    }
+
+    [AvaloniaFact]
+    public async Task Enter_DoesNotAcceptAnEmptyTextPrompt()
+    {
+        // The disabling is only worth anything if it also closes the keyboard route in. A default
+        // button that is disabled is not a default button, but that is worth showing rather than
+        // assuming, because it is the difference between a greyed-out button and a real refusal.
+        var manager = new SukiDialogManager();
+        var service = new DialogService(Substitute.For<ITopLevelService>(), []);
+        ((IDialogHost)service).DialogManager = manager;
+
+        var window = new Window { Content = new SukiDialogHost { Manager = manager }, Width = 600, Height = 400 };
+        window.Show();
+
+        var answered = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add magnet"));
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.False(answered.IsCompleted, "Enter accepted a prompt with nothing in it");
+
+        // Escape still works, so the dialog is not a trap.
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(answered.IsCompleted, "Escape must still dismiss an empty prompt");
+        Assert.Null(await answered);
+    }
+
+    private static Button Confirm(ISukiDialog dialog) => dialog.ActionButtons.OfType<Button>().First();
+
+    private static TextBox Box(ISukiDialog dialog) =>
+        (dialog.Content as Control)!.GetSelfAndLogicalDescendants().OfType<TextBox>().First();
+
+    [AvaloniaFact]
     public void ARemovePrompt_OffersEveryChoiceItWasGiven()
     {
         var dialog = Show(service => service.PromptForRemoveOptionsAsync(new RemoveTorrentPrompt(

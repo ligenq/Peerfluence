@@ -82,7 +82,8 @@ public sealed class DialogService : IDialogService, IDialogHost
         var accepted = await ShowAsync(
             builder => builder.WithTitle(prompt.Title).WithContent(textBox),
             prompt.ConfirmLabel,
-            Properties.Resources.Common_Cancel);
+            Properties.Resources.Common_Cancel,
+            confirm => EnableOnlyWhenFilledIn(confirm, textBox));
 
         return accepted ? textBox.Text?.Trim() : null;
     }
@@ -173,7 +174,8 @@ public sealed class DialogService : IDialogService, IDialogHost
     private async Task<bool> ShowAsync(
         Func<SukiDialogBuilder, SukiDialogBuilder> describe,
         string confirmLabel,
-        string cancelLabel)
+        string cancelLabel,
+        Action<Button>? configureConfirm = null)
     {
         var answered = new TaskCompletionSource<bool>();
 
@@ -187,7 +189,13 @@ public sealed class DialogService : IDialogService, IDialogHost
             .WithActionButton(confirmLabel, _ => answered.TrySetResult(true), true, "Flat")
             .WithActionButton(cancelLabel, _ => answered.TrySetResult(false), true);
 
-        GiveTheKeyboardItsTwoAnswers(builder.Dialog);
+        var buttons = builder.Dialog.ActionButtons.OfType<Button>().ToList();
+        GiveTheKeyboardItsTwoAnswers(buttons);
+
+        if (buttons.Count > 0)
+        {
+            configureConfirm?.Invoke(buttons[0]);
+        }
 
         await builder.TryShowAsync();
 
@@ -211,9 +219,8 @@ public sealed class DialogService : IDialogService, IDialogHost
     /// these prompts do not need to become windows to behave like dialogs.
     /// </para>
     /// </remarks>
-    private static void GiveTheKeyboardItsTwoAnswers(ISukiDialog dialog)
+    private static void GiveTheKeyboardItsTwoAnswers(List<Button> buttons)
     {
-        var buttons = dialog.ActionButtons.OfType<Button>().ToList();
         if (buttons.Count != 2)
         {
             return;
@@ -222,6 +229,31 @@ public sealed class DialogService : IDialogService, IDialogHost
         // Confirm is added first so that it renders leftmost, which makes it the default.
         buttons[0].IsDefault = true;
         buttons[1].IsCancel = true;
+    }
+
+    /// <summary>
+    /// Keeps the accepting button switched off until there is something to accept.
+    /// </summary>
+    /// <remarks>
+    /// A prompt asking for a value has nothing to do with an empty one: adding a blank magnet and
+    /// renaming a file to nothing are both refused further in, and a button that looks available
+    /// and then does nothing is a worse way to say so. It also stops Enter submitting an empty
+    /// prompt, because a disabled default button is not a default button.
+    /// </remarks>
+    private static void EnableOnlyWhenFilledIn(Button confirm, TextBox textBox)
+    {
+        void Sync() => confirm.IsEnabled = !string.IsNullOrWhiteSpace(textBox.Text);
+
+        textBox.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == TextBox.TextProperty)
+            {
+                Sync();
+            }
+        };
+
+        // The magnet prompt opens with whatever was on the clipboard, which may be nothing.
+        Sync();
     }
 
     private static TextBlock Wrapped(string text) =>
