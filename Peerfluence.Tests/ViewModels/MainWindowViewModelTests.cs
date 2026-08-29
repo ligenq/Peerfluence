@@ -51,9 +51,21 @@ public class MainWindowViewModelTests
 
         // The real constructor always assigns this, and MainWindowViewModel reaches through it to
         // hand the details pane the dialog manager, so an uninitialized object needs it set.
-        typeof(DownloadsViewModel)
-            .GetField("<SelectedTorrentDetailViewModel>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance)!
-            .SetValue(downloadsVm, _detailsVm);
+        var downloadsFields = typeof(DownloadsViewModel).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        downloadsFields.First(f => f.Name == "<SelectedTorrentDetailViewModel>k__BackingField").SetValue(downloadsVm, _detailsVm);
+
+        // MainWindowViewModel disposes the feature view models it was handed, and DownloadsViewModel
+        // reaches for these when it does. A real one gets them from its constructor.
+        downloadsFields.First(f => f.Name == "<Torrents>k__BackingField")
+            .SetValue(downloadsVm, new System.Collections.ObjectModel.ObservableCollection<TorrentListItemViewModel>());
+        downloadsFields.First(f => f.Name == "_loopCts").SetValue(downloadsVm, new CancellationTokenSource());
+        downloadsFields.First(f => f.Name == "_alertChannel").SetValue(
+            downloadsVm,
+            System.Threading.Channels.Channel.CreateBounded<TorrentAlertEventArgs>(
+                new System.Threading.Channels.BoundedChannelOptions(1)
+                {
+                    FullMode = System.Threading.Channels.BoundedChannelFullMode.DropOldest
+                }));
 
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 
@@ -145,4 +157,13 @@ public class MainWindowViewModelTests
 
         await updateService.DidNotReceive().CheckForUpdatesAsync();
     }
+
+    [Fact]
+    public void DisposingTheWindow_CanHappenTwice()
+    {
+        // The window closes and then the host disposes the container. Both call this.
+        _sut.Dispose();
+        _sut.Dispose();
+    }
+
 }

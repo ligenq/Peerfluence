@@ -686,4 +686,60 @@ public class DownloadsViewModelTests
             .GetField("_addTorrentDialogService", flags)!
             .GetValue(vm)!;
     }
+
+    [Fact]
+    public void WithNoCategoryChosen_TheListIsNotNarrowed()
+    {
+        SetCategoryFilter(_sut, string.Empty);
+
+        Assert.False(_sut.HasCategoryFilter);
+        Assert.True(_sut.IsAllCategories);
+    }
+
+    [Fact]
+    public void WithACategoryChosen_TheListSaysItIsNarrowed()
+    {
+        // Set through the backing field for the same reason the whole class is built that way: the
+        // property is set by a command this uninitialized instance does not carry. What is being
+        // pinned down is that "no category" is the empty string rather than null, and that the two
+        // chips - "All" and a named one - can never both be lit.
+        SetCategoryFilter(_sut, "Films");
+
+        Assert.True(_sut.HasCategoryFilter);
+        Assert.False(_sut.IsAllCategories);
+    }
+
+    private static void SetCategoryFilter(DownloadsViewModel viewModel, string value)
+    {
+        typeof(DownloadsViewModel)
+            .GetField("<CategoryFilter>k__BackingField", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(viewModel, value);
+    }
+
+    [Fact]
+    public void DisposingTheList_StopsItsLoopsAndCanHappenTwice()
+    {
+        // The window is closed once, but the host disposes the container afterwards, so a second
+        // call has to be harmless rather than throwing on an already-cancelled source.
+#pragma warning disable SYSLIB0050
+        var sut = (DownloadsViewModel)System.Runtime.Serialization.FormatterServices
+            .GetUninitializedObject(typeof(DownloadsViewModel));
+#pragma warning restore SYSLIB0050
+
+        var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+        var fields = typeof(DownloadsViewModel).GetFields(flags);
+        fields.First(f => f.Name == "<Torrents>k__BackingField").SetValue(sut, new ObservableCollection<TorrentListItemViewModel>());
+        fields.First(f => f.Name == "_loopCts").SetValue(sut, new CancellationTokenSource());
+        fields.First(f => f.Name == "_alertChannel").SetValue(
+            sut,
+            System.Threading.Channels.Channel.CreateBounded<TorrentAlertEventArgs>(
+                new System.Threading.Channels.BoundedChannelOptions(1)
+                {
+                    FullMode = System.Threading.Channels.BoundedChannelFullMode.DropOldest
+                }));
+
+        sut.Dispose();
+        sut.Dispose();
+    }
+
 }

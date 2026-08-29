@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 
@@ -23,9 +23,14 @@ public sealed class ByteSizeConverter : IValueConverter
         return FormatBytes(bytes);
     }
 
+    /// <summary>
+    /// Refused rather than answered. This converter formats a number for display and there is no
+    /// way back from "1.5 GB" to the bytes it came from, so a two-way binding through it is a
+    /// mistake in the XAML. Returning the input, which this used to do, made that mistake silent.
+    /// </summary>
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value;
+        throw new NotSupportedException($"{nameof(ByteSizeConverter)} formats values for display and cannot convert back.");
     }
 
     private static bool TryGetDouble(object value, out double bytes)

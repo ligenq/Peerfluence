@@ -186,4 +186,55 @@ public class AddTorrentOptionsViewModelTests
         });
         return settingsService;
     }
+
+    [Fact]
+    public async Task ADialogForATorrentFile_IsFilledInFromTheFileRatherThanLeftPending()
+    {
+        // The counterpart of CreateForMagnet: a torrent file already carries everything the dialog
+        // shows, so nothing here waits on the network and the file list is populated up front.
+        var path = Path.Combine(Path.GetTempPath(), $"peerfluence-add-options-{Guid.NewGuid():N}.torrent");
+        await File.WriteAllBytesAsync(path, TorrentFileBytes(), TestContext.Current.CancellationToken);
+
+        try
+        {
+            var sut = await AddTorrentOptionsViewModel.CreateForTorrentFileAsync(
+                path,
+                Substitute.For<ITorrentService>(),
+                Substitute.For<ITopLevelService>(),
+                CreateSettingsService(@"C:\Downloads"),
+                Substitute.For<ITorrentCategoryService>());
+
+            Assert.Equal("peerfluence-round-trip.bin", sut.Name);
+            Assert.False(sut.IsMetadataPending);
+            Assert.Equal(1024, sut.TotalSizeBytes);
+            Assert.Equal(1, sut.FileCount);
+            Assert.Single(sut.Files);
+
+            // Landed in its own folder under the download root rather than loose in it.
+            Assert.Equal(
+                Path.Combine(@"C:\Downloads", "peerfluence-round-trip.bin"),
+                sut.DownloadPath);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>
+    /// A minimal single-file v1 torrent, bencoded by hand so the test needs no fixture on disk.
+    /// </summary>
+    private static byte[] TorrentFileBytes()
+    {
+        const string name = "peerfluence-round-trip.bin";
+        var pieces = new string(' ', 20);
+
+        var bencoded =
+            "d8:announce31:http://tracker.invalid/announce" +
+            "4:infod6:lengthi1024e4:name" + name.Length + ":" + name +
+            "12:piece lengthi16384e6:pieces20:" + pieces + "ee";
+
+        return System.Text.Encoding.ASCII.GetBytes(bencoded);
+    }
+
 }

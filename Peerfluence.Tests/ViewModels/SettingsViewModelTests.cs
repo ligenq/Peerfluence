@@ -817,4 +817,52 @@ public class SettingsViewModelTests
         Assert.Equal("http://example.invalid/api", reloaded.TorznabUrl);
         Assert.Equal("abc123", reloaded.TorznabApiKey);
     }
+
+    [Fact]
+    public void WhetherUpdatesCanBeChecked_ComesFromTheUpdateService()
+    {
+        // These two decide whether the update section is offered at all. A build installed from a
+        // package manager has no Velopack path, and showing it a "check for updates" button that
+        // can never work is worse than showing nothing.
+        var updateService = Substitute.For<IUpdateService>();
+        updateService.IsInstalled.Returns(true);
+        updateService.CanCheckForUpdates.Returns(true);
+
+        var sut = CreateWith(updateService);
+
+        Assert.True(sut.IsUpdateServiceInstalled);
+        Assert.True(sut.CanCheckForUpdates);
+    }
+
+    [Fact]
+    public void ABuildThatCannotUpdateItself_SaysSo()
+    {
+        var updateService = Substitute.For<IUpdateService>();
+        updateService.IsInstalled.Returns(false);
+        updateService.CanCheckForUpdates.Returns(false);
+
+        var sut = CreateWith(updateService);
+
+        Assert.False(sut.IsUpdateServiceInstalled);
+        Assert.False(sut.CanCheckForUpdates);
+    }
+
+    private SettingsViewModel CreateWith(IUpdateService updateService)
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns(TorrentSearchResponse.Succeeded([]));
+
+        return new SettingsViewModel(
+            _settingsService,
+            _themeService,
+            _localizationService,
+            _topLevelService,
+            _engineService,
+            updateService,
+            _windowsAssociationService,
+            Substitute.For<IInterfaceModeService>(),
+            searchService,
+            Substitute.For<ITorrentCategoryService>());
+    }
+
 }
