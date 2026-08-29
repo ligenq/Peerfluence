@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Automation;
+using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
@@ -119,6 +120,24 @@ public class DialogServiceTests
 
         Assert.True(answered.IsCompleted, "Escape must still dismiss an empty prompt");
         Assert.Null(await answered);
+    }
+
+    [AvaloniaFact]
+    public void APromptBuiltInCode_CanBeFoundByAutomationId()
+    {
+        // The architecture test that requires an automation id reads .axaml, so it is blind to a
+        // control built in C#. These prompts have twice been missed by exactly that blindness. The
+        // end-to-end tests drive them through the accessibility tree, so the ids are load-bearing.
+        var dialog = Show(service => service.PromptForTextAsync(
+            new TextPrompt("Add magnet", "Add magnet")));
+
+        var box = Box(dialog);
+        var buttons = dialog.ActionButtons.OfType<Button>().ToList();
+
+        Assert.Equal(DialogService.PromptTextBoxId, box.GetValue(AutomationProperties.AutomationIdProperty));
+        Assert.Equal("Add magnet", box.GetValue(AutomationProperties.NameProperty));
+        Assert.Equal(DialogService.PromptConfirmButtonId, buttons[0].GetValue(AutomationProperties.AutomationIdProperty));
+        Assert.Equal(DialogService.PromptCancelButtonId, buttons[1].GetValue(AutomationProperties.AutomationIdProperty));
     }
 
     private static Button Confirm(ISukiDialog dialog) => dialog.ActionButtons.OfType<Button>().First();

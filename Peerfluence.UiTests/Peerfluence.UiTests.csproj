@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    End to end tests that drive the real, running application through the Windows accessibility
+    tree: the same tree a screen reader reads and an AI agent would drive.
+
+    Deliberately not in Peerfluence.slnx, and deliberately not in CI. UI Automation is a Windows API
+    that needs an interactive desktop session, and these tests start a real process and wait on real
+    rendering, so they are slower and less certain than everything else here. They are for running on
+    a developer machine when the interface changes; the fast suites remain the gate.
+
+      Run them with dotnet test on this project.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FlaUI.Core" Version="4.0.0" />
+
+    <!--
+      FlaUI drags in System.Drawing.Common 5.0.2 for its screenshot support, and that version has a
+      critical advisory (GHSA-rxg9-xrhp-64gj). Pinned forward to a patched one, which the repository
+      policy of failing on any warning is what surfaced. Windows only, which this project already is.
+    -->
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
+    <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!--
+    A reference rather than a copy: the tests name automation ids that the application declares as
+    constants, so renaming one breaks the build instead of a test at run time.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\Peerfluence\Peerfluence.csproj" />
+  </ItemGroup>
+
+</Project>
