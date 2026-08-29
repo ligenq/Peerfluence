@@ -51,7 +51,7 @@
                 the status strip now, where the rest of the numbers are.
             -->
             <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
-                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}">
+                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}" AutomationProperties.AutomationId="ShowAboutButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacityDisabled}"/>
                         <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacityDisabled}"/>
@@ -79,7 +79,7 @@
                         HorizontalAlignment="Right">
                 <Button Classes="Basic"
                         Command="{Binding ShowSimpleSettingsCommand}"
-                        IsVisible="{Binding !IsSimpleSettingsOpen}">
+                        IsVisible="{Binding !IsSimpleSettingsOpen}" AutomationProperties.AutomationId="ShowSimpleSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
                         <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
@@ -87,13 +87,13 @@
                 </Button>
                 <Button Classes="Basic"
                         Command="{Binding CloseSimpleSettingsCommand}"
-                        IsVisible="{Binding IsSimpleSettingsOpen}">
+                        IsVisible="{Binding IsSimpleSettingsOpen}" AutomationProperties.AutomationId="CloseSimpleSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
                         <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}">
+                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}" AutomationProperties.AutomationId="SwitchToAdvancedModeButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
                         <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
@@ -130,7 +130,7 @@
                 <Button Command="{Binding ChooseSimpleModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.AutomationId="ChooseSimpleModeButton">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Simple_Title}" FontWeight="SemiBold"/>
                         <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
@@ -140,7 +140,7 @@
                 <Button Command="{Binding ChooseAdvancedModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.AutomationId="ChooseAdvancedModeButton">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Advanced_Title}" FontWeight="SemiBold"/>
                         <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>

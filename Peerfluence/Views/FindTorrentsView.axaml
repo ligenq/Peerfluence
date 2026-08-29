@@ -16,12 +16,12 @@
                   IsVisible="{Binding IsConfigured}"
                   Margin="{StaticResource StandardBottomMargin}">
                 <TextBox Text="{Binding Query, Mode=TwoWay}"
-                         PlaceholderText="{m:L Find_QueryWatermark}">
+                         PlaceholderText="{m:L Find_QueryWatermark}" AutomationProperties.AutomationId="QueryTextBox">
                     <TextBox.KeyBindings>
                         <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}"/>
                     </TextBox.KeyBindings>
                 </TextBox>
-                <Button Grid.Column="1" Classes="Flat" Command="{Binding SearchCommand}">
+                <Button Grid.Column="1" Classes="Flat" Command="{Binding SearchCommand}" AutomationProperties.AutomationId="SearchButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Magnify" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Find_Search}"/>
@@ -45,7 +45,7 @@
                         Classes="Flat"
                         HorizontalAlignment="Left"
                         IsVisible="{Binding CanFixInSettings}"
-                        Command="{Binding OpenSearchSettingsCommand}">
+                        Command="{Binding OpenSearchSettingsCommand}" AutomationProperties.AutomationId="OpenSearchSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Find_OpenSearchSettings}"/>
@@ -68,10 +68,10 @@
                           CanUserReorderColumns="False"
                           CanUserResizeColumns="True"
                           GridLinesVisibility="None"
-                          BorderThickness="0">
+                          BorderThickness="0" AutomationProperties.AutomationId="ResultGrid">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="{m:L Find_Add}" Command="{Binding AddCommand}" CommandParameter="{Binding SelectedResult}">
+                            <MenuItem Header="{m:L Find_Add}" Command="{Binding AddCommand}" CommandParameter="{Binding SelectedResult}" AutomationProperties.AutomationId="AddMenuItem">
                                 <MenuItem.Icon>
                                     <materialIcons:MaterialIcon Kind="Plus"/>
                                 </MenuItem.Icon>
@@ -119,7 +119,7 @@
                         HorizontalAlignment="Center"
                         Margin="{StaticResource SmallTopMargin}"
                         Command="{Binding OpenSearchSettingsCommand}"
-                        Content="{m:L Find_SetUpIndexer}"/>
+                        Content="{m:L Find_SetUpIndexer}" AutomationProperties.AutomationId="FindTorrentsOpenSearchSettingsButton"/>
             </StackPanel>
         </Grid>
     </suki:BusyArea>

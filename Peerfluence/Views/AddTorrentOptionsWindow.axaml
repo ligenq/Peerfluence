@@ -53,15 +53,15 @@
                                 <ComboBox x:Name="CategoryPicker"
                                           ItemsSource="{Binding Categories}"
                                           SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-                                          HorizontalAlignment="Stretch"/>
+                                          HorizontalAlignment="Stretch" AutomationProperties.AutomationId="CategoryComboBox"/>
                             </StackPanel>
                             <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                                <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" PlaceholderText="{m:L AddTorrent_DownloadFolderWatermark}"/>
-                                <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}">
+                                <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" PlaceholderText="{m:L AddTorrent_DownloadFolderWatermark}" AutomationProperties.AutomationId="DownloadPathTextBox"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseDownloadPathButton">
                                     <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 </Button>
                             </Grid>
-                            <CheckBox Content="{m:L AddTorrent_StartImmediately}" IsChecked="{Binding StartImmediately}"/>
+                            <CheckBox Content="{m:L AddTorrent_StartImmediately}" IsChecked="{Binding StartImmediately}" AutomationProperties.AutomationId="StartImmediatelyCheckBox"/>
                         </StackPanel>
                     </suki:GlassCard>
 
@@ -92,7 +92,7 @@
                                       CanUserReorderColumns="False"
                                       CanUserResizeColumns="True"
                                       CanUserSortColumns="True"
-                                      Height="240">
+                                      Height="240" AutomationProperties.AutomationId="FilesGrid">
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -147,7 +147,7 @@
                                                   Grid.ColumnSpan="2"
                                                   Content="{m:L CreateTorrent_Private}"
                                                   IsChecked="{Binding IsPrivate}"
-                                                  IsEnabled="False"/>
+                                                  IsEnabled="False" AutomationProperties.AutomationId="PrivateCheckBox"/>
                                     </Grid>
                                 </StackPanel>
                             </suki:GlassCard>
@@ -159,23 +159,23 @@
                                         <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingNormal}">
                                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                                 <TextBlock Text="{m:L AddTorrent_DownloadLimitKib}" Opacity="{StaticResource OpacitySecondary}"/>
-                                                <NumericUpDown Value="{Binding DownloadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}"/>
+                                                <NumericUpDown Value="{Binding DownloadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}" AutomationProperties.AutomationId="DownloadLimitKiBPerSecondInput"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                                 <TextBlock Text="{m:L AddTorrent_UploadLimitKib}" Opacity="{StaticResource OpacitySecondary}"/>
-                                                <NumericUpDown Value="{Binding UploadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}"/>
+                                                <NumericUpDown Value="{Binding UploadLimitKiBPerSecond}" Minimum="0" Increment="64" PlaceholderText="{m:L AddTorrent_GlobalLimitWatermark}" AutomationProperties.AutomationId="UploadLimitKiBPerSecondInput"/>
                                             </StackPanel>
                                             <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
                                                 <TextBlock Text="{m:L Details_QueuePriority}" Opacity="{StaticResource OpacitySecondary}"/>
-                                                <NumericUpDown Value="{Binding QueuePriority}" Increment="1"/>
+                                                <NumericUpDown Value="{Binding QueuePriority}" Increment="1" AutomationProperties.AutomationId="QueuePriorityInput"/>
                                             </StackPanel>
                                             <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                                                 <TextBlock Text="{m:L Details_RatioLimit}" Opacity="{StaticResource OpacitySecondary}"/>
-                                                <NumericUpDown Value="{Binding RatioLimit}" Minimum="0" Increment="0.25" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}"/>
+                                                <NumericUpDown Value="{Binding RatioLimit}" Minimum="0" Increment="0.25" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}" AutomationProperties.AutomationId="RatioLimitInput"/>
                                             </StackPanel>
                                             <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="{StaticResource SpacingXSmall}">
                                                 <TextBlock Text="{m:L AddTorrent_SeedTimeLimitMinutes}" Opacity="{StaticResource OpacitySecondary}"/>
-                                                <NumericUpDown Value="{Binding SeedTimeLimitMinutes}" Minimum="0" Increment="15" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}"/>
+                                                <NumericUpDown Value="{Binding SeedTimeLimitMinutes}" Minimum="0" Increment="15" PlaceholderText="{m:L AddTorrent_UnlimitedWatermark}" AutomationProperties.AutomationId="SeedTimeLimitMinutesInput"/>
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
@@ -188,12 +188,12 @@
                                                  Height="82"
                                                  AcceptsReturn="True"
                                                  TextWrapping="Wrap"
-                                                 PlaceholderText="{m:L AddTorrent_IncludedTrackersWatermark}"/>
+                                                 PlaceholderText="{m:L AddTorrent_IncludedTrackersWatermark}" AutomationProperties.AutomationId="ExistingTrackersTextBox"/>
                                         <TextBox Text="{Binding AdditionalTrackers, Mode=TwoWay}"
                                                  Height="100"
                                                  AcceptsReturn="True"
                                                  TextWrapping="Wrap"
-                                                 PlaceholderText="{m:L AddTorrent_AdditionalTrackersWatermark}"/>
+                                                 PlaceholderText="{m:L AddTorrent_AdditionalTrackersWatermark}" AutomationProperties.AutomationId="AdditionalTrackersTextBox"/>
                                     </StackPanel>
                                 </Grid>
                             </suki:GlassCard>
@@ -213,13 +213,13 @@
                   Margin="{StaticResource MediumTopMargin}">
                 <CheckBox Content="{m:L AddTorrent_SkipThisStepNextTime}"
                           IsChecked="{Binding SkipThisStepNextTime}"
-                          VerticalAlignment="Center"/>
+                          VerticalAlignment="Center" AutomationProperties.AutomationId="SkipThisStepNextTimeCheckBox"/>
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             Spacing="{StaticResource SpacingStandard}">
-                    <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" MinWidth="110"/>
-                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" MinWidth="130"/>
+                    <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
+                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
                 </StackPanel>
             </Grid>
         </Grid>

@@ -49,13 +49,13 @@
 				</StackPanel>
 
 				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource XSmallLeftMargin}">
-					<Button Command="{Binding ChangeDownloadPathCommand}" ToolTip.Tip="{m:L Details_ChangeDownloadPath}">
+					<Button Command="{Binding ChangeDownloadPathCommand}" ToolTip.Tip="{m:L Details_ChangeDownloadPath}" AutomationProperties.AutomationId="ChangeDownloadPathButton">
 						<materialIcons:MaterialIcon Kind="FolderMoveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 					</Button>
-					<Button Command="{Binding ForceRecheckCommand}" ToolTip.Tip="{m:L Details_VerifyFiles}">
+					<Button Command="{Binding ForceRecheckCommand}" ToolTip.Tip="{m:L Details_VerifyFiles}" AutomationProperties.AutomationId="ForceRecheckButton">
 						<materialIcons:MaterialIcon Kind="ShieldCheckOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 					</Button>
-					<Button Command="{Binding SaveResumeDataCommand}" ToolTip.Tip="{m:L Details_SaveResumeData}">
+					<Button Command="{Binding SaveResumeDataCommand}" ToolTip.Tip="{m:L Details_SaveResumeData}" AutomationProperties.AutomationId="SaveResumeDataButton">
 						<materialIcons:MaterialIcon Kind="ContentSaveOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 					</Button>
 				</StackPanel>
@@ -63,12 +63,12 @@
 
 			<TabControl Grid.Row="1">
 				<!-- Files Tab -->
-				<TabItem Header="{m:L Details_FilesTab}">
+				<TabItem Header="{m:L Details_FilesTab}" AutomationProperties.AutomationId="FilesTabTab">
 					<Grid RowDefinitions="*,Auto">
 						<DataGrid ItemsSource="{Binding Files}"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
-                                  GridLinesVisibility="None">
+                                  GridLinesVisibility="None" AutomationProperties.AutomationId="DetailsFilesGrid">
 							<DataGrid.Columns>
 								<DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="50">
 									<DataGridTemplateColumn.CellTemplate>
@@ -124,26 +124,26 @@
 						</DataGrid>
 						<Button Grid.Row="1" Content="{m:L Details_ApplyFileSelection}"
                                 Command="{Binding ApplyFileSelectionCommand}"
-                                Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource XSmallTopMargin}"/>
+                                Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource XSmallTopMargin}" AutomationProperties.AutomationId="ApplyFileSelectionButton"/>
 					</Grid>
 				</TabItem>
 
 				<!-- Trackers Tab -->
-				<TabItem Header="{m:L Details_TrackersTab}">
+				<TabItem Header="{m:L Details_TrackersTab}" AutomationProperties.AutomationId="TrackersTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
-							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}"/>
-							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat">
+							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}" AutomationProperties.AutomationId="NewTrackerUrlTextBox"/>
+							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" AutomationProperties.AutomationId="AddTrackerButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
-							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}">
+							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}" AutomationProperties.AutomationId="AnnounceButton">
 								<materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
-							<Button Grid.Column="3" Command="{Binding ScrapeCommand}" ToolTip.Tip="{m:L Details_Trackers_Scrape}">
+							<Button Grid.Column="3" Command="{Binding ScrapeCommand}" ToolTip.Tip="{m:L Details_Trackers_Scrape}" AutomationProperties.AutomationId="ScrapeButton">
 								<materialIcons:MaterialIcon Kind="AccountSearchOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
-						<DataGrid Grid.Row="1" ItemsSource="{Binding Trackers}" AutoGenerateColumns="False" IsReadOnly="True">
+						<DataGrid Grid.Row="1" ItemsSource="{Binding Trackers}" AutoGenerateColumns="False" IsReadOnly="True" AutomationProperties.AutomationId="TrackersGrid">
 							<DataGrid.Columns>
 								<DataGridTextColumn Header="{m:L Details_Trackers_Url}" Binding="{Binding Url}" Width="*"/>
 								<DataGridTextColumn Header="{m:L Details_Trackers_State}" Binding="{Binding State}" Width="120"/>
@@ -167,15 +167,15 @@
 				</TabItem>
 
 				<!-- Peers Tab -->
-				<TabItem Header="{m:L Details_PeersTab}">
+				<TabItem Header="{m:L Details_PeersTab}" AutomationProperties.AutomationId="PeersTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
-							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}"/>
-							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat">
+							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}" AutomationProperties.AutomationId="NewPeerAddressesTextBox"/>
+							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" AutomationProperties.AutomationId="AddPeersButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
-						<DataGrid Grid.Row="1" ItemsSource="{Binding Peers}" AutoGenerateColumns="False" IsReadOnly="True">
+						<DataGrid Grid.Row="1" ItemsSource="{Binding Peers}" AutoGenerateColumns="False" IsReadOnly="True" AutomationProperties.AutomationId="PeersGrid">
 							<DataGrid.Columns>
 								<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*"/>
 								<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*"/>
@@ -189,11 +189,11 @@
 				</TabItem>
 
 				<!-- Web Seeds Tab -->
-				<TabItem Header="{m:L Details_WebSeedsTab}">
+				<TabItem Header="{m:L Details_WebSeedsTab}" AutomationProperties.AutomationId="WebSeedsTabTab">
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
-							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}"/>
-							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat">
+							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}" AutomationProperties.AutomationId="NewWebSeedUrlTextBox"/>
+							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat" AutomationProperties.AutomationId="AddWebSeedButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -203,7 +203,7 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    IsVisible="{Binding !HasWebSeeds}"/>
-						<DataGrid Grid.Row="1" ItemsSource="{Binding WebSeeds}" AutoGenerateColumns="False" IsReadOnly="True" IsVisible="{Binding HasWebSeeds}">
+						<DataGrid Grid.Row="1" ItemsSource="{Binding WebSeeds}" AutoGenerateColumns="False" IsReadOnly="True" IsVisible="{Binding HasWebSeeds}" AutomationProperties.AutomationId="WebSeedsGrid">
 							<DataGrid.Columns>
 								<DataGridTextColumn Header="{m:L Details_WebSeeds_Url}" Binding="{Binding}" Width="*"/>
 								<DataGridTemplateColumn Width="40">
@@ -223,7 +223,7 @@
 				</TabItem>
 
 				<!-- Pieces Tab -->
-				<TabItem Header="{m:L Details_PiecesTab}">
+				<TabItem Header="{m:L Details_PiecesTab}" AutomationProperties.AutomationId="PiecesTabTab">
 					<StackPanel Spacing="{StaticResource SpacingMedium}">
 						<WrapPanel Orientation="Horizontal">
 							<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource StandardRightMargin}">
@@ -253,30 +253,30 @@
 				</TabItem>
 
 				<!-- Settings Tab -->
-				<TabItem Header="{m:L Details_SettingsTab}">
+				<TabItem Header="{m:L Details_SettingsTab}" AutomationProperties.AutomationId="SettingsTabTab">
 					<ScrollViewer>
 						<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="{StaticResource XXSmallLeftTopRightBottomMargin}" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
 							<StackPanel Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
+								<NumericUpDown Value="{Binding DownloadLimitBytesPerSecond}" Minimum="0" Increment="10240" AutomationProperties.AutomationId="DownloadLimitInput"/>
 							</StackPanel>
 							<StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding UploadLimitBytesPerSecond}" Minimum="0" Increment="10240"/>
+								<NumericUpDown Value="{Binding UploadLimitBytesPerSecond}" Minimum="0" Increment="10240" AutomationProperties.AutomationId="UploadLimitInput"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DiskReadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding DiskReadLimitBytesPerSecond}" Minimum="0" Increment="1048576"/>
+								<NumericUpDown Value="{Binding DiskReadLimitBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.AutomationId="DiskReadLimitInput"/>
 							</StackPanel>
 							<StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_DiskWriteLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding DiskWriteLimitBytesPerSecond}" Minimum="0" Increment="1048576"/>
+								<NumericUpDown Value="{Binding DiskWriteLimitBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.AutomationId="DiskWriteLimitInput"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="2" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_Strategy}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="DownloadStrategyComboBox">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding DisplayName}"/>
@@ -286,37 +286,37 @@
 							</StackPanel>
 							<StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_QueuePriority}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding QueuePriority}" Minimum="0" PlaceholderText="{m:L Details_QueuePriorityWatermark}"/>
+								<NumericUpDown Value="{Binding QueuePriority}" Minimum="0" PlaceholderText="{m:L Details_QueuePriorityWatermark}" AutomationProperties.AutomationId="DetailsQueuePriorityInput"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="3" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_RatioLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<TextBox Text="{Binding RatioLimit, Mode=TwoWay}" PlaceholderText="{m:L Details_RatioLimitWatermark}"/>
+								<TextBox Text="{Binding RatioLimit, Mode=TwoWay}" PlaceholderText="{m:L Details_RatioLimitWatermark}" AutomationProperties.AutomationId="RatioLimitTextBox"/>
 							</StackPanel>
 							<StackPanel Grid.Row="3" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_SeedTimeMinutes}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}"/>
+								<TextBox Text="{Binding SeedTimeLimitMinutes, Mode=TwoWay}" PlaceholderText="{m:L Details_SeedTimeWatermark}" AutomationProperties.AutomationId="SeedTimeLimitMinutesTextBox"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="4" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_MaxConnections}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding MaxConnections}" Minimum="0"/>
+								<NumericUpDown Value="{Binding MaxConnections}" Minimum="0" AutomationProperties.AutomationId="MaxConnectionsInput"/>
 								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 							<StackPanel Grid.Row="4" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
 								<TextBlock Text="{m:L Details_MaxUploadSlots}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-								<NumericUpDown Value="{Binding MaxUploadSlots}" Minimum="0"/>
+								<NumericUpDown Value="{Binding MaxUploadSlots}" Minimum="0" AutomationProperties.AutomationId="MaxUploadSlotsInput"/>
 								<TextBlock Text="{m:L Details_ZeroMeansEngineDefault}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 
 							<StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="{StaticResource SpacingXSmall}">
-								<CheckBox IsChecked="{Binding SuperSeeding, Mode=TwoWay}" Content="{m:L Details_SuperSeeding}"/>
+								<CheckBox IsChecked="{Binding SuperSeeding, Mode=TwoWay}" Content="{m:L Details_SuperSeeding}" AutomationProperties.AutomationId="SuperSeedingCheckBox"/>
 								<TextBlock Text="{m:L Details_SuperSeedingHint}" Opacity="{StaticResource OpacityHint}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap"/>
 							</StackPanel>
 
 							<Button Grid.Row="6" Grid.ColumnSpan="2" Content="{m:L Details_Apply}"
                                     Command="{Binding ApplyTorrentSettingsCommand}"
-                                    Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}"/>
+                                    Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}" AutomationProperties.AutomationId="ApplyTorrentSettingsButton"/>
 						</Grid>
 					</ScrollViewer>
 				</TabItem>
