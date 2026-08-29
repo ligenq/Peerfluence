@@ -141,6 +141,62 @@ public sealed class AutomationIdTests
         Assert.True(missing.Count == 0, string.Join(Environment.NewLine, missing));
     }
 
+    /// <summary>
+    /// Controls that show a label rather than being labelled by something else.
+    /// </summary>
+    private static readonly HashSet<string> CarriesItsOwnLabel =
+    [
+        "Button", "ToggleButton", "RadioButton", "CheckBox", "MenuItem", "TabItem",
+    ];
+
+    [Fact]
+    public void EveryLabelMadeOfMarkup_IsAlsoWrittenDownForAScreenReader()
+    {
+        // A control whose label is a string - Content="{m:L Key}" - is announced as that string, and
+        // needs nothing further. A control whose label is built out of child elements, which here is
+        // every toolbar button with an icon beside its text and every tab, is announced as the type
+        // name of that content: "Avalonia.Controls.StackPanel", read out loud, fifty-five times.
+        //
+        // Found by driving the built application through UI Automation, because the markup gives no
+        // sign of it. This is the cheap guard against it coming back.
+        var mute = new List<string>();
+
+        foreach (var file in XamlFiles())
+        {
+            foreach (var element in InteractiveElements(File.ReadAllText(file)))
+            {
+                if (!CarriesItsOwnLabel.Contains(element.Tag)
+                    || element.Raw.Contains("AutomationProperties.Name", StringComparison.Ordinal)
+                    || element.Raw.Contains("AutomationProperties.LabeledBy", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                // A label given as an attribute is a string, and speaks for itself.
+                if (Regex.IsMatch(element.Raw, @"(Content|Header)\s*=\s*"""))
+                {
+                    continue;
+                }
+
+                // Nothing inside it, so nothing to mistake for a label.
+                if (element.Raw.TrimEnd().EndsWith("/>", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                mute.Add(
+                    $"  {Relative(file)}:{element.Line}  <{element.Tag}> is labelled by its child markup, "
+                        + "so a screen reader announces the name of a class. Give it "
+                        + "AutomationProperties.Name.");
+            }
+        }
+
+        Assert.True(
+            mute.Count == 0,
+            $"{mute.Count} controls would be read out as a type name:{Environment.NewLine}"
+                + string.Join(Environment.NewLine, mute));
+    }
+
     [Fact]
     public void EveryAccessibleName_IsLocalized()
     {

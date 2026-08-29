@@ -49,7 +49,7 @@
         <suki:GlassCard Grid.Row="1" Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
             <DockPanel>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Left">
-                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="AddTorrentButton">
+                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.Name="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="AddTorrentButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddTorrent}"/>
@@ -57,7 +57,7 @@
                     </Button>
 
                     <!-- Same weight as Add Torrent: two ways to start the same thing. -->
-                    <Button Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}" AutomationProperties.AutomationId="AddMagnetButton">
+                    <Button Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}" AutomationProperties.Name="{m:L Downloads_AddMagnet}" AutomationProperties.AutomationId="AddMagnetButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddMagnet}"/>
@@ -66,19 +66,19 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Right" HorizontalAlignment="Right">
-                    <Button Command="{Binding StartSelectedCommand}" ToolTip.Tip="{m:L Downloads_Start}" AutomationProperties.AutomationId="StartSelectedButton">
+                    <Button Command="{Binding StartSelectedCommand}" ToolTip.Tip="{m:L Downloads_Start}" AutomationProperties.Name="{m:L Downloads_Start}" AutomationProperties.AutomationId="StartSelectedButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Play" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_Start}"/>
                         </StackPanel>
                     </Button>
-                    <Button Command="{Binding StopSelectedCommand}" ToolTip.Tip="{m:L Downloads_Stop}" AutomationProperties.AutomationId="StopSelectedButton">
+                    <Button Command="{Binding StopSelectedCommand}" ToolTip.Tip="{m:L Downloads_Stop}" AutomationProperties.Name="{m:L Downloads_Stop}" AutomationProperties.AutomationId="StopSelectedButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Stop" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_Stop}"/>
                         </StackPanel>
                     </Button>
-                    <Button Command="{Binding RemoveSelectedCommand}" ToolTip.Tip="{m:L Downloads_Remove}" Foreground="{StaticResource ErrorColor}" AutomationProperties.AutomationId="RemoveSelectedButton">
+                    <Button Command="{Binding RemoveSelectedCommand}" ToolTip.Tip="{m:L Downloads_Remove}" Foreground="{StaticResource ErrorColor}" AutomationProperties.Name="{m:L Downloads_Remove}" AutomationProperties.AutomationId="RemoveSelectedButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Delete" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_Remove}"/>
@@ -94,23 +94,23 @@
                     -->
                     <Button Command="{Binding ToggleSessionPauseCommand}"
                             ToolTip.Tip="{m:L Downloads_PauseAll}"
-                            IsVisible="{Binding !IsSessionPaused}" AutomationProperties.AutomationId="PauseAllButton">
+                            IsVisible="{Binding !IsSessionPaused}" AutomationProperties.Name="{m:L Downloads_PauseAll}" AutomationProperties.AutomationId="PauseAllButton">
                         <materialIcons:MaterialIcon Kind="PauseCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
                     <Button Command="{Binding ToggleSessionPauseCommand}"
                             ToolTip.Tip="{m:L Downloads_ResumeAll}"
-                            IsVisible="{Binding IsSessionPaused}" AutomationProperties.AutomationId="ResumeAllButton">
+                            IsVisible="{Binding IsSessionPaused}" AutomationProperties.Name="{m:L Downloads_ResumeAll}" AutomationProperties.AutomationId="ResumeAllButton">
                         <materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" Foreground="{DynamicResource SukiPrimaryColor}"/>
                     </Button>
 
-                    <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}" AutomationProperties.AutomationId="CreateTorrentButton">
+                    <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}" AutomationProperties.Name="{m:L CreateTorrent_Title}" AutomationProperties.AutomationId="CreateTorrentButton">
                         <materialIcons:MaterialIcon Kind="File" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
 
                     <ToggleButton x:Name="DetailsPaneToggle"
                                   IsChecked="{Binding IsDetailsPaneVisible, Mode=OneWay}"
                                   Command="{Binding ToggleDetailsPaneCommand}"
-                                  ToolTip.Tip="{m:L Downloads_ToggleDetails}" AutomationProperties.AutomationId="ToggleDetailsPaneToggle">
+                                  ToolTip.Tip="{m:L Downloads_ToggleDetails}" AutomationProperties.Name="{m:L Downloads_ToggleDetails}" AutomationProperties.AutomationId="ToggleDetailsPaneToggle">
                         <materialIcons:MaterialIcon Kind="DockBottom" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </ToggleButton>
                 </StackPanel>

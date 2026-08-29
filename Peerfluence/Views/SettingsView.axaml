@@ -17,7 +17,7 @@
                         <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Right">
-                        <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent" AutomationProperties.AutomationId="ResetDefaultsButton">
+                        <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent" AutomationProperties.Name="{m:L Settings_Reset}" AutomationProperties.AutomationId="ResetDefaultsButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="Restore" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_Reset}"/>
@@ -33,7 +33,7 @@
         </suki:GlassCard>
 
         <TabControl x:Name="SettingsTabs" Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
-            <TabItem Header="{m:L Settings_Appearance}" AutomationProperties.AutomationId="AppearanceTab">
+            <TabItem Header="{m:L Settings_Appearance}" AutomationProperties.Name="{m:L Settings_Appearance}" AutomationProperties.AutomationId="AppearanceTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
 
@@ -119,7 +119,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_StorageAndSession}" AutomationProperties.AutomationId="StorageAndSessionTab">
+            <TabItem Header="{m:L Settings_StorageAndSession}" AutomationProperties.Name="{m:L Settings_StorageAndSession}" AutomationProperties.AutomationId="StorageAndSessionTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
@@ -133,7 +133,7 @@
                         <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_DownloadFolder}" AutomationProperties.AutomationId="SettingsDownloadPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="SettingsBrowseDownloadPathButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="SettingsBrowseDownloadPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -143,7 +143,7 @@
                         <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding SessionPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_SessionFolder}" AutomationProperties.AutomationId="SessionPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSessionPathButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSessionPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -180,7 +180,7 @@
                         <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}" AutomationProperties.Name="{m:L Settings_MediaPlayerPath}" AutomationProperties.AutomationId="MediaPlayerPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseMediaPlayerButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseMediaPlayerButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -201,7 +201,7 @@
                             <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                                 <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionProgram}" AutomationProperties.AutomationId="CompletionActionProgramPathTextBox"/>
-                                <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCompletionActionProgramButton">
+                                <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCompletionActionProgramButton">
                                     <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 </Button>
                             </Grid>
@@ -239,7 +239,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.AutomationId="NetworkAndConnectivityTab">
+            <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_NetworkAndConnectivity}" AutomationProperties.AutomationId="NetworkAndConnectivityTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
@@ -251,7 +251,7 @@
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <TextBlock Text="{m:L Settings_PortMapping}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <Button Command="{Binding RefreshPortMappingCommand}" HorizontalAlignment="Left" AutomationProperties.AutomationId="RefreshPortMappingButton">
+                        <Button Command="{Binding RefreshPortMappingCommand}" HorizontalAlignment="Left" AutomationProperties.Name="{m:L Settings_PortMapping_Refresh}" AutomationProperties.AutomationId="RefreshPortMappingButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                                 <materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}"/>
                                 <TextBlock Text="{m:L Settings_PortMapping_Refresh}"/>
@@ -403,7 +403,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.AutomationId="SecurityAndPrivacyTab">
+            <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_SecurityAndPrivacy}" AutomationProperties.AutomationId="SecurityAndPrivacyTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
@@ -428,7 +428,7 @@
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
                             <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.Name="{m:L Settings_BlocklistFile}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseBlocklistButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseBlocklistButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -448,7 +448,7 @@
                         <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
                             <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}" AutomationProperties.Name="{m:L Settings_GeoIpFile}" AutomationProperties.AutomationId="GeoIpPathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseGeoIpButton">
+                            <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseGeoIpButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -505,7 +505,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.AutomationId="RemoteTab">
+            <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Remote}" AutomationProperties.AutomationId="RemoteTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
@@ -563,7 +563,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.AutomationId="CategoriesTab">
+            <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Categories}" AutomationProperties.AutomationId="CategoriesTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
@@ -608,7 +608,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.AutomationId="SearchTab">
+            <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Search}" AutomationProperties.AutomationId="SearchTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
@@ -636,7 +636,7 @@
                                     <Button Command="{Binding UseIndexerPresetCommand}"
                                             CommandParameter="{x:Static config:SearchSettings.JackettTemplate}"
                                             Content="{m:L Settings_Search_UseJackett}" AutomationProperties.AutomationId="SettingsUseIndexerPresetButton"/>
-                                    <Button Command="{Binding DetectIndexerCommand}" Classes="Flat" AutomationProperties.AutomationId="DetectIndexerButton">
+                                    <Button Command="{Binding DetectIndexerCommand}" Classes="Flat" AutomationProperties.Name="{m:L Settings_Search_Detect}" AutomationProperties.AutomationId="DetectIndexerButton">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                             <materialIcons:MaterialIcon Kind="Radar" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                             <TextBlock Text="{m:L Settings_Search_Detect}"/>
@@ -669,7 +669,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.AutomationId="UpdatesTab">
+            <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Updates}" AutomationProperties.AutomationId="UpdatesTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
@@ -692,13 +692,13 @@
                     <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}" AutomationProperties.AutomationId="CheckForUpdatesOnStartupSwitch"/>
 
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
-                        <Button Command="{Binding CheckForUpdatesCommand}" AutomationProperties.AutomationId="CheckForUpdatesButton">
+                        <Button Command="{Binding CheckForUpdatesCommand}" AutomationProperties.Name="{m:L Settings_CheckForUpdates}" AutomationProperties.AutomationId="CheckForUpdatesButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="CloudDownloadOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_CheckForUpdates}"/>
                             </StackPanel>
                         </Button>
-                        <Button Command="{Binding ApplyUpdateAndRestartCommand}" IsVisible="{Binding IsUpdateAvailable}" Classes="Accent" AutomationProperties.AutomationId="ApplyUpdateAndRestartButton">
+                        <Button Command="{Binding ApplyUpdateAndRestartCommand}" IsVisible="{Binding IsUpdateAvailable}" Classes="Accent" AutomationProperties.Name="{m:L Settings_ApplyUpdateAndRestart}" AutomationProperties.AutomationId="ApplyUpdateAndRestartButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="RestartAlert" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_ApplyUpdateAndRestart}"/>

@@ -21,7 +21,7 @@
                         <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}"/>
                     </TextBox.KeyBindings>
                 </TextBox>
-                <Button Grid.Column="1" Classes="Flat" Command="{Binding SearchCommand}" AutomationProperties.AutomationId="SearchButton">
+                <Button Grid.Column="1" Classes="Flat" Command="{Binding SearchCommand}" AutomationProperties.Name="{m:L Find_Search}" AutomationProperties.AutomationId="SearchButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Magnify" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Find_Search}"/>
@@ -45,7 +45,7 @@
                         Classes="Flat"
                         HorizontalAlignment="Left"
                         IsVisible="{Binding CanFixInSettings}"
-                        Command="{Binding OpenSearchSettingsCommand}" AutomationProperties.AutomationId="OpenSearchSettingsButton">
+                        Command="{Binding OpenSearchSettingsCommand}" AutomationProperties.Name="{m:L Find_OpenSearchSettings}" AutomationProperties.AutomationId="OpenSearchSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Find_OpenSearchSettings}"/>
