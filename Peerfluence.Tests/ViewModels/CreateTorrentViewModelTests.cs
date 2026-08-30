@@ -127,13 +127,14 @@ public class CreateTorrentViewModelTests
     }
 
     [Fact]
-    public void OnRequestClose_CanBeSubscribedTo()
+    public void CancelCommand_RequestsTheWindowToClose()
     {
         var invoked = false;
         _sut.OnRequestClose += () => invoked = true;
 
-        // Just verify no exception — we can't trigger it without a full Create flow
-        Assert.False(invoked);
+        _sut.CancelCommand.Execute(null);
+
+        Assert.True(invoked);
     }
 
     [Fact]

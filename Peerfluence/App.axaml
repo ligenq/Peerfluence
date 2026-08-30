@@ -1,4 +1,4 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Peerfluence"
              xmlns:converters="using:Peerfluence.Converters"
@@ -21,6 +21,8 @@
                 <ResourceInclude Source="avares://Peerfluence/Resources/_FontSizes.axaml"/>
                 <ResourceInclude Source="avares://Peerfluence/Resources/_IconSizes.axaml"/>
                 <ResourceInclude Source="avares://Peerfluence/Resources/_CornerRadii.axaml"/>
+                <ResourceInclude Source="avares://Peerfluence/Resources/_Opacities.axaml"/>
+                <ResourceInclude Source="avares://Peerfluence/Resources/_Dimensions.axaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:ByteSizeConverter x:Key="ByteSizeConverter"/>
             <converters:SpeedConverter x:Key="SpeedConverter"/>

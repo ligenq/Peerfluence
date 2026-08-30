@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -560,7 +560,7 @@
     <value>Komentarz</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Utwórz</value>
+    <value>Utwórz...</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>Plik...</value>
@@ -662,7 +662,7 @@
     <value>Ścieżka do pliku listy zablokowanych (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Przeglądaj</value>
+    <value>Przeglądaj...</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Wygląd</value>
@@ -1017,12 +1017,6 @@
   </data>
   <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
     <value>Przykład: --path „{downloadPath}” --name „{name}”</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
-    <value>Katalog roboczy</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
-    <value>{downloadPath}</value>
   </data>
   <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
     <value>Limit czasu (sekundy)</value>
@@ -1383,5 +1377,173 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   </data>
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Adres wpisany, ale zastąp 1 identyfikatorem swojego indeksera: Prowlarr nadaje każdemu indekserowi własny adres i nie ma wspólnego. Identyfikator znajdziesz w pasku adresu po otwarciu indeksera w Prowlarr.</value>
+  </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Metadane nie docierają</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Zmieniono port nasłuchu</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>Nie można powiązać portu {0}, więc używany jest {1}. Zaktualizuj przekierowanie portów w routerze.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>Serwer proxy nie obsługuje UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>Skonfigurowano serwer proxy HTTP, więc DHT i uTP są wyłączone w tej sesji. Użyj serwera SOCKS5, aby je zachować.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Zmieniono ścieżkę pobierania i przeniesiono dane</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Odpytaj</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>Odpytanie nie powiodło się: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Web seedy</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>Adres URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Dodaj web seed</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>To nie jest prawidłowy adres web seed albo torrent już go ma.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>Ten torrent nie ma web seedów.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Zmień nazwę</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>Zmiana nazwy nie powiodła się: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Super seeding (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>Dla pojedynczego seeda wprowadzającego nową zawartość do pustego roju. Potem wyłącz: w ustalonym roju spowalnia peerów, którzy mogliby pobierać swobodnie.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Maks. połączeń</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Maks. slotów wysyłania</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 używa ustawienia globalnego</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Wstrzymaj wszystko</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Wznów wszystko</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>Wszystkie torrenty wstrzymane</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Torrenty wznowione</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Powiąż z adresem</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Wysyłaj wszystko z jednego adresu lokalnego, np. adresu VPN. Jeśli ten adres zniknie, ruch zostaje wstrzymany zamiast wyjść inną trasą - to czyni z tego wyłącznik awaryjny. Pozostaw puste, aby używać wszystkich interfejsów. Mapowanie portów jest wyłączone, gdy to ustawienie działa.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>Połączenia na adres</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>Ile połączeń jeden adres może utrzymywać w ramach jednego torrenta. 0 oznacza bez ograniczeń. Pojedynczy peer przez chwilę utrzymuje więcej niż jedno, gdy próba połączenia sprawdza oba transporty - ustaw wartość według swojej sieci, a nie nisko z zasady.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>To nie jest adres, z którym można się powiązać. Użyj własnego adresu tego komputera, nie 0.0.0.0.</value>
+  </data>
+  <data name="Settings_Seeding" xml:space="preserve">
+    <value>Udostępnianie</value>
+  </data>
+  <data name="Settings_SeedingHint" xml:space="preserve">
+    <value>Dotyczy torrentów dodanych od teraz. Każdy torrent nadal może mieć własne cele.</value>
+  </data>
+  <data name="Settings_LimitSeedingRatio" xml:space="preserve">
+    <value>Zatrzymaj przy współczynniku</value>
+  </data>
+  <data name="Settings_LimitSeedingTime" xml:space="preserve">
+    <value>Zatrzymaj po minutach</value>
+  </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Statystyki</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Pobrano w tej sesji</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Wysłano w tej sesji</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Współczynnik udostępniania</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Torrenty</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Liczone od uruchomienia Peerfluence i zgłaszane przez sam silnik.</value>
+  </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Obserwowany folder</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Dodawaj pliki torrent z folderu</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Pliki torrent umieszczone tutaj są dodawane automatycznie. Każdy zostaje zmieniony nazwą, a nie usunięty.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Wybierz folder do obserwowania</value>
+  </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Zaplanowane limity</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Używaj innych limitów o określonych porach</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Gdy okno jest otwarte, te limity zastępują powyższe. Godzina zakończenia wcześniejsza niż rozpoczęcia przechodzi przez północ.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>Od</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>Do</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Dni</value>
+  </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Wyszukiwanie automatyczne</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Uruchamiaj zapisane wyszukiwanie samodzielnie</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>Zapytanie działa na powyższym indeksie i dodaje to, czego wcześniej nie dodało. Piętnaście minut to najkrótszy używany odstęp.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Zapytanie</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Co (minut)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Kategoria dla dodanych</value>
   </data>
 </root>

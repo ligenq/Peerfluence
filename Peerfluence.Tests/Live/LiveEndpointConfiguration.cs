@@ -7,7 +7,8 @@ namespace Peerfluence.Tests.Live;
 /// rather than failed when there is nothing to talk to.
 ///
 /// <para>
-/// Read from <c>live-contract.local.json</c> at the repository root. The name ends in
+/// Read from <c>live-contract.local.json</c> at the repository root, but only after
+/// <c>PEERFLUENCE_RUN_LIVE_TESTS=1</c> explicitly opts in. The name ends in
 /// <c>.local.json</c>, which the repository ignores, because this file holds an API key and an API
 /// key does not belong in version control. Nobody who clones this gets one, so on their machine
 /// these tests skip, which is the correct behaviour for a test that needs someone else's server.
@@ -16,13 +17,19 @@ namespace Peerfluence.Tests.Live;
 public sealed record LiveEndpointConfiguration(string TorznabUrl, string ApiKey)
 {
     private const string FileName = "live-contract.local.json";
+    private const string EnableVariable = "PEERFLUENCE_RUN_LIVE_TESTS";
 
     /// <summary>
     /// The configuration if there is one, or null. Null is the ordinary case - on a build machine,
-    /// on a contributor's laptop, and here whenever Prowlarr is not running.
+    /// on a contributor's laptop, and here whenever live tests have not been explicitly enabled.
     /// </summary>
     public static LiveEndpointConfiguration? TryLoad()
     {
+        if (!string.Equals(Environment.GetEnvironmentVariable(EnableVariable), "1", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
         if (FindFile() is not { } path)
         {
             return null;

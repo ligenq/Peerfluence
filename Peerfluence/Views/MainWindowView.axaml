@@ -1,4 +1,4 @@
-<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:vm="using:Peerfluence.ViewModels"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -26,19 +26,20 @@
     -->
     <primitives:VisualLayerManager>
     <Panel>
-    <suki:SukiSideMenu ItemsSource="{Binding NavigationItems}"
+    <suki:SukiSideMenu ZIndex="0"
+                       ItemsSource="{Binding NavigationItems}"
                        SelectedItem="{Binding SelectedNavigationItem}"
                        IsVisible="{Binding !IsSimpleMode}"
                        UseCustomContent="True">
         <suki:SukiSideMenu.HeaderContent>
             <StackPanel Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource LargeLeftRightTopBottomMargin}">
                 <TextBlock Text="{m:L App_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource SukiPrimaryColor}" />
-                <TextBlock Text="{m:L App_Tagline}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource SukiLowText}"/>
+                <TextBlock Text="{m:L App_Tagline}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource SukiLowText}"/>
             </StackPanel>
         </suki:SukiSideMenu.HeaderContent>
         <suki:SukiSideMenu.ItemTemplate>
             <DataTemplate x:DataType="vm:NavigationItem">
-                <suki:SukiSideMenuItem Header="{Binding Title}">
+                <suki:SukiSideMenuItem Header="{Binding Title}" AutomationProperties.Name="{Binding Title}">
                     <suki:SukiSideMenuItem.Icon>
                         <materialIcons:MaterialIcon Kind="{Binding Icon}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}" />
                     </suki:SukiSideMenuItem.Icon>
@@ -51,10 +52,10 @@
                 the status strip now, where the rest of the numbers are.
             -->
             <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
-                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="0" Margin="0,4,0,0">
+                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}" AutomationProperties.Name="{m:L Nav_About}" AutomationProperties.AutomationId="ShowAboutButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.5"/>
-                        <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.5"/>
+                        <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacityDisabled}"/>
+                        <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacityDisabled}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -68,7 +69,7 @@
             Simple mode: the one screen, and a quiet way back to everything else. No side menu,
             because there is nowhere else to navigate to.
         -->
-        <Grid RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+        <Grid ZIndex="0" RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
             <!--
                 The only chrome simple mode gets: a way into settings and a way out to advanced,
                 muted and out of the way of the one thing the screen is for.
@@ -79,24 +80,24 @@
                         HorizontalAlignment="Right">
                 <Button Classes="Basic"
                         Command="{Binding ShowSimpleSettingsCommand}"
-                        IsVisible="{Binding !IsSimpleSettingsOpen}">
+                        IsVisible="{Binding !IsSimpleSettingsOpen}" AutomationProperties.Name="{m:L Settings_Title}" AutomationProperties.AutomationId="ShowSimpleSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
-                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="Basic"
                         Command="{Binding CloseSimpleSettingsCommand}"
-                        IsVisible="{Binding IsSimpleSettingsOpen}">
+                        IsVisible="{Binding IsSimpleSettingsOpen}" AutomationProperties.Name="{m:L Nav_Downloads}" AutomationProperties.AutomationId="CloseSimpleSettingsButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
-                        <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                        <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}">
+                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}" AutomationProperties.Name="{m:L Simple_SwitchToAdvanced}" AutomationProperties.AutomationId="SwitchToAdvancedModeButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="0.6"/>
-                        <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="0.6"/>
+                        <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -114,7 +115,7 @@
             hero and no decoration. The thing being chosen is which interface to show, not a product
             to be sold.
         -->
-        <Border IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
+        <Border ZIndex="10" IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
             <StackPanel VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Spacing="{StaticResource SpacingStandard}"
@@ -123,27 +124,27 @@
                            FontSize="{StaticResource FontSizeLarge}"
                            FontWeight="SemiBold"/>
                 <TextBlock Text="{m:L Welcome_Subtitle}"
-                           Opacity="0.65"
+                           Opacity="{StaticResource OpacitySecondary}"
                            TextWrapping="Wrap"
                            Margin="{StaticResource StandardBottomMargin}"/>
 
                 <Button Command="{Binding ChooseSimpleModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.Name="{m:L Welcome_Simple_Title}" AutomationProperties.AutomationId="ChooseSimpleModeButton">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Simple_Title}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="0.65" TextWrapping="Wrap" MaxWidth="360"/>
+                        <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
                     </StackPanel>
                 </Button>
 
                 <Button Command="{Binding ChooseAdvancedModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.Name="{m:L Welcome_Advanced_Title}" AutomationProperties.AutomationId="ChooseAdvancedModeButton">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Welcome_Advanced_Title}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="0.65" TextWrapping="Wrap" MaxWidth="360"/>
+                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
                     </StackPanel>
                 </Button>
             </StackPanel>

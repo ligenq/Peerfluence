@@ -29,6 +29,7 @@ updates:
           - "xunit*"
           - "NSubstitute"
           - "Microsoft.NET.Test.Sdk"
+          - "Microsoft.Testing.Extensions.CodeCoverage"
 
   - package-ecosystem: github-actions
     directory: "/"

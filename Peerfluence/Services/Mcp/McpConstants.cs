@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Peerfluence.Services.Mcp;
@@ -6,7 +6,7 @@ namespace Peerfluence.Services.Mcp;
 public static class McpConstants
 {
     public const string Name = "Peerfluence";
-    public const string Version = "1.0.0";
+    public static string Version => ApplicationVersionInfo.Version;
 
     // Tool Names
     public const string ToolAddTorrent = "add_torrent";
@@ -25,6 +25,21 @@ public static class McpConstants
     public const string ToolGetTorrentDiagnosticsDescription = "Gets detailed diagnostic information for a specific torrent (trackers, peers, missing pieces).";
     public const string ToolSetFilePriority = "set_file_priority";
     public const string ToolSetFilePriorityDescription = "Sets the download priority for a specific file within a torrent.";
+    public const string ToolConfigureTorrent = "configure_torrent";
+    public const string ToolConfigureTorrentDescription = "Sets a torrent's super-seeding mode, maximum connections, and maximum upload slots. Omitted values are left unchanged.";
+    public const string ToolManageWebSeeds = "manage_web_seeds";
+    public const string ToolManageWebSeedsDescription = "Lists, adds, or removes BEP 19 web seed URLs for a torrent.";
+    public const string ToolSearchTorrents = "search_torrents";
+    public const string ToolSearchTorrentsDescription =
+        "Searches the configured Torznab indexer for torrents matching a query and returns what it "
+        + "found, including a link that add_torrent accepts. Finds nothing if no indexer is set up.";
+    public const string ToolScrapeTrackers = "scrape_trackers";
+    public const string ToolScrapeTrackersDescription = "Asks a torrent's trackers for current seeder and leecher counts and returns them.";
+    public const string ToolRenameTorrentFile = "rename_torrent_file";
+    public const string ToolRenameTorrentFileDescription = "Stores one of a torrent's files under a different name, moving what has been downloaded. The torrent must be stopped.";
+    public const string ToolMoveTorrentStorage = "move_torrent_storage";
+    public const string ToolMoveTorrentStorageDescription = "Moves a torrent's downloaded data to a new directory and continues from there. The torrent must be stopped.";
+
     public const string ToolGetUiTestState = "ui_agent_get_state";
     public const string ToolGetUiTestStateDescription = "Gets structured UI-agent test state, including window status, selection, and visible torrents.";
     public const string ToolLoadTorrentFile = "ui_agent_load_torrent_file";
@@ -75,9 +90,32 @@ public static class McpConstants
         long TotalUploaded,
         int TotalPeers,
         int ActiveTorrents,
-        int DownloadSpeed,
-        int UploadSpeed,
-        int TorrentCount
+        long DownloadSpeed,
+        long UploadSpeed,
+        int TorrentCount,
+        // From the engine's own meter rather than the stats snapshot. These cover the engine's whole
+        // life, torrents since removed included, so they answer "how much has this machine pulled
+        // down" - which the snapshot, reporting only the torrents present now, never could.
+        long LifetimeDownloaded,
+        long LifetimeUploaded
+    );
+
+    public record WebSeedsResponse(
+        string InfoHash,
+        List<string> WebSeeds
+    );
+
+    public record TrackerScrapeEntry(
+        string Url,
+        string State,
+        int SeedCount,
+        int LeechCount,
+        string? LastError
+    );
+
+    public record TrackerScrapeResponse(
+        string InfoHash,
+        List<TrackerScrapeEntry> Trackers
     );
 
     public record TorrentListResponse(
@@ -95,6 +133,26 @@ public static class McpConstants
         int Seeds,
         long Size
     );
+
+    /// <summary>One result of a search, with the link that <c>add_torrent</c> takes.</summary>
+    public record SearchResultSummary(
+        string Title,
+        long SizeBytes,
+        int Seeders,
+        int Peers,
+        string IndexerName,
+        DateTimeOffset? PublishedAt,
+        string Link,
+        bool IsMagnet);
+
+    /// <summary>
+    /// What a search came back with, and why it came back with nothing when it did.
+    /// </summary>
+    public record SearchResultsResponse(
+        string Query,
+        IReadOnlyList<SearchResultSummary> Results,
+        string? Failure = null,
+        string? FailureDetail = null);
 
     public record UiAgentStateResponse(
         bool WindowAvailable,

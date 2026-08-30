@@ -27,19 +27,49 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 10.0.400
 
       - name: Restore
         run: dotnet restore Peerfluence.slnx
 
-      - name: Build
-        run: dotnet build Peerfluence.slnx --no-restore --configuration Release
+      - name: Verify formatting
+        run: dotnet format Peerfluence.slnx --verify-no-changes --no-restore
 
+      - name: Strict build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Debug --warnaserror
+
+      - name: Build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Release --warnaserror
+
+      # xunit.v3 4.0 is Microsoft.Testing.Platform only - it dropped VSTest, which is what the
+      # --logger options above spoke. global.json opts `dotnet test` into MTP; everything after the
+      # bare -- is passed to the test executable itself, which is where the reporting options moved.
+      #
+      # Not everything, though: `dotnet test` reads --results-directory itself even after the bare
+      # --, and then reads the value after it as a directory to test, which it refuses. The reports
+      # land in ./TestResults without being asked, which is where the upload step looks anyway.
       - name: Unit tests
-        run: dotnet test Peerfluence.Tests/Peerfluence.Tests.csproj --no-build --configuration Release --logger "console;verbosity=minimal" --logger "trx;LogFileName=unit-${{ matrix.os }}.trx" --results-directory TestResults
+        run: >
+          dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj
+          --no-build
+          --configuration Release
+          --
+          --report-trx
+          --report-trx-filename unit-${{ matrix.os }}.trx
 
       - name: Headless UI tests
-        run: dotnet test Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --no-build --configuration Release --logger "console;verbosity=minimal" --logger "trx;LogFileName=headless-${{ matrix.os }}.trx" --results-directory TestResults
+        run: >
+          dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
+          --no-build
+          --configuration Release
+          --
+          --report-trx
+          --report-trx-filename headless-${{ matrix.os }}.trx
+
+      # Peerfluence.UiTests is built by the step above and deliberately not run here. It drives the
+      # real application through Windows UI Automation, which needs an interactive desktop session,
+      # and it is slower and less certain than the suites that gate a merge. Building it keeps it
+      # from rotting; running it is a developer's choice. Off Windows it compiles to nothing.
 
       # The part no unit test reaches: that the dependency graph resolves, that every hosted service
       # starts and stops without throwing, and that settings survive a round trip on a machine that
@@ -60,3 +90,43 @@ jobs:
           name: ${{ matrix.os }}-test-results
           path: TestResults/*.trx
           if-no-files-found: ignore
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Restore
+        run: dotnet restore Peerfluence.slnx
+
+      - name: Build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Release --warnaserror
+
+      - name: Unit coverage
+        run: >
+          dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj
+          --no-build --configuration Release --
+          --coverage --coverage-output-format cobertura
+          --coverage-output coverage/unit.cobertura.xml
+
+      - name: Headless coverage
+        run: >
+          dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
+          --no-build --configuration Release --
+          --coverage --coverage-output-format cobertura
+          --coverage-output coverage/headless.cobertura.xml
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: TestResults/coverage/*.cobertura.xml
+          if-no-files-found: error

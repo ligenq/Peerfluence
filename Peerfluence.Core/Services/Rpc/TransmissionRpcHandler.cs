@@ -159,7 +159,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
 
         foreach (var torrent in torrents)
         {
-            var snapshot = _snapshots.Get(torrent.Hash);
+            var snapshot = _snapshots.GetSnapshot(torrent.Hash);
             down += snapshot.DownloadSpeed;
             up += snapshot.UploadSpeed;
             if (torrent.Started)
@@ -237,7 +237,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
 
     private void WriteField(Utf8JsonWriter writer, ITorrent torrent, string field)
     {
-        var snapshot = _snapshots.Get(torrent.Hash);
+        var snapshot = _snapshots.GetSnapshot(torrent.Hash);
 
         switch (field)
         {
@@ -485,7 +485,10 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
     /// Accepted and reported honestly rather than silently ignored: the engine cannot move a
     /// torrent's data, so a client told this succeeded would believe files are somewhere they are not.
     /// </summary>
-    private Task<string> TorrentSetLocationAsync(JsonElement arguments, int? tag, CancellationToken cancellationToken)
+    private static Task<string> TorrentSetLocationAsync(
+        JsonElement arguments,
+        int? tag,
+        CancellationToken cancellationToken)
     {
         _ = arguments;
         _ = cancellationToken;

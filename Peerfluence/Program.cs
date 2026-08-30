@@ -62,7 +62,7 @@ internal sealed class Program
         {
             // 1. Initial Host Setup
             var builder = Host.CreateApplicationBuilder(args);
-            
+
             // 2. Configure Logging
             ConfigureLogging(builder, appPaths);
 

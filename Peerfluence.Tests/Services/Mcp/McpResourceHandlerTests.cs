@@ -25,7 +25,7 @@ public class McpResourceHandlerTests : IDisposable
         // Arrange
         var logger = Substitute.For<ILogger<McpResourceHandler>>();
         // We pass null for TorrentEngineService and TorrentService as they are not used in GetLatestLogsAsync
-        var handler = new McpResourceHandler(null!, _appPaths, logger);
+        var handler = new McpResourceHandler(null!, _appPaths, logger, Substitute.For<IEngineMetricsReader>());
 
         var logFilePath = Path.Combine(_testLogDir, "test_log_123.log");
         await File.WriteAllTextAsync(logFilePath, "Test Log Line 1\nTest Log Line 2", TestContext.Current.CancellationToken);
@@ -53,7 +53,7 @@ public class McpResourceHandlerTests : IDisposable
     {
         // Arrange
         var logger = Substitute.For<ILogger<McpResourceHandler>>();
-        var handler = new McpResourceHandler(null!, _appPaths, logger);
+        var handler = new McpResourceHandler(null!, _appPaths, logger, Substitute.For<IEngineMetricsReader>());
 
         // Act
         var result = await handler.GetEngineStatsAsync();
@@ -80,5 +80,7 @@ public class McpResourceHandlerTests : IDisposable
         {
             try { File.Delete(file); } catch { /* ignore */ }
         }
+
+        GC.SuppressFinalize(this);
     }
 }

@@ -21,7 +21,7 @@ namespace Peerfluence.Services;
 /// has no business carrying a web server it uses a hundredth of.
 /// </para>
 /// </summary>
-public sealed class TransmissionRpcHostedService : IHostedService
+public sealed class TransmissionRpcHostedService : IHostedService, IDisposable
 {
     private const string Path = "/transmission/rpc";
 
@@ -112,6 +112,16 @@ public sealed class TransmissionRpcHostedService : IHostedService
             }
         }
 
+        _cts?.Dispose();
+        _cts = null;
+        _listener = null;
+        _loop = null;
+    }
+
+    void IDisposable.Dispose()
+    {
+        _cts?.Cancel();
+        _listener?.Close();
         _cts?.Dispose();
         _cts = null;
         _listener = null;

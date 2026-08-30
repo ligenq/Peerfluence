@@ -19,7 +19,7 @@ public sealed class TorrentTransferSnapshotsTests
 
         sut.Record(Hash, new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
 
-        Assert.Equal(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7), sut.Get(Hash));
+        Assert.Equal(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7), sut.GetSnapshot(Hash));
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public sealed class TorrentTransferSnapshotsTests
         sut.Record(Hash, new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
 
         // Every field zero: a torrent that has not reported yet is going nowhere, which is true.
-        Assert.Equal(default, sut.Get(Other));
+        Assert.Equal(default, sut.GetSnapshot(Other));
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public sealed class TorrentTransferSnapshotsTests
         sut.Record(Hash, new TorrentTransferSnapshot(1, 1, 1, 1, 1));
         sut.Record(Hash, new TorrentTransferSnapshot(2, 2, 2, 2, 2));
 
-        Assert.Equal(2, sut.Get(Hash).DownloadSpeed);
+        Assert.Equal(2, sut.GetSnapshot(Hash).DownloadSpeed);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public sealed class TorrentTransferSnapshotsTests
 
         sut.Record(default, new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
 
-        Assert.Equal(default, sut.Get(default));
+        Assert.Equal(default, sut.GetSnapshot(default));
     }
 
     /// <summary>
@@ -70,9 +70,9 @@ public sealed class TorrentTransferSnapshotsTests
         Parallel.For(0, 200, i =>
         {
             sut.Record(Hash, new TorrentTransferSnapshot(i, i, i, i, i));
-            _ = sut.Get(Hash);
+            _ = sut.GetSnapshot(Hash);
         });
 
-        Assert.True(sut.Get(Hash).DownloadSpeed >= 0);
+        Assert.True(sut.GetSnapshot(Hash).DownloadSpeed >= 0);
     }
 }

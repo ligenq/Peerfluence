@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Config;
 using PeerSharp.Clients;
 using PeerSharp.Config;
@@ -6,22 +6,33 @@ using PeerSharp.Interfaces;
 
 namespace Peerfluence.Core.Services;
 
-public sealed class TorrentEngineService : ITorrentEngineService
+public sealed partial class TorrentEngineService : ITorrentEngineService
 {
     private readonly IAppSettingsService _settingsService;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<TorrentEngineService> _logger;
+    private readonly TimeProvider _timeProvider;
     private IClientEngine? _engine;
     private Task? _shutdownTask;
 
-    public TorrentEngineService(IAppSettingsService settingsService, ILoggerFactory loggerFactory)
+    public TorrentEngineService(
+        IAppSettingsService settingsService,
+        ILoggerFactory loggerFactory,
+        TimeProvider timeProvider)
     {
         _settingsService = settingsService;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<TorrentEngineService>();
+        _timeProvider = timeProvider;
     }
 
     public IClientEngine Engine => _engine ?? throw new InvalidOperationException("Torrent engine is not initialized.");
+
+    /// <summary>
+    /// Whether the configured proxy cost this session DHT or uTP. Read once the engine is built, so
+    /// the user can be told rather than left wondering why no peers arrive.
+    /// </summary>
+    public bool ProxyRestrictionApplied { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -30,20 +41,22 @@ public sealed class TorrentEngineService : ITorrentEngineService
         await _engine.InitializeAsync(cancellationToken).ConfigureAwait(false);
         var engineElapsedMs = stopwatch.ElapsedMilliseconds;
         await LoadBlocklistAsync(cancellationToken).ConfigureAwait(false);
-        _logger.LogInformation(
-            "Torrent engine initialized in {ElapsedMs} ms with {TorrentCount} restored torrents (blocklist: {BlocklistElapsedMs} ms)",
-            stopwatch.ElapsedMilliseconds,
-            _engine.GetTorrents().Count,
-            stopwatch.ElapsedMilliseconds - engineElapsedMs);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            var torrentCount = _engine.GetTorrents().Count;
+            LogTorrentEngineInitialized(
+                _logger,
+                stopwatch.ElapsedMilliseconds,
+                torrentCount,
+                stopwatch.ElapsedMilliseconds - engineElapsedMs);
+        }
     }
 
     public async Task LoadOptionalDataAsync(CancellationToken cancellationToken)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         await LoadGeoIpAsync(cancellationToken).ConfigureAwait(false);
-        _logger.LogInformation(
-            "Optional GeoIP data loaded after startup in {ElapsedMs} ms",
-            stopwatch.ElapsedMilliseconds);
+        LogOptionalDataLoaded(_logger, stopwatch.ElapsedMilliseconds);
     }
 
     public ValueTask DisposeAsync()
@@ -74,11 +87,11 @@ public sealed class TorrentEngineService : ITorrentEngineService
             try
             {
                 await _shutdownTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation("Torrent engine shutdown completed in {ElapsedMs} ms", stopwatch.ElapsedMilliseconds);
+                LogTorrentEngineShutdown(_logger, stopwatch.ElapsedMilliseconds);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogWarning("Torrent engine shutdown exceeded its deadline after {ElapsedMs} ms; disposal continues in the background", stopwatch.ElapsedMilliseconds);
+                LogTorrentEngineShutdownDeadlineExceeded(_logger, stopwatch.ElapsedMilliseconds);
                 throw;
             }
         }
@@ -92,34 +105,55 @@ public sealed class TorrentEngineService : ITorrentEngineService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Torrent engine disposal failed");
+            LogTorrentEngineDisposalFailed(_logger, ex);
         }
     }
 
     private IClientEngine CreateEngine()
     {
         var settings = _settingsService.Current;
+        // Restored torrents can begin transferring during initialization, before the schedule's
+        // minute timer has ticked. Start with the limits that are in force now rather than briefly
+        // exposing the ordinary limits inside a scheduled window.
+        var (downloadLimit, uploadLimit) = BandwidthSchedule.LimitsFor(settings, _timeProvider.GetLocalNow());
+
+        var udpPlan = ProxyUdpPolicy.Decide(settings.Proxy, settings.Network.EnableDht);
+        var bindAddress = ParseBindAddress(settings.Network.BindAddress);
+        if (udpPlan.RestrictedByProxy)
+        {
+            // Warned rather than thrown. The engine would refuse to start at all, and an application
+            // that will not open is a worse answer to "your proxy cannot carry UDP" than one that
+            // opens with less of the network available and says so.
+            LogHttpProxyRestrictsUdp(_logger, udpPlan.EnableUtp ? "on" : "off");
+            ProxyRestrictionApplied = true;
+        }
 
         var clientSettings = new Settings
         {
             Dht = new DhtSettings
             {
-                Enabled = settings.Network.EnableDht,
+                Enabled = udpPlan.EnableDht,
                 AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling
             },
             Files = new FilesSettings
             {
                 DefaultDownloadPath = settings.Storage.DownloadPath,
-                MaxDiskReadSpeed = (uint)Math.Max(0, settings.Network.MaxDiskReadSpeedBytesPerSecond),
-                MaxDiskWriteSpeed = (uint)Math.Max(0, settings.Network.MaxDiskWriteSpeedBytesPerSecond)
+                MaxDiskReadSpeed = ToSpeed(settings.Network.MaxDiskReadSpeedBytesPerSecond),
+                MaxDiskWriteSpeed = ToSpeed(settings.Network.MaxDiskWriteSpeedBytesPerSecond)
             },
             Connection = new ConnectionSettings
             {
                 TcpPort = GetListeningPort(settings.Network),
                 UdpPort = GetListeningPort(settings.Network),
-                NatPmpPortMapping = settings.Network.EnableNatPmp,
-                UpnpPortMapping = settings.Network.EnableUpnp,
+                // Port mapping discovers the interface independently and opens its own sockets, so
+                // it cannot honour a single-address kill switch.
+                NatPmpPortMapping = bindAddress is null && settings.Network.EnableNatPmp,
+                UpnpPortMapping = bindAddress is null && settings.Network.EnableUpnp,
                 AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp,
+                MaxConnectionsPerIp = Math.Max(0, settings.Network.MaxConnectionsPerIp),
+                BindAddress = bindAddress,
+                EnableUtpIn = udpPlan.EnableUtp,
+                EnableUtpOut = udpPlan.EnableUtp,
                 Encryption = ParseEncryption(settings.EncryptionMode)
             },
             Session = new SessionSettings
@@ -136,8 +170,8 @@ public sealed class TorrentEngineService : ITorrentEngineService
             },
             Transfer = new TransferSettings
             {
-                MaxDownloadSpeed = ToSpeed(settings.Network.MaxDownloadSpeedBytesPerSecond),
-                MaxUploadSpeed = ToSpeed(settings.Network.MaxUploadSpeedBytesPerSecond)
+                MaxDownloadSpeed = ToSpeed(downloadLimit),
+                MaxUploadSpeed = ToSpeed(uploadLimit)
             },
             Proxy = CreateProxySettings(settings.Proxy)
         };
@@ -161,19 +195,27 @@ public sealed class TorrentEngineService : ITorrentEngineService
 
         // Properties rather than a replacement Transfer object. The engine reads these from its own
         // loops and does not support having a sub-settings object swapped underneath it.
-        var network = _settingsService.Current.Network;
-        engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(network.MaxDownloadSpeedBytesPerSecond);
-        engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(network.MaxUploadSpeedBytesPerSecond);
+        // Through the schedule, which answers with the ordinary limits outside its window. So this
+        // one method is what the settings screen calls when a limit changes and what the clock calls
+        // when the window opens, and there is only ever one answer to what the limits are.
+        var (download, upload) = BandwidthSchedule.LimitsFor(_settingsService.Current, _timeProvider.GetLocalNow());
+        engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(download);
+        engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(upload);
     }
 
     /// <summary>
-    /// Clamps a stored limit into what the engine takes. A negative value is meaningless and would
-    /// wrap into an enormous limit rather than an absent one, which is the opposite of what someone
-    /// typing a minus sign meant.
+    /// Clamps a stored limit into what the engine takes. A negative value is meaningless, and the
+    /// engine now rejects one with <see cref="ArgumentOutOfRangeException"/> rather than clamping it,
+    /// so a stored minus sign would otherwise stop the engine being built at all.
     /// </summary>
-    private static uint ToSpeed(long bytesPerSecond)
+    /// <remarks>
+    /// The ceiling used to be <c>uint.MaxValue</c>, because the engine took a <c>uint</c>. PeerSharp
+    /// 3.2.0 widened every limit to <c>long</c>, so there is no ceiling to clamp to any more: a limit
+    /// above 4 GB/s is now carried rather than quietly becoming 4 GB/s.
+    /// </remarks>
+    private static long ToSpeed(long bytesPerSecond)
     {
-        return (uint)Math.Clamp(bytesPerSecond, 0, uint.MaxValue);
+        return Math.Max(0, bytesPerSecond);
     }
 
     private static ushort GetListeningPort(NetworkSettings settings)
@@ -205,12 +247,39 @@ public sealed class TorrentEngineService : ITorrentEngineService
         _ => Encryption.Allow
     };
 
-    private static ProxyType ParseProxyType(string type) => type switch
+    private static ProxyType ParseProxyType(string type) => ProxyUdpPolicy.ParseProxyType(type) switch
     {
-        "Socks5" => ProxyType.Socks5,
-        "Http" => ProxyType.Http,
+        ProxyKind.Socks5 => ProxyType.Socks5,
+        ProxyKind.Http => ProxyType.Http,
         _ => ProxyType.None
     };
+
+    /// <summary>
+    /// Reads the address the engine should bind to, which is what makes a VPN a kill switch rather
+    /// than a preference: PeerSharp fails socket creation instead of falling back to an unbound one.
+    /// </summary>
+    /// <remarks>
+    /// Blank means "listen on everything", which the engine spells <see langword="null"/> - passing
+    /// it <see cref="System.Net.IPAddress.Any"/> throws, because that is not a single-address
+    /// guarantee it could keep. An unparseable address is treated the same as blank rather than
+    /// stopping startup, and is warned about where it is entered.
+    /// </remarks>
+    private static System.Net.IPAddress? ParseBindAddress(string? address)
+    {
+        if (string.IsNullOrWhiteSpace(address))
+        {
+            return null;
+        }
+
+        if (!System.Net.IPAddress.TryParse(address, out var parsed))
+        {
+            return null;
+        }
+
+        return parsed.Equals(System.Net.IPAddress.Any) || parsed.Equals(System.Net.IPAddress.IPv6Any)
+            ? null
+            : parsed;
+    }
 
     private async Task LoadBlocklistAsync(CancellationToken cancellationToken)
     {
@@ -236,7 +305,7 @@ public sealed class TorrentEngineService : ITorrentEngineService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Blocklist failed to load from {BlocklistPath}", settings.BlocklistPath);
+            LogBlocklistLoadFailed(_logger, ex, settings.BlocklistPath);
         }
     }
 
@@ -264,7 +333,50 @@ public sealed class TorrentEngineService : ITorrentEngineService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "GeoIP data failed to load from {GeoIpPath}", settings.GeoIpPath);
+            LogGeoIpLoadFailed(_logger, ex, settings.GeoIpPath);
         }
     }
+
+    [LoggerMessage(
+        EventId = 1,
+        Level = LogLevel.Information,
+        Message = "Torrent engine initialized in {ElapsedMs} ms with {TorrentCount} restored torrents (blocklist: {BlocklistElapsedMs} ms)")]
+    private static partial void LogTorrentEngineInitialized(
+        ILogger logger,
+        long elapsedMs,
+        int torrentCount,
+        long blocklistElapsedMs);
+
+    [LoggerMessage(
+        EventId = 2,
+        Level = LogLevel.Information,
+        Message = "Optional GeoIP data loaded after startup in {ElapsedMs} ms")]
+    private static partial void LogOptionalDataLoaded(ILogger logger, long elapsedMs);
+
+    [LoggerMessage(
+        EventId = 3,
+        Level = LogLevel.Information,
+        Message = "Torrent engine shutdown completed in {ElapsedMs} ms")]
+    private static partial void LogTorrentEngineShutdown(ILogger logger, long elapsedMs);
+
+    [LoggerMessage(
+        EventId = 4,
+        Level = LogLevel.Warning,
+        Message = "Torrent engine shutdown exceeded its deadline after {ElapsedMs} ms; disposal continues in the background")]
+    private static partial void LogTorrentEngineShutdownDeadlineExceeded(ILogger logger, long elapsedMs);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Torrent engine disposal failed")]
+    private static partial void LogTorrentEngineDisposalFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(
+        EventId = 6,
+        Level = LogLevel.Warning,
+        Message = "An HTTP proxy is configured, which cannot carry UDP. DHT is off for this session and uTP is {UtpState}. Use a SOCKS5 proxy to keep them.")]
+    private static partial void LogHttpProxyRestrictsUdp(ILogger logger, string utpState);
+
+    [LoggerMessage(EventId = 7, Level = LogLevel.Warning, Message = "Blocklist failed to load from {BlocklistPath}")]
+    private static partial void LogBlocklistLoadFailed(ILogger logger, Exception exception, string blocklistPath);
+
+    [LoggerMessage(EventId = 8, Level = LogLevel.Warning, Message = "GeoIP data failed to load from {GeoIpPath}")]
+    private static partial void LogGeoIpLoadFailed(ILogger logger, Exception exception, string geoIpPath);
 }

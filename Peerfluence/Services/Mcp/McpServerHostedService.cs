@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Security.AccessControl;
@@ -84,11 +84,11 @@ public class McpServerHostedService : BackgroundService
                         continue;
                     }
 
-                    var transport = new StreamServerTransport(pipeServer, pipeServer, "Peerfluence", _loggerFactory);
+                    var transport = new StreamServerTransport(pipeServer, pipeServer, McpConstants.Name, _loggerFactory);
 
                     var options = new McpServerOptions
                     {
-                        ServerInfo = new Implementation { Name = "Peerfluence", Version = "1.0.0" },
+                        ServerInfo = new Implementation { Name = McpConstants.Name, Version = McpConstants.Version },
                         ToolCollection = new McpServerPrimitiveCollection<McpServerTool>(),
                         ResourceCollection = new McpServerResourceCollection(),
                         PromptCollection = new McpServerPrimitiveCollection<McpServerPrompt>()
@@ -98,6 +98,10 @@ public class McpServerHostedService : BackgroundService
                     options.ToolCollection.Add(McpServerTool.Create(
                         _toolHandler.AddTorrentAsync,
                         new McpServerToolCreateOptions { Name = McpConstants.ToolAddTorrent, Description = McpConstants.ToolAddTorrentDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.SearchTorrentsAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolSearchTorrents, Description = McpConstants.ToolSearchTorrentsDescription }));
 
                     options.ToolCollection.Add(McpServerTool.Create(
                         _toolHandler.ManageTorrentAsync,
@@ -126,6 +130,26 @@ public class McpServerHostedService : BackgroundService
                     options.ToolCollection.Add(McpServerTool.Create(
                         _toolHandler.SetFilePriorityAsync,
                         new McpServerToolCreateOptions { Name = McpConstants.ToolSetFilePriority, Description = McpConstants.ToolSetFilePriorityDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.ConfigureTorrentAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolConfigureTorrent, Description = McpConstants.ToolConfigureTorrentDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.ManageWebSeedsAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolManageWebSeeds, Description = McpConstants.ToolManageWebSeedsDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.ScrapeTrackersAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolScrapeTrackers, Description = McpConstants.ToolScrapeTrackersDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.RenameTorrentFileAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolRenameTorrentFile, Description = McpConstants.ToolRenameTorrentFileDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.MoveTorrentStorageAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolMoveTorrentStorage, Description = McpConstants.ToolMoveTorrentStorageDescription }));
 
                     if (_runtimeOptions.EnableUiAgentTools)
                     {

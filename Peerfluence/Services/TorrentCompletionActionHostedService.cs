@@ -22,7 +22,7 @@ internal interface ICompletionActionRunner
 
 internal sealed record CompletionActionResult(bool Started, int? ExitCode, string? Error);
 
-internal sealed class TorrentCompletionActionHostedService : IHostedService
+internal sealed class TorrentCompletionActionHostedService : IHostedService, IDisposable
 {
     private readonly IAppSettingsService _settingsService;
     private readonly ICompletionActionRunner _runner;
@@ -53,6 +53,12 @@ internal sealed class TorrentCompletionActionHostedService : IHostedService
         _stopTokenSource.Cancel();
         WeakReferenceMessenger.Default.Unregister<TorrentAlertMessage>(this);
         return Task.CompletedTask;
+    }
+
+    void IDisposable.Dispose()
+    {
+        WeakReferenceMessenger.Default.Unregister<TorrentAlertMessage>(this);
+        _stopTokenSource.Dispose();
     }
 
     private void OnTorrentAlert(TorrentAlertMessage msg)
