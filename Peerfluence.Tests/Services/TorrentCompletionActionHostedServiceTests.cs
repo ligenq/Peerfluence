@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
@@ -27,7 +27,11 @@ public sealed class TorrentCompletionActionHostedServiceTests
         });
 
         var runner = new FakeCompletionActionRunner(new CompletionActionResult(true, 0, null));
-        var notifications = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
+        var published = new List<NotificationItem>();
+        var notifications = Substitute.For<INotificationService>();
+        notifications
+            .When(service => service.Publish(Arg.Any<NotificationItem>(), Arg.Any<TimeSpan?>()))
+            .Do(call => published.Add(call.Arg<NotificationItem>()));
         var sut = new TorrentCompletionActionHostedService(settingsService, runner, notifications, NullLogger<TorrentCompletionActionHostedService>.Instance);
         var torrent = CreateTorrent("Ubuntu ISO");
 
@@ -44,7 +48,7 @@ public sealed class TorrentCompletionActionHostedServiceTests
         Assert.Equal(1, runner.RunCount);
         Assert.Same(torrent, runner.LastTorrent);
         Assert.Same(settingsService.Current.CompletionAction, runner.LastSettings);
-        Assert.Contains(notifications.Notifications, n => n.Title == "Completion action finished" && n.Type == NotificationType.Success);
+        Assert.Contains(published, n => n.Title == "Completion action finished" && n.Type == NotificationType.Success);
 
         await sut.StopAsync(TestContext.Current.CancellationToken);
     }
@@ -66,7 +70,7 @@ public sealed class TorrentCompletionActionHostedServiceTests
         var sut = new TorrentCompletionActionHostedService(
             settingsService,
             runner,
-            new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>()),
+            Substitute.For<INotificationService>(),
             NullLogger<TorrentCompletionActionHostedService>.Instance);
         var torrent = CreateTorrent("Ubuntu ISO");
 

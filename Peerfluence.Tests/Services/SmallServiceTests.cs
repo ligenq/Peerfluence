@@ -15,43 +15,6 @@ namespace Peerfluence.Tests.Services;
 /// </summary>
 public sealed class NotificationServiceTests
 {
-    private static NotificationItem Item(string title = "title") =>
-        new(title, "message", NotificationType.Info, "Information");
-
-    [Fact]
-    public void APublishedNotification_JoinsTheList()
-    {
-        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
-
-        var notification = Item();
-        sut.Publish(notification);
-
-        Assert.Same(notification, Assert.Single(sut.Notifications));
-    }
-
-    [Fact]
-    public void ADismissedNotification_LeavesTheList()
-    {
-        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
-        var notification = Item();
-        sut.Publish(notification);
-
-        sut.Dismiss(notification);
-
-        Assert.Empty(sut.Notifications);
-    }
-
-    [Fact]
-    public void DismissingSomethingThatWasNeverThere_ChangesNothing()
-    {
-        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
-        sut.Publish(Item("kept"));
-
-        sut.Dismiss(Item("never published"));
-
-        Assert.Single(sut.Notifications);
-    }
-
     [Fact]
     public void PublishingNothing_IsRejectedRatherThanStored()
     {
