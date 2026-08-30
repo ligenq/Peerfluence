@@ -247,8 +247,8 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
     /// </summary>
     internal async Task AddWithRetriesAsync(
         string path,
-        CancellationToken cancellationToken,
-        TimeSpan? retryDelay = null)
+        TimeSpan? retryDelay = null,
+        CancellationToken cancellationToken = default)
     {
         var delay = retryDelay ?? RetryDelay;
         for (var attempt = 1; attempt <= AddAttempts; attempt++)
@@ -272,7 +272,7 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
             // has finished. Failing is handled - the file stays for the next sweep - but waiting a
             // moment first turns the common case into a success rather than a retry.
             await Task.Delay(RetryDelay, _timeProvider, _stopping.Token).ConfigureAwait(false);
-            await AddWithRetriesAsync(e.FullPath, _stopping.Token).ConfigureAwait(false);
+            await AddWithRetriesAsync(e.FullPath, cancellationToken: _stopping.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (_stopping.IsCancellationRequested)
         {

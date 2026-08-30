@@ -6,7 +6,7 @@ namespace Peerfluence.Services.Mcp;
 public static class McpConstants
 {
     public const string Name = "Peerfluence";
-    public const string Version = "1.0.0";
+    public static string Version => ApplicationVersionInfo.Version;
 
     // Tool Names
     public const string ToolAddTorrent = "add_torrent";
