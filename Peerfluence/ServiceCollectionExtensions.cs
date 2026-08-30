@@ -112,10 +112,12 @@ public static class ServiceCollectionExtensions
         services.AddTransient<AboutViewModel>();
         services.AddTransient<CreateTorrentViewModel>();
         services.AddSingleton<FindTorrentsViewModel>();
+        services.AddSingleton<StatisticsViewModel>();
 
         // IFeatureViewModel discovery (order matters for navigation)
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<DownloadsViewModel>());
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<FindTorrentsViewModel>());
+        services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<StatisticsViewModel>());
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<SettingsViewModel>());
 
         return services;
@@ -128,6 +130,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<DetailsView>();
         services.AddTransient<SettingsView>();
         services.AddTransient<FindTorrentsView>();
+        services.AddTransient<StatisticsView>();
         services.AddTransient<AboutView>();
         services.AddTransient<CreateTorrentWindow>();
         services.AddTransient<AddTorrentOptionsWindow>();

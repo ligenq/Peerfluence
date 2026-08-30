@@ -1486,4 +1486,22 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Settings_LimitSeedingTime" xml:space="preserve">
     <value>Stoppa efter minuter</value>
   </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Statistik</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Hämtat denna session</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Skickat denna session</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Delningsförhållande</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Torrenter</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Räknat sedan Peerfluence startade, och rapporterat av motorn själv.</value>
+  </data>
 </root>

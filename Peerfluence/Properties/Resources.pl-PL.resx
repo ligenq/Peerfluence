@@ -1486,4 +1486,22 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="Settings_LimitSeedingTime" xml:space="preserve">
     <value>Zatrzymaj po minutach</value>
   </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Statystyki</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Pobrano w tej sesji</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Wysłano w tej sesji</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Współczynnik udostępniania</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Torrenty</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Liczone od uruchomienia Peerfluence i zgłaszane przez sam silnik.</value>
+  </data>
 </root>

@@ -1486,4 +1486,22 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   <data name="Settings_LimitSeedingTime" xml:space="preserve">
     <value>Ferma dopo i minuti</value>
   </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Statistiche</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Scaricato in questa sessione</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Inviato in questa sessione</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Rapporto di condivisione</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Torrent</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Contato dall’avvio di Peerfluence e riportato dal motore stesso.</value>
+  </data>
 </root>

@@ -24,6 +24,7 @@ public sealed class NavigationTests
     [
         "AddMagnetButton",                      // downloads
         "FindTorrentsOpenSearchSettingsButton", // find torrents, with nothing set up yet
+        "StatisticsPage",                       // statistics
         "AppearanceTab",                        // settings
     ];
 
