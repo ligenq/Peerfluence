@@ -21,7 +21,7 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
         var previewService = Substitute.For<IMagnetMetadataPreviewService>();
         previewService
             .FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<IProgress<double>?>(), Arg.Any<CancellationToken>())
-            .Returns(call => FetchUntilCancelled(call.Arg<CancellationToken>(), () => previewReleased = true));
+            .Returns(call => FetchUntilCancelled(() => previewReleased = true, call.Arg<CancellationToken>()));
 
         var previewHadUnwoundWhenAddRan = true;
         var torrentService = Substitute.For<ITorrentService>();
@@ -61,8 +61,8 @@ public sealed class AddTorrentOptionsMetadataPreviewTests
     }
 
     private static async Task<MagnetMetadataPreview?> FetchUntilCancelled(
-        CancellationToken cancellationToken,
-        Action onReleased)
+        Action onReleased,
+        CancellationToken cancellationToken)
     {
         try
         {

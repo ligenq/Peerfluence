@@ -67,7 +67,11 @@ public sealed class WatchFolderHostedServiceTests : IDisposable
         torrents.AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(Substitute.For<ITorrent>()));
 
-        return (new WatchFolderHostedService(settingsService, torrents, NullLogger<WatchFolderHostedService>.Instance), torrents);
+        return (new WatchFolderHostedService(
+            settingsService,
+            torrents,
+            NullLogger<WatchFolderHostedService>.Instance,
+            TimeProvider.System), torrents);
     }
 
     private string Drop(string name)
@@ -153,7 +157,8 @@ public sealed class WatchFolderHostedServiceTests : IDisposable
         var service = new WatchFolderHostedService(
             settingsService,
             torrents,
-            NullLogger<WatchFolderHostedService>.Instance);
+            NullLogger<WatchFolderHostedService>.Instance,
+            TimeProvider.System);
         await service.StartAsync(TestContext.Current.CancellationToken);
 
         settings.WatchFolder.Enabled = true;

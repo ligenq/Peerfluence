@@ -41,7 +41,7 @@ public class ConverterTests
             var result = sut.Convert(new object(), typeof(bool), null, Culture);
             Assert.Equal(false, result);
         }
-    
+
         [Fact]
         public void ConvertBack_WritesNothingBackToTheSource()
         {
@@ -52,7 +52,7 @@ public class ConverterTests
 
             Assert.Same(BindingOperations.DoNothing, answer);
         }
-}
+    }
 
     public class ByteSizeConverterTests
     {
@@ -105,7 +105,7 @@ public class ConverterTests
             Assert.IsType<string>(result);
             Assert.Contains("B", (string)result!);
         }
-    
+
         [Fact]
         public void ConvertBack_WritesNothingBackToTheSource()
         {
@@ -117,7 +117,7 @@ public class ConverterTests
 
             Assert.Same(BindingOperations.DoNothing, answer);
         }
-}
+    }
 
     public class SpeedConverterTests
     {
@@ -136,7 +136,7 @@ public class ConverterTests
             var result = (string?)_sut.Convert(1024L, typeof(string), null, Culture);
             Assert.Equal("1 KB/s", result);
         }
-    
+
         [Fact]
         public void ConvertBack_WritesNothingBackToTheSource()
         {
@@ -145,5 +145,5 @@ public class ConverterTests
 
             Assert.Same(BindingOperations.DoNothing, answer);
         }
-}
+    }
 }

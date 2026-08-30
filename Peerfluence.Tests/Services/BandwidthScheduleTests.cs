@@ -8,6 +8,8 @@ namespace Peerfluence.Tests.Services;
 /// </summary>
 public sealed class BandwidthScheduleTests
 {
+    private static readonly string[] DayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
     private static AppSettings Settings(
         bool enabled = true,
         string from = "08:00",
@@ -30,7 +32,7 @@ public sealed class BandwidthScheduleTests
     {
         // 2026-08-31 is a Monday, so the offsets below name the day they say.
         var monday = new DateTimeOffset(2026, 8, 31, 0, 0, 0, TimeSpan.Zero);
-        var index = Array.IndexOf(new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" }, day);
+        var index = Array.IndexOf(DayNames, day);
         return monday.AddDays(index).AddHours(hour).AddMinutes(minute);
     }
 

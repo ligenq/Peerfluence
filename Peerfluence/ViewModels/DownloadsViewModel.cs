@@ -262,7 +262,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             if (SetProperty(ref field, value))
             {
                 OnPropertyChanged(nameof(HasCategoryFilter));
-        OnPropertyChanged(nameof(IsAllCategories));
+                OnPropertyChanged(nameof(IsAllCategories));
                 OnPropertyChanged(nameof(IsAllCategories));
                 ApplyFilter();
             }
@@ -526,7 +526,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             ]
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             await AddTorrentFileAsync(file.Path.LocalPath);
@@ -864,7 +864,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         var selection = SelectionOrFocused();
         if (selection.Count <= 1)
         {
-            await RemoveTorrentAsync(selection.FirstOrDefault());
+            await RemoveTorrentAsync(selection.Count > 0 ? selection[0] : null);
             return;
         }
 

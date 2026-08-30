@@ -24,15 +24,20 @@ namespace Peerfluence.Services;
 internal sealed class BandwidthScheduleHostedService : BackgroundService
 {
     private readonly ITorrentEngineService _engineService;
+    private readonly TimeProvider _timeProvider;
 
-    public BandwidthScheduleHostedService(ITorrentEngineService engineService)
+    public BandwidthScheduleHostedService(ITorrentEngineService engineService, TimeProvider timeProvider)
     {
         _engineService = engineService;
+        _timeProvider = timeProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        // The engine may restore and begin transferring before the first minute elapses. Apply the
+        // limits once immediately, then keep them aligned with the clock.
+        _engineService.ApplySpeedLimits();
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1), _timeProvider);
 
         try
         {

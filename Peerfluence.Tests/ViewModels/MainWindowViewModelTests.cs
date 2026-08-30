@@ -33,14 +33,14 @@ public class MainWindowViewModelTests
         var fileSystem = new FileSystem();
         _settingsService = new AppSettingsService(paths, store, fileSystem);
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(_settingsService, loggerFactory);
+        var engineService = new TorrentEngineService(_settingsService, loggerFactory, TimeProvider.System);
         var torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
         var selectionService = new TorrentSelectionService(Substitute.For<IAppMessenger>());
         var topLevelService = Substitute.For<ITopLevelService>();
         var localizationService = new LocalizationService();
         var themeService = new ThemeService();
 
-        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService,Substitute.For<IDialogService>());
+        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService, Substitute.For<IDialogService>());
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
         _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>(), Substitute.For<ITorrentCategoryService>());

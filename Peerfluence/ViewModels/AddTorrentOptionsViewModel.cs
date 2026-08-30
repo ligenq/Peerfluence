@@ -15,6 +15,10 @@ using PeerSharp.Interfaces;
 
 namespace Peerfluence.ViewModels;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Design",
+    "CA1001:Types that own disposable fields should be disposable",
+    Justification = "The active preview operation owns and disposes its CancellationTokenSource in FetchMetadataPreviewAsync's finally block.")]
 public partial class AddTorrentOptionsViewModel : ViewModelBase
 {
     private readonly ITorrentService _torrentService;
@@ -321,7 +325,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             AllowMultiple = false
         });
 
-        var folder = folders.FirstOrDefault();
+        var folder = folders.Count > 0 ? folders[0] : null;
         if (folder != null)
         {
             DownloadPath = folder.Path.LocalPath;

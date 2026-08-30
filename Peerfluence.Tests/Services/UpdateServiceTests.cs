@@ -9,6 +9,10 @@ namespace Peerfluence.Tests.Services;
 
 public class UpdateServiceTests
 {
+    private static readonly string[] ExpectedCreatedUrls =
+        ["https://updates.example/v1", "https://updates.example/v2"];
+    private static readonly string[] ExpectedRestartArguments = ["--restart"];
+
     private readonly IUpdateService _sut;
 
     public UpdateServiceTests()
@@ -135,7 +139,7 @@ public class UpdateServiceTests
         settingsService.Current.Update.UpdateUrl = "https://updates.example/v2";
         await sut.CheckForUpdatesAsync();
 
-        Assert.Equal(new[] { "https://updates.example/v1", "https://updates.example/v2" }, createdUrls);
+        Assert.Equal(ExpectedCreatedUrls, createdUrls);
     }
 
     [Theory]
@@ -187,7 +191,7 @@ public class UpdateServiceTests
         Assert.True(downloadResult);
         Assert.Same(updateInfo, adapter.DownloadedUpdate);
         Assert.Same(updateInfo.TargetFullRelease, adapter.AppliedAsset);
-        Assert.Equal(new[] { "--restart" }, adapter.AppliedArgs);
+        Assert.Equal(ExpectedRestartArguments, adapter.AppliedArgs);
     }
 
     [Fact]

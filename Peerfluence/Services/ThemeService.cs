@@ -34,7 +34,7 @@ public sealed class ThemeService : IThemeService
         ApplyBackgroundStyle(settings.BackgroundStyle);
     }
 
-    private void ApplyVariant(string variant)
+    private static void ApplyVariant(string variant)
     {
         if (Application.Current == null)
         {
@@ -51,7 +51,7 @@ public sealed class ThemeService : IThemeService
         Application.Current.RequestedThemeVariant = ThemeVariant.Default;
     }
 
-    private void ApplyPalette(string? themeName)
+    private static void ApplyPalette(string? themeName)
     {
         // Named palette or nothing. The name arrives from settings, so it can be absent or something
         // this version does not know; the other two Apply methods already shrug such a value off,
@@ -78,7 +78,7 @@ public sealed class ThemeService : IThemeService
         resources["SukiAccentDarkColor"] = palette.AccentDark;
     }
 
-    private void ApplyBackgroundStyle(string styleName)
+    private static void ApplyBackgroundStyle(string styleName)
     {
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
         {

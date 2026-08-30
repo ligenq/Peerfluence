@@ -1,4 +1,5 @@
 using Peerfluence.Core.Config;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Text.Json;
 
@@ -68,7 +69,7 @@ public sealed class JsonAppSettingsStore : IAppSettingsStore
         var directory = _fileSystem.Path.GetDirectoryName(path);
         var fileName = _fileSystem.Path.GetFileNameWithoutExtension(path);
         var extension = _fileSystem.Path.GetExtension(path);
-        var timestamp = DateTimeOffset.Now.ToString("yyyyMMdd-HHmmss-fff");
+        var timestamp = DateTimeOffset.Now.ToString("yyyyMMdd-HHmmss-fff", CultureInfo.InvariantCulture);
         var backupPath = _fileSystem.Path.Combine(
             directory ?? string.Empty,
             $"{fileName}.invalid-{timestamp}{extension}");

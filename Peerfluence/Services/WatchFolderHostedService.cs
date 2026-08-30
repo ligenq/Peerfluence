@@ -30,6 +30,7 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
     private readonly IAppSettingsService _settingsService;
     private readonly ITorrentService _torrentService;
     private readonly ILogger<WatchFolderHostedService> _logger;
+    private readonly TimeProvider _timeProvider;
     private readonly CancellationTokenSource _stopping = new();
     private readonly SemaphoreSlim _configurationLock = new(1, 1);
     private readonly SemaphoreSlim _addLock = new(1, 1);
@@ -40,11 +41,13 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
     public WatchFolderHostedService(
         IAppSettingsService settingsService,
         ITorrentService torrentService,
-        ILogger<WatchFolderHostedService> logger)
+        ILogger<WatchFolderHostedService> logger,
+        TimeProvider timeProvider)
     {
         _settingsService = settingsService;
         _torrentService = torrentService;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -257,7 +260,7 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
                 return;
             }
 
-            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+            await Task.Delay(delay, _timeProvider, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -268,7 +271,7 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
             // A file is reported the moment it is created, which can be before whatever is writing it
             // has finished. Failing is handled - the file stays for the next sweep - but waiting a
             // moment first turns the common case into a success rather than a retry.
-            await Task.Delay(RetryDelay, _stopping.Token).ConfigureAwait(false);
+            await Task.Delay(RetryDelay, _timeProvider, _stopping.Token).ConfigureAwait(false);
             await AddWithRetriesAsync(e.FullPath, _stopping.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (_stopping.IsCancellationRequested)

@@ -1,0 +1,5 @@
+# Default ownership keeps architecture, build, and security changes reviewed.
+* @ligenq
+/.github/ @ligenq
+/Directory.Build.props @ligenq
+/global.json @ligenq

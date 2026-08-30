@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         IAppPaths? appPaths)
     {
         services.AddSingleton(mcpRuntimeOptions ?? new McpRuntimeOptions());
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IFileSystem, FileSystem>();
         services.AddSingleton(appPaths ?? new AppPaths());
         services.AddSingleton<IAppSettingsStore, JsonAppSettingsStore>();

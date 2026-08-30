@@ -28,6 +28,7 @@ public class ViewLocatorTests : IDisposable
     {
         ViewLocator.Services = null;
         _serviceProvider.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     [Fact]

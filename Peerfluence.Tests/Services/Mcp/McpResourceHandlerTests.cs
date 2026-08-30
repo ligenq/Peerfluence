@@ -80,5 +80,7 @@ public class McpResourceHandlerTests : IDisposable
         {
             try { File.Delete(file); } catch { /* ignore */ }
         }
+
+        GC.SuppressFinalize(this);
     }
 }

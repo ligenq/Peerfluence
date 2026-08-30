@@ -14,6 +14,9 @@ namespace Peerfluence.Tests.ViewModels;
 [Collection("Messenger")]
 public class DetailsViewModelTests
 {
+    private static readonly string[] ExpectedPeerAddresses =
+        ["192.168.1.10:51413", "[::1]:6881", "10.0.0.5:6889"];
+
     private readonly TorrentSelectionService _selectionService = new(Substitute.For<IAppMessenger>());
     private readonly ITorrentService _torrentService;
     private readonly LocalizationService _localizationService = new();
@@ -32,7 +35,7 @@ public class DetailsViewModelTests
         // does when someone is looking at it.
         settingsService.Current.ShowDetailsPane = true;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(settingsService, loggerFactory);
+        var engineService = new TorrentEngineService(settingsService, loggerFactory, TimeProvider.System);
         _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
 
         _sut = new DetailsViewModel(
@@ -41,7 +44,7 @@ public class DetailsViewModelTests
             _localizationService,
             _notificationService,
             _topLevelService,
-            settingsService,Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>());
         _sut.UIDispatcher = action => action();
     }
 
@@ -350,8 +353,7 @@ public class DetailsViewModelTests
         _sut.AddPeersCommand.Execute(null);
 
         peers.Received(1).Add(Arg.Is<IEnumerable<IPEndPoint>>(endPoints =>
-            endPoints.Select(endPoint => endPoint.ToString()).SequenceEqual(
-                new[] { "192.168.1.10:51413", "[::1]:6881", "10.0.0.5:6889" })));
+            endPoints.Select(endPoint => endPoint.ToString()).SequenceEqual(ExpectedPeerAddresses)));
         Assert.Equal(string.Empty, _sut.NewPeerAddresses);
     }
 

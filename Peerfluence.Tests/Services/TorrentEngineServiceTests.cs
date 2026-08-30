@@ -26,7 +26,7 @@ public class TorrentEngineServiceTests
                 ListeningPort = 55125
             }
         });
-        var sut = new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>());
+        var sut = new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>(), TimeProvider.System);
 
         await sut.InitializeAsync(TestContext.Current.CancellationToken);
 
@@ -63,7 +63,7 @@ public class TorrentEngineServiceTests
     {
         var settingsService = Substitute.For<IAppSettingsService>();
         settingsService.Current.Returns(settings);
-        return new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>());
+        return new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>(), TimeProvider.System);
     }
 
     /// <summary>

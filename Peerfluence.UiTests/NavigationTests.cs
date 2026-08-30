@@ -41,7 +41,7 @@ public sealed class NavigationTests
         // languages the machine running this happens to use.
         for (int index = 0; index < app.NavigationItems().Length; index++)
         {
-            app.Activate(app.NavigationItems()[index]);
+            RunningApplication.Activate(app.NavigationItems()[index]);
             RunningApplication.Until(
                 () => Landmarks.Any(app.Exists), "a destination to finish opening");
 

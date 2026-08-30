@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -42,7 +43,7 @@ internal sealed class FileLoggerProvider : ILoggerProvider
         var directory = Path.GetDirectoryName(path);
         var fileName = Path.GetFileNameWithoutExtension(path);
         var extension = Path.GetExtension(path);
-        var timestamp = DateTimeOffset.Now.ToString("yyyyMMdd-HHmmss-fff");
+        var timestamp = DateTimeOffset.Now.ToString("yyyyMMdd-HHmmss-fff", CultureInfo.InvariantCulture);
         var archivePath = Path.Combine(
             directory ?? string.Empty,
             $"{fileName}.{timestamp}{extension}");
@@ -154,7 +155,7 @@ internal sealed class FileLoggerProvider : ILoggerProvider
                 return;
             }
 
-            var timestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            var timestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
             var line = $"{timestamp} [{logLevel}] {_category}: {message}";
             if (exception != null)
             {

@@ -22,9 +22,9 @@ public sealed class NetworkSettings
 
     public bool EnableNatPmp { get; set; } = true;
 
-    public bool EnableUpnp { get; set; } = false;
+    public bool EnableUpnp { get; set; }
 
-    public bool UseAutomaticListeningPort { get; set; } = false;
+    public bool UseAutomaticListeningPort { get; set; }
 
     /// <summary>
     /// The port to listen on for TCP and UDP.
@@ -58,7 +58,7 @@ public sealed class NetworkSettings
     /// of, while a dial tries both transports or a reconnect overlaps the connection it replaces, so
     /// any non-zero value has to be chosen for the network it runs on.
     /// </summary>
-    public int MaxConnectionsPerIp { get; set; } = 0;
+    public int MaxConnectionsPerIp { get; set; }
 
     /// <summary>
     /// A single local address to bind every socket to, or blank to listen on everything.
@@ -81,13 +81,12 @@ public sealed class NetworkSettings
     /// second, which is the unit every other client uses and the one people think in.
     /// </para>
     /// </summary>
-    public long MaxDownloadSpeedBytesPerSecond { get; set; } = 0;
+    public long MaxDownloadSpeedBytesPerSecond { get; set; }
 
     /// <summary>How fast torrents may upload, in bytes per second. Zero is unlimited.</summary>
-    public long MaxUploadSpeedBytesPerSecond { get; set; } = 0;
+    public long MaxUploadSpeedBytesPerSecond { get; set; }
 
-    public long MaxDiskReadSpeedBytesPerSecond { get; set; } = 0;
+    public long MaxDiskReadSpeedBytesPerSecond { get; set; }
 
-    public long MaxDiskWriteSpeedBytesPerSecond { get; set; } = 0;
+    public long MaxDiskWriteSpeedBytesPerSecond { get; set; }
 }
-

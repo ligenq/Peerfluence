@@ -17,10 +17,11 @@ using Peerfluence.ViewModels;
 
 namespace Peerfluence;
 
-public class App : Application
+public class App : Application, IDisposable
 {
     private readonly IServiceProvider? _services;
     private readonly CancellationTokenSource _optionalStartupCts = new();
+    private bool _disposed;
 
     public App()
     {
@@ -133,7 +134,7 @@ public class App : Application
             }
         }
 
-        desktop.Exit += (_, _) => _optionalStartupCts.Cancel();
+        desktop.Exit += (_, _) => ((IDisposable)this).Dispose();
 
         // Register Top-Level for Dialogs
         _services
@@ -167,5 +168,19 @@ public class App : Application
         Dispatcher.UIThread.Post(async () => await viewModel.CheckForUpdatesOnStartupAsync());
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    void IDisposable.Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        _optionalStartupCts.Cancel();
+        _optionalStartupCts.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

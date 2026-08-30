@@ -6,7 +6,7 @@ public sealed class ProxySettings
 
     public string ProxyHost { get; set; } = string.Empty;
 
-    public int ProxyPort { get; set; } = 0;
+    public int ProxyPort { get; set; }
 
     public string ProxyUsername { get; set; } = string.Empty;
 

@@ -33,7 +33,7 @@ public sealed class RestartTests
         using var first = new RunningApplication();
         first.Find("ChooseSimpleModeButton").AsButton().Invoke();
         first.Find("ShowSimpleSettingsButton").AsButton().Invoke();
-        first.Activate(first.Find("StorageAndSessionTab"));
+        RunningApplication.Activate(first.Find("StorageAndSessionTab"));
 
         var before = first.Find("ShowAddTorrentOptionsSwitch").AsToggleButton();
         var flipped = before.IsToggled != true;
@@ -51,7 +51,7 @@ public sealed class RestartTests
 
         using var second = first.Restart();
         second.Find("ShowSimpleSettingsButton").AsButton().Invoke();
-        second.Activate(second.Find("StorageAndSessionTab"));
+        RunningApplication.Activate(second.Find("StorageAndSessionTab"));
 
         Assert.Equal(
             flipped,
