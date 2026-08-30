@@ -703,6 +703,40 @@
             <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Search}" AutomationProperties.AutomationId="SearchTab">
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                        <!--
+                            A saved query that runs on its own. Anyone with Sonarr or Radarr already
+                            has this through the Transmission endpoint; this is for everyone else.
+                        -->
+                        <suki:GlassCard>
+                            <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <materialIcons:MaterialIcon Kind="AutoFix" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <TextBlock Text="{m:L Settings_AutoSearch}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <ToggleSwitch IsChecked="{Binding AutoSearchEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableAutoSearch}" AutomationProperties.AutomationId="EnableAutoSearchSwitch"/>
+                                <TextBlock Text="{m:L Settings_AutoSearchHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                                <StackPanel Spacing="{StaticResource SpacingMedium}" IsEnabled="{Binding AutoSearchEnabled}">
+                                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                        <TextBlock Text="{m:L Settings_AutoSearchQuery}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBox Text="{Binding AutoSearchQuery, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchQuery}" AutomationProperties.AutomationId="AutoSearchQueryTextBox"/>
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_AutoSearchInterval}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <NumericUpDown Value="{Binding AutoSearchIntervalMinutes}" Minimum="15" AutomationProperties.Name="{m:L Settings_AutoSearchInterval}" AutomationProperties.AutomationId="AutoSearchIntervalInput"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_AutoSearchCategory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding AutoSearchCategory, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchCategory}" AutomationProperties.AutomationId="AutoSearchCategoryTextBox"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </suki:GlassCard>
+
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">

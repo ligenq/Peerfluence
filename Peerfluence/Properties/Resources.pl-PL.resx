@@ -1534,4 +1534,22 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="Settings_ScheduleDays" xml:space="preserve">
     <value>Dni</value>
   </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Wyszukiwanie automatyczne</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Uruchamiaj zapisane wyszukiwanie samodzielnie</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>Zapytanie działa na powyższym indeksie i dodaje to, czego wcześniej nie dodało. Piętnaście minut to najkrótszy używany odstęp.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Zapytanie</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Co (minut)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Kategoria dla dodanych</value>
+  </data>
 </root>

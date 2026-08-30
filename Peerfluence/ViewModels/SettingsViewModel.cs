@@ -1022,6 +1022,31 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IAsyncRelayCommand BrowseWatchFolderPathCommand { get; }
 
+    // The saved query that runs on its own.
+    public bool AutoSearchEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string AutoSearchQuery
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    public int AutoSearchIntervalMinutes
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(Peerfluence.Core.Services.AutoSearch.MinimumIntervalMinutes, value));
+    } = 60;
+
+    public string AutoSearchCategory
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
     // The scheduled window: different speed limits while somebody is using the connection.
     public bool ScheduleEnabled
     {
@@ -1172,6 +1197,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = settings.Queue.EnableQueueManagement;
         MaxActiveDownloads = settings.Queue.MaxActiveDownloads;
         MaxActiveSeeds = settings.Queue.MaxActiveSeeds;
+        AutoSearchEnabled = settings.AutoSearch.Enabled;
+        AutoSearchQuery = settings.AutoSearch.Query;
+        AutoSearchIntervalMinutes = settings.AutoSearch.IntervalMinutes;
+        AutoSearchCategory = settings.AutoSearch.Category;
         ScheduleEnabled = settings.Schedule.Enabled;
         ScheduleFrom = settings.Schedule.From;
         ScheduleTo = settings.Schedule.To;
@@ -1283,6 +1312,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Queue.EnableQueueManagement = EnableQueueManagement;
             settings.Queue.MaxActiveDownloads = MaxActiveDownloads;
             settings.Queue.MaxActiveSeeds = MaxActiveSeeds;
+            settings.AutoSearch.Enabled = AutoSearchEnabled;
+            settings.AutoSearch.Query = AutoSearchQuery;
+            settings.AutoSearch.IntervalMinutes = AutoSearchIntervalMinutes;
+            settings.AutoSearch.Category = AutoSearchCategory;
             settings.Schedule.Enabled = ScheduleEnabled;
             settings.Schedule.From = ScheduleFrom;
             settings.Schedule.To = ScheduleTo;
@@ -1429,6 +1462,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
         MaxActiveSeeds = defaults.Queue.MaxActiveSeeds;
+        AutoSearchEnabled = defaults.AutoSearch.Enabled;
+        AutoSearchQuery = defaults.AutoSearch.Query;
+        AutoSearchIntervalMinutes = defaults.AutoSearch.IntervalMinutes;
+        AutoSearchCategory = defaults.AutoSearch.Category;
         ScheduleEnabled = defaults.Schedule.Enabled;
         ScheduleFrom = defaults.Schedule.From;
         ScheduleTo = defaults.Schedule.To;

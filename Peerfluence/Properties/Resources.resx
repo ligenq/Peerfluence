@@ -1528,4 +1528,22 @@
   <data name="Settings_ScheduleDays" xml:space="preserve">
     <value>Days</value>
   </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Automatic search</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Run a saved search on its own</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>The query runs on the indexer above and adds anything it has not added before. Fifteen minutes is the shortest interval it will use.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Query</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Every (minutes)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Category for what it adds</value>
+  </data>
 </root>

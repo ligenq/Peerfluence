@@ -147,6 +147,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<TorrentCompletionActionHostedService>();
         services.AddHostedService<WatchFolderHostedService>();
         services.AddHostedService<BandwidthScheduleHostedService>();
+        services.AddHostedService<AutoSearchHostedService>();
         services.AddHostedService<TorrentEngineHostedService>();
         services.AddHostedService<TorrentAlertsHostedService>();
         services.AddHostedService<McpServerHostedService>();

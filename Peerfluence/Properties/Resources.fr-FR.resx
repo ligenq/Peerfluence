@@ -1534,4 +1534,22 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   <data name="Settings_ScheduleDays" xml:space="preserve">
     <value>Jours</value>
   </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Recherche automatique</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Exécuter une recherche enregistrée toute seule</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>La requête s’exécute sur l’indexeur ci-dessus et ajoute ce qu’elle n’a pas déjà ajouté. Quinze minutes est l’intervalle le plus court utilisé.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Requête</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Toutes les (minutes)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Catégorie des ajouts</value>
+  </data>
 </root>
