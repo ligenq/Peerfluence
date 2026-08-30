@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+	<!--
+		Sizes that are one decision made once and used in several places, as opposed to the widths
+		of a particular grid's columns, which mean something different in every grid and belong
+		where they are written.
+	-->
+
+	<!--
+		How wide a column of settings may grow before a line of text is tiring to read across. Every
+		section on the settings screen is capped at the same width, or they would not line up.
+	-->
+	<sys:Double x:Key="ContentMaxWidth">900</sys:Double>
+
+	<!--How thick a progress bar is, wherever one appears.-->
+	<sys:Double x:Key="ProgressBarHeight">6</sys:Double>
+
+	<!--The thinner one, for a bar reporting a background job rather than the download itself.-->
+	<sys:Double x:Key="ProgressBarHeightSlim">4</sys:Double>
+
+	<!--A small coloured square standing for a state: a piece map legend, a connection indicator.-->
+	<sys:Double x:Key="StatusDotSize">10</sys:Double>
+
+</ResourceDictionary>

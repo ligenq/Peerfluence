@@ -83,6 +83,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         BrowseCompletionActionProgramCommand = new AsyncRelayCommand(BrowseCompletionActionProgramAsync);
         BrowseDownloadPathCommand = new AsyncRelayCommand(BrowseDownloadPathAsync);
         BrowseSessionPathCommand = new AsyncRelayCommand(BrowseSessionPathAsync);
+        BrowseWatchFolderPathCommand = new AsyncRelayCommand(BrowseWatchFolderPathAsync);
         RefreshPortMappingCommand = new RelayCommand(RefreshPortMapping);
         CheckForUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
         ApplyUpdateAndRestartCommand = new RelayCommand(ApplyUpdateAndRestart);
@@ -132,6 +133,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         IsSimpleMode = mode == InterfaceMode.Simple;
         OnPropertyChanged(nameof(IsAdvancedMode));
+        OnPropertyChanged(nameof(SimpleModeSelected));
+        OnPropertyChanged(nameof(AdvancedModeSelected));
     }
 
     /// <summary>
@@ -169,6 +172,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(Title),
         nameof(IsSimpleMode),
         nameof(IsAdvancedMode),
+        nameof(SimpleModeSelected),
+        nameof(AdvancedModeSelected),
         nameof(SearchStatusMessage),
         nameof(HasSearchStatusMessage),
         nameof(SelectedTabIndex),
@@ -313,6 +318,54 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     }
 
+    /// <summary>
+    /// How many connections one address may hold on a single torrent. Zero is unlimited, and is the
+    /// middle ground <see cref="AllowMultipleConnectionsPerIp"/> lacked - that could only allow one
+    /// per address or as many as turned up.
+    /// </summary>
+    public int MaxConnectionsPerIp
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    /// <summary>
+    /// A single local address every socket is bound to, or blank for all interfaces. Kept as typed
+    /// rather than validated into an <see cref="System.Net.IPAddress"/> here, so a half-typed address
+    /// is not rejected mid-keystroke; <see cref="IsBindAddressValid"/> reports on it instead.
+    /// </summary>
+    public string BindAddress
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(IsBindAddressValid));
+            }
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Whether what is typed is an address the engine can bind to. Blank is valid and means every
+    /// interface. <c>0.0.0.0</c> and <c>::</c> are not: the engine rejects them outright, because
+    /// "any address" is not a single-address guarantee it could keep.
+    /// </summary>
+    public bool IsBindAddressValid
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(BindAddress))
+            {
+                return true;
+            }
+
+            return System.Net.IPAddress.TryParse(BindAddress, out var parsed)
+                && !parsed.Equals(System.Net.IPAddress.Any)
+                && !parsed.Equals(System.Net.IPAddress.IPv6Any);
+        }
+    }
+
     public bool EnableNatPmp
     {
         get;
@@ -350,6 +403,45 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     public bool IsAdvancedMode => !IsSimpleMode;
+
+    /// <summary>
+    /// The two interface mode chips as a radio button sees them: reading says which dot to fill,
+    /// writing is somebody choosing.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <see cref="IsSimpleMode"/>, which reports the mode in force and is assigned
+    /// whenever it changes - including by the link in simple mode, which is not this screen. A
+    /// property that both reported the mode and changed it would answer its own assignment.
+    /// </remarks>
+    public bool SimpleModeSelected
+    {
+        get => IsSimpleMode;
+        set => ChooseWhenChecked(value, InterfaceMode.Simple);
+    }
+
+    /// <inheritdoc cref="SimpleModeSelected"/>
+    public bool AdvancedModeSelected
+    {
+        get => IsAdvancedMode;
+        set => ChooseWhenChecked(value, InterfaceMode.Advanced);
+    }
+
+    /// <summary>
+    /// Switches to the mode a chip stands for, when that chip is the one being checked.
+    /// </summary>
+    /// <remarks>
+    /// Only when checked, because choosing one member of a radio group unchecks the rest and both
+    /// arrive here in no guaranteed order.
+    /// </remarks>
+    private void ChooseWhenChecked(bool isChecked, InterfaceMode mode)
+    {
+        if (isChecked && Current() != mode)
+        {
+            SetInterfaceModeCommand.Execute(mode);
+        }
+
+        InterfaceMode Current() => IsSimpleMode ? InterfaceMode.Simple : InterfaceMode.Advanced;
+    }
 
     // Remote control
     public bool RemoteEnabled
@@ -449,7 +541,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        if (folders.FirstOrDefault() is { } folder)
+        if (folders.Count > 0 && folders[0] is { } folder)
         {
             NewCategoryPath = folder.Path.LocalPath;
         }
@@ -601,7 +693,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         get;
         set => SetProperty(ref field, Math.Clamp(value, 1, 65535));
-    } = 55125;
+    } = NetworkSettings.DefaultListeningPort;
 
     /// <summary>
     /// The download limit in kibibytes per second, which is the unit every other client uses and the
@@ -670,6 +762,31 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, Math.Max(0, value));
     } = 3;
 
+    // Seeding goals. What a torrent is told when nobody tells it anything.
+    public bool LimitSeedingRatio
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public float SeedingRatioLimit
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0f, value));
+    } = 2.0f;
+
+    public bool LimitSeedingTime
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public int SeedingTimeLimitMinutes
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    } = 1440;
+
     public int MaxActiveSeeds
     {
         get;
@@ -728,6 +845,24 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = string.Empty;
 
+    /// <summary>
+    /// Where the completion action runs. No longer shown on the settings screen.
+    /// </summary>
+    /// <remarks>
+    /// The behaviour is worth having - a script that unpacks or moves what was downloaded works in
+    /// relative paths, and without this it works relative to wherever Peerfluence was started from -
+    /// but the field was not. Its only sensible values were the default and empty, a directory that
+    /// does not exist stops the action running at all rather than falling back, and it was the
+    /// fourth of five boxes in the densest card on the screen.
+    ///
+    /// <para>
+    /// Kept rather than deleted because of Reset defaults, which works by assigning every property
+    /// on this screen from a fresh <c>AppSettings</c>. Without it, resetting would put everything
+    /// back except this, and a hand-edited working directory would outlive the reset that was meant
+    /// to clear it. Saving would preserve the value either way: <c>ApplyToSettings</c> mutates the
+    /// stored settings in place, so what nobody assigns is left alone.
+    /// </para>
+    /// </remarks>
     public string CompletionActionWorkingDirectoryTemplate
     {
         get;
@@ -903,6 +1038,99 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IAsyncRelayCommand BrowseSessionPathCommand { get; }
 
+    public IAsyncRelayCommand BrowseWatchFolderPathCommand { get; }
+
+    // The saved query that runs on its own.
+    public bool AutoSearchEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string AutoSearchQuery
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    public int AutoSearchIntervalMinutes
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(Peerfluence.Core.Services.AutoSearch.MinimumIntervalMinutes, value));
+    } = 60;
+
+    public string AutoSearchCategory
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
+    // The scheduled window: different speed limits while somebody is using the connection.
+    public bool ScheduleEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string ScheduleFrom
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = "08:00";
+
+    public string ScheduleTo
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = "18:00";
+
+    public long ScheduleDownloadKibibytesPerSecond
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    public long ScheduleUploadKibibytesPerSecond
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    /// <summary>
+    /// The days the window runs on, named by the culture rather than by the resource files.
+    /// </summary>
+    public System.Collections.Generic.IReadOnlyList<ScheduleDayViewModel> ScheduleDays { get; } =
+        BuildScheduleDays();
+
+    private static System.Collections.Generic.IReadOnlyList<ScheduleDayViewModel> BuildScheduleDays()
+    {
+        var format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat;
+
+        // Starting on the culture's own first day, so a week reads the way the reader expects.
+        var first = (int)format.FirstDayOfWeek;
+        var days = new ScheduleDayViewModel[7];
+        for (int i = 0; i < 7; i++)
+        {
+            var day = (DayOfWeek)((first + i) % 7);
+            days[i] = new ScheduleDayViewModel(day, format.GetAbbreviatedDayName(day), true);
+        }
+
+        return days;
+    }
+
+    // The watched folder: torrent files dropped here are added without a dialog.
+    public bool WatchFolderEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string WatchFolderPath
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
     public IRelayCommand RefreshPortMappingCommand { get; }
 
     public IAsyncRelayCommand CheckForUpdatesCommand { get; }
@@ -966,6 +1194,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableDht = settings.Network.EnableDht;
         AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling;
         AllowMultipleConnectionsPerIp = settings.Network.AllowMultipleConnectionsPerIp;
+        MaxConnectionsPerIp = settings.Network.MaxConnectionsPerIp;
+        BindAddress = settings.Network.BindAddress;
         EnableNatPmp = settings.Network.EnableNatPmp;
         EnableUpnp = settings.Network.EnableUpnp;
         UseAutomaticListeningPort = settings.Network.UseAutomaticListeningPort;
@@ -985,6 +1215,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = settings.Queue.EnableQueueManagement;
         MaxActiveDownloads = settings.Queue.MaxActiveDownloads;
         MaxActiveSeeds = settings.Queue.MaxActiveSeeds;
+        AutoSearchEnabled = settings.AutoSearch.Enabled;
+        AutoSearchQuery = settings.AutoSearch.Query;
+        AutoSearchIntervalMinutes = settings.AutoSearch.IntervalMinutes;
+        AutoSearchCategory = settings.AutoSearch.Category;
+        ScheduleEnabled = settings.Schedule.Enabled;
+        ScheduleFrom = settings.Schedule.From;
+        ScheduleTo = settings.Schedule.To;
+        ScheduleDownloadKibibytesPerSecond = ToKibibytes(settings.Schedule.DownloadLimitBytesPerSecond);
+        ScheduleUploadKibibytesPerSecond = ToKibibytes(settings.Schedule.UploadLimitBytesPerSecond);
+        ReadScheduleDays(settings.Schedule);
+        WatchFolderEnabled = settings.WatchFolder.Enabled;
+        WatchFolderPath = settings.WatchFolder.Path;
+        LimitSeedingRatio = settings.Seeding.LimitRatio;
+        SeedingRatioLimit = settings.Seeding.RatioLimit;
+        LimitSeedingTime = settings.Seeding.LimitSeedTime;
+        SeedingTimeLimitMinutes = settings.Seeding.SeedTimeLimitMinutes;
 
         // Misc
         EnableBlocklist = settings.EnableBlocklist;
@@ -1059,6 +1305,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Network.EnableDht = EnableDht;
             settings.Network.AnswerInfoHashSampling = AnswerInfoHashSampling;
             settings.Network.AllowMultipleConnectionsPerIp = AllowMultipleConnectionsPerIp;
+            settings.Network.MaxConnectionsPerIp = MaxConnectionsPerIp;
+
+            // Only stored once it parses. A half-typed address saved as it stands would be read back
+            // as "no bind address" on the next start, which is the opposite of what a kill switch is
+            // for - it would silently go back to leaving by the default route.
+            settings.Network.BindAddress = IsBindAddressValid ? BindAddress.Trim() : settings.Network.BindAddress;
             settings.Network.EnableNatPmp = EnableNatPmp;
             settings.Network.EnableUpnp = EnableUpnp;
             settings.Network.UseAutomaticListeningPort = UseAutomaticListeningPort;
@@ -1078,6 +1330,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Queue.EnableQueueManagement = EnableQueueManagement;
             settings.Queue.MaxActiveDownloads = MaxActiveDownloads;
             settings.Queue.MaxActiveSeeds = MaxActiveSeeds;
+            settings.AutoSearch.Enabled = AutoSearchEnabled;
+            settings.AutoSearch.Query = AutoSearchQuery;
+            settings.AutoSearch.IntervalMinutes = AutoSearchIntervalMinutes;
+            settings.AutoSearch.Category = AutoSearchCategory;
+            settings.Schedule.Enabled = ScheduleEnabled;
+            settings.Schedule.From = ScheduleFrom;
+            settings.Schedule.To = ScheduleTo;
+            settings.Schedule.DownloadLimitBytesPerSecond = ToBytes(ScheduleDownloadKibibytesPerSecond);
+            settings.Schedule.UploadLimitBytesPerSecond = ToBytes(ScheduleUploadKibibytesPerSecond);
+            WriteScheduleDays(settings.Schedule);
+            settings.WatchFolder.Enabled = WatchFolderEnabled;
+            settings.WatchFolder.Path = WatchFolderPath;
+            settings.Seeding.LimitRatio = LimitSeedingRatio;
+            settings.Seeding.RatioLimit = SeedingRatioLimit;
+            settings.Seeding.LimitSeedTime = LimitSeedingTime;
+            settings.Seeding.SeedTimeLimitMinutes = SeedingTimeLimitMinutes;
 
             // Misc
             settings.EnableBlocklist = EnableBlocklist;
@@ -1197,6 +1465,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableDht = defaults.Network.EnableDht;
         AnswerInfoHashSampling = defaults.Network.AnswerInfoHashSampling;
         AllowMultipleConnectionsPerIp = defaults.Network.AllowMultipleConnectionsPerIp;
+        MaxConnectionsPerIp = defaults.Network.MaxConnectionsPerIp;
+        BindAddress = defaults.Network.BindAddress;
         EnableNatPmp = defaults.Network.EnableNatPmp;
         EnableUpnp = defaults.Network.EnableUpnp;
         UseAutomaticListeningPort = defaults.Network.UseAutomaticListeningPort;
@@ -1210,6 +1480,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
         MaxActiveSeeds = defaults.Queue.MaxActiveSeeds;
+        AutoSearchEnabled = defaults.AutoSearch.Enabled;
+        AutoSearchQuery = defaults.AutoSearch.Query;
+        AutoSearchIntervalMinutes = defaults.AutoSearch.IntervalMinutes;
+        AutoSearchCategory = defaults.AutoSearch.Category;
+        ScheduleEnabled = defaults.Schedule.Enabled;
+        ScheduleFrom = defaults.Schedule.From;
+        ScheduleTo = defaults.Schedule.To;
+        ScheduleDownloadKibibytesPerSecond = ToKibibytes(defaults.Schedule.DownloadLimitBytesPerSecond);
+        ScheduleUploadKibibytesPerSecond = ToKibibytes(defaults.Schedule.UploadLimitBytesPerSecond);
+        ReadScheduleDays(defaults.Schedule);
+        WatchFolderEnabled = defaults.WatchFolder.Enabled;
+        WatchFolderPath = defaults.WatchFolder.Path;
+        LimitSeedingRatio = defaults.Seeding.LimitRatio;
+        SeedingRatioLimit = defaults.Seeding.RatioLimit;
+        LimitSeedingTime = defaults.Seeding.LimitSeedTime;
+        SeedingTimeLimitMinutes = defaults.Seeding.SeedTimeLimitMinutes;
         EnableBlocklist = defaults.EnableBlocklist;
         BlocklistPath = defaults.BlocklistPath;
         EnableGeoIp = defaults.EnableGeoIp;
@@ -1385,7 +1671,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             ]
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             BlocklistPath = file.Path.LocalPath;
@@ -1430,7 +1716,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             ]
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             GeoIpPath = file.Path.LocalPath;
@@ -1468,7 +1754,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             FileTypeFilter = filter
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             MediaPlayerPath = file.Path.LocalPath;
@@ -1506,7 +1792,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             FileTypeFilter = filter
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             CompletionActionProgramPath = file.Path.LocalPath;
@@ -1523,10 +1809,52 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        var folder = folders.FirstOrDefault();
+        var folder = folders.Count > 0 ? folders[0] : null;
         if (folder != null)
         {
             DownloadPath = folder.Path.LocalPath;
+        }
+    }
+
+    private void ReadScheduleDays(Peerfluence.Core.Config.ScheduleSettings schedule)
+    {
+        foreach (var day in ScheduleDays)
+        {
+            day.IsSelected = Peerfluence.Core.Services.BandwidthSchedule.IsSelected(schedule, day.Day);
+        }
+    }
+
+    private void WriteScheduleDays(Peerfluence.Core.Config.ScheduleSettings schedule)
+    {
+        foreach (var day in ScheduleDays)
+        {
+            switch (day.Day)
+            {
+                case DayOfWeek.Monday: schedule.Monday = day.IsSelected; break;
+                case DayOfWeek.Tuesday: schedule.Tuesday = day.IsSelected; break;
+                case DayOfWeek.Wednesday: schedule.Wednesday = day.IsSelected; break;
+                case DayOfWeek.Thursday: schedule.Thursday = day.IsSelected; break;
+                case DayOfWeek.Friday: schedule.Friday = day.IsSelected; break;
+                case DayOfWeek.Saturday: schedule.Saturday = day.IsSelected; break;
+                default: schedule.Sunday = day.IsSelected; break;
+            }
+        }
+    }
+
+    private async Task BrowseWatchFolderPathAsync()
+    {
+        var storageProvider = _topLevelService.GetStorageProvider();
+
+        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = Properties.Resources.Settings_WatchFolderPicker_Title,
+            AllowMultiple = false
+        });
+
+        var folder = folders.Count > 0 ? folders[0] : null;
+        if (folder != null)
+        {
+            WatchFolderPath = folder.Path.LocalPath;
         }
     }
 
@@ -1540,7 +1868,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        var folder = folders.FirstOrDefault();
+        var folder = folders.Count > 0 ? folders[0] : null;
         if (folder != null)
         {
             SessionPath = folder.Path.LocalPath;

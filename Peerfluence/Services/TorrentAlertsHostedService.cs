@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -36,7 +36,21 @@ public sealed class TorrentAlertsHostedService : IHostedService
             AlertId.TorrentError |
             AlertId.MetadataInitialized |
             AlertId.MetadataProgressChanged |
-            AlertId.TorrentFinished;
+            AlertId.TorrentFinished |
+
+            // Added in PeerSharp 4.0. A magnet that has asked capable peers for a long time and been
+            // given nothing is the failure people describe as "it just sits there"; a piece failing
+            // its hash repeatedly and a peer being refused are what a support question needs
+            // answering; and a listener that could not bind the configured port is the case where
+            // port forwarding silently stops reaching the session.
+            AlertId.MetadataDownloadStalled |
+            AlertId.PieceHashFailed |
+            AlertId.PeerBlocked |
+            AlertId.ListenPortChanged;
+
+        // Deliberately not registered: PeerDisconnected. It fires once per departing peer, which in
+        // a busy swarm is constant, and nothing here needs it - the peer list is rebuilt from a
+        // snapshot on each refresh rather than accumulated from arrivals and departures.
 
         _torrentService.RegisterAlertMask((uint)alerts);
 

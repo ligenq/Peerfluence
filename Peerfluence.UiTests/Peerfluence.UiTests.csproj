@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    End to end tests that drive the real, running application through the Windows accessibility
+    tree: the same tree a screen reader reads and an AI agent would drive.
+
+    In the solution so it keeps compiling and cannot quietly rot, but never run by CI. UI Automation
+    is a Windows API that needs an interactive desktop session, and these tests start a real process
+    and wait on real rendering, so they are slower and less certain than everything else here. They
+    are for a developer machine when the interface changes; the fast suites remain the gate.
+
+      Run them with dotnet test on this project. Building with IsWindowsBuild=false rewrites obj/
+      for the empty shape, so build once more without it before running the tests again.
+  -->
+
+  <PropertyGroup>
+    <!--
+      Windows only, because UI Automation is. Everywhere else this builds an empty assembly: the
+      solution is built on Linux in CI, and a project that fails to restore there would break a leg
+      that has nothing to do with these tests.
+
+      A property rather than the platform check written into every condition, so that the shape this
+      takes on Linux can be built and checked from Windows:
+
+        dotnet build Peerfluence.UiTests/Peerfluence.UiTests.csproj -p:IsWindowsBuild=false
+    -->
+    <IsWindowsBuild Condition="'$(IsWindowsBuild)' == ''">$([MSBuild]::IsOSPlatform('Windows'))</IsWindowsBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(IsWindowsBuild)' == 'true'">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(IsWindowsBuild)' != 'true'">net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!--
+    Nothing to compile off Windows, which csc warns about. The warning is the intent here, and
+    warnings are errors in this repository.
+  -->
+  <ItemGroup Condition="'$(IsWindowsBuild)' != 'true'">
+    <Compile Remove="**/*.cs" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsWindowsBuild)' != 'true'">
+    <NoWarn>$(NoWarn);CS2008</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
+    <PackageReference Include="FlaUI.Core" Version="4.0.0" />
+
+    <!--
+      FlaUI drags in System.Drawing.Common 5.0.2 for its screenshot support, and that version has a
+      critical advisory (GHSA-rxg9-xrhp-64gj). Pinned forward to a patched one, which the repository
+      policy of failing on any warning is what surfaced. Windows only, which this project already is.
+    -->
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
+    <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!--
+    A reference rather than a copy: the tests name automation ids that the application declares as
+    constants, so renaming one breaks the build instead of a test at run time.
+  -->
+  <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
+    <ProjectReference Include="..\Peerfluence\Peerfluence.csproj" />
+  </ItemGroup>
+
+</Project>

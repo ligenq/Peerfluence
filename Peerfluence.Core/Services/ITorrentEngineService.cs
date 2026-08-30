@@ -1,10 +1,16 @@
-using PeerSharp.Interfaces;
+﻿using PeerSharp.Interfaces;
 
 namespace Peerfluence.Core.Services;
 
 public interface ITorrentEngineService : IAsyncDisposable
 {
     IClientEngine Engine { get; }
+
+    /// <summary>
+    /// Whether the configured proxy cost this session DHT or uTP, because an HTTP proxy cannot
+    /// carry UDP and PeerSharp refuses to send it directly.
+    /// </summary>
+    bool ProxyRestrictionApplied { get; }
 
     Task InitializeAsync(CancellationToken cancellationToken);
 

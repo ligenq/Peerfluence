@@ -32,7 +32,7 @@ public class SettingsViewModelTests
         _settingsService = new AppSettingsService(paths, store, new FileSystem());
 
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        _engineService = new TorrentEngineService(_settingsService, loggerFactory);
+        _engineService = new TorrentEngineService(_settingsService, loggerFactory, TimeProvider.System);
 
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         var updateService = new UpdateService(updateLogger, _settingsService);
@@ -53,6 +53,26 @@ public class SettingsViewModelTests
             Substitute.For<IInterfaceModeService>(),
             searchService,
             Substitute.For<ITorrentCategoryService>());
+    }
+
+    [Fact]
+    public async Task AHandEditedWorkingDirectory_SurvivesTheSettingsScreen()
+    {
+        // The working directory is no longer a field on the screen, but it is still a setting, and
+        // removing the field must not quietly take the capability with it.
+        //
+        // This passes whether or not the view model writes the property back, because ApplyToSettings
+        // mutates the stored settings in place and what nobody touches survives. That is worth
+        // pinning rather than assuming: it is the reason the removal was safe, and it would stop
+        // being true the day saving starts from a fresh AppSettings instead.
+        _settingsService.Current.CompletionAction.WorkingDirectoryTemplate = "D:\tools";
+
+        var sut = Create(_settingsService);
+        sut.CompletionActionTimeoutSeconds = 45;
+        await sut.SaveCommand.ExecuteAsync(null);
+
+        Assert.Equal("D:\tools", _settingsService.Current.CompletionAction.WorkingDirectoryTemplate);
+        Assert.Equal(45, _settingsService.Current.CompletionAction.TimeoutSeconds);
     }
 
     [Fact]
@@ -306,7 +326,7 @@ public class SettingsViewModelTests
         Assert.Equal(UpdateSettings.DefaultUpdateUrl, _sut.UpdateUrl);
         Assert.True(_sut.EnableDht);
         Assert.False(_sut.UseAutomaticListeningPort);
-        Assert.Equal(55125, _sut.ListeningPort);
+        Assert.Equal(6881, _sut.ListeningPort);
         Assert.True(_sut.ShowRemoveTorrentOptions);
     }
 
@@ -588,6 +608,52 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void CheckingAModeChip_SwitchesToThatMode()
+    {
+        // The chips bind IsChecked two ways rather than doing their work in a click handler, so that
+        // choosing one through the accessibility API - which moves the dot without raising a click -
+        // switches the mode as well as filling in the dot.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(false);
+        var sut = Create(_settingsService, interfaceModeService);
+        Assert.True(sut.AdvancedModeSelected);
+
+        sut.SimpleModeSelected = true;
+
+        Assert.True(sut.IsSimpleMode);
+        Assert.True(sut.SimpleModeSelected);
+        Assert.False(sut.AdvancedModeSelected);
+    }
+
+    [Fact]
+    public void UncheckingAModeChip_ChangesNothing()
+    {
+        // A choice arrives as one chip becoming true and the other false, in no guaranteed order.
+        // Acting on the false would switch to the mode being left behind.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+        var sut = Create(_settingsService, interfaceModeService);
+
+        sut.AdvancedModeSelected = false;
+
+        Assert.True(sut.IsSimpleMode);
+    }
+
+    [Fact]
+    public void CheckingTheModeAlreadyInForce_DoesNotSaveItAgain()
+    {
+        // The binding writes the property back whenever the dot moves, including when the mode was
+        // changed somewhere else and this screen is only catching up.
+        var interfaceModeService = Substitute.For<IInterfaceModeService>();
+        interfaceModeService.IsSimple.Returns(true);
+        var sut = Create(_settingsService, interfaceModeService);
+
+        sut.SimpleModeSelected = true;
+
+        interfaceModeService.DidNotReceive().SetAsync(Arg.Any<InterfaceMode>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public void SimpleMode_HidesTheAdvancedSettings()
     {
         var interfaceModeService = Substitute.For<IInterfaceModeService>();
@@ -673,7 +739,10 @@ public class SettingsViewModelTests
             _themeService,
             localizationService ?? _localizationService,
             _topLevelService,
-            engineService ?? new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
+            engineService ?? new TorrentEngineService(
+                settingsService,
+                Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>(),
+                TimeProvider.System),
             new UpdateService(updateLogger, settingsService),
             _windowsAssociationService,
             interfaceModeService ?? Substitute.For<IInterfaceModeService>(),
@@ -817,4 +886,52 @@ public class SettingsViewModelTests
         Assert.Equal("http://example.invalid/api", reloaded.TorznabUrl);
         Assert.Equal("abc123", reloaded.TorznabApiKey);
     }
+
+    [Fact]
+    public void WhetherUpdatesCanBeChecked_ComesFromTheUpdateService()
+    {
+        // These two decide whether the update section is offered at all. A build installed from a
+        // package manager has no Velopack path, and showing it a "check for updates" button that
+        // can never work is worse than showing nothing.
+        var updateService = Substitute.For<IUpdateService>();
+        updateService.IsInstalled.Returns(true);
+        updateService.CanCheckForUpdates.Returns(true);
+
+        var sut = CreateWith(updateService);
+
+        Assert.True(sut.IsUpdateServiceInstalled);
+        Assert.True(sut.CanCheckForUpdates);
+    }
+
+    [Fact]
+    public void ABuildThatCannotUpdateItself_SaysSo()
+    {
+        var updateService = Substitute.For<IUpdateService>();
+        updateService.IsInstalled.Returns(false);
+        updateService.CanCheckForUpdates.Returns(false);
+
+        var sut = CreateWith(updateService);
+
+        Assert.False(sut.IsUpdateServiceInstalled);
+        Assert.False(sut.CanCheckForUpdates);
+    }
+
+    private SettingsViewModel CreateWith(IUpdateService updateService)
+    {
+        var searchService = Substitute.For<ITorrentSearchService>();
+        searchService.TestAsync(Arg.Any<CancellationToken>()).Returns(TorrentSearchResponse.Succeeded([]));
+
+        return new SettingsViewModel(
+            _settingsService,
+            _themeService,
+            _localizationService,
+            _topLevelService,
+            _engineService,
+            updateService,
+            _windowsAssociationService,
+            Substitute.For<IInterfaceModeService>(),
+            searchService,
+            Substitute.For<ITorrentCategoryService>());
+    }
+
 }

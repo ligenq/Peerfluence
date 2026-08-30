@@ -1,4 +1,4 @@
-using Peerfluence.Core.Messaging;
+﻿using Peerfluence.Core.Messaging;
 using PeerSharp.Config;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
@@ -9,14 +9,20 @@ public sealed class TorrentService : ITorrentService
 {
     private readonly ITorrentEngineService _engineService;
     private readonly IAppMessenger _messenger;
+    private readonly IAppSettingsService _settings;
 
     private readonly HttpClient _httpClient;
 
-    public TorrentService(ITorrentEngineService engineService, IAppMessenger messenger, HttpClient httpClient)
+    public TorrentService(
+        ITorrentEngineService engineService,
+        IAppMessenger messenger,
+        HttpClient httpClient,
+        IAppSettingsService settings)
     {
         _engineService = engineService;
         _messenger = messenger;
         _httpClient = httpClient;
+        _settings = settings;
     }
 
     public IReadOnlyList<ITorrent> GetTorrents()
@@ -53,6 +59,8 @@ public sealed class TorrentService : ITorrentService
         {
             options.DownloadPath = _engineService.Engine.Settings.Files.DefaultDownloadPath;
         }
+
+        ApplySeedingDefaults(options);
 
         return await _engineService.Engine.AddMagnetAsync(magnet, options, cancellationToken).ConfigureAwait(false);
     }
@@ -105,7 +113,32 @@ public sealed class TorrentService : ITorrentService
             options.DownloadPath = Path.Combine(basePath, torrentFile.Name);
         }
 
+        ApplySeedingDefaults(options);
+
         return await _engineService.Engine.AddTorrentAsync(torrentFile, options, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gives a torrent the seeding goals it was not given.
+    /// </summary>
+    /// <remarks>
+    /// Every way into the application arrives here - the add dialog, a magnet from the browser, the
+    /// Transmission RPC endpoint, the MCP tools - so this is the one place a default can be applied
+    /// to all of them. Only where nothing was said: a torrent added with a ratio of its own keeps it.
+    /// </remarks>
+    private void ApplySeedingDefaults(AddTorrentOptions options)
+    {
+        var seeding = _settings.Current.Seeding;
+
+        if (seeding.LimitRatio)
+        {
+            options.RatioLimit ??= seeding.RatioLimit;
+        }
+
+        if (seeding.LimitSeedTime)
+        {
+            options.SeedTimeLimit ??= TimeSpan.FromMinutes(seeding.SeedTimeLimitMinutes);
+        }
     }
 
     public static Task StartAsync(ITorrent torrent, CancellationToken cancellationToken = default)
@@ -133,6 +166,32 @@ public sealed class TorrentService : ITorrentService
         return _engineService.Engine.RemoveTorrentAsync(torrent, options, cancellationToken);
     }
 
+    public bool IsSessionPaused
+    {
+        get
+        {
+            try
+            {
+                return _engineService.Engine.IsPaused;
+            }
+            catch (InvalidOperationException)
+            {
+                // Asked before the engine exists, which the toolbar does on the first bind.
+                return false;
+            }
+        }
+    }
+
+    public Task PauseSessionAsync(CancellationToken cancellationToken = default)
+    {
+        return _engineService.Engine.PauseAsync(cancellationToken);
+    }
+
+    public Task ResumeSessionAsync(CancellationToken cancellationToken = default)
+    {
+        return _engineService.Engine.ResumeAsync(cancellationToken);
+    }
+
     public void RegisterAlertMask(uint alertMask)
     {
         _engineService.Engine.Alerts.RegisterAlerts(alertMask);
@@ -156,6 +215,13 @@ public sealed class TorrentService : ITorrentService
                     _ = EnsureUniqueDownloadPathAsync(metadataAlert.Torrent, cancellationToken);
                 }
                 _messenger.Publish(new TorrentAlertMessage(metadataAlert.Torrent, alert));
+                break;
+
+            // Everything that is about the session rather than a torrent - the listener that could
+            // not bind the configured port, so far. Dropped entirely before there was anywhere to
+            // put it.
+            default:
+                _messenger.Publish(new EngineAlertMessage(alert));
                 break;
         }
     }

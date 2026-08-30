@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <!-- Kept in one place so the projects do not drift to different package versions. -->
-    <PeerSharpPackageVersion>3.1.0</PeerSharpPackageVersion>
+    <PeerSharpPackageVersion>4.0.0</PeerSharpPackageVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,11 +16,24 @@
     -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-    <!--
-      Off for the release build only. A warning that stops a developer should not stop a release
-      being cut hours after some analyzer package updated itself, and CI compiles Debug as well.
-    -->
-    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">false</TreatWarningsAsErrors>
-    <WarningsAsErrors Condition="'$(Configuration)' == 'Release'"></WarningsAsErrors>
+    <!-- Keep compiler, SDK analyzer, and configured code-style diagnostics identical locally and
+         in CI. The SDK itself is pinned in global.json, so analyzer waves cannot move underneath a
+         release without an explicit dependency update. -->
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Audit direct and transitive dependencies during every restore. A moderate-or-higher
+         advisory is a warning and therefore fails the build under the zero-warning policy. -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>moderate</NuGetAuditLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Peerfluence.Tests'
+      Or '$(MSBuildProjectName)' == 'Peerfluence.HeadlessTests'
+      Or '$(MSBuildProjectName)' == 'Peerfluence.UiTests'">
+    <!-- Underscores separate the arrange/condition/outcome clauses in executable test names. The
+         public-library naming rule makes those specifications harder to scan and has no API impact. -->
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
   </PropertyGroup>
 </Project>

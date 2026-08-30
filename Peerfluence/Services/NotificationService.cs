@@ -1,34 +1,48 @@
-using System;
-using System.Collections.ObjectModel;
+﻿using System;
 using Avalonia.Threading;
 using SukiUI.Toasts;
-using System.Linq;
 
 namespace Peerfluence.Services;
 
 public sealed class NotificationService : INotificationService
 {
-    private readonly ObservableCollection<NotificationItem> _notifications = new();
+    private readonly ISukiToastManager _toastManager;
 
-    public NotificationService()
+    public NotificationService(ISukiToastManager toastManager)
     {
-        Notifications = new ReadOnlyObservableCollection<NotificationItem>(_notifications);
+        _toastManager = toastManager;
     }
 
-    public ISukiToastManager? ToastManager { get; set; }
-
-    public ReadOnlyObservableCollection<NotificationItem> Notifications { get; }
-
+    /// <summary>
+    /// Shows a notification, from whichever thread happens to have something to say.
+    /// </summary>
+    /// <remarks>
+    /// The marshalling is here rather than at the call sites. Most of them are hosted services -
+    /// a torrent finishing, a completion action failing - which have no reason to know that saying
+    /// so touches the interface, and a contract of "call me only from the UI thread" would be ten
+    /// chances to forget.
+    /// </remarks>
     public void Publish(NotificationItem notification, TimeSpan? autoDismiss = null)
     {
         ArgumentNullException.ThrowIfNull(notification);
 
-        _notifications.Add(notification);
+        Dispatcher.UIThread.Post(() => Show(notification, autoDismiss));
+    }
 
-        if (ToastManager == null)
-        {
-            return;
-        }
+    /// <summary>
+    /// Queues the toast. Must be on the UI thread.
+    /// </summary>
+    /// <remarks>
+    /// The check is the point. Nothing about <see cref="ISukiToastManager"/> says it is thread
+    /// affine - it is an interface like any other - so the requirement lived in whoever remembered
+    /// it, and half of this method used to marshal while the other half did not. Verifying it here
+    /// turns losing the Post into an exception on the first notification in every build, rather than
+    /// into a collection mutated from a background thread that misbehaves for somebody else, later,
+    /// occasionally.
+    /// </remarks>
+    private void Show(NotificationItem notification, TimeSpan? autoDismiss)
+    {
+        Dispatcher.UIThread.VerifyAccess();
 
         var type = notification.Type switch
         {
@@ -38,25 +52,17 @@ public sealed class NotificationService : INotificationService
             _ => Avalonia.Controls.Notifications.NotificationType.Information
         };
 
-        Dispatcher.UIThread.Post(() =>
+        var builder = _toastManager.CreateToast()
+            .OfType(type)
+            .WithTitle(notification.Title)
+            .WithContent(notification.Message)
+            .Dismiss().ByClicking();
+
+        if (autoDismiss.HasValue)
         {
-            var builder = ToastManager.CreateToast()
-                .OfType(type)
-                .WithTitle(notification.Title)
-                .WithContent(notification.Message)
-                .Dismiss().ByClicking();
+            builder.Dismiss().After(autoDismiss.Value);
+        }
 
-            if (autoDismiss.HasValue)
-            {
-                builder.Dismiss().After(autoDismiss.Value);
-            }
-
-            builder.Queue();
-        });
-    }
-
-    public void Dismiss(NotificationItem notification)
-    {
-        _notifications.Remove(notification);
+        builder.Queue();
     }
 }

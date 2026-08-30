@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using System.Reflection;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -14,6 +15,7 @@ namespace Peerfluence.Tests.ViewModels;
 public class MainWindowViewModelTests
 {
     private readonly DetailsViewModel _detailsVm;
+    private readonly DownloadsViewModel _downloadsVm;
     private readonly SettingsViewModel _settingsVm;
     private readonly INotificationService _notificationService;
     private readonly IAppSettingsService _settingsService;
@@ -31,27 +33,51 @@ public class MainWindowViewModelTests
         var fileSystem = new FileSystem();
         _settingsService = new AppSettingsService(paths, store, fileSystem);
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(_settingsService, loggerFactory);
-        var torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        var engineService = new TorrentEngineService(_settingsService, loggerFactory, TimeProvider.System);
+        var torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
         var selectionService = new TorrentSelectionService(Substitute.For<IAppMessenger>());
         var topLevelService = Substitute.For<ITopLevelService>();
         var localizationService = new LocalizationService();
         var themeService = new ThemeService();
 
-        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService);
+        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService, Substitute.For<IDialogService>());
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
         _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>(), Substitute.For<ITorrentCategoryService>());
 
         // Create an uninitialized DownloadsViewModel to avoid DispatcherTimer in its constructor
 #pragma warning disable SYSLIB0050
-        var downloadsVm = (DownloadsViewModel)FormatterServices.GetUninitializedObject(typeof(DownloadsViewModel));
+        _downloadsVm = (DownloadsViewModel)FormatterServices.GetUninitializedObject(typeof(DownloadsViewModel));
+        var downloadsVm = _downloadsVm;
 #pragma warning restore SYSLIB0050
+
+        // The real constructor always assigns this, and MainWindowViewModel reaches through it to
+        // hand the details pane the dialog manager, so an uninitialized object needs it set.
+        var downloadsFields = typeof(DownloadsViewModel).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        downloadsFields.First(f => f.Name == "<SelectedTorrentDetailViewModel>k__BackingField").SetValue(downloadsVm, _detailsVm);
+
+        // MainWindowViewModel disposes the feature view models it was handed, and DownloadsViewModel
+        // reaches for these when it does. A real one gets them from its constructor.
+        downloadsFields.First(f => f.Name == "<Torrents>k__BackingField")
+            .SetValue(downloadsVm, new System.Collections.ObjectModel.ObservableCollection<TorrentListItemViewModel>());
+        downloadsFields.First(f => f.Name == "_loopCts").SetValue(downloadsVm, new CancellationTokenSource());
+        downloadsFields.First(f => f.Name == "_alertChannel").SetValue(
+            downloadsVm,
+            System.Threading.Channels.Channel.CreateBounded<TorrentAlertEventArgs>(
+                new System.Threading.Channels.BoundedChannelOptions(1)
+                {
+                    FullMode = System.Threading.Channels.BoundedChannelFullMode.DropOldest
+                }));
 
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 
         var features = new IFeatureViewModel[] { downloadsVm, _settingsVm };
-        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>());
+        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            downloadsVm,
+            _settingsVm,
+            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
+            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
     }
 
     [Fact]
@@ -111,7 +137,12 @@ public class MainWindowViewModelTests
             _notificationService,
             settings,
             updateService,
-            Substitute.For<IInterfaceModeService>());
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            _downloadsVm,
+            _settingsVm,
+            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
+            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -132,10 +163,24 @@ public class MainWindowViewModelTests
             _notificationService,
             settings,
             updateService,
-            Substitute.For<IInterfaceModeService>());
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            _downloadsVm,
+            _settingsVm,
+            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
+            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
         await updateService.DidNotReceive().CheckForUpdatesAsync();
     }
+
+    [Fact]
+    public void DisposingTheWindow_CanHappenTwice()
+    {
+        // The window closes and then the host disposes the container. Both call this.
+        _sut.Dispose();
+        _sut.Dispose();
+    }
+
 }

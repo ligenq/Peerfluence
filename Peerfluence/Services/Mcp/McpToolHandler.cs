@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +10,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Protocol;
+using Peerfluence.Core;
+using Peerfluence.Core.Services;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Services.Mcp;
@@ -18,6 +20,7 @@ public class McpToolHandler : IMcpToolHandler
 {
     private const int DefaultMaxTorrentPayloadBytes = 10 * 1024 * 1024;
     private readonly ITorrentService _torrentService;
+    private readonly ITorrentSearchService _searchService;
     private readonly ITopLevelService _topLevelService;
     private readonly IAppSettingsService _appSettingsService;
     private readonly IHostApplicationLifetime _hostLifetime;
@@ -28,8 +31,10 @@ public class McpToolHandler : IMcpToolHandler
         ITopLevelService topLevelService,
         IAppSettingsService appSettingsService,
         IHostApplicationLifetime hostLifetime,
+        ITorrentSearchService searchService,
         IMcpRuntimeOptions? runtimeOptions = null)
     {
+        _searchService = searchService;
         _torrentService = torrentService;
         _topLevelService = topLevelService;
         _appSettingsService = appSettingsService;
@@ -124,17 +129,17 @@ public class McpToolHandler : IMcpToolHandler
         }
     }
 
-    public async Task<CallToolResult> ManageTorrentAsync(string infoHashHex, string action, CancellationToken cancellationToken = default)
+    public async Task<CallToolResult> ManageTorrentAsync(string infoHash, string action, CancellationToken cancellationToken = default)
     {
         try
         {
-            if (!InfoHash.TryFromHex(infoHashHex, out var infoHash))
+            if (!InfoHash.TryFromHex(infoHash, out var parsedHash))
             {
                 return ToolError("Invalid info hash format.", "invalid_info_hash");
             }
 
             var torrents = _torrentService.GetTorrents();
-            var torrent = torrents.FirstOrDefault(t => t.Hash == infoHash);
+            var torrent = torrents.FirstOrDefault(t => TorrentIdentity.HasHash(t, parsedHash));
 
             if (torrent == null)
             {
@@ -146,19 +151,19 @@ public class McpToolHandler : IMcpToolHandler
                 case "pause":
                     if (torrent.State == TorrentState.Stopped)
                     {
-                        return ToolSuccess($"Torrent {infoHashHex} is already paused.");
+                        return ToolSuccess($"Torrent {infoHash} is already paused.");
                     }
 
                     await TorrentService.StopAsync(torrent, cancellationToken);
-                    return ToolSuccess($"Successfully paused torrent {infoHashHex}.");
+                    return ToolSuccess($"Successfully paused torrent {infoHash}.");
                 case "resume":
                     if (torrent.State == TorrentState.Active)
                     {
-                        return ToolSuccess($"Torrent {infoHashHex} is already active.");
+                        return ToolSuccess($"Torrent {infoHash} is already active.");
                     }
 
                     await TorrentService.StartAsync(torrent, cancellationToken);
-                    return ToolSuccess($"Successfully resumed torrent {infoHashHex}.");
+                    return ToolSuccess($"Successfully resumed torrent {infoHash}.");
                 case "remove":
                     if (!DestructiveToolsAllowed)
                     {
@@ -166,7 +171,7 @@ public class McpToolHandler : IMcpToolHandler
                     }
 
                     await _torrentService.RemoveAsync(torrent, PeerSharp.Config.RemoveOptions.None, cancellationToken);
-                    return ToolSuccess($"Successfully removed torrent {infoHashHex}.");
+                    return ToolSuccess($"Successfully removed torrent {infoHash}.");
                 default:
                     return ToolError($"Unknown action '{action}'. Valid actions are pause, resume, remove.", "unknown_action");
             }
@@ -295,6 +300,27 @@ public class McpToolHandler : IMcpToolHandler
             case "enabledht": current.Network.EnableDht = value.GetBoolean(); break;
             case "answerinfohashsampling": current.Network.AnswerInfoHashSampling = value.GetBoolean(); break;
             case "allowmultipleconnectionsperip": current.Network.AllowMultipleConnectionsPerIp = value.GetBoolean(); break;
+            case "maxconnectionsperip": current.Network.MaxConnectionsPerIp = value.GetInt32(); break;
+            case "bindaddress":
+                var bindAddress = value.GetString();
+                if (bindAddress is null)
+                {
+                    break;
+                }
+
+                bindAddress = bindAddress.Trim();
+                if (bindAddress.Length > 0
+                    && (!System.Net.IPAddress.TryParse(bindAddress, out var parsed)
+                        || parsed.Equals(System.Net.IPAddress.Any)
+                        || parsed.Equals(System.Net.IPAddress.IPv6Any)))
+                {
+                    throw new ArgumentException(
+                        "Bind address must be a specific IPv4 or IPv6 address, or blank to use every interface.",
+                        nameof(value));
+                }
+
+                current.Network.BindAddress = bindAddress;
+                break;
             case "enablenatpmp": current.Network.EnableNatPmp = value.GetBoolean(); break;
             case "enableupnp": current.Network.EnableUpnp = value.GetBoolean(); break;
             case "useautomaticlisteningport": current.Network.UseAutomaticListeningPort = value.GetBoolean(); break;
@@ -357,21 +383,17 @@ public class McpToolHandler : IMcpToolHandler
     {
         try
         {
-            var torrents = _torrentService.GetTorrents();
             switch (actionName.ToLowerInvariant())
             {
+                // The engine's own pause, not a loop over every torrent. The loop's resume_all
+                // started everything, including torrents the user had deliberately stopped, because
+                // it had no way of knowing which were running when it paused. This remembers.
                 case "pause_all":
-                    foreach (var torrent in torrents)
-                    {
-                        await TorrentService.StopAsync(torrent, cancellationToken);
-                    }
-                    return ToolSuccess($"Paused {torrents.Count} torrents.");
+                    await _torrentService.PauseSessionAsync(cancellationToken);
+                    return ToolSuccess("Paused every running torrent.");
                 case "resume_all":
-                    foreach (var torrent in torrents)
-                    {
-                        await TorrentService.StartAsync(torrent, cancellationToken);
-                    }
-                    return ToolSuccess($"Resumed {torrents.Count} torrents.");
+                    await _torrentService.ResumeSessionAsync(cancellationToken);
+                    return ToolSuccess("Resumed the torrents that were running when the session was paused.");
                 default:
                     return ToolError($"Unknown UI action: {actionName}. Supported actions: pause_all, resume_all.", "unknown_action");
             }
@@ -386,17 +408,318 @@ public class McpToolHandler : IMcpToolHandler
         }
     }
 
-    public Task<CallToolResult> GetTorrentDiagnosticsAsync(string infoHashHex)
+    /// <summary>
+    /// Finds a torrent by info hash, or says why it could not.
+    /// </summary>
+    private bool TryResolveTorrent(string infoHashHex, out ITorrent torrent, out CallToolResult? error)
+    {
+        torrent = null!;
+
+        if (!InfoHash.TryFromHex(infoHashHex, out var infoHash))
+        {
+            error = ToolError("Invalid info hash format.", "invalid_info_hash");
+            return false;
+        }
+
+        var found = _torrentService.GetTorrents().FirstOrDefault(t => TorrentIdentity.HasHash(t, infoHash));
+        if (found == null)
+        {
+            error = ToolError("Torrent not found.", "torrent_not_found");
+            return false;
+        }
+
+        torrent = found;
+        error = null;
+        return true;
+    }
+
+    public Task<CallToolResult> ConfigureTorrentAsync(
+        string infoHash,
+        bool? superSeeding = null,
+        int? maxConnections = null,
+        int? maxUploadSlots = null)
     {
         try
         {
-            if (!InfoHash.TryFromHex(infoHashHex, out var infoHash))
+            if (!TryResolveTorrent(infoHash, out var torrent, out var error))
+            {
+                return Task.FromResult(error!);
+            }
+
+            if (maxConnections is < 0 || maxUploadSlots is < 0)
+            {
+                return Task.FromResult(ToolError("Connection and upload slot limits cannot be negative.", "invalid_limit"));
+            }
+
+            var changed = new List<string>();
+
+            if (superSeeding is { } seed)
+            {
+                torrent.SuperSeeding = seed;
+                changed.Add($"superSeeding={seed}");
+            }
+
+            if (maxConnections is { } connections)
+            {
+                torrent.MaxConnections = connections;
+                changed.Add($"maxConnections={connections}");
+            }
+
+            if (maxUploadSlots is { } slots)
+            {
+                torrent.MaxUploadSlots = slots;
+                changed.Add($"maxUploadSlots={slots}");
+            }
+
+            return Task.FromResult(changed.Count == 0
+                ? ToolSuccess("Nothing to change: no values were supplied.")
+                : ToolSuccess($"Updated {infoHash}: {string.Join(", ", changed)}."));
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(ToolError($"Error configuring torrent: {ex.Message}", "configure_torrent_failed"));
+        }
+    }
+
+    public Task<CallToolResult> ManageWebSeedsAsync(string infoHash, string action, string? url = null)
+    {
+        try
+        {
+            if (!TryResolveTorrent(infoHash, out var torrent, out var error))
+            {
+                return Task.FromResult(error!);
+            }
+
+            switch (action.ToLowerInvariant())
+            {
+                case "list":
+                    break;
+
+                case "add":
+                    if (string.IsNullOrWhiteSpace(url))
+                    {
+                        return Task.FromResult(ToolError("A url is required to add a web seed.", "missing_url"));
+                    }
+
+                    if (!torrent.WebSeeds.Add(url))
+                    {
+                        return Task.FromResult(ToolError(
+                            "The url is blank, malformed, not http/https/ftp, or already in use by this torrent.",
+                            "web_seed_rejected"));
+                    }
+
+                    break;
+
+                case "remove":
+                    if (string.IsNullOrWhiteSpace(url))
+                    {
+                        return Task.FromResult(ToolError("A url is required to remove a web seed.", "missing_url"));
+                    }
+
+                    if (!torrent.WebSeeds.Remove(url))
+                    {
+                        return Task.FromResult(ToolError("That url was not in use by this torrent.", "web_seed_not_found"));
+                    }
+
+                    break;
+
+                default:
+                    return Task.FromResult(ToolError(
+                        $"Unknown action '{action}'. Valid actions are list, add, remove.",
+                        "unknown_action"));
+            }
+
+            var response = new McpConstants.WebSeedsResponse(infoHash, torrent.WebSeeds.GetAll().ToList());
+            return Task.FromResult(ToolSuccess(
+                JsonSerializer.Serialize(response, McpJsonContext.Default.WebSeedsResponse)));
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(ToolError($"Error managing web seeds: {ex.Message}", "manage_web_seeds_failed"));
+        }
+    }
+
+    public async Task<CallToolResult> ScrapeTrackersAsync(string infoHash, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (!TryResolveTorrent(infoHash, out var torrent, out var error))
+            {
+                return error!;
+            }
+
+            // Waits for the replies, unlike an announce: the counts are the only reason to ask. A
+            // tracker that refuses or does not implement scrape is recorded in its own status rather
+            // than failing the call, so the response can still carry the ones that answered.
+            await torrent.Trackers.ScrapeAsync(cancellationToken: cancellationToken);
+
+            var trackers = torrent.Trackers
+                .GetTrackers()
+                .Select(tracker => new McpConstants.TrackerScrapeEntry(
+                    tracker.Url,
+                    tracker.Status.ToString(),
+                    (int)tracker.SeedCount,
+                    (int)tracker.LeechCount,
+                    tracker.LastError))
+                .ToList();
+
+            var response = new McpConstants.TrackerScrapeResponse(infoHash, trackers);
+            return ToolSuccess(JsonSerializer.Serialize(response, McpJsonContext.Default.TrackerScrapeResponse));
+        }
+        catch (OperationCanceledException)
+        {
+            return ToolError("Scrape was cancelled.", "cancelled");
+        }
+        catch (Exception ex)
+        {
+            return ToolError($"Error scraping trackers: {ex.Message}", "scrape_failed");
+        }
+    }
+
+    public async Task<CallToolResult> RenameTorrentFileAsync(
+        string infoHash,
+        int fileIndex,
+        string newPath,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (!DestructiveToolsAllowed)
+            {
+                return ToolError("Destructive MCP tools are disabled in settings.", "destructive_tools_disabled");
+            }
+
+            if (!TryResolveTorrent(infoHash, out var torrent, out var error))
+            {
+                return error!;
+            }
+
+            if (string.IsNullOrWhiteSpace(newPath))
+            {
+                return ToolError("A new path is required.", "missing_path");
+            }
+
+            if (torrent.State != TorrentState.Stopped)
+            {
+                return ToolError("The torrent must be stopped before a file can be renamed.", "torrent_running");
+            }
+
+            await torrent.RenameFileAsync(fileIndex, newPath, cancellationToken);
+            return ToolSuccess($"Renamed file {fileIndex} of {infoHash} to '{newPath}'.");
+        }
+        catch (ArgumentException ex)
+        {
+            // An absolute path, or one climbing out of the download directory with "..".
+            return ToolError($"Invalid path: {ex.Message}", "invalid_path");
+        }
+        catch (OperationCanceledException)
+        {
+            return ToolError("Rename was cancelled.", "cancelled");
+        }
+        catch (Exception ex)
+        {
+            return ToolError($"Error renaming file: {ex.Message}", "rename_failed");
+        }
+    }
+
+    public async Task<CallToolResult> MoveTorrentStorageAsync(
+        string infoHash,
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (!DestructiveToolsAllowed)
+            {
+                return ToolError("Destructive MCP tools are disabled in settings.", "destructive_tools_disabled");
+            }
+
+            if (!TryResolveTorrent(infoHash, out var torrent, out var error))
+            {
+                return error!;
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return ToolError("A destination path is required.", "missing_path");
+            }
+
+            if (torrent.State != TorrentState.Stopped)
+            {
+                return ToolError("The torrent must be stopped before its data can be moved.", "torrent_running");
+            }
+
+            // Moves the files and continues from the new path. A move within a volume is a rename;
+            // one that crosses volumes copies, and takes as long as the data is large. If it fails
+            // partway what was already moved is put back, so the torrent is never split in two.
+            await torrent.MoveStorageAsync(path, cancellationToken);
+            return ToolSuccess($"Moved the data for {infoHash} to '{path}'.");
+        }
+        catch (OperationCanceledException)
+        {
+            return ToolError("Move was cancelled.", "cancelled");
+        }
+        catch (Exception ex)
+        {
+            return ToolError($"Error moving torrent storage: {ex.Message}", "move_storage_failed");
+        }
+    }
+
+    /// <summary>
+    /// Searches the configured indexer.
+    /// </summary>
+    /// <remarks>
+    /// The agent could add a torrent it already had a link for and could not find one, so half of
+    /// "find me something and add it" was missing. The search service treats an unreachable indexer
+    /// as an ordinary outcome rather than an exception, and that outcome is passed on rather than
+    /// turned into an error: nothing found because nothing is configured is worth saying plainly.
+    /// </remarks>
+    public async Task<CallToolResult> SearchTorrentsAsync(string query, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return ToolError("A search needs something to search for.", "empty_query");
+            }
+
+            var response = await _searchService.SearchAsync(query, cancellationToken).ConfigureAwait(false);
+
+            var results = response.Results.Select(result => new McpConstants.SearchResultSummary(
+                Title: result.Title,
+                SizeBytes: result.SizeBytes,
+                Seeders: result.Seeders,
+                Peers: result.Peers,
+                IndexerName: result.IndexerName,
+                PublishedAt: result.PublishedAt,
+                Link: result.Link,
+                IsMagnet: result.IsMagnet)).ToList();
+
+            var payload = new McpConstants.SearchResultsResponse(
+                Query: query,
+                Results: results,
+                Failure: response.Failure == SearchFailure.None ? null : response.Failure.ToString(),
+                FailureDetail: response.FailureDetail);
+
+            return ToolText(JsonSerializer.Serialize(payload, McpJsonContext.Default.SearchResultsResponse));
+        }
+        catch (Exception ex)
+        {
+            return ToolError($"Error searching: {ex.Message}", "search_failed");
+        }
+    }
+
+    public Task<CallToolResult> GetTorrentDiagnosticsAsync(string infoHash)
+    {
+        try
+        {
+            if (!InfoHash.TryFromHex(infoHash, out var parsedHash))
             {
                 return Task.FromResult(ToolError("Invalid info hash format.", "invalid_info_hash"));
             }
 
             var torrents = _torrentService.GetTorrents();
-            var torrent = torrents.FirstOrDefault(t => t.Hash == infoHash);
+            var torrent = torrents.FirstOrDefault(t => TorrentIdentity.HasHash(t, parsedHash));
 
             if (torrent == null)
             {
@@ -445,16 +768,20 @@ public class McpToolHandler : IMcpToolHandler
         }
     }
 
-    public async Task<CallToolResult> SetFilePriorityAsync(string infoHashHex, int fileIndex, string priorityStr, CancellationToken cancellationToken = default)
+    public async Task<CallToolResult> SetFilePriorityAsync(
+        string infoHash,
+        int fileIndex,
+        string priority,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            if (!InfoHash.TryFromHex(infoHashHex, out var infoHash))
+            if (!InfoHash.TryFromHex(infoHash, out var parsedHash))
             {
                 return ToolError("Invalid info hash format.", "invalid_info_hash");
             }
 
-            var torrent = _torrentService.GetTorrents().FirstOrDefault(t => t.Hash == infoHash);
+            var torrent = _torrentService.GetTorrents().FirstOrDefault(t => TorrentIdentity.HasHash(t, parsedHash));
             if (torrent == null)
             {
                 return ToolError("Torrent not found.", "torrent_not_found");
@@ -465,7 +792,7 @@ public class McpToolHandler : IMcpToolHandler
                 return ToolError($"Invalid file index {fileIndex}. Torrent has {torrent.FileCount} files.", "invalid_file_index");
             }
 
-            Priority priority = priorityStr.ToLowerInvariant() switch
+            Priority parsedPriority = priority.ToLowerInvariant() switch
             {
                 "null" => Priority.DoNotDownload,
                 "skip" => Priority.DoNotDownload,
@@ -475,8 +802,8 @@ public class McpToolHandler : IMcpToolHandler
                 _ => Priority.Normal
             };
 
-            await torrent.SetFilePriorityAsync(fileIndex, priority, cancellationToken);
-            return ToolSuccess($"Successfully set priority of file {fileIndex} to {priority}.");
+            await torrent.SetFilePriorityAsync(fileIndex, parsedPriority, cancellationToken);
+            return ToolSuccess($"Successfully set priority of file {fileIndex} to {parsedPriority}.");
         }
         catch (OperationCanceledException)
         {

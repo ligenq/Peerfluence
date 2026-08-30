@@ -3,23 +3,84 @@
 # S3267: Loops should be simplified with "LINQ" expressions
 dotnet_diagnostic.S3267.severity = none
 
-# Naming: private static fields - CamelCase, no prefix
-dotnet_naming_rule.private_static_fields_should_be_camel_case.symbols = private_static_fields
-dotnet_naming_rule.private_static_fields_should_be_camel_case.style = camel_case_style
-dotnet_naming_rule.private_static_fields_should_be_camel_case.severity = warning
+# Naming: private static fields - PascalCase, no prefix
+dotnet_naming_rule.private_static_fields_should_be_pascal_case.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_rule.private_static_fields_should_be_pascal_case.severity = warning
 
 dotnet_naming_symbols.private_static_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
 dotnet_naming_symbols.private_static_fields.required_modifiers = static
 
-# Naming: private const fields - CamelCase, no prefix
-dotnet_naming_rule.private_const_fields_should_be_camel_case.symbols = private_const_fields
-dotnet_naming_rule.private_const_fields_should_be_camel_case.style = camel_case_style
-dotnet_naming_rule.private_const_fields_should_be_camel_case.severity = warning
+# Naming: private const fields - PascalCase, no prefix
+dotnet_naming_rule.private_const_fields_should_be_pascal_case.symbols = private_const_fields
+dotnet_naming_rule.private_const_fields_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_rule.private_const_fields_should_be_pascal_case.severity = warning
 
 dotnet_naming_symbols.private_const_fields.applicable_kinds = field
 dotnet_naming_symbols.private_const_fields.applicable_accessibilities = private
 dotnet_naming_symbols.private_const_fields.required_modifiers = const
 
-# Shared style: CamelCase with no prefix
-dotnet_naming_style.camel_case_style.capitalization = pascal_case
+# Shared style: PascalCase with no prefix
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# These recommendations trade API clarity and maintainability for micro-optimizations. Keep them
+# visible in editors, but do not make them merge gates: resource format strings can change when the
+# user changes language, and abstractions are intentional at service/view-model boundaries.
+dotnet_diagnostic.CA1859.severity = suggestion
+dotnet_diagnostic.CA1863.severity = suggestion
+
+# The desktop shell logs low-frequency lifecycle and user actions. Source-generated logging for
+# every event would add dozens of partial methods without a measurable hot-path benefit. Core engine
+# services remain covered by these rules because this override is scoped to the UI assembly.
+[Peerfluence/**/*.cs]
+dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion
+# Most formatting in this assembly is localized UI text and must follow CurrentCulture. Protocol,
+# persistence, and diagnostic output still pass InvariantCulture explicitly at their call sites.
+dotnet_diagnostic.CA1305.severity = suggestion
+
+[Peerfluence/*.cs]
+dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion
+dotnet_diagnostic.CA1305.severity = suggestion
+
+# Avalonia binds these instance properties by name. Making them static would satisfy the analyzer
+# but remove them from the view-model surface the compiled binding expects.
+[Peerfluence/ViewModels/*.cs]
+dotnet_diagnostic.CA1822.severity = suggestion
+
+# Test names are executable behavioral sentences, and fixtures intentionally own their system under
+# test until xUnit tears the fixture down. Public-library naming/design rules obscure that intent;
+# correctness, reliability, security, and async diagnostics remain warnings and therefore gates.
+[Peerfluence.Tests/**/*.cs]
+dotnet_diagnostic.CA1001.severity = suggestion
+dotnet_diagnostic.CA1305.severity = suggestion
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1822.severity = suggestion
+dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1859.severity = suggestion
+dotnet_diagnostic.CA1863.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion
+
+[Peerfluence.HeadlessTests/**/*.cs]
+dotnet_diagnostic.CA1001.severity = suggestion
+dotnet_diagnostic.CA1305.severity = suggestion
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1816.severity = suggestion
+dotnet_diagnostic.CA1822.severity = suggestion
+dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1859.severity = suggestion
+dotnet_diagnostic.CA1863.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion
+
+[Peerfluence.UiTests/**/*.cs]
+dotnet_diagnostic.CA1001.severity = suggestion
+dotnet_diagnostic.CA1305.severity = suggestion
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1816.severity = suggestion
+dotnet_diagnostic.CA1822.severity = suggestion
+dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1859.severity = suggestion
+dotnet_diagnostic.CA1863.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion

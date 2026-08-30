@@ -1,4 +1,4 @@
-// Ported from Avalonia 12.0 source (MIT License)
+﻿// Ported from Avalonia 12.0 source (MIT License)
 
 using System.ComponentModel;
 using Xunit.Internal;
@@ -15,14 +15,16 @@ public class AvaloniaTheoryDiscoverer : TheoryDiscoverer
         IXunitTestMethod testMethod,
         ITheoryAttribute theoryAttribute,
         ITheoryDataRow dataRow,
-        object?[] testMethodArguments)
+        object?[] testMethodArguments,
+        string? index)
     {
         var details = TestIntrospectionHelper.GetTestCaseDetailsForTheoryDataRow(
             discoveryOptions,
             testMethod,
             theoryAttribute,
             dataRow,
-            testMethodArguments);
+            testMethodArguments,
+            index);
         var traits = TestIntrospectionHelper.GetTraits(testMethod, dataRow);
 
         var testCase = new AvaloniaTestCase(

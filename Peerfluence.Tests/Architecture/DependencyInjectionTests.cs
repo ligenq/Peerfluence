@@ -9,12 +9,16 @@ namespace Peerfluence.Tests.Architecture;
 public class DependencyInjectionTests
 {
     [Fact]
-    public void Services_MustOnlyInjectInterfaces_InConstructors()
+    public void Services_MustOnlyInjectAbstractions_InConstructors()
     {
         var assembly = typeof(ServiceCollectionExtensions).Assembly;
 
         var serviceTypes = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && (t.GetInterfaces().Any(i => i.Namespace?.StartsWith("Peerfluence") == true || i.Namespace?.StartsWith("PeerSharp") == true) || typeof(ViewModelBase).IsAssignableFrom(t)) && !t.IsDefined(typeof(ExcludeFromDIAttribute), inherit: true))
+            .Where(t => t.IsClass && !t.IsAbstract && (t.GetInterfaces().Any(i =>
+                i.Namespace?.StartsWith("Peerfluence", StringComparison.Ordinal) == true
+                || i.Namespace?.StartsWith("PeerSharp", StringComparison.Ordinal) == true)
+                || typeof(ViewModelBase).IsAssignableFrom(t))
+                && !t.IsDefined(typeof(ExcludeFromDIAttribute), inherit: true))
             .ToList();
 
         var errors = new List<string>();
@@ -47,10 +51,12 @@ public class DependencyInjectionTests
                     if (typeof(ViewModelBase).IsAssignableFrom(paramType))
                         continue;
 
-                    // Enforce that complex types MUST be interfaces
-                    if (!paramType.IsInterface)
+                    // Interfaces and abstract framework abstractions such as TimeProvider are both
+                    // replaceable in tests and cannot accidentally couple a service to an
+                    // implementation.
+                    if (!paramType.IsInterface && !paramType.IsAbstract)
                     {
-                        errors.Add($"Violation in '{type.Name}': Constructor injects concrete type '{paramType.Name}'. Must use an interface.");
+                        errors.Add($"Violation in '{type.Name}': Constructor injects concrete type '{paramType.Name}'. Must use an abstraction.");
                     }
                 }
             }
@@ -80,5 +86,23 @@ public class DependencyInjectionTests
 
         var hostedServices = provider.GetServices<IHostedService>().ToList();
         Assert.True(hostedServices.Count >= 5);
+    }
+
+    [Fact]
+    public void EveryRegisteredConstructionPath_IsValid()
+    {
+        // Host validation defaults vary with environment. Make it unconditional here so a missing
+        // dependency in a lazily-created page, dialog or server fails this test rather than the
+        // first time somebody opens or enables it.
+        var builder = Host.CreateApplicationBuilder();
+        builder.Services.AddPeerfluenceServices();
+
+        using var provider = builder.Services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true
+        });
+
+        Assert.NotNull(provider);
     }
 }

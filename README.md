@@ -39,16 +39,25 @@ Velopack update path are in place.
   limits, ratio rules, seed time rules, and queue priority. The details pane is opened from
   the toolbar and closed by default, so the list has the whole window until it is wanted.
 - Select files, set file priorities, and apply per-file download choices.
-- Add/remove trackers and manually announce.
+- Rename a file within a torrent, taking what has already been downloaded with it.
+- Add/remove trackers, manually announce, and scrape trackers for seeder/leecher counts.
+- Add and remove BEP 19 web seeds, including ones a torrent's own metadata declared.
 - Offer peer addresses by hand, for a peer no tracker, DHT node or exchange has mentioned.
 - Save resume data.
-- Change a torrent's download path.
+- Change a torrent's download path, moving the downloaded data along with it.
+- Pause and resume the whole session in one action, which starts back exactly the torrents
+  it stopped rather than everything.
+- Set per-torrent connection and upload-slot limits, and turn on BEP 16 super-seeding for
+  an initial seed introducing content to an empty swarm.
 - Stream eligible files through the configured external media player.
 - Show notifications for finished downloads, metadata readiness, torrent errors, and
   completion actions.
 - Persist session data and settings across restarts.
 - Use DHT, NAT-PMP, UPnP, proxy settings, encryption mode, blocklist, and GeoIP settings.
 - Use fixed or automatic OS-assigned listening ports for TCP/uTP.
+- Bind every socket to a single local address, so traffic stops rather than leaving by
+  another route when a VPN goes away.
+- Limit how many connections one address may hold on a single torrent.
 - Configure disk read/write limits separately from network settings.
 - Configure queue management with maximum active downloads/seeds.
 - Configure a completion action program/script that runs when a torrent finishes.
@@ -101,7 +110,8 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 - Storage and session: download folder, session folder, session persistence, add/remove
   dialog preferences.
 - Network and connectivity: DHT, NAT-PMP, UPnP, whether several connections may share one
-  IP address, automatic or fixed listening port, listening-port hints, and port-mapping
+  IP address, how many connections one address may hold on a torrent, the local address to
+  bind to, automatic or fixed listening port, listening-port hints, and port-mapping
   status.
 - Performance: disk read/write limits.
 - Queue management: enable queueing, max active downloads, max active seeds.
@@ -150,6 +160,11 @@ mode is a stdio JSON-RPC proxy that connects to the already-running app.
 - `invoke_ui_action`: invoke UI actions such as `pause_all` or `resume_all`.
 - `get_torrent_diagnostics`: inspect trackers, peers, missing pieces, and errors.
 - `set_file_priority`: set the priority for a torrent file.
+- `configure_torrent`: set super-seeding, maximum connections, and maximum upload slots.
+- `manage_web_seeds`: list, add, or remove a torrent's BEP 19 web seed URLs.
+- `scrape_trackers`: ask a torrent's trackers for current seeder and leecher counts.
+- `rename_torrent_file`: store one of a torrent's files under a different name. Destructive.
+- `move_torrent_storage`: move a torrent's data to a new directory. Destructive.
 
 ### MCP Resources
 
@@ -203,6 +218,31 @@ UI-agent tools include:
 Natural-language test cases and runner guidance live in
 `Testing\AI_UI_Test_Cases.md`. The `Testing` folder also contains fixture torrent data
 and a magnet link used by the test cases.
+
+## Development Quality Gates
+
+The repository pins the .NET SDK in `global.json`, treats compiler and analyzer warnings as
+errors in every configuration, audits NuGet dependencies during restore, and verifies formatting
+with `dotnet format`. The normal CI workflow builds Debug and Release, runs unit/headless tests on
+Linux and Windows, executes an isolated smoke test, and publishes Cobertura coverage artifacts.
+
+Security and depth checks are separate workflows: CodeQL and dependency review run for pull
+requests, while scheduled deep validation runs mutation analysis with Stryker and the interactive
+Windows UI suite. Configure the repository's main-branch ruleset to require the CI, CodeQL, and
+dependency-review checks, require a maintainer review, resolve conversations, and disallow bypasses.
+
+Before opening a pull request, the shortest local gate is:
+
+```powershell
+dotnet restore Peerfluence.slnx
+dotnet format Peerfluence.slnx --verify-no-changes --no-restore
+dotnet build Peerfluence.slnx --configuration Debug --warnaserror
+dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj --configuration Debug
+dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --configuration Debug
+```
+
+Live Torznab contract tests are opt-in so a local configuration cannot make ordinary builds depend
+on a running indexer. Set `PEERFLUENCE_RUN_LIVE_TESTS=1` when intentionally running them.
 
 ## Build And Run
 

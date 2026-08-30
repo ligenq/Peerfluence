@@ -1,3 +1,5 @@
+﻿using SukiUI.Toasts;
+using SukiUI.Dialogs;
 using System;
 using System.IO.Abstractions;
 using System.Net.Http;
@@ -32,6 +34,7 @@ public static class ServiceCollectionExtensions
         IAppPaths? appPaths)
     {
         services.AddSingleton(mcpRuntimeOptions ?? new McpRuntimeOptions());
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IFileSystem, FileSystem>();
         services.AddSingleton(appPaths ?? new AppPaths());
         services.AddSingleton<IAppSettingsStore, JsonAppSettingsStore>();
@@ -42,7 +45,17 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
-        services.AddSingleton<IDialogService, DialogService>();
+        // One instance behind two interfaces: the window sets the host, everything else asks for
+        // a prompt.
+        // The two SukiUI managers. Singletons rather than something a view model creates and
+        // hands round: the window binds its hosts to them, the notification service raises toasts
+        // through one and the dialog service shows prompts through the other, and every one of those
+        // is a constructor argument now instead of a property somebody has to remember to set.
+        services.AddSingleton<ISukiToastManager>(_ => new SukiToastManager());
+        services.AddSingleton<ISukiDialogManager>(_ => new SukiDialogManager());
+
+        services.AddSingleton<DialogService>();
+        services.AddSingleton<IDialogService>(sp => sp.GetRequiredService<DialogService>());
         services.AddSingleton<IAddTorrentDialogService, AddTorrentDialogService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IMagnetMetadataPreviewService, MagnetMetadataPreviewService>();
@@ -52,6 +65,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITopLevelService, TopLevelService>();
         services.AddSingleton<ICompletionActionRunner, CompletionActionRunner>();
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
+        services.AddSingleton<IEngineMetricsReader, EngineMetricsReader>();
         services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
         services.AddSingleton<ITorrentCategoryService, TorrentCategoryService>();
@@ -103,15 +117,17 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DetailsViewModel>();
 
         // Transients
-        services.AddTransient<SettingsViewModel>();
+        services.AddSingleton<SettingsViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<CreateTorrentViewModel>();
         services.AddSingleton<FindTorrentsViewModel>();
+        services.AddSingleton<StatisticsViewModel>();
 
         // IFeatureViewModel discovery (order matters for navigation)
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<DownloadsViewModel>());
         services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<FindTorrentsViewModel>());
-        services.AddTransient<IFeatureViewModel>(sp => sp.GetRequiredService<SettingsViewModel>());
+        services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<StatisticsViewModel>());
+        services.AddSingleton<IFeatureViewModel>(sp => sp.GetRequiredService<SettingsViewModel>());
 
         return services;
     }
@@ -123,6 +139,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<DetailsView>();
         services.AddTransient<SettingsView>();
         services.AddTransient<FindTorrentsView>();
+        services.AddTransient<StatisticsView>();
         services.AddTransient<AboutView>();
         services.AddTransient<CreateTorrentWindow>();
         services.AddTransient<AddTorrentOptionsWindow>();
@@ -139,6 +156,11 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<TorrentCompletionActionHostedService>();
         services.AddHostedService<TorrentEngineHostedService>();
         services.AddHostedService<TorrentAlertsHostedService>();
+        // These all consume the running engine. Registering them afterwards also makes the host
+        // stop them first, so no timer or file-system event can race engine disposal.
+        services.AddHostedService<WatchFolderHostedService>();
+        services.AddHostedService<BandwidthScheduleHostedService>();
+        services.AddHostedService<AutoSearchHostedService>();
         services.AddHostedService<McpServerHostedService>();
         // Last of the servers, and does nothing unless switched on.
         services.AddHostedService<TransmissionRpcHostedService>();

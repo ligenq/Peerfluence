@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,10 +17,11 @@ using Peerfluence.ViewModels;
 
 namespace Peerfluence;
 
-public class App : Application
+public class App : Application, IDisposable
 {
     private readonly IServiceProvider? _services;
     private readonly CancellationTokenSource _optionalStartupCts = new();
+    private bool _disposed;
 
     public App()
     {
@@ -103,6 +104,21 @@ public class App : Application
             try
             {
                 var engineService = _services.GetRequiredService<ITorrentEngineService>();
+
+                // Raised here rather than where it is decided, which is engine construction: that
+                // happens before there is a window, and a notification with nowhere to appear is
+                // the same as no notification.
+                if (engineService.ProxyRestrictionApplied)
+                {
+                    _services.GetRequiredService<INotificationService>().Publish(
+                        new NotificationItem(
+                            Properties.Resources.Notification_ProxyRestricted,
+                            Properties.Resources.Notification_ProxyRestrictedBody,
+                            NotificationType.Warning,
+                            Material.Icons.MaterialIconKind.ShieldAlertOutline.ToString()),
+                        TimeSpan.FromSeconds(15));
+                }
+
                 await Task.Run(
                     () => engineService.LoadOptionalDataAsync(_optionalStartupCts.Token),
                     _optionalStartupCts.Token);
@@ -118,7 +134,7 @@ public class App : Application
             }
         }
 
-        desktop.Exit += (_, _) => _optionalStartupCts.Cancel();
+        desktop.Exit += (_, _) => ((IDisposable)this).Dispose();
 
         // Register Top-Level for Dialogs
         _services
@@ -149,8 +165,25 @@ public class App : Application
                 WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage(startupArguments)));
         }
 
-        Dispatcher.UIThread.Post(async () => await viewModel.CheckForUpdatesOnStartupAsync());
+        // The dispatcher accepts Action, so making this lambda async would turn it into async void
+        // and leave any exception with no Task to carry it. The operation owns its exception policy
+        // and catches before doing any work, making this deliberate fire-and-forget safe.
+        Dispatcher.UIThread.Post(() => _ = viewModel.CheckForUpdatesOnStartupAsync());
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    void IDisposable.Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        _optionalStartupCts.Cancel();
+        _optionalStartupCts.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

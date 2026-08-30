@@ -1,4 +1,4 @@
-// Ported from Avalonia 12.0 source (MIT License)
+﻿// Ported from Avalonia 12.0 source (MIT License)
 
 using Avalonia.Headless;
 using Avalonia.Threading;
@@ -23,6 +23,9 @@ internal sealed class AvaloniaTestRunner : XunitTestRunnerBase<AvaloniaTestRunne
         ExceptionAggregator aggregator,
         CancellationTokenSource cancellationTokenSource,
         IReadOnlyCollection<IBeforeAfterTestAttribute> beforeAfterAttributes,
+        ParallelMode parallelMode,
+        ExecutionScheduler scheduler,
+        FixtureMappingManager methodFixtureMappings,
         HeadlessUnitTestSession session)
     {
         await using var ctxt = new AvaloniaTestRunnerContext(
@@ -33,6 +36,9 @@ internal sealed class AvaloniaTestRunner : XunitTestRunnerBase<AvaloniaTestRunne
             cancellationTokenSource,
             beforeAfterAttributes,
             constructorArguments,
+            parallelMode,
+            scheduler,
+            methodFixtureMappings,
             session
         );
         await ctxt.InitializeAsync();

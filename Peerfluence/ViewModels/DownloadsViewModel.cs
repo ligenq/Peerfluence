@@ -85,6 +85,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ToggleTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(ToggleTorrentAsync);
         OpenTorrentFolderCommand = new RelayCommand<TorrentListItemViewModel?>(OpenFolderFor);
         RemoveTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(RemoveTorrentAsync);
+        ToggleSessionPauseCommand = new AsyncRelayCommand(ToggleSessionPauseAsync);
 
         IsDetailsPaneVisible = _settingsService.Current.ShowDetailsPane;
 
@@ -261,7 +262,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             if (SetProperty(ref field, value))
             {
                 OnPropertyChanged(nameof(HasCategoryFilter));
-        OnPropertyChanged(nameof(IsAllCategories));
+                OnPropertyChanged(nameof(IsAllCategories));
                 OnPropertyChanged(nameof(IsAllCategories));
                 ApplyFilter();
             }
@@ -271,7 +272,17 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     public bool HasCategoryFilter => CategoryFilter.Length > 0;
 
     /// <summary>Whether the list is showing every category, which is the state of the "All" chip.</summary>
-    public bool IsAllCategories => CategoryFilter.Length == 0;
+    public bool IsAllCategories
+    {
+        get => CategoryFilter.Length == 0;
+        set
+        {
+            if (value)
+            {
+                SetCategoryFilter(null);
+            }
+        }
+    }
 
     /// <summary>
     /// Whether there is anything to filter by. Nobody who has not defined a category should be shown
@@ -322,13 +333,50 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ApplyFilter();
     }
 
-    public bool IsFilterAll => Filter == TorrentFilter.All;
+    // These are written to as well as read, so that checking a chip is what changes the filter.
+    // They used to be read only, with the work done by a command bound to the button's click, and
+    // that left the chips unusable by anything that selects a radio button without clicking it -
+    // which is how assistive technology selects one. See ChooseWhenChecked.
 
-    public bool IsFilterDownloading => Filter == TorrentFilter.Downloading;
+    public bool IsFilterAll
+    {
+        get => Filter == TorrentFilter.All;
+        set => ChooseWhenChecked(value, TorrentFilter.All);
+    }
 
-    public bool IsFilterSeeding => Filter == TorrentFilter.Seeding;
+    public bool IsFilterDownloading
+    {
+        get => Filter == TorrentFilter.Downloading;
+        set => ChooseWhenChecked(value, TorrentFilter.Downloading);
+    }
 
-    public bool IsFilterCompleted => Filter == TorrentFilter.Completed;
+    public bool IsFilterSeeding
+    {
+        get => Filter == TorrentFilter.Seeding;
+        set => ChooseWhenChecked(value, TorrentFilter.Seeding);
+    }
+
+    public bool IsFilterCompleted
+    {
+        get => Filter == TorrentFilter.Completed;
+        set => ChooseWhenChecked(value, TorrentFilter.Completed);
+    }
+
+    /// <summary>
+    /// Applies the filter a chip stands for, when that chip is the one being checked.
+    /// </summary>
+    /// <remarks>
+    /// Only when checked. Choosing one member of a radio group unchecks the rest, so every choice
+    /// arrives here as one true and one false, in no guaranteed order. Acting on the false would
+    /// mean acting on the chip being left behind.
+    /// </remarks>
+    private void ChooseWhenChecked(bool isChecked, TorrentFilter filter)
+    {
+        if (isChecked)
+        {
+            Filter = filter;
+        }
+    }
 
     private void ApplyFilter()
     {
@@ -376,13 +424,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         set => SetProperty(ref field, value);
     }
 
-    public int TotalDownloadSpeedBytesPerSecond
+    public long TotalDownloadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
     }
 
-    public int TotalUploadSpeedBytesPerSecond
+    public long TotalUploadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
@@ -431,7 +479,18 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     public IAsyncRelayCommand<TorrentListItemViewModel?> RemoveTorrentCommand { get; }
 
-    public ISukiDialogManager? SukiDialogManager { get; set; }
+    /// <summary>Stops everything that is running, or starts back exactly what it stopped.</summary>
+    public IAsyncRelayCommand ToggleSessionPauseCommand { get; }
+
+    /// <summary>
+    /// Whether the session is paused. Drives the toolbar button's label and icon, so it is a
+    /// property rather than a read straight through to the engine on each bind.
+    /// </summary>
+    public bool IsSessionPaused
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
 
     /// <summary>
     /// Opens or closes the details pane and remembers the choice. Opening refreshes the pane by
@@ -467,7 +526,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             ]
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             await AddTorrentFileAsync(file.Path.LocalPath);
@@ -588,6 +647,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             ref _totalUploadSpeedSamples);
         ActiveTorrents = stats.ActiveTorrents;
         TotalPeers = stats.TotalPeers;
+        IsSessionPaused = _torrentService.IsSessionPaused;
     }
 
 
@@ -597,7 +657,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     private int _totalDownloadSpeedSamples;
     private int _totalUploadSpeedSamples;
 
-    private static int UpdateSmoothedSpeed(int current, ref double smoothed, ref int samples)
+    private static long UpdateSmoothedSpeed(long current, ref double smoothed, ref int samples)
     {
         if (samples == 0)
         {
@@ -614,13 +674,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
                 smoothed = 0;
             }
             samples++;
-            return (int)Math.Round(smoothed);
+            return (long)Math.Round(smoothed);
         }
 
         double alpha = 2.0 / (SpeedSmoothingWindow + 1);
         smoothed = (alpha * current) + ((1.0 - alpha) * smoothed);
         samples++;
-        return (int)Math.Round(smoothed);
+        return (long)Math.Round(smoothed);
     }
 
     private async Task AddMagnetAsync()
@@ -644,6 +704,36 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         }
 
         await AddMagnetUriAsync(magnet);
+    }
+
+    /// <summary>
+    /// Stops every running torrent, or starts back the ones a previous pause stopped.
+    /// </summary>
+    /// <remarks>
+    /// The engine keeps running either way - the DHT node, the listeners and the port mappings all
+    /// stay up - so this is not a way of going offline, it is a way of stopping the transfers.
+    /// </remarks>
+    private async Task ToggleSessionPauseAsync()
+    {
+        try
+        {
+            if (_torrentService.IsSessionPaused)
+            {
+                await _torrentService.ResumeSessionAsync();
+                SetStatusMessage(Resources.Status_SessionResumed, autoClear: true);
+            }
+            else
+            {
+                await _torrentService.PauseSessionAsync();
+                SetStatusMessage(Resources.Status_SessionPaused, autoClear: true);
+            }
+
+            IsSessionPaused = _torrentService.IsSessionPaused;
+        }
+        catch (Exception ex)
+        {
+            SetStatusMessage(ex.Message);
+        }
     }
 
     private void SetStatusMessage(string message, bool autoClear = false)
@@ -700,43 +790,18 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private async Task<string?> PromptForMagnetLinkAsync()
     {
-        if (SukiDialogManager == null)
+        var typed = await _dialogService.PromptForTextAsync(new TextPrompt(
+            Resources.Downloads_AddMagnet,
+            Resources.Downloads_AddMagnet,
+            InitialText: MagnetLink,
+            Watermark: Resources.Downloads_MagnetWatermark));
+
+        if (typed is null)
         {
             return null;
         }
 
-        var textBox = new Avalonia.Controls.TextBox
-        {
-            Width = 420,
-            MinWidth = 320,
-            Text = MagnetLink,
-            PlaceholderText = Resources.Downloads_MagnetWatermark
-        };
-
-        var result = new TaskCompletionSource<bool>();
-        await SukiDialogManager
-            .CreateDialog()
-            .WithTitle(Resources.Downloads_AddMagnet)
-            .WithContent(textBox)
-            .Dismiss().ByClickingBackground()
-            .OnDismissed(_ => result.TrySetResult(false))
-            .WithActionButton(
-                Resources.Common_Cancel,
-                _ => result.TrySetResult(false),
-                true)
-            .WithActionButton(
-                Resources.Downloads_AddMagnet,
-                _ => result.TrySetResult(true),
-                true,
-                "Flat")
-            .TryShowAsync();
-
-        if (!result.Task.IsCompletedSuccessfully || !result.Task.Result)
-        {
-            return null;
-        }
-
-        MagnetLink = textBox.Text?.Trim() ?? string.Empty;
+        MagnetLink = typed;
         return MagnetLink;
     }
 
@@ -799,7 +864,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         var selection = SelectionOrFocused();
         if (selection.Count <= 1)
         {
-            await RemoveTorrentAsync(selection.FirstOrDefault());
+            await RemoveTorrentAsync(selection.Count > 0 ? selection[0] : null);
             return;
         }
 
@@ -816,30 +881,21 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         }
     }
 
-    private async Task<bool> ConfirmRemoveManyAsync(int count)
+    private Task<bool> ConfirmRemoveManyAsync(int count)
     {
-        if (SukiDialogManager == null)
+        // Nowhere to ask means the window is not up, which happens only at startup and in tests.
+        // Going ahead is what this did before the prompt moved behind the service, and changing it
+        // in a refactor would be changing it by accident.
+        if (!_dialogService.CanPrompt)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        var confirmed = new TaskCompletionSource<bool>();
-        await SukiDialogManager
-            .CreateDialog()
-            .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
-            .WithTitle(Resources.Downloads_Remove_Confirm_Title)
-            .WithContent(new Avalonia.Controls.TextBlock
-            {
-                Text = string.Format(Resources.Downloads_Remove_Confirm_Many, count),
-                TextWrapping = Avalonia.Media.TextWrapping.Wrap
-            })
-            .Dismiss().ByClickingBackground()
-            .OnDismissed(_ => confirmed.TrySetResult(false))
-            .WithActionButton(Resources.Common_Cancel, _ => confirmed.TrySetResult(false), true)
-            .WithActionButton(Resources.Downloads_Remove, _ => confirmed.TrySetResult(true), true, "Flat")
-            .TryShowAsync();
-
-        return confirmed.Task.IsCompletedSuccessfully && confirmed.Task.Result;
+        return _dialogService.ConfirmAsync(new ConfirmPrompt(
+            Resources.Downloads_Remove_Confirm_Title,
+            string.Format(Resources.Downloads_Remove_Confirm_Many, count),
+            Resources.Downloads_Remove,
+            Resources.Common_Cancel));
     }
 
     private async Task RemoveTorrentAsync(TorrentListItemViewModel? item)
@@ -859,92 +915,36 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             return;
         }
 
-        if (SukiDialogManager != null)
+        if (!_dialogService.CanPrompt)
         {
-            var removeOnly = new Avalonia.Controls.RadioButton
-            {
-                Content = Resources.Downloads_Remove_Option_RemoveOnly,
-                GroupName = "RemoveTorrentAction",
-                IsChecked = removeAction == RemoveTorrentAction.RemoveOnly
-            };
-            var deleteFiles = new Avalonia.Controls.RadioButton
-            {
-                Content = Resources.Downloads_Remove_Option_DeleteFiles,
-                GroupName = "RemoveTorrentAction",
-                IsChecked = removeAction == RemoveTorrentAction.DeleteFiles
-            };
-            var deleteMetadata = new Avalonia.Controls.RadioButton
-            {
-                Content = Resources.Downloads_Remove_Option_DeleteMetadata,
-                GroupName = "RemoveTorrentAction",
-                IsChecked = removeAction == RemoveTorrentAction.DeleteMetadata
-            };
-            var deleteAll = new Avalonia.Controls.RadioButton
-            {
-                Content = Resources.Downloads_Remove_Option_DeleteAll,
-                GroupName = "RemoveTorrentAction",
-                IsChecked = removeAction == RemoveTorrentAction.DeleteAll
-            };
-            var rememberChoice = new Avalonia.Controls.CheckBox
-            {
-                Content = Resources.Downloads_Remove_RememberChoice,
-                Margin = new Avalonia.Thickness(0, 10, 0, 0)
-            };
-
-            var content = new Avalonia.Controls.StackPanel
-            {
-                Children =
-                {
-                    new Avalonia.Controls.TextBlock
-                    {
-                        Text = string.Format(Resources.Downloads_Remove_Confirm_Message, torrentName),
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap
-                    },
-                    new Avalonia.Controls.StackPanel
-                    {
-                        Margin = new Avalonia.Thickness(0, 10, 0, 0),
-                        Children =
-                        {
-                            removeOnly,
-                            deleteFiles,
-                            deleteMetadata,
-                            deleteAll
-                        }
-                    },
-                    rememberChoice
-                }
-            };
-
-            var result = new TaskCompletionSource<bool>();
-            await SukiDialogManager
-                .CreateDialog()
-                .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
-                .WithTitle(Resources.Downloads_Remove_Confirm_Title)
-                .WithContent(content)
-                .Dismiss().ByClickingBackground()
-                .OnDismissed(_ => result.TrySetResult(false))
-                .WithActionButton(Resources.Common_Cancel, _ => result.TrySetResult(false), true)
-                .WithActionButton(Resources.Downloads_Remove, _ => result.TrySetResult(true), true, "Flat")
-                .TryShowAsync();
-
-            if (!result.Task.IsCompletedSuccessfully || !result.Task.Result)
-            {
-                return;
-            }
-
-            removeAction = GetSelectedRemoveAction(removeOnly, deleteFiles, deleteMetadata, deleteAll);
-            if (rememberChoice.IsChecked == true)
-            {
-                _settingsService.Current.ShowRemoveTorrentOptions = false;
-                _settingsService.Current.DefaultRemoveTorrentAction = ToSettingsValue(removeAction);
-                await _settingsService.SaveAsync(default);
-            }
-
-            await _torrentService.RemoveAsync(torrent, ToRemoveOptions(removeAction));
+            // Cannot ask which files to delete, so delete none of them: remove the torrent and
+            // leave what it downloaded alone.
+            await _torrentService.RemoveAsync(torrent, RemoveOptions.None);
             return;
         }
 
-        await _torrentService.RemoveAsync(torrent, ToRemoveOptions(removeAction));
+        var choice = await _dialogService.PromptForRemoveOptionsAsync(new RemoveTorrentPrompt(
+            Resources.Downloads_Remove_Confirm_Title,
+            string.Format(Resources.Downloads_Remove_Confirm_Message, torrentName),
+            Resources.Downloads_Remove,
+            Resources.Common_Cancel,
+            removeAction,
+            RemoveOptionLabels(),
+            Resources.Downloads_Remove_RememberChoice));
+
+        if (choice is null)
+        {
+            return;
+        }
+
+        if (choice.RememberChoice)
+        {
+            _settingsService.Current.ShowRemoveTorrentOptions = false;
+            _settingsService.Current.DefaultRemoveTorrentAction = ToSettingsValue(choice.Action);
+            await _settingsService.SaveAsync(default);
+        }
+
+        await _torrentService.RemoveAsync(torrent, ToRemoveOptions(choice.Action));
     }
 
     private void OpenFolder()
@@ -1297,23 +1297,22 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         };
     }
 
-    private static RemoveTorrentAction GetSelectedRemoveAction(
-        Avalonia.Controls.RadioButton removeOnly,
-        Avalonia.Controls.RadioButton deleteFiles,
-        Avalonia.Controls.RadioButton deleteMetadata,
-        Avalonia.Controls.RadioButton deleteAll)
+    /// <summary>
+    /// What each removal option is called, in the language the interface is showing.
+    /// </summary>
+    /// <remarks>
+    /// Passed to the dialog rather than read by it. The dialog service builds controls and knows
+    /// nothing about torrents; naming the options is this view model's business.
+    /// </remarks>
+    private static Dictionary<RemoveTorrentAction, string> RemoveOptionLabels()
     {
-        if (deleteAll.IsChecked == true)
+        return new Dictionary<RemoveTorrentAction, string>
         {
-            return RemoveTorrentAction.DeleteAll;
-        }
-
-        if (deleteMetadata.IsChecked == true)
-        {
-            return RemoveTorrentAction.DeleteMetadata;
-        }
-
-        return deleteFiles.IsChecked == true ? RemoveTorrentAction.DeleteFiles : RemoveTorrentAction.RemoveOnly;
+            [RemoveTorrentAction.RemoveOnly] = Resources.Downloads_Remove_Option_RemoveOnly,
+            [RemoveTorrentAction.DeleteFiles] = Resources.Downloads_Remove_Option_DeleteFiles,
+            [RemoveTorrentAction.DeleteMetadata] = Resources.Downloads_Remove_Option_DeleteMetadata,
+            [RemoveTorrentAction.DeleteAll] = Resources.Downloads_Remove_Option_DeleteAll
+        };
     }
 
     internal static RemoveOptions ToRemoveOptions(RemoveTorrentAction action)
@@ -1380,11 +1379,4 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         _loopCts.Dispose();
     }
 
-    internal enum RemoveTorrentAction
-    {
-        RemoveOnly,
-        DeleteFiles,
-        DeleteMetadata,
-        DeleteAll
-    }
 }

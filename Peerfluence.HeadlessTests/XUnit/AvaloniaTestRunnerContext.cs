@@ -1,4 +1,4 @@
-// Ported from Avalonia 12.0 source (MIT License)
+﻿// Ported from Avalonia 12.0 source (MIT License)
 
 using Avalonia.Headless;
 using Xunit.Sdk;
@@ -14,15 +14,21 @@ internal sealed class AvaloniaTestRunnerContext(
     CancellationTokenSource cancellationTokenSource,
     IReadOnlyCollection<IBeforeAfterTestAttribute> beforeAfterTestAttributes,
     object?[] constructorArguments,
+    ParallelMode parallelMode,
+    ExecutionScheduler scheduler,
+    FixtureMappingManager methodFixtureMappings,
     HeadlessUnitTestSession session)
     : XunitTestRunnerContext(
         test,
-        messageBus,
         explicitOption,
+        messageBus,
         aggregator,
         cancellationTokenSource,
+        parallelMode,
+        scheduler,
         beforeAfterTestAttributes,
-        constructorArguments)
+        constructorArguments,
+        methodFixtureMappings)
 {
     public HeadlessUnitTestSession Session { get; } = session;
 }

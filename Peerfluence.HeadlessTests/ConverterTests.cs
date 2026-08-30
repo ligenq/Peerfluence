@@ -1,4 +1,5 @@
-using System.Globalization;
+﻿using System.Globalization;
+using Avalonia.Data;
 using Peerfluence.Converters;
 
 namespace Peerfluence.HeadlessTests;
@@ -39,6 +40,17 @@ public class ConverterTests
             var sut = new NullToBoolConverter { Invert = true };
             var result = sut.Convert(new object(), typeof(bool), null, Culture);
             Assert.Equal(false, result);
+        }
+
+        [Fact]
+        public void ConvertBack_WritesNothingBackToTheSource()
+        {
+            // Display only, so there is nothing sensible to write back. It must decline rather than throw:
+            // a DataGridTextColumn binds two ways by default and asks for the way back merely to show
+            // a row, and throwing there took the application down mid-download.
+            var answer = _sut.ConvertBack("1.5 GB", typeof(long), null, Culture);
+
+            Assert.Same(BindingOperations.DoNothing, answer);
         }
     }
 
@@ -93,6 +105,18 @@ public class ConverterTests
             Assert.IsType<string>(result);
             Assert.Contains("B", (string)result!);
         }
+
+        [Fact]
+        public void ConvertBack_WritesNothingBackToTheSource()
+        {
+            // There is no way back from "1.5 GB" to the bytes it came from. Returning the input wrote a
+            // display string into the source; throwing crashed a running download, because a
+            // DataGridTextColumn binds two ways by default and asks for the way back to show a row.
+            // DoNothing is the third answer. See ByteSizeConverterBindingTests for the shape that asks.
+            var answer = _sut.ConvertBack("1.5 GB", typeof(long), null, Culture);
+
+            Assert.Same(BindingOperations.DoNothing, answer);
+        }
     }
 
     public class SpeedConverterTests
@@ -111,6 +135,15 @@ public class ConverterTests
         {
             var result = (string?)_sut.Convert(1024L, typeof(string), null, Culture);
             Assert.Equal("1 KB/s", result);
+        }
+
+        [Fact]
+        public void ConvertBack_WritesNothingBackToTheSource()
+        {
+            // Same as the size column, on the peers grid.
+            var answer = _sut.ConvertBack("1.5 GB", typeof(long), null, Culture);
+
+            Assert.Same(BindingOperations.DoNothing, answer);
         }
     }
 }

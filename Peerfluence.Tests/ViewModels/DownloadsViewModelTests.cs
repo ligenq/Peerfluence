@@ -35,8 +35,8 @@ public class DownloadsViewModelTests
         var settingsService = new AppSettingsService(paths, store, new FileSystem());
         _settingsService = settingsService;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(settingsService, loggerFactory);
-        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        var engineService = new TorrentEngineService(settingsService, loggerFactory, TimeProvider.System);
+        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
         var notificationService = Substitute.For<INotificationService>();
 
         _detailsVm = new DetailsViewModel(
@@ -45,7 +45,7 @@ public class DownloadsViewModelTests
             _localizationService,
             notificationService,
             _topLevelService,
-            settingsService);
+            settingsService, Substitute.For<IDialogService>());
 
         // Workaround for Dispatcher dependencies in constructor
 #pragma warning disable SYSLIB0050
@@ -407,6 +407,70 @@ public class DownloadsViewModelTests
         }
     }
 
+    [Fact]
+    public void CheckingAFilterChip_AppliesThatFilter()
+    {
+        // The chips bind IsChecked two ways rather than doing their work in a click handler, so that
+        // every way of choosing one - a mouse, a keyboard, a screen reader going through the
+        // accessibility API - arrives in the same place. Driven here as a binding would drive it.
+        var sut = CreateViewModelWithTorrents(
+            ("downloading", Complete: false, Running: true),
+            ("seeding", Complete: true, Running: true));
+
+        try
+        {
+            sut.IsFilterSeeding = true;
+
+            Assert.Equal(TorrentFilter.Seeding, sut.Filter);
+            Assert.Equal(["seeding"], sut.VisibleTorrents.Select(item => item.Name));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void UncheckingAFilterChip_ChangesNothing()
+    {
+        // Choosing one member of a radio group unchecks the rest, so a choice arrives as one true
+        // and one false in no guaranteed order. Acting on the false would apply the filter that was
+        // just left behind.
+        var sut = CreateViewModelWithTorrents(("downloading", Complete: false, Running: true));
+
+        try
+        {
+            sut.IsFilterSeeding = true;
+            sut.IsFilterSeeding = false;
+
+            Assert.Equal(TorrentFilter.Seeding, sut.Filter);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public void CheckingTheAllCategoriesChip_ClearsTheCategoryFilter()
+    {
+        var sut = CreateViewModelWithTorrents(("downloading", Complete: false, Running: true));
+
+        try
+        {
+            sut.SetCategoryFilterCommand.Execute("films");
+            Assert.False(sut.IsAllCategories);
+
+            sut.IsAllCategories = true;
+
+            Assert.Equal(string.Empty, sut.CategoryFilter);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
     private DownloadsViewModel CreateViewModelWithTorrents(params (string Name, bool Complete, bool Running)[] torrents)
     {
         var torrentService = Substitute.For<ITorrentService>();
@@ -453,7 +517,7 @@ public class DownloadsViewModelTests
             await sut.StartSelectedCommand.ExecuteAsync(null);
 
             // The running one is left alone rather than restarted.
-            foreach (var item in sut.Torrents.Where(t => t.Name.StartsWith("stopped")))
+            foreach (var item in sut.Torrents.Where(t => t.Name.StartsWith("stopped", StringComparison.Ordinal)))
             {
                 await item.Torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
             }
@@ -554,10 +618,10 @@ public class DownloadsViewModelTests
     [Fact]
     public void ToRemoveOptions_MapsActionToPeerSharpOptions()
     {
-        Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.RemoveOnly));
-        Assert.Equal(RemoveOptions.DeleteFiles, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.DeleteFiles));
-        Assert.Equal(RemoveOptions.DeleteTorrentFile, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.DeleteMetadata));
-        Assert.Equal(RemoveOptions.DeleteAll, DownloadsViewModel.ToRemoveOptions(DownloadsViewModel.RemoveTorrentAction.DeleteAll));
+        Assert.Equal(RemoveOptions.None, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.RemoveOnly));
+        Assert.Equal(RemoveOptions.DeleteFiles, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.DeleteFiles));
+        Assert.Equal(RemoveOptions.DeleteTorrentFile, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.DeleteMetadata));
+        Assert.Equal(RemoveOptions.DeleteAll, DownloadsViewModel.ToRemoveOptions(RemoveTorrentAction.DeleteAll));
     }
 
     [Fact]
@@ -617,7 +681,9 @@ public class DownloadsViewModelTests
         settingsService.Current.Returns(new Peerfluence.Core.Config.AppSettings
         {
             ShowRemoveTorrentOptions = true,
-            DefaultRemoveTorrentAction = "RemoveOnly"
+            // A previously remembered destructive choice must not be used when there is nowhere
+            // to ask. The safe fallback is always to leave data on disk.
+            DefaultRemoveTorrentAction = "DeleteAll"
         });
 
         var sut = new DownloadsViewModel(
@@ -645,6 +711,59 @@ public class DownloadsViewModelTests
             await sut.RemoveSelectedCommand.ExecuteAsync(null);
 
             await torrentService.Received(1).RemoveAsync(torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task RemoveSelectedCommand_UsesTheDialogsChoiceInsteadOfTheRememberedDefault()
+    {
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns(Array.Empty<ITorrent>());
+        torrentService.GetStats().Returns(new EngineStats());
+
+        var settingsService = Substitute.For<IAppSettingsService>();
+        settingsService.Current.Returns(new Peerfluence.Core.Config.AppSettings
+        {
+            ShowRemoveTorrentOptions = true,
+            DefaultRemoveTorrentAction = "DeleteAll"
+        });
+
+        var dialogService = Substitute.For<IDialogService>();
+        dialogService.CanPrompt.Returns(true);
+        dialogService.PromptForRemoveOptionsAsync(Arg.Any<RemoveTorrentPrompt>())
+            .Returns(new RemoveTorrentChoice(RemoveTorrentAction.RemoveOnly, RememberChoice: false));
+
+        var sut = new DownloadsViewModel(
+            torrentService,
+            new TorrentSelectionService(Substitute.For<IAppMessenger>()),
+            new LocalizationService(),
+            Substitute.For<ITopLevelService>(),
+            dialogService,
+            Substitute.For<IAddTorrentDialogService>(),
+            settingsService,
+            Substitute.For<ITorrentCategoryService>(),
+            _detailsVm);
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Name.Returns("Test");
+        torrent.Hash.Returns(InfoHash.CreateRandom());
+        torrent.HashV2.Returns(InfoHash.EmptyV2);
+        torrent.State.Returns(TorrentState.Stopped);
+        torrent.TotalSize.Returns(100);
+        torrent.HasMetadata.Returns(true);
+        sut.SelectedTorrent = new TorrentListItemViewModel(torrent);
+
+        try
+        {
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            await torrentService.Received(1).RemoveAsync(
+                torrent,
+                RemoveOptions.None,
+                Arg.Any<CancellationToken>());
         }
         finally
         {
@@ -686,4 +805,60 @@ public class DownloadsViewModelTests
             .GetField("_addTorrentDialogService", flags)!
             .GetValue(vm)!;
     }
+
+    [Fact]
+    public void WithNoCategoryChosen_TheListIsNotNarrowed()
+    {
+        SetCategoryFilter(_sut, string.Empty);
+
+        Assert.False(_sut.HasCategoryFilter);
+        Assert.True(_sut.IsAllCategories);
+    }
+
+    [Fact]
+    public void WithACategoryChosen_TheListSaysItIsNarrowed()
+    {
+        // Set through the backing field for the same reason the whole class is built that way: the
+        // property is set by a command this uninitialized instance does not carry. What is being
+        // pinned down is that "no category" is the empty string rather than null, and that the two
+        // chips - "All" and a named one - can never both be lit.
+        SetCategoryFilter(_sut, "Films");
+
+        Assert.True(_sut.HasCategoryFilter);
+        Assert.False(_sut.IsAllCategories);
+    }
+
+    private static void SetCategoryFilter(DownloadsViewModel viewModel, string value)
+    {
+        typeof(DownloadsViewModel)
+            .GetField("<CategoryFilter>k__BackingField", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(viewModel, value);
+    }
+
+    [Fact]
+    public void DisposingTheList_StopsItsLoopsAndCanHappenTwice()
+    {
+        // The window is closed once, but the host disposes the container afterwards, so a second
+        // call has to be harmless rather than throwing on an already-cancelled source.
+#pragma warning disable SYSLIB0050
+        var sut = (DownloadsViewModel)System.Runtime.Serialization.FormatterServices
+            .GetUninitializedObject(typeof(DownloadsViewModel));
+#pragma warning restore SYSLIB0050
+
+        var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+        var fields = typeof(DownloadsViewModel).GetFields(flags);
+        fields.First(f => f.Name == "<Torrents>k__BackingField").SetValue(sut, new ObservableCollection<TorrentListItemViewModel>());
+        fields.First(f => f.Name == "_loopCts").SetValue(sut, new CancellationTokenSource());
+        fields.First(f => f.Name == "_alertChannel").SetValue(
+            sut,
+            System.Threading.Channels.Channel.CreateBounded<TorrentAlertEventArgs>(
+                new System.Threading.Channels.BoundedChannelOptions(1)
+                {
+                    FullMode = System.Threading.Channels.BoundedChannelFullMode.DropOldest
+                }));
+
+        sut.Dispose();
+        sut.Dispose();
+    }
+
 }

@@ -13,7 +13,7 @@ public sealed class TorrentAlertsHostedServiceTests
     {
         var torrentService = Substitute.For<ITorrentService>();
         var torrent = Substitute.For<ITorrent>();
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
         var alert = new SimpleTorrentAlert
         {
             Id = AlertId.TorrentAdded,

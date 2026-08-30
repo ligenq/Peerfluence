@@ -1,4 +1,4 @@
-using ModelContextProtocol.Protocol;
+﻿using ModelContextProtocol.Protocol;
 using Peerfluence.Core.Services;
 using Peerfluence.Services.Mcp;
 using Peerfluence.Services;
@@ -252,6 +252,9 @@ public sealed class UiAgentToolHandlerTests
     private static ITorrent CreateTorrent(string name, float progress, TorrentState state, byte hashSeed = 0)
     {
         var hashBytes = new byte[20];
+        // Never all zeros: that is how an absent hash is stored, and a torrent without one cannot be
+        // looked up by one. The seed still tells these apart.
+        hashBytes[0] = 0xA5;
         hashBytes[19] = hashSeed;
 
         var peers = Substitute.For<IPeers>();

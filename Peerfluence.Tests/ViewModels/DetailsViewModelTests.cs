@@ -14,6 +14,9 @@ namespace Peerfluence.Tests.ViewModels;
 [Collection("Messenger")]
 public class DetailsViewModelTests
 {
+    private static readonly string[] ExpectedPeerAddresses =
+        ["192.168.1.10:51413", "[::1]:6881", "10.0.0.5:6889"];
+
     private readonly TorrentSelectionService _selectionService = new(Substitute.For<IAppMessenger>());
     private readonly ITorrentService _torrentService;
     private readonly LocalizationService _localizationService = new();
@@ -32,8 +35,8 @@ public class DetailsViewModelTests
         // does when someone is looking at it.
         settingsService.Current.ShowDetailsPane = true;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(settingsService, loggerFactory);
-        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        var engineService = new TorrentEngineService(settingsService, loggerFactory, TimeProvider.System);
+        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
 
         _sut = new DetailsViewModel(
             _selectionService,
@@ -41,7 +44,7 @@ public class DetailsViewModelTests
             _localizationService,
             _notificationService,
             _topLevelService,
-            settingsService);
+            settingsService, Substitute.For<IDialogService>());
         _sut.UIDispatcher = action => action();
     }
 
@@ -217,7 +220,7 @@ public class DetailsViewModelTests
     {
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Test Torrent");
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
         torrent.State.Returns(TorrentState.Active);
 
         var files = Substitute.For<IFiles>();
@@ -263,6 +266,57 @@ public class DetailsViewModelTests
         Assert.Equal("Selected", _sut.Name);
     }
 
+    [Fact]
+    public async Task TorrentStateChange_RefreshesRenameFileAvailability()
+    {
+        var state = TorrentState.Active;
+        var torrent = CreateRefreshableTorrent("Selected", 1);
+        torrent.State.Returns(_ => state);
+        var file = new TorrentFileItemViewModel(
+            new TorrentFileInfo("file.bin", 100, 0, 0),
+            new FileSelection());
+
+        _selectionService.SelectedTorrent = torrent;
+        _sut.RefreshFromSelection();
+        await WaitForNameAsync("Selected");
+        Assert.False(_sut.RenameFileCommand.CanExecute(file));
+
+        var notified = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _sut.RenameFileCommand.CanExecuteChanged += (_, _) => notified.TrySetResult();
+        state = TorrentState.Stopped;
+
+        WeakReferenceMessenger.Default.Send(
+            new TorrentAlertMessage(torrent, new SimpleTorrentAlert { Id = AlertId.TorrentStateChanged, Torrent = torrent }));
+        await notified.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
+
+        Assert.True(_sut.RenameFileCommand.CanExecute(file));
+    }
+
+    [Fact]
+    public async Task ScrapeCompletingAfterSelectionChanges_DoesNotReplaceTheNewTorrentsTrackers()
+    {
+        var first = CreateRefreshableTorrent("First", 1);
+        var second = CreateRefreshableTorrent("Second", 2);
+        var scrape = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        first.Trackers
+            .ScrapeAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(scrape.Task);
+        first.Trackers.GetTrackers().Returns([
+            new TrackerStatus("https://first.invalid/announce", TrackerStatusType.Working)
+        ]);
+        _sut.Trackers.Add(new TrackerStatusItemViewModel(
+            new TrackerStatus("https://second.invalid/announce", TrackerStatusType.Working)));
+
+        _selectionService.SelectedTorrent = first;
+        var command = _sut.ScrapeCommand.ExecuteAsync(null);
+        _selectionService.SelectedTorrent = second;
+        scrape.SetResult();
+        await command;
+
+        var tracker = Assert.Single(_sut.Trackers);
+        Assert.Equal("https://second.invalid/announce", tracker.Url);
+    }
+
     private static ITorrent CreateRefreshableTorrent(string name, byte hashSeed)
     {
         var torrent = Substitute.For<ITorrent>();
@@ -299,8 +353,7 @@ public class DetailsViewModelTests
         _sut.AddPeersCommand.Execute(null);
 
         peers.Received(1).Add(Arg.Is<IEnumerable<IPEndPoint>>(endPoints =>
-            endPoints.Select(endPoint => endPoint.ToString()).SequenceEqual(
-                new[] { "192.168.1.10:51413", "[::1]:6881", "10.0.0.5:6889" })));
+            endPoints.Select(endPoint => endPoint.ToString()).SequenceEqual(ExpectedPeerAddresses)));
         Assert.Equal(string.Empty, _sut.NewPeerAddresses);
     }
 
@@ -335,7 +388,7 @@ public class DetailsViewModelTests
     private IPeers SelectTorrentWithPeers()
     {
         var torrent = Substitute.For<ITorrent>();
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
         var peers = Substitute.For<IPeers>();
         torrent.Peers.Returns(peers);
         _selectionService.SelectedTorrent = torrent;

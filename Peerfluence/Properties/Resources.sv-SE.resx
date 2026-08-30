@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -560,7 +560,7 @@
     <value>Kommentar</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Skapa</value>
+    <value>Skapa...</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>Fil...</value>
@@ -662,7 +662,7 @@
     <value>Sökväg till blocklistefil (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Bläddra</value>
+    <value>Bläddra...</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Utseende</value>
@@ -1017,12 +1017,6 @@
   </data>
   <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
     <value>Exempel: --path "{downloadPath}" --name "{name}"</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
-    <value>Arbetskatalog</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
-    <value>{downloadPath}</value>
   </data>
   <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
     <value>Tidsgräns (sekunder)</value>
@@ -1383,5 +1377,173 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   </data>
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Adressen ifylld, men ersätt 1:an med din indexerares id - Prowlarr ger varje indexerare en egen adress och har ingen gemensam. Id:t syns i adressfältet när du öppnar en indexerare i Prowlarr.</value>
+  </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Metadata kommer inte fram</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Lyssningsporten ändrades</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>Porten {0} kunde inte bindas, så {1} används i stället. Uppdatera portvidarebefordran i din router.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>Proxyn kan inte bära UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>En HTTP-proxy är konfigurerad, så DHT och uTP är avstängda denna session. Använd en SOCKS5-proxy för att behålla dem.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Nedladdningssökvägen ändrades och data flyttades</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Hämta antal</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>Hämtningen misslyckades: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Webbkällor</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Lägg till webbkälla</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>Det är inte en användbar webbkälladress, eller så har torrenten den redan.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>Den här torrenten har inga webbkällor.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Byt namn</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>Namnbytet misslyckades: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Supersådd (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>För en ensam seed som introducerar nytt innehåll i en tom svärm. Stäng av den efteråt: i en etablerad svärm bromsar den peers som kunde ha laddat ner fritt.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Max anslutningar</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Max uppladdningsplatser</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 använder den globala inställningen</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Pausa alla</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Återuppta alla</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>Alla torrenter pausade</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Torrenter återupptagna</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Bind till adress</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Skicka allt från en enda lokal adress, till exempel din VPN:s. Om den adressen försvinner stoppas trafiken i stället för att gå en annan väg - det är det som gör den till en kill switch. Lämna tomt för att använda alla gränssnitt. Portmappning stängs av medan detta är satt.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>Anslutningar per adress</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>Hur många anslutningar en adress får ha på en enskild torrent. 0 är obegränsat. En och samma peer håller kortvarigt fler än en medan ett uppringningsförsök testar båda transporterna, så sätt värdet efter hur ditt nät ser ut i stället för lågt av princip.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>Inte en adress som går att binda till. Använd en av datorns egna adresser, inte 0.0.0.0.</value>
+  </data>
+  <data name="Settings_Seeding" xml:space="preserve">
+    <value>Delning</value>
+  </data>
+  <data name="Settings_SeedingHint" xml:space="preserve">
+    <value>Gäller torrenter som läggs till från och med nu. Varje torrent kan fortfarande få egna mål.</value>
+  </data>
+  <data name="Settings_LimitSeedingRatio" xml:space="preserve">
+    <value>Stoppa vid förhållande</value>
+  </data>
+  <data name="Settings_LimitSeedingTime" xml:space="preserve">
+    <value>Stoppa efter minuter</value>
+  </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Statistik</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Hämtat denna session</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Skickat denna session</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Delningsförhållande</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Torrenter</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Räknat sedan Peerfluence startade, och rapporterat av motorn själv.</value>
+  </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Bevakad mapp</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Lägg till torrentfiler från en mapp</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Torrentfiler som läggs här läggs till automatiskt. Var och en byter namn i stället för att raderas när den har tagits.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Välj en mapp att bevaka</value>
+  </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Schemalagda gränser</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Använd andra gränser vid vissa tider</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Så länge fönstret är öppet ersätter dessa gränser dem ovan. En sluttid tidigare än starttiden löper över midnatt.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>Från</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>Till</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Dagar</value>
+  </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Automatisk sökning</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Kör en sparad sökning på egen hand</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>Frågan körs mot indexeraren ovan och lägger till det som inte redan lagts till. Femton minuter är det kortaste intervallet som används.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Fråga</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Var (minut)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Kategori för det som läggs till</value>
   </data>
 </root>

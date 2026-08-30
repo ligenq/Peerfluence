@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -14,10 +14,10 @@
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold"/>
                         <!-- No Save button: changes apply as they are made, so say that instead. -->
-                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="0.6" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Right">
-                        <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent">
+                        <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent" AutomationProperties.Name="{m:L Settings_Reset}" AutomationProperties.AutomationId="ResetDefaultsButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="Restore" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_Reset}"/>
@@ -33,9 +33,9 @@
         </suki:GlassCard>
 
         <TabControl x:Name="SettingsTabs" Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
-            <TabItem Header="{m:L Settings_Appearance}">
+            <TabItem Header="{m:L Settings_Appearance}" AutomationProperties.Name="{m:L Settings_Appearance}" AutomationProperties.AutomationId="AppearanceTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
 
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
@@ -47,18 +47,14 @@
                     <!-- The only way back to simple mode once advanced has been chosen. -->
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                         <RadioButton Classes="Chips" GroupName="InterfaceMode"
-                                     IsChecked="{Binding IsSimpleMode, Mode=OneWay}"
-                                     Command="{Binding SetInterfaceModeCommand}"
-                                     CommandParameter="{x:Static config:InterfaceMode.Simple}"
-                                     Content="{m:L Settings_InterfaceMode_Simple}"/>
+                                     IsChecked="{Binding SimpleModeSelected, Mode=TwoWay}"
+                                     Content="{m:L Settings_InterfaceMode_Simple}" AutomationProperties.AutomationId="InterfaceModeSimpleRadioButton"/>
                         <RadioButton Classes="Chips" GroupName="InterfaceMode"
-                                     IsChecked="{Binding IsAdvancedMode, Mode=OneWay}"
-                                     Command="{Binding SetInterfaceModeCommand}"
-                                     CommandParameter="{x:Static config:InterfaceMode.Advanced}"
-                                     Content="{m:L Settings_InterfaceMode_Advanced}"/>
+                                     IsChecked="{Binding AdvancedModeSelected, Mode=TwoWay}"
+                                     Content="{m:L Settings_InterfaceMode_Advanced}" AutomationProperties.AutomationId="InterfaceModeAdvancedRadioButton"/>
                     </StackPanel>
                     <TextBlock Text="{m:L Settings_InterfaceModeHint}"
-                               Opacity="0.55"
+                               Opacity="{StaticResource OpacityHint}"
                                FontSize="{StaticResource FontSizeSmall}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
@@ -73,40 +69,40 @@
 
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding ThemeVariantOptions}" SelectedValue="{Binding SelectedThemeVariant}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ComboBox ItemsSource="{Binding ThemeVariantOptions}" SelectedValue="{Binding SelectedThemeVariant}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ThemeVariant}" AutomationProperties.AutomationId="ThemeVariantComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ColorTheme}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding ColorThemeOptions}" SelectedValue="{Binding SelectedColorTheme}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{m:L Settings_ColorTheme}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ComboBox ItemsSource="{Binding ColorThemeOptions}" SelectedValue="{Binding SelectedColorTheme}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ColorTheme}" AutomationProperties.AutomationId="ColorThemeComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_BackgroundStyle}" AutomationProperties.AutomationId="BackgroundStyleComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_Language}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{m:L Settings_Language}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_Language}" AutomationProperties.AutomationId="LanguageComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -119,9 +115,9 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_StorageAndSession}">
+            <TabItem Header="{m:L Settings_StorageAndSession}" AutomationProperties.Name="{m:L Settings_StorageAndSession}" AutomationProperties.AutomationId="StorageAndSessionTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -130,28 +126,43 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_DownloadFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding DownloadPath, Mode=TwoWay}"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}">
+                            <TextBox Text="{Binding DownloadPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_DownloadFolder}" AutomationProperties.AutomationId="SettingsDownloadPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseDownloadPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="SettingsBrowseDownloadPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_SessionFolder}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding SessionPath, Mode=TwoWay}"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}">
+                            <TextBox Text="{Binding SessionPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_SessionFolder}" AutomationProperties.AutomationId="SessionPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseSessionPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSessionPathButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding EnableSessionPersistence, Mode=TwoWay}" Content="{m:L Settings_EnableSessionPersistence}"/>
-                    <ToggleSwitch IsChecked="{Binding ShowAddTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowAddTorrentOptions}"/>
-                    <ToggleSwitch IsChecked="{Binding ShowRemoveTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowRemoveTorrentOptions}"/>
+                    <!--
+                        A directory that adds what is dropped into it: the other half of the loop
+                        the completion action already gave the end of.
+                    -->
+                    <StackPanel Spacing="{StaticResource SpacingMedium}">
+                        <ToggleSwitch IsChecked="{Binding WatchFolderEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableWatchFolder}" AutomationProperties.AutomationId="EnableWatchFolderSwitch"/>
+                        <TextBlock Text="{m:L Settings_WatchFolderHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding WatchFolderEnabled}">
+                            <TextBox Text="{Binding WatchFolderPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_WatchFolder}" AutomationProperties.AutomationId="WatchFolderPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseWatchFolderPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseWatchFolderPathButton">
+                                <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <ToggleSwitch IsChecked="{Binding EnableSessionPersistence, Mode=TwoWay}" Content="{m:L Settings_EnableSessionPersistence}" AutomationProperties.AutomationId="EnableSessionPersistenceSwitch"/>
+                    <ToggleSwitch IsChecked="{Binding ShowAddTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowAddTorrentOptions}" AutomationProperties.AutomationId="ShowAddTorrentOptionsSwitch"/>
+                    <ToggleSwitch IsChecked="{Binding ShowRemoveTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowRemoveTorrentOptions}" AutomationProperties.AutomationId="ShowRemoveTorrentOptionsSwitch"/>
                 </StackPanel>
             </suki:GlassCard>
             <suki:GlassCard IsVisible="{Binding CanManageWindowsAssociations}">
@@ -161,10 +172,10 @@
                         <TextBlock Text="{m:L Settings_WindowsAssociations}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding AssociateTorrentFiles, Mode=TwoWay}" Content="{m:L Settings_AssociateTorrentFiles}"/>
-                    <ToggleSwitch IsChecked="{Binding AssociateMagnetLinks, Mode=TwoWay}" Content="{m:L Settings_AssociateMagnetLinks}"/>
+                    <ToggleSwitch IsChecked="{Binding AssociateTorrentFiles, Mode=TwoWay}" Content="{m:L Settings_AssociateTorrentFiles}" AutomationProperties.AutomationId="AssociateTorrentFilesSwitch"/>
+                    <ToggleSwitch IsChecked="{Binding AssociateMagnetLinks, Mode=TwoWay}" Content="{m:L Settings_AssociateMagnetLinks}" AutomationProperties.AutomationId="AssociateMagnetLinksSwitch"/>
                     <TextBlock Text="{m:L Settings_WindowsAssociationsHint}"
-                               Opacity="0.55"
+                               Opacity="{StaticResource OpacityHint}"
                                FontSize="{StaticResource FontSizeSmall}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
@@ -177,10 +188,10 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_MediaPlayerPath}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}">
+                            <TextBox Text="{Binding MediaPlayerPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_MediaPlayerWatermark}" AutomationProperties.Name="{m:L Settings_MediaPlayerPath}" AutomationProperties.AutomationId="MediaPlayerPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseMediaPlayerCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseMediaPlayerButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -194,42 +205,37 @@
                         <TextBlock Text="{m:L Settings_CompletionAction}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding CompletionActionEnabled, Mode=TwoWay}" Content="{m:L Settings_CompletionActionEnabled}"/>
+                    <ToggleSwitch IsChecked="{Binding CompletionActionEnabled, Mode=TwoWay}" Content="{m:L Settings_CompletionActionEnabled}" AutomationProperties.AutomationId="CompletionActionEnabledSwitch"/>
 
                     <StackPanel Spacing="{StaticResource SpacingStandard}" IsEnabled="{Binding CompletionActionEnabled}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBlock Text="{m:L Settings_CompletionActionProgram}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                                <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}"/>
-                                <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}">
+                                <TextBox Text="{Binding CompletionActionProgramPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionProgramWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionProgram}" AutomationProperties.AutomationId="CompletionActionProgramPathTextBox"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseCompletionActionProgramCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCompletionActionProgramButton">
                                     <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 </Button>
                             </Grid>
                         </StackPanel>
 
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionArguments}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding CompletionActionArgumentsTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionArgumentsWatermark}"/>
-                        </StackPanel>
-
-                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionWorkingDirectory}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding CompletionActionWorkingDirectoryTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionWorkingDirectoryWatermark}"/>
+                            <TextBlock Text="{m:L Settings_CompletionActionArguments}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBox Text="{Binding CompletionActionArgumentsTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionArgumentsWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionArguments}" AutomationProperties.AutomationId="CompletionActionArgumentsTemplateTextBox"/>
                         </StackPanel>
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                <TextBlock Text="{m:L Settings_CompletionActionTimeoutSeconds}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                <NumericUpDown Value="{Binding CompletionActionTimeoutSeconds}" Minimum="1"/>
+                                <TextBlock Text="{m:L Settings_CompletionActionTimeoutSeconds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <NumericUpDown Value="{Binding CompletionActionTimeoutSeconds}" Minimum="1" AutomationProperties.Name="{m:L Settings_CompletionActionTimeoutSeconds}" AutomationProperties.AutomationId="CompletionActionTimeoutSecondsInput"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                <TextBlock Text="{m:L Settings_CompletionActionWindow}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                <ToggleSwitch IsChecked="{Binding CompletionActionRunHidden, Mode=TwoWay}" Content="{m:L Settings_CompletionActionRunHidden}"/>
+                                <TextBlock Text="{m:L Settings_CompletionActionWindow}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <ToggleSwitch IsChecked="{Binding CompletionActionRunHidden, Mode=TwoWay}" Content="{m:L Settings_CompletionActionRunHidden}" AutomationProperties.AutomationId="CompletionActionRunHiddenSwitch"/>
                             </StackPanel>
                         </Grid>
 
                         <TextBlock Text="{m:L Settings_CompletionActionTokens}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
@@ -239,9 +245,9 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}">
+            <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_NetworkAndConnectivity}" AutomationProperties.AutomationId="NetworkAndConnectivityTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -250,8 +256,8 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <TextBlock Text="{m:L Settings_PortMapping}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        <Button Command="{Binding RefreshPortMappingCommand}" HorizontalAlignment="Left">
+                        <TextBlock Text="{m:L Settings_PortMapping}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <Button Command="{Binding RefreshPortMappingCommand}" HorizontalAlignment="Left" AutomationProperties.Name="{m:L Settings_PortMapping_Refresh}" AutomationProperties.AutomationId="RefreshPortMappingButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
                                 <materialIcons:MaterialIcon Kind="Refresh" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}"/>
                                 <TextBlock Text="{m:L Settings_PortMapping_Refresh}"/>
@@ -261,13 +267,13 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:PortMappingStatusViewModel">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}" Margin="{StaticResource MicroTopBottomMargin}">
-                                        <Border Width="10" Height="10" CornerRadius="{StaticResource CornerRadiusNormal}">
+                                        <Border Width="{StaticResource StatusDotSize}" Height="{StaticResource StatusDotSize}" CornerRadius="{StaticResource CornerRadiusNormal}">
                                             <Border.Background>
                                                 <SolidColorBrush Color="{Binding StatusColor}"/>
                                             </Border.Background>
                                         </Border>
                                         <TextBlock Text="{Binding Protocol}" FontWeight="SemiBold" Width="80"/>
-                                        <TextBlock Text="{Binding DisplayText}" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding DisplayText}" Opacity="{StaticResource OpacitySecondary}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -275,45 +281,68 @@
                     </StackPanel>
 
                     <WrapPanel Orientation="Horizontal">
-                        <ToggleSwitch IsChecked="{Binding EnableDht, Mode=TwoWay}" Content="{m:L Settings_EnableDht}" Margin="{StaticResource MediumRightMargin}"/>
-                        <ToggleSwitch IsChecked="{Binding EnableNatPmp, Mode=TwoWay}" Content="{m:L Settings_EnableNatPmp}" Margin="{StaticResource MediumRightMargin}"/>
-                        <ToggleSwitch IsChecked="{Binding EnableUpnp, Mode=TwoWay}" Content="{m:L Settings_EnableUpnp}"/>
+                        <ToggleSwitch IsChecked="{Binding EnableDht, Mode=TwoWay}" Content="{m:L Settings_EnableDht}" Margin="{StaticResource MediumRightMargin}" AutomationProperties.AutomationId="EnableDhtSwitch"/>
+                        <ToggleSwitch IsChecked="{Binding EnableNatPmp, Mode=TwoWay}" Content="{m:L Settings_EnableNatPmp}" Margin="{StaticResource MediumRightMargin}" AutomationProperties.AutomationId="EnableNatPmpSwitch"/>
+                        <ToggleSwitch IsChecked="{Binding EnableUpnp, Mode=TwoWay}" Content="{m:L Settings_EnableUpnp}" AutomationProperties.AutomationId="EnableUpnpSwitch"/>
                     </WrapPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingSmall}" IsEnabled="{Binding EnableDht}">
                         <ToggleSwitch IsChecked="{Binding AnswerInfoHashSampling, Mode=TwoWay}"
-                                      Content="{m:L Settings_AnswerInfoHashSampling}"/>
+                                      Content="{m:L Settings_AnswerInfoHashSampling}" AutomationProperties.AutomationId="AnswerInfoHashSamplingSwitch"/>
                         <TextBlock Text="{m:L Settings_AnswerInfoHashSamplingHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingSmall}">
                         <ToggleSwitch IsChecked="{Binding AllowMultipleConnectionsPerIp, Mode=TwoWay}"
-                                      Content="{m:L Settings_AllowMultipleConnectionsPerIp}"/>
+                                      Content="{m:L Settings_AllowMultipleConnectionsPerIp}" AutomationProperties.AutomationId="AllowMultipleConnectionsPerIpSwitch"/>
                         <TextBlock Text="{m:L Settings_AllowMultipleConnectionsPerIpHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Settings_MaxConnectionsPerIp}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <NumericUpDown Value="{Binding MaxConnectionsPerIp}" Minimum="0" Increment="1" AutomationProperties.Name="{m:L Settings_MaxConnectionsPerIp}" AutomationProperties.AutomationId="MaxConnectionsPerIpInput"/>
+                        <TextBlock Text="{m:L Settings_MaxConnectionsPerIpHint}"
+                                   Opacity="{StaticResource OpacityHint}"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Settings_BindAddress}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBox Text="{Binding BindAddress, Mode=TwoWay}" PlaceholderText="192.168.1.50" AutomationProperties.Name="{m:L Settings_BindAddress}" AutomationProperties.AutomationId="BindAddressTextBox"/>
+                        <TextBlock Text="{m:L Settings_BindAddressInvalid}"
+                                   Foreground="{StaticResource ErrorColor}"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding !IsBindAddressValid}"/>
+                        <TextBlock Text="{m:L Settings_BindAddressHint}"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <ToggleSwitch IsChecked="{Binding UseAutomaticListeningPort, Mode=TwoWay}" Content="{m:L Settings_UseAutomaticListeningPort}"/>
+                        <ToggleSwitch IsChecked="{Binding UseAutomaticListeningPort, Mode=TwoWay}" Content="{m:L Settings_UseAutomaticListeningPort}" AutomationProperties.AutomationId="UseAutomaticListeningPortSwitch"/>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding IsFixedListeningPortEnabled}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                <TextBlock Text="{m:L Settings_ListeningPort}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                <NumericUpDown Value="{Binding ListeningPort}" Minimum="1" Maximum="65535" Increment="1"/>
+                                <TextBlock Text="{m:L Settings_ListeningPort}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <NumericUpDown Value="{Binding ListeningPort}" Minimum="1" Maximum="65535" Increment="1" AutomationProperties.Name="{m:L Settings_ListeningPort}" AutomationProperties.AutomationId="ListeningPortInput"/>
                             </StackPanel>
                             <TextBlock Grid.Column="1"
                                        Text="{m:L Settings_ListeningPortHint}"
-                                       Opacity="0.55"
+                                       Opacity="{StaticResource OpacityHint}"
                                        FontSize="{StaticResource FontSizeSmall}"
                                        TextWrapping="Wrap"
                                        VerticalAlignment="Center"/>
                         </Grid>
                         <TextBlock Text="{m:L Settings_PortRestartHint}"
-                                   Opacity="0.55"
+                                   Opacity="{StaticResource OpacityHint}"
                                    FontSize="{StaticResource FontSizeSmall}"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
@@ -330,27 +359,27 @@
                          disk throttles rather than below them. Applied to the running engine at once. -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown x:Name="DownloadLimitBox" Value="{Binding MaxDownloadSpeedKibibytesPerSecond}" Minimum="0" Increment="128"/>
+                            <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown x:Name="DownloadLimitBox" Value="{Binding MaxDownloadSpeedKibibytesPerSecond}" Minimum="0" Increment="128" AutomationProperties.Name="{m:L Settings_DownloadLimit}" AutomationProperties.AutomationId="MaxDownloadSpeedKibibytesPerSecondInput"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown x:Name="UploadLimitBox" Value="{Binding MaxUploadSpeedKibibytesPerSecond}" Minimum="0" Increment="128"/>
+                            <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown x:Name="UploadLimitBox" Value="{Binding MaxUploadSpeedKibibytesPerSecond}" Minimum="0" Increment="128" AutomationProperties.Name="{m:L Settings_UploadLimit}" AutomationProperties.AutomationId="MaxUploadSpeedKibibytesPerSecondInput"/>
                         </StackPanel>
                     </Grid>
                     <TextBlock Text="{m:L Settings_SpeedLimitHint}"
-                               Opacity="0.55"
+                               Opacity="{StaticResource OpacityHint}"
                                FontSize="{StaticResource FontSizeSmall}"
                                TextWrapping="Wrap"/>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_DiskReadLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxDiskReadSpeedBytesPerSecond}" Minimum="0" Increment="1048576"/>
+                            <TextBlock Text="{m:L Settings_DiskReadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown Value="{Binding MaxDiskReadSpeedBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.Name="{m:L Settings_DiskReadLimit}" AutomationProperties.AutomationId="MaxDiskReadSpeedInput"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_DiskWriteLimit}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxDiskWriteSpeedBytesPerSecond}" Minimum="0" Increment="1048576"/>
+                            <TextBlock Text="{m:L Settings_DiskWriteLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown Value="{Binding MaxDiskWriteSpeedBytesPerSecond}" Minimum="0" Increment="1048576" AutomationProperties.Name="{m:L Settings_DiskWriteLimit}" AutomationProperties.AutomationId="MaxDiskWriteSpeedInput"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -362,16 +391,97 @@
                         <TextBlock Text="{m:L Settings_QueueManagement}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding EnableQueueManagement, Mode=TwoWay}" Content="{m:L Settings_EnableQueueManagement}"/>
+                    <ToggleSwitch IsChecked="{Binding EnableQueueManagement, Mode=TwoWay}" Content="{m:L Settings_EnableQueueManagement}" AutomationProperties.AutomationId="EnableQueueManagementSwitch"/>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}" IsEnabled="{Binding EnableQueueManagement}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_MaxActiveDownloads}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxActiveDownloads}" Minimum="1"/>
+                            <TextBlock Text="{m:L Settings_MaxActiveDownloads}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown Value="{Binding MaxActiveDownloads}" Minimum="1" AutomationProperties.Name="{m:L Settings_MaxActiveDownloads}" AutomationProperties.AutomationId="MaxActiveDownloadsInput"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_MaxActiveSeeds}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <NumericUpDown Value="{Binding MaxActiveSeeds}" Minimum="0"/>
+                            <TextBlock Text="{m:L Settings_MaxActiveSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <NumericUpDown Value="{Binding MaxActiveSeeds}" Minimum="0" AutomationProperties.Name="{m:L Settings_MaxActiveSeeds}" AutomationProperties.AutomationId="MaxActiveSeedsInput"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </suki:GlassCard>
+            <!--
+                Scheduled limits. One window rather than a table of them: what people want is to
+                leave the connection alone while they are using it.
+            -->
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                        <materialIcons:MaterialIcon Kind="ClockOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <TextBlock Text="{m:L Settings_Schedule}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <ToggleSwitch IsChecked="{Binding ScheduleEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableSchedule}" AutomationProperties.AutomationId="EnableScheduleSwitch"/>
+                    <TextBlock Text="{m:L Settings_ScheduleHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                    <StackPanel Spacing="{StaticResource SpacingMedium}" IsEnabled="{Binding ScheduleEnabled}">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_ScheduleFrom}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding ScheduleFrom, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ScheduleFrom}" AutomationProperties.AutomationId="ScheduleFromTextBox"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_ScheduleTo}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding ScheduleTo, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ScheduleTo}" AutomationProperties.AutomationId="ScheduleToTextBox"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <NumericUpDown Value="{Binding ScheduleDownloadKibibytesPerSecond}" Minimum="0" AutomationProperties.Name="{m:L Settings_DownloadLimit}" AutomationProperties.AutomationId="ScheduleDownloadLimitInput"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <NumericUpDown Value="{Binding ScheduleUploadKibibytesPerSecond}" Minimum="0" AutomationProperties.Name="{m:L Settings_UploadLimit}" AutomationProperties.AutomationId="ScheduleUploadLimitInput"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                            <TextBlock Text="{m:L Settings_ScheduleDays}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ItemsControl ItemsSource="{Binding ScheduleDays}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ScheduleDayViewModel">
+                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </suki:GlassCard>
+            <!--
+                Seeding goals. The engine has always enforced these per torrent and the add dialog
+                has always been able to set them; what was missing was an answer for the torrents
+                nobody says anything about, which is nearly all of them.
+            -->
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                        <materialIcons:MaterialIcon Kind="SeedOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <TextBlock Text="{m:L Settings_Seeding}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{m:L Settings_SeedingHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                            <ToggleSwitch IsChecked="{Binding LimitSeedingRatio, Mode=TwoWay}" Content="{m:L Settings_LimitSeedingRatio}" AutomationProperties.AutomationId="LimitSeedingRatioSwitch"/>
+                            <NumericUpDown Value="{Binding SeedingRatioLimit}" Minimum="0" Increment="0.1" FormatString="0.0#" IsEnabled="{Binding LimitSeedingRatio}" AutomationProperties.Name="{m:L Settings_LimitSeedingRatio}" AutomationProperties.AutomationId="SeedingRatioLimitInput"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                            <ToggleSwitch IsChecked="{Binding LimitSeedingTime, Mode=TwoWay}" Content="{m:L Settings_LimitSeedingTime}" AutomationProperties.AutomationId="LimitSeedingTimeSwitch"/>
+                            <NumericUpDown Value="{Binding SeedingTimeLimitMinutes}" Minimum="0" IsEnabled="{Binding LimitSeedingTime}" AutomationProperties.Name="{m:L Settings_LimitSeedingTime}" AutomationProperties.AutomationId="SeedingTimeLimitInput"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -380,9 +490,9 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}">
+            <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_SecurityAndPrivacy}" AutomationProperties.AutomationId="SecurityAndPrivacyTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -391,10 +501,10 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_EncryptionMode}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        <ComboBox ItemsSource="{Binding EncryptionModeOptions}" SelectedValue="{Binding SelectedEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                        <TextBlock Text="{m:L Settings_EncryptionMode}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <ComboBox ItemsSource="{Binding EncryptionModeOptions}" SelectedValue="{Binding SelectedEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_EncryptionMode}" AutomationProperties.AutomationId="EncryptionModeComboBox">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption">
                                     <TextBlock Text="{Binding DisplayName}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -402,10 +512,10 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
-                        <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}"/>
+                        <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
-                            <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}">
+                            <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.Name="{m:L Settings_BlocklistFile}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseBlocklistCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseBlocklistButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -419,13 +529,13 @@
                         <TextBlock Text="{m:L Settings_GeoIp}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding EnableGeoIp, Mode=TwoWay}" Content="{m:L Settings_EnableGeoIp}"/>
+                    <ToggleSwitch IsChecked="{Binding EnableGeoIp, Mode=TwoWay}" Content="{m:L Settings_EnableGeoIp}" AutomationProperties.AutomationId="EnableGeoIpSwitch"/>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsEnabled="{Binding EnableGeoIp}">
-                        <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_GeoIpFile}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}">
+                            <TextBox Text="{Binding GeoIpPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_GeoIpWatermark}" AutomationProperties.Name="{m:L Settings_GeoIpFile}" AutomationProperties.AutomationId="GeoIpPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseGeoIpCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseGeoIpButton">
                                 <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             </Button>
                         </Grid>
@@ -440,10 +550,10 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_ProxyType}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        <ComboBox ItemsSource="{Binding ProxyTypeOptions}" SelectedValue="{Binding SelectedProxyType}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch">
+                        <TextBlock Text="{m:L Settings_ProxyType}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <ComboBox ItemsSource="{Binding ProxyTypeOptions}" SelectedValue="{Binding SelectedProxyType}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ProxyType}" AutomationProperties.AutomationId="ProxyTypeComboBox">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption">
                                     <TextBlock Text="{Binding DisplayName}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -452,29 +562,29 @@
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyHost}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyHost, Mode=TwoWay}"/>
+                            <TextBlock Text="{m:L Settings_ProxyHost}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBox Text="{Binding ProxyHost, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ProxyHost}" AutomationProperties.AutomationId="ProxyHostTextBox"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyPort}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyPort, Mode=TwoWay}"/>
+                            <TextBlock Text="{m:L Settings_ProxyPort}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBox Text="{Binding ProxyPort, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ProxyPort}" AutomationProperties.AutomationId="ProxyPortTextBox"/>
                         </StackPanel>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyUsername}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyUsername, Mode=TwoWay}"/>
+                            <TextBlock Text="{m:L Settings_ProxyUsername}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBox Text="{Binding ProxyUsername, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ProxyUsername}" AutomationProperties.AutomationId="ProxyUsernameTextBox"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_ProxyPassword}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding ProxyPassword, Mode=TwoWay}" PasswordChar="*"/>
+                            <TextBlock Text="{m:L Settings_ProxyPassword}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <TextBox Text="{Binding ProxyPassword, Mode=TwoWay}" PasswordChar="*" AutomationProperties.Name="{m:L Settings_ProxyPassword}" AutomationProperties.AutomationId="ProxyPasswordTextBox"/>
                         </StackPanel>
                     </Grid>
 
                     <WrapPanel Orientation="Horizontal">
-                        <ToggleSwitch IsChecked="{Binding ProxyPeers, Mode=TwoWay}" Content="{m:L Settings_ProxyPeers}" Margin="{StaticResource MediumRightMargin}"/>
-                        <ToggleSwitch IsChecked="{Binding ProxyTrackers, Mode=TwoWay}" Content="{m:L Settings_ProxyTrackers}"/>
+                        <ToggleSwitch IsChecked="{Binding ProxyPeers, Mode=TwoWay}" Content="{m:L Settings_ProxyPeers}" Margin="{StaticResource MediumRightMargin}" AutomationProperties.AutomationId="ProxyPeersSwitch"/>
+                        <ToggleSwitch IsChecked="{Binding ProxyTrackers, Mode=TwoWay}" Content="{m:L Settings_ProxyTrackers}" AutomationProperties.AutomationId="ProxyTrackersSwitch"/>
                     </WrapPanel>
                 </StackPanel>
             </suki:GlassCard>
@@ -482,9 +592,9 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}">
+            <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Remote}" AutomationProperties.AutomationId="RemoteTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -493,31 +603,31 @@
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_RemoteHint}"
-                                           Opacity="0.6"
+                                           Opacity="{StaticResource OpacitySecondary}"
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
                                 <ToggleSwitch x:Name="RemoteEnabledToggle"
                                               IsChecked="{Binding RemoteEnabled}"
-                                              Content="{m:L Settings_Remote_Enable}"/>
+                                              Content="{m:L Settings_Remote_Enable}" AutomationProperties.AutomationId="RemoteEnabledSwitch"/>
 
                                 <StackPanel Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding RemoteEnabled}">
                                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                        <TextBlock Text="{m:L Settings_Remote_Port}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                        <NumericUpDown Value="{Binding RemotePort}" Minimum="1" Maximum="65535" Increment="1"/>
+                                        <TextBlock Text="{m:L Settings_Remote_Port}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <NumericUpDown Value="{Binding RemotePort}" Minimum="1" Maximum="65535" Increment="1" AutomationProperties.Name="{m:L Settings_Remote_Port}" AutomationProperties.AutomationId="RemotePortInput"/>
                                     </StackPanel>
 
                                     <ToggleSwitch IsChecked="{Binding RemoteAllowRemoteConnections}"
-                                                  Content="{m:L Settings_Remote_AllowRemote}"/>
+                                                  Content="{m:L Settings_Remote_AllowRemote}" AutomationProperties.AutomationId="RemoteAllowRemoteConnectionsSwitch"/>
 
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                                         <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Settings_Remote_Username}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                            <TextBox Text="{Binding RemoteUsername, Mode=TwoWay}"/>
+                                            <TextBlock Text="{m:L Settings_Remote_Username}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding RemoteUsername, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_Remote_Username}" AutomationProperties.AutomationId="RemoteUsernameTextBox"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Settings_Remote_Password}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                            <TextBox Text="{Binding RemotePassword, Mode=TwoWay}" PasswordChar="*"/>
+                                            <TextBlock Text="{m:L Settings_Remote_Password}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding RemotePassword, Mode=TwoWay}" PasswordChar="*" AutomationProperties.Name="{m:L Settings_Remote_Password}" AutomationProperties.AutomationId="RemotePasswordTextBox"/>
                                         </StackPanel>
                                     </Grid>
 
@@ -530,7 +640,7 @@
                                                   Message="{m:L Settings_Remote_NeedsCredentials}"/>
 
                                     <TextBlock Text="{m:L Settings_Remote_RestartHint}"
-                                               Opacity="0.55"
+                                               Opacity="{StaticResource OpacityHint}"
                                                FontSize="{StaticResource FontSizeSmall}"
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
@@ -540,9 +650,9 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}">
+            <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Categories}" AutomationProperties.AutomationId="CategoriesTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -551,7 +661,7 @@
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_CategoriesHint}"
-                                           Opacity="0.6"
+                                           Opacity="{StaticResource OpacitySecondary}"
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
@@ -560,10 +670,11 @@
                                         <DataTemplate x:DataType="config:TorrentCategory">
                                             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource XXSmallBottomMargin}">
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" MinWidth="120"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding SavePath}" Opacity="0.6" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding SavePath}" Opacity="{StaticResource OpacitySecondary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                                 <Button Grid.Column="2"
                                                         Classes="Basic"
                                                         Command="{Binding $parent[ItemsControl].((vm:SettingsViewModel)DataContext).RemoveCategoryCommand}"
+                                                        ToolTip.Tip="{m:L Downloads_Remove}"
                                                         CommandParameter="{Binding Name}">
                                                     <materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                                 </Button>
@@ -573,10 +684,10 @@
                                 </ItemsControl>
 
                                 <Grid ColumnDefinitions="*,2*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
-                                    <TextBox Text="{Binding NewCategoryName, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_NameWatermark}"/>
-                                    <TextBox Grid.Column="1" Text="{Binding NewCategoryPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_PathWatermark}"/>
-                                    <Button Grid.Column="2" Command="{Binding BrowseCategoryPathCommand}" Content="{m:L Settings_Browse}"/>
-                                    <Button Grid.Column="3" Command="{Binding AddCategoryCommand}" Content="{m:L Settings_Categories_Add}"/>
+                                    <TextBox Text="{Binding NewCategoryName, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_NameWatermark}" AutomationProperties.Name="{m:L Settings_CategoriesHint}" AutomationProperties.AutomationId="NewCategoryNameTextBox"/>
+                                    <TextBox Grid.Column="1" Text="{Binding NewCategoryPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_Categories_PathWatermark}" AutomationProperties.Name="{m:L Settings_CategoriesHint}" AutomationProperties.AutomationId="NewCategoryPathTextBox"/>
+                                    <Button Grid.Column="2" Command="{Binding BrowseCategoryPathCommand}" Content="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseCategoryPathButton"/>
+                                    <Button Grid.Column="3" Command="{Binding AddCategoryCommand}" Content="{m:L Settings_Categories_Add}" AutomationProperties.AutomationId="AddCategoryButton"/>
                                 </Grid>
                             </StackPanel>
                         </suki:GlassCard>
@@ -584,9 +695,43 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}">
+            <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Search}" AutomationProperties.AutomationId="SearchTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                        <!--
+                            A saved query that runs on its own. Anyone with Sonarr or Radarr already
+                            has this through the Transmission endpoint; this is for everyone else.
+                        -->
+                        <suki:GlassCard>
+                            <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <materialIcons:MaterialIcon Kind="AutoFix" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <TextBlock Text="{m:L Settings_AutoSearch}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <ToggleSwitch IsChecked="{Binding AutoSearchEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableAutoSearch}" AutomationProperties.AutomationId="EnableAutoSearchSwitch"/>
+                                <TextBlock Text="{m:L Settings_AutoSearchHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                                <StackPanel Spacing="{StaticResource SpacingMedium}" IsEnabled="{Binding AutoSearchEnabled}">
+                                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                        <TextBlock Text="{m:L Settings_AutoSearchQuery}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBox Text="{Binding AutoSearchQuery, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchQuery}" AutomationProperties.AutomationId="AutoSearchQueryTextBox"/>
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_AutoSearchInterval}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <NumericUpDown Value="{Binding AutoSearchIntervalMinutes}" Minimum="15" AutomationProperties.Name="{m:L Settings_AutoSearchInterval}" AutomationProperties.AutomationId="AutoSearchIntervalInput"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_AutoSearchCategory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding AutoSearchCategory, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchCategory}" AutomationProperties.AutomationId="AutoSearchCategoryTextBox"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </suki:GlassCard>
+
                         <suki:GlassCard>
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -595,7 +740,7 @@
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_SearchHint}"
-                                           Opacity="0.6"
+                                           Opacity="{StaticResource OpacitySecondary}"
                                            FontSize="{StaticResource FontSizeSmall}"
                                            TextWrapping="Wrap"/>
 
@@ -608,11 +753,11 @@
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
                                     <Button Command="{Binding UseIndexerPresetCommand}"
                                             CommandParameter="{x:Static config:SearchSettings.ProwlarrTemplate}"
-                                            Content="{m:L Settings_Search_UseProwlarr}"/>
+                                            Content="{m:L Settings_Search_UseProwlarr}" AutomationProperties.AutomationId="UseIndexerPresetButton"/>
                                     <Button Command="{Binding UseIndexerPresetCommand}"
                                             CommandParameter="{x:Static config:SearchSettings.JackettTemplate}"
-                                            Content="{m:L Settings_Search_UseJackett}"/>
-                                    <Button Command="{Binding DetectIndexerCommand}" Classes="Flat">
+                                            Content="{m:L Settings_Search_UseJackett}" AutomationProperties.AutomationId="SettingsUseIndexerPresetButton"/>
+                                    <Button Command="{Binding DetectIndexerCommand}" Classes="Flat" AutomationProperties.Name="{m:L Settings_Search_Detect}" AutomationProperties.AutomationId="DetectIndexerButton">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                             <materialIcons:MaterialIcon Kind="Radar" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                             <TextBlock Text="{m:L Settings_Search_Detect}"/>
@@ -621,19 +766,19 @@
                                 </StackPanel>
 
                                 <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                    <TextBlock Text="{m:L Settings_Search_Url}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                    <TextBox Text="{Binding TorznabUrl, Mode=TwoWay}" PlaceholderText="{x:Static config:SearchSettings.JackettTemplate}"/>
+                                    <TextBlock Text="{m:L Settings_Search_Url}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                    <TextBox Text="{Binding TorznabUrl, Mode=TwoWay}" PlaceholderText="{x:Static config:SearchSettings.JackettTemplate}" AutomationProperties.Name="{m:L Settings_Search_Url}" AutomationProperties.AutomationId="TorznabUrlTextBox"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}">
                                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                        <TextBlock Text="{m:L Settings_Search_ApiKey}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                                        <TextBox Text="{Binding TorznabApiKey, Mode=TwoWay}" PasswordChar="*"/>
+                                        <TextBlock Text="{m:L Settings_Search_ApiKey}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBox Text="{Binding TorznabApiKey, Mode=TwoWay}" PasswordChar="*" AutomationProperties.Name="{m:L Settings_Search_ApiKey}" AutomationProperties.AutomationId="TorznabApiKeyTextBox"/>
                                     </StackPanel>
                                     <Button Grid.Column="1"
                                             Command="{Binding TestIndexerCommand}"
                                             Content="{m:L Settings_Search_Test}"
-                                            VerticalAlignment="Bottom"/>
+                                            VerticalAlignment="Bottom" AutomationProperties.AutomationId="TestIndexerButton"/>
                                 </Grid>
 
                                 <suki:InfoBar IsVisible="{Binding HasSearchStatusMessage}"
@@ -645,9 +790,9 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}">
+            <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Updates}" AutomationProperties.AutomationId="UpdatesTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="900" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
             <suki:GlassCard>
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
@@ -656,25 +801,25 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L AddTorrent_Version}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding ApplicationVersion}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L AddTorrent_Version}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding ApplicationVersion}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
-                        <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="0.7" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}"/>
+                        <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}" AutomationProperties.Name="{m:L Settings_UpdateUrl}" AutomationProperties.AutomationId="UpdateUrlTextBox"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}"/>
+                    <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}" AutomationProperties.AutomationId="CheckForUpdatesOnStartupSwitch"/>
 
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
-                        <Button Command="{Binding CheckForUpdatesCommand}">
+                        <Button Command="{Binding CheckForUpdatesCommand}" AutomationProperties.Name="{m:L Settings_CheckForUpdates}" AutomationProperties.AutomationId="CheckForUpdatesButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="CloudDownloadOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_CheckForUpdates}"/>
                             </StackPanel>
                         </Button>
-                        <Button Command="{Binding ApplyUpdateAndRestartCommand}" IsVisible="{Binding IsUpdateAvailable}" Classes="Accent">
+                        <Button Command="{Binding ApplyUpdateAndRestartCommand}" IsVisible="{Binding IsUpdateAvailable}" Classes="Accent" AutomationProperties.Name="{m:L Settings_ApplyUpdateAndRestart}" AutomationProperties.AutomationId="ApplyUpdateAndRestartButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="RestartAlert" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_ApplyUpdateAndRestart}"/>
@@ -682,7 +827,7 @@
                         </Button>
                     </StackPanel>
 
-                    <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="0.5" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding ShouldShowUpdateNotInstalled}"/>
+                    <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="{StaticResource OpacityDisabled}" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding ShouldShowUpdateNotInstalled}"/>
                 </StackPanel>
             </suki:GlassCard>
                     </StackPanel>

@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerfluence.Core.Services;
 using Peerfluence.Properties;
 using PeerSharp.Core;
+using PeerSharp.Interfaces;
 
 namespace Peerfluence.Services;
 
@@ -20,6 +21,7 @@ public sealed class MagnetMetadataPreviewService : IMagnetMetadataPreviewService
     public async Task<MagnetMetadataPreview?> FetchAsync(
         string magnetUri,
         TimeSpan timeout,
+        IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
         using var timeoutCts = new CancellationTokenSource(timeout);
@@ -30,10 +32,23 @@ public sealed class MagnetMetadataPreviewService : IMagnetMetadataPreviewService
         // torrent is transient in the engine's own sense: it emits no alerts, takes no session
         // entry, joins no queue and claims no info hash. Nothing downstream of the alert queue can
         // see it, so nothing here has to hide it.
+        //
+        // Being outside the alert stream used to mean the fetch was also unobservable - the only
+        // thing a caller knew was that it had not finished, which is why the dialog's progress bar
+        // was indeterminate. PeerSharp 3.2 added a progress-reporting overload for exactly this.
         try
         {
-            var torrentFile = await _engineService.Engine.GetMagnetMetadataAsync(magnet, linkedCts.Token)
-                .ConfigureAwait(false);
+            var torrentFile = progress is null
+                ? await _engineService.Engine
+                    .GetMagnetMetadataAsync(magnet, linkedCts.Token)
+                    .ConfigureAwait(false)
+                : await _engineService.Engine
+                    .GetMagnetMetadataWithProgressAsync(
+                        magnet,
+                        new Progress<MetadataProgress>(update => progress.Report(update.Progress)),
+                        linkedCts.Token)
+                    .ConfigureAwait(false);
+
             return CreatePreview(torrentFile);
         }
         catch (OperationCanceledException)

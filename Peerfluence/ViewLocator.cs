@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -17,6 +17,7 @@ public class ViewLocator : IDataTemplate
         [typeof(DetailsViewModel)] = typeof(DetailsView),
         [typeof(SettingsViewModel)] = typeof(SettingsView),
         [typeof(FindTorrentsViewModel)] = typeof(FindTorrentsView),
+        [typeof(StatisticsViewModel)] = typeof(StatisticsView),
         [typeof(AboutViewModel)] = typeof(AboutView),
         [typeof(CreateTorrentViewModel)] = typeof(CreateTorrentWindow),
     };

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -24,7 +24,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly INotificationService _notificationService;
     private readonly AboutViewModel _aboutViewModel;
     private readonly IInterfaceModeService _interfaceModeService;
-    private readonly List<NavigationItem> _featureItems = new();
+    private readonly IDialogService _dialogService;
     private bool _startupUpdateCheckStarted;
     private bool _disposed;
 
@@ -34,46 +34,31 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         INotificationService notificationService,
         IAppSettingsService settingsService,
         IUpdateService updateService,
-        IInterfaceModeService interfaceModeService)
+        IInterfaceModeService interfaceModeService,
+        IDialogService dialogService,
+        DownloadsViewModel downloadsViewModel,
+        SettingsViewModel settingsViewModel,
+        ISukiToastManager toastManager,
+        ISukiDialogManager dialogManager)
     {
         _settingsService = settingsService;
         _updateService = updateService;
         _notificationService = notificationService;
         _aboutViewModel = aboutViewModel;
         _interfaceModeService = interfaceModeService;
+        _dialogService = dialogService;
 
-        // Create SukiUI managers here (after UI thread is available)
-        ToastManager = new SukiToastManager();
-        DialogManager = new SukiDialogManager();
+        // Held so the window can bind its toast and dialog hosts to them. Created by the container
+        // rather than here, so the services that raise toasts and show prompts are given the same
+        // two managers as constructor arguments instead of being reached into and configured.
+        ToastManager = toastManager;
+        DialogManager = dialogManager;
 
-        // Wire toast manager into notification service
-        if (notificationService is NotificationService ns)
-        {
-            ns.ToastManager = ToastManager;
-        }
-
-        // Build navigation from discovered features
-        foreach (var feature in features.OrderBy(f => f.Order))
-        {
-            var icon = Enum.TryParse<MaterialIconKind>(feature.IconKind, out var parsed)
-                ? parsed
-                : MaterialIconKind.CircleOutline;
-
-            var item = new NavigationItem(feature.Title, icon, (ViewModelBase)feature);
-            _featureItems.Add(item);
-
-            // Wire dialog manager into downloads view model
-            if (feature is DownloadsViewModel dvm)
-            {
-                DownloadsViewModel = dvm;
-                dvm.SukiDialogManager = DialogManager;
-            }
-
-            if (feature is SettingsViewModel svm)
-            {
-                SettingsPage = svm;
-            }
-        }
+        // Asked for by name rather than picked out of the feature list by type. They are the same
+        // singletons either way, and this says which two screens are special instead of discovering
+        // it while building the navigation.
+        DownloadsViewModel = downloadsViewModel;
+        SettingsPage = settingsViewModel;
 
         ShowAboutCommand = new RelayCommand(ShowAbout);
         ShowSimpleSettingsCommand = new RelayCommand(() => IsSimpleSettingsOpen = true);
@@ -82,7 +67,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         ChooseAdvancedModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Advanced));
         SwitchToAdvancedModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Advanced));
 
-        NavigationItems = new ObservableCollection<NavigationItem>(_featureItems);
+        NavigationItems = new ObservableCollection<NavigationItem>(BuildNavigation(features));
 
         SelectedNavigationItem = NavigationItems.FirstOrDefault();
 
@@ -142,7 +127,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// The settings page, so simple mode can show it without the side menu that normally reaches it.
     /// </summary>
-    public ViewModelBase? SettingsPage { get; private set; }
+    /// <summary>
+    /// The settings screen, shown in simple mode where there is no navigation to reach it by.
+    /// </summary>
+    /// <remarks>
+    /// Get only. It is assigned once, from a constructor argument, and a bound property with a
+    /// setter that never announces a change is a screen that shows whatever it saw first - which is
+    /// what the rule about this asks, and the honest answer here is that it cannot change at all.
+    /// </remarks>
+    public ViewModelBase? SettingsPage { get; }
 
     public IRelayCommand ShowSimpleSettingsCommand { get; }
 
@@ -199,9 +192,48 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         set => SetProperty(ref field, value);
     }
 
+    /// <summary>
+    /// The navigation, in the order the features asked to appear in.
+    /// </summary>
+    /// <remarks>
+    /// A function of its argument and nothing else, so the ordering and the fallback icon can be
+    /// checked without building a window's worth of view model. It stays on the way in rather than
+    /// moving to an initialise step, because turning a constructor argument into this object's own
+    /// state is the one thing a constructor is unarguably for.
+    /// </remarks>
+    internal static IReadOnlyList<NavigationItem> BuildNavigation(IEnumerable<IFeatureViewModel> features)
+    {
+        ArgumentNullException.ThrowIfNull(features);
+
+        var items = new List<NavigationItem>();
+
+        foreach (var feature in features.OrderBy(f => f.Order))
+        {
+            // Named rather than cast. A feature that is not a view model is a registration mistake,
+            // and an InvalidCastException at startup names neither the feature nor what was expected
+            // of it.
+            if (feature is not ViewModelBase viewModel)
+            {
+                throw new InvalidOperationException(
+                    $"{feature.GetType().Name} is registered as a navigation feature but does not "
+                        + $"derive from {nameof(ViewModelBase)}, so there is nothing to show for it.");
+            }
+
+            // An icon nobody recognises is worth a placeholder rather than a crash: the name is a
+            // string in a view model, and getting it wrong should cost a wrong picture.
+            var icon = Enum.TryParse<MaterialIconKind>(feature.IconKind, out var parsed)
+                ? parsed
+                : MaterialIconKind.CircleOutline;
+
+            items.Add(new NavigationItem(feature.Title, icon, viewModel));
+        }
+
+        return items;
+    }
+
     private void UpdateNavigationTitles()
     {
-        foreach (var item in _featureItems)
+        foreach (var item in NavigationItems)
         {
             if (item.ViewModel is IFeatureViewModel feature)
             {
@@ -218,17 +250,20 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     public async Task CheckForUpdatesOnStartupAsync()
     {
-        if (_startupUpdateCheckStarted ||
-            !_settingsService.Current.Update.CheckForUpdatesOnStartup ||
-            !_updateService.CanCheckForUpdates)
-        {
-            return;
-        }
-
-        _startupUpdateCheckStarted = true;
-
         try
         {
+            // Everything, including deciding whether to start, stays inside the catch. App starts
+            // this from a synchronous dispatcher callback and deliberately does not await it, so
+            // this method must never return a faulted Task.
+            if (_startupUpdateCheckStarted ||
+                !_settingsService.Current.Update.CheckForUpdatesOnStartup ||
+                !_updateService.CanCheckForUpdates)
+            {
+                return;
+            }
+
+            _startupUpdateCheckStarted = true;
+
             var hasUpdate = await _updateService.CheckForUpdatesAsync();
             if (!hasUpdate)
             {
@@ -269,33 +304,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private async Task<bool> PromptForStartupUpdateAsync()
+    private Task<bool> PromptForStartupUpdateAsync()
     {
         var version = _updateService.AvailableVersion;
         var title = string.IsNullOrWhiteSpace(version)
             ? Resources.UpdatePrompt_Title_Generic
             : string.Format(Resources.UpdatePrompt_Title, version);
 
-        var content = new TextBlock
-        {
-            Text = Resources.UpdatePrompt_Message,
-            TextWrapping = TextWrapping.Wrap,
-            MaxWidth = 420
-        };
-
-        var result = new TaskCompletionSource<bool>();
-        await DialogManager
-            .CreateDialog()
-            .OfType(Avalonia.Controls.Notifications.NotificationType.Information)
-            .WithTitle(title)
-            .WithContent(content)
-            .Dismiss().ByClickingBackground()
-            .OnDismissed(_ => result.TrySetResult(false))
-            .WithActionButton(Resources.Common_Later, _ => result.TrySetResult(false), true)
-            .WithActionButton(Resources.UpdatePrompt_Install, _ => result.TrySetResult(true), true, "Flat")
-            .TryShowAsync();
-
-        return result.Task.IsCompletedSuccessfully && result.Task.Result;
+        return _dialogService.ConfirmAsync(new ConfirmPrompt(
+            title,
+            Resources.UpdatePrompt_Message,
+            Resources.UpdatePrompt_Install,
+            Resources.Common_Later,
+            PromptSeverity.Information));
     }
 
     public void Dispose()
@@ -307,7 +328,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
         _disposed = true;
         WeakReferenceMessenger.Default.UnregisterAll(this);
-        foreach (var disposable in _featureItems.Select(item => item.ViewModel).OfType<IDisposable>())
+        foreach (var disposable in NavigationItems.Select(item => item.ViewModel).OfType<IDisposable>())
         {
             disposable.Dispose();
         }

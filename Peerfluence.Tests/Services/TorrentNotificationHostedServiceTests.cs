@@ -1,3 +1,5 @@
+﻿using Peerfluence.Core;
+using Peerfluence.Core.Services;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Services;
 using Peerfluence.Core.Messaging;
@@ -12,7 +14,13 @@ public sealed class TorrentNotificationHostedServiceTests
     [Fact]
     public async Task TorrentErrorNotification_IncludesExceptionMessage()
     {
-        var notificationService = new NotificationService();
+        // Substituted rather than real: what is being tested is what this service says, and a
+        // substitute records it without a dispatcher having to run.
+        var published = new List<NotificationItem>();
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
+            .When(service => service.Publish(Arg.Any<NotificationItem>(), Arg.Any<TimeSpan?>()))
+            .Do(call => published.Add(call.Arg<NotificationItem>()));
         var sut = new TorrentNotificationHostedService(notificationService);
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Ubuntu ISO");
@@ -28,7 +36,7 @@ public sealed class TorrentNotificationHostedServiceTests
                 Exception = new InvalidOperationException("disk full")
             }));
 
-        var notification = Assert.Single(notificationService.Notifications, n => n.Title == "Torrent error");
+        var notification = Assert.Single(published, n => n.Title == "Torrent error");
         Assert.Equal("Torrent error", notification.Title);
         Assert.Contains("Ubuntu ISO", notification.Message);
         Assert.Contains("disk full", notification.Message);

@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using Peerfluence.Core;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -311,7 +312,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
 
         if (InfoHash.TryFromHex(trimmed, out var hash))
         {
-            return torrents.FirstOrDefault(t => t.Hash == hash);
+            return torrents.FirstOrDefault(t => TorrentIdentity.HasHash(t, hash));
         }
 
         var exact = torrents.FirstOrDefault(t => string.Equals(t.Name, trimmed, StringComparison.OrdinalIgnoreCase));

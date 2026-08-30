@@ -1,4 +1,4 @@
-namespace Peerfluence.Core.Config;
+﻿namespace Peerfluence.Core.Config;
 
 public sealed class AppSettings
 {
@@ -9,6 +9,14 @@ public sealed class AppSettings
     public ThemeSettings Theme { get; set; } = new();
 
     public QueueSettings Queue { get; set; } = new();
+
+    public SeedingSettings Seeding { get; set; } = new();
+
+    public WatchFolderSettings WatchFolder { get; set; } = new();
+
+    public ScheduleSettings Schedule { get; set; } = new();
+
+    public AutoSearchSettings AutoSearch { get; set; } = new();
 
     public ProxySettings Proxy { get; set; } = new();
 
@@ -53,12 +61,11 @@ public sealed class AppSettings
 
     public string EncryptionMode { get; set; } = "Allow";
 
-    public bool EnableBlocklist { get; set; } = false;
+    public bool EnableBlocklist { get; set; }
 
     public string BlocklistPath { get; set; } = string.Empty;
 
-    public bool EnableGeoIp { get; set; } = false;
+    public bool EnableGeoIp { get; set; }
 
     public string GeoIpPath { get; set; } = string.Empty;
 }
-

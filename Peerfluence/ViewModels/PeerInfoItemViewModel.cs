@@ -37,13 +37,13 @@ public sealed class PeerInfoItemViewModel : ObservableObject
         private set => SetProperty(ref field, value);
     } = string.Empty;
 
-    public int DownloadSpeedBytesPerSecond
+    public long DownloadSpeedBytesPerSecond
     {
         get;
         private set => SetProperty(ref field, value);
     }
 
-    public int UploadSpeedBytesPerSecond
+    public long UploadSpeedBytesPerSecond
     {
         get;
         private set => SetProperty(ref field, value);

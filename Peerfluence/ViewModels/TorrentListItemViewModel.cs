@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Interfaces;
 using System;
@@ -76,13 +76,13 @@ public sealed class TorrentListItemViewModel : ViewModelBase
         set => SetProperty(ref field, value);
     }
 
-    public int DownloadSpeedBytesPerSecond
+    public long DownloadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
     }
 
-    public int UploadSpeedBytesPerSecond
+    public long UploadSpeedBytesPerSecond
     {
         get;
         set => SetProperty(ref field, value);
@@ -110,7 +110,15 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     /// What this row can do, so its context menu can bind to the commands directly instead of
     /// walking a visual tree it is not part of. Null only in tests that build a row on its own.
     /// </summary>
-    public ITorrentRowActions? Actions { get; internal set; }
+    /// <summary>
+    /// What the row asks to start, stop or remove itself. Handed over by the list that made it.
+    /// </summary>
+    /// <remarks>
+    /// <c>init</c> rather than <c>set</c>: it is assigned in the object initialiser that creates the
+    /// row and never again, and saying so is what stops it being a collaborator anybody could swap
+    /// out later.
+    /// </remarks>
+    public ITorrentRowActions? Actions { get; internal init; }
 
     /// <summary>
     /// Whether the torrent is running, so a row can offer the one action that makes sense for it
@@ -227,7 +235,7 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     private int _downloadSpeedSamples;
     private int _uploadSpeedSamples;
 
-    private static int UpdateSmoothedSpeed(int current, ref double smoothed, ref int samples)
+    private static long UpdateSmoothedSpeed(long current, ref double smoothed, ref int samples)
     {
         if (samples == 0)
         {
@@ -244,12 +252,12 @@ public sealed class TorrentListItemViewModel : ViewModelBase
                 smoothed = 0;
             }
             samples++;
-            return (int)Math.Round(smoothed);
+            return (long)Math.Round(smoothed);
         }
 
         double alpha = 2.0 / (SpeedSmoothingWindow + 1);
         smoothed = (alpha * current) + ((1.0 - alpha) * smoothed);
         samples++;
-        return (int)Math.Round(smoothed);
+        return (long)Math.Round(smoothed);
     }
 }

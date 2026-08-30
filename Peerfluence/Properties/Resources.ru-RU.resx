@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -560,7 +560,7 @@
     <value>Комментарий</value>
   </data>
   <data name="CreateTorrent_Create" xml:space="preserve">
-    <value>Создавать</value>
+    <value>Создавать...</value>
   </data>
   <data name="CreateTorrent_BrowseFile" xml:space="preserve">
     <value>Файл...</value>
@@ -662,7 +662,7 @@
     <value>Путь к файлу черного списка (.p2p, .txt, .dat)</value>
   </data>
   <data name="Settings_Browse" xml:space="preserve">
-    <value>Обзор</value>
+    <value>Обзор...</value>
   </data>
   <data name="Settings_Appearance" xml:space="preserve">
     <value>Внешний вид</value>
@@ -1017,12 +1017,6 @@
   </data>
   <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
     <value>Пример: --path «{downloadPath}» --name «{name}»</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
-    <value>Рабочий каталог</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
-    <value>{downloadPath}</value>
   </data>
   <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
     <value>Тайм-аут (секунды)</value>
@@ -1383,5 +1377,173 @@ Peerfluence распространяется по MIT License. Устанавл�
   </data>
   <data name="Settings_Search_ProwlarrNeedsIndexerId" xml:space="preserve">
     <value>Адрес заполнен, но замените 1 на идентификатор вашего индексатора: Prowlarr даёт каждому индексатору свой адрес и не имеет общего. Идентификатор виден в адресной строке, когда вы открываете индексатор в Prowlarr.</value>
+  </data>
+  <data name="Notification_MetadataStalled" xml:space="preserve">
+    <value>Метаданные не поступают</value>
+  </data>
+  <data name="Notification_ListenPortChanged" xml:space="preserve">
+    <value>Порт прослушивания изменён</value>
+  </data>
+  <data name="Notification_ListenPortChangedBody" xml:space="preserve">
+    <value>Не удалось занять порт {0}, поэтому используется {1}. Обновите переадресацию портов на маршрутизаторе.</value>
+  </data>
+  <data name="Notification_ProxyRestricted" xml:space="preserve">
+    <value>Прокси не может передавать UDP</value>
+  </data>
+  <data name="Notification_ProxyRestrictedBody" xml:space="preserve">
+    <value>Настроен HTTP-прокси, поэтому DHT и uTP отключены в этом сеансе. Используйте SOCKS5-прокси, чтобы сохранить их.</value>
+  </data>
+  <data name="Details_MoveStorage_Success" xml:space="preserve">
+    <value>Путь загрузки изменён, данные перемещены</value>
+  </data>
+  <data name="Details_Trackers_Scrape" xml:space="preserve">
+    <value>Запросить</value>
+  </data>
+  <data name="Details_Scrape_Failed" xml:space="preserve">
+    <value>Не удалось выполнить запрос: {0}</value>
+  </data>
+  <data name="Details_WebSeedsTab" xml:space="preserve">
+    <value>Веб-сиды</value>
+  </data>
+  <data name="Details_WebSeeds_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Details_WebSeeds_Add" xml:space="preserve">
+    <value>Добавить веб-сид</value>
+  </data>
+  <data name="Details_WebSeeds_Watermark" xml:space="preserve">
+    <value>https://example.com/files/</value>
+  </data>
+  <data name="Details_WebSeeds_Rejected" xml:space="preserve">
+    <value>Это не пригодный адрес веб-сида, либо он уже добавлен в торрент.</value>
+  </data>
+  <data name="Details_WebSeeds_Empty" xml:space="preserve">
+    <value>У этого торрента нет веб-сидов.</value>
+  </data>
+  <data name="Details_Files_Rename" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
+  <data name="Details_Rename_Failed" xml:space="preserve">
+    <value>Не удалось переименовать: {0}</value>
+  </data>
+  <data name="Details_SuperSeeding" xml:space="preserve">
+    <value>Суперраздача (BEP 16)</value>
+  </data>
+  <data name="Details_SuperSeedingHint" xml:space="preserve">
+    <value>Для одиночного сида, вводящего новое содержимое в пустой рой. Затем отключите: в сложившемся рое это тормозит пиров, которые могли бы качать свободно.</value>
+  </data>
+  <data name="Details_MaxConnections" xml:space="preserve">
+    <value>Макс. подключений</value>
+  </data>
+  <data name="Details_MaxUploadSlots" xml:space="preserve">
+    <value>Макс. слотов раздачи</value>
+  </data>
+  <data name="Details_ZeroMeansEngineDefault" xml:space="preserve">
+    <value>0 — использовать общую настройку</value>
+  </data>
+  <data name="Downloads_PauseAll" xml:space="preserve">
+    <value>Приостановить все</value>
+  </data>
+  <data name="Downloads_ResumeAll" xml:space="preserve">
+    <value>Возобновить все</value>
+  </data>
+  <data name="Status_SessionPaused" xml:space="preserve">
+    <value>Все торренты приостановлены</value>
+  </data>
+  <data name="Status_SessionResumed" xml:space="preserve">
+    <value>Торренты возобновлены</value>
+  </data>
+  <data name="Settings_BindAddress" xml:space="preserve">
+    <value>Привязать к адресу</value>
+  </data>
+  <data name="Settings_BindAddressHint" xml:space="preserve">
+    <value>Отправлять всё с одного локального адреса, например адреса VPN. Если этот адрес исчезнет, трафик остановится, а не пойдёт другим маршрутом — именно это делает настройку аварийным выключателем. Оставьте пустым, чтобы использовать все интерфейсы. Пока задано, сопоставление портов отключено.</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIp" xml:space="preserve">
+    <value>Подключений на адрес</value>
+  </data>
+  <data name="Settings_MaxConnectionsPerIpHint" xml:space="preserve">
+    <value>Сколько подключений один адрес может держать в пределах одного торрента. 0 — без ограничений. Один пир ненадолго держит несколько, пока попытка соединения пробует оба транспорта, поэтому задавайте значение исходя из своей сети, а не низким из принципа.</value>
+  </data>
+  <data name="Settings_BindAddressInvalid" xml:space="preserve">
+    <value>К этому адресу привязаться нельзя. Укажите собственный адрес этой машины, а не 0.0.0.0.</value>
+  </data>
+  <data name="Settings_Seeding" xml:space="preserve">
+    <value>Раздача</value>
+  </data>
+  <data name="Settings_SeedingHint" xml:space="preserve">
+    <value>Применяется к торрентам, добавленным с этого момента. У каждого торрента могут быть свои цели.</value>
+  </data>
+  <data name="Settings_LimitSeedingRatio" xml:space="preserve">
+    <value>Остановить при рейтинге</value>
+  </data>
+  <data name="Settings_LimitSeedingTime" xml:space="preserve">
+    <value>Остановить через минуты</value>
+  </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Загружено за сеанс</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Отдано за сеанс</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Рейтинг раздачи</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Торренты</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Подсчитано с момента запуска Peerfluence и сообщено самим движком.</value>
+  </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Отслеживаемая папка</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Добавлять торрент-файлы из папки</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Торрент-файлы, помещённые сюда, добавляются автоматически. Каждый переименовывается, а не удаляется.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Выберите папку для отслеживания</value>
+  </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Ограничения по расписанию</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Использовать другие ограничения в определённое время</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Пока окно открыто, эти ограничения заменяют указанные выше. Время окончания раньше времени начала проходит через полночь.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>С</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>До</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Дни</value>
+  </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Автоматический поиск</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Выполнять сохранённый поиск самостоятельно</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>Запрос выполняется на указанном выше индексаторе и добавляет то, чего ещё не добавлял. Пятнадцать минут — самый короткий интервал.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Запрос</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Каждые (минут)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Категория для добавленного</value>
   </data>
 </root>

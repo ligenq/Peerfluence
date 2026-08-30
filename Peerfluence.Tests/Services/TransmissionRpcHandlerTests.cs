@@ -279,7 +279,7 @@ public sealed class TransmissionRpcHandlerTests
     {
         var torrent = Torrent();
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
+        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
 
         var response = await CallAsync(
             """{"method":"torrent-get","arguments":{"fields":["rateDownload","rateUpload","peersConnected","eta"]}}""");
@@ -297,7 +297,7 @@ public sealed class TransmissionRpcHandlerTests
     {
         var torrent = Torrent();
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.Get(Hash).Returns(default(TorrentTransferSnapshot));
+        _snapshots.GetSnapshot(Hash).Returns(default(TorrentTransferSnapshot));
 
         var response = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["eta"]}}""");
 
@@ -318,7 +318,7 @@ public sealed class TransmissionRpcHandlerTests
         var running = Torrent();
         var stopped = Torrent(name: "stopped", started: false, state: TorrentState.Stopped);
         _torrentService.GetTorrents().Returns([running, stopped]);
-        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(1000, 250, 0, 0, 3));
+        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(1000, 250, 0, 0, 3));
 
         var response = await CallAsync("""{"method":"session-stats"}""");
 
@@ -350,7 +350,11 @@ public sealed class TransmissionRpcHandlerTests
     [Fact]
     public async Task FreeSpace_ForSomewhereThatCannotBeMeasured_IsMinusOne()
     {
-        var response = await CallAsync("""{"method":"free-space","arguments":{"path":"::not a path"}}""");
+        // A null character, which is the one thing neither Windows nor Linux allows in a path.
+        // "::not a path" is rejected by Windows and is a perfectly ordinary relative filename on
+        // Linux, where the measurement then succeeded and returned the real free space.
+        var response = await CallAsync(
+            """{"method":"free-space","arguments":{"path":"cannot\u0000measure"}}""");
 
         Assert.Equal(-1, response.GetProperty("arguments").GetProperty("size-bytes").GetInt64());
     }
@@ -366,7 +370,7 @@ public sealed class TransmissionRpcHandlerTests
         torrent.RatioLimit.Returns(1.5f);
         torrent.LastException.Returns(new InvalidOperationException("disk full"));
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(10, 20, 30, 40, 5));
+        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(10, 20, 30, 40, 5));
 
         var response = await CallAsync("""
             {"method":"torrent-get","arguments":{"fields":[
