@@ -96,7 +96,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80">
                                         <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate DataType="vm:AddTorrentFileOptionViewModel">
+                                            <DataTemplate DataType="vm:AddTorrentFileOptionViewModel" x:DataType="vm:AddTorrentFileOptionViewModel">
                                                 <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -105,10 +105,10 @@
                                     <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="120" IsReadOnly="True"/>
                                     <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160">
                                         <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate DataType="vm:AddTorrentFileOptionViewModel">
+                                            <DataTemplate DataType="vm:AddTorrentFileOptionViewModel" x:DataType="vm:AddTorrentFileOptionViewModel">
                                                 <ComboBox ItemsSource="{Binding PriorityOptions}" SelectedValue="{Binding Priority, Mode=TwoWay}" SelectedValueBinding="{Binding Value}">
                                                     <ComboBox.ItemTemplate>
-                                                        <DataTemplate>
+                                                        <DataTemplate x:DataType="vm:DisplayOption">
                                                             <TextBlock Text="{Binding DisplayName}"/>
                                                         </DataTemplate>
                                                     </ComboBox.ItemTemplate>

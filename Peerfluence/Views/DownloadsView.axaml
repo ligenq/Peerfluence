@@ -259,7 +259,7 @@
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="{m:L Downloads_Grid_Name}" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalLeftRightMargin}">
                                     <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
                                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
@@ -270,7 +270,7 @@
 
                     <DataGridTemplateColumn Header="{m:L Downloads_Grid_Progress}" Width="150">
                         <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel VerticalAlignment="Center" Margin="{StaticResource NormalLeftRightMargin}" Spacing="{StaticResource SpacingTiny}">
                                     <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource CornerRadiusSmall}" />
                                     <TextBlock Text="{Binding ProgressPercent, StringFormat='{}{0:F1}%'}" FontSize="{StaticResource FontSizeTiny}" HorizontalAlignment="Right" Opacity="{StaticResource OpacitySecondary}"/>
@@ -289,7 +289,7 @@
 
                     <DataGridTemplateColumn Header="{m:L Downloads_Grid_Down}" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
                                     <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource SukiPrimaryColor}"/>
                                     <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
@@ -300,7 +300,7 @@
 
                     <DataGridTemplateColumn Header="{m:L Downloads_Grid_Up}" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
                                     <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource SukiPrimaryColor}"/>
                                     <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -71,4 +71,15 @@ public static class PriorityOptions
     }
 }
 
-public sealed record EnumDisplayOption<TValue>(TValue Value, string DisplayName);
+/// <summary>
+/// The part of a choice that a list shows: its label.
+/// </summary>
+/// <remarks>
+/// Non-generic so that markup can name it. A DataTemplate declares the type of the thing it is
+/// given with x:DataType, and there is no way to write a closed generic there - which is why the
+/// templates for these choices were the only ones left binding by reflection.
+/// </remarks>
+public abstract record DisplayOption(string DisplayName);
+
+public sealed record EnumDisplayOption<TValue>(TValue Value, string DisplayName)
+    : DisplayOption(DisplayName);

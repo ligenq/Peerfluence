@@ -72,7 +72,7 @@
                             <TextBlock Text="{m:L Settings_ThemeVariant}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding ThemeVariantOptions}" SelectedValue="{Binding SelectedThemeVariant}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ThemeVariant}" AutomationProperties.AutomationId="ThemeVariantComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -82,7 +82,7 @@
                             <TextBlock Text="{m:L Settings_ColorTheme}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding ColorThemeOptions}" SelectedValue="{Binding SelectedColorTheme}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ColorTheme}" AutomationProperties.AutomationId="ColorThemeComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -92,7 +92,7 @@
                             <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_BackgroundStyle}" AutomationProperties.AutomationId="BackgroundStyleComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -102,7 +102,7 @@
                             <TextBlock Text="{m:L Settings_Language}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_Language}" AutomationProperties.AutomationId="LanguageComboBox">
                                 <ComboBox.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsOption">
                                         <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -504,7 +504,7 @@
                         <TextBlock Text="{m:L Settings_EncryptionMode}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <ComboBox ItemsSource="{Binding EncryptionModeOptions}" SelectedValue="{Binding SelectedEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_EncryptionMode}" AutomationProperties.AutomationId="EncryptionModeComboBox">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption">
                                     <TextBlock Text="{Binding DisplayName}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -553,7 +553,7 @@
                         <TextBlock Text="{m:L Settings_ProxyType}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <ComboBox ItemsSource="{Binding ProxyTypeOptions}" SelectedValue="{Binding SelectedProxyType}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_ProxyType}" AutomationProperties.AutomationId="ProxyTypeComboBox">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption">
                                     <TextBlock Text="{Binding DisplayName}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>

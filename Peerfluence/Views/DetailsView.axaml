@@ -72,7 +72,7 @@
 							<DataGrid.Columns>
 								<DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="50">
 									<DataGridTemplateColumn.CellTemplate>
-										<DataTemplate>
+										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
 											<CheckBox IsChecked="{Binding IsSelected}" HorizontalAlignment="Center"/>
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
@@ -85,7 +85,7 @@
                                                       SelectedValueBinding="{Binding Value}"
                                                       HorizontalAlignment="Stretch" Padding="{StaticResource TinyLeftRightTopBottomMargin}">
                                                 <ComboBox.ItemTemplate>
-                                                    <DataTemplate>
+                                                    <DataTemplate x:DataType="vm:DisplayOption">
                                                         <TextBlock Text="{Binding DisplayName}"/>
                                                     </DataTemplate>
                                                 </ComboBox.ItemTemplate>
@@ -281,7 +281,7 @@
 								<TextBlock Text="{m:L Details_Strategy}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
 								<ComboBox ItemsSource="{Binding DownloadStrategies}" SelectedValue="{Binding SelectedDownloadStrategy, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Details_Strategy}" AutomationProperties.AutomationId="DownloadStrategyComboBox">
                                     <ComboBox.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="vm:DisplayOption">
                                             <TextBlock Text="{Binding DisplayName}"/>
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>

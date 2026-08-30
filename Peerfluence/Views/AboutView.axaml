@@ -34,7 +34,7 @@
             <TextBlock Text="{m:L About_Packages}" FontWeight="SemiBold"/>
             <ItemsControl ItemsSource="{Binding Packages}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="x:String">
                         <TextBlock Text="{Binding}" Margin="{StaticResource XXSmallBottomMargin}" Opacity="{StaticResource OpacitySecondary}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

@@ -29,6 +29,105 @@ public sealed class XamlInteractionTests
     private const string TheCategoryChipStillToDo = "SetCategoryFilterCommand";
 
     [Fact]
+    public void EveryDataTemplate_SaysWhatItIsGiven()
+    {
+        // The project compiles its bindings, which is what turns a renamed property into a build
+        // error instead of a blank column. Inside a DataTemplate the DataContext is the item rather
+        // than the view, so the compiler cannot work out the type on its own: without x:DataType it
+        // falls back to binding by reflection, and the checking silently stops applying exactly
+        // where it is hardest to notice - list rows and grid cells.
+        //
+        // Half the templates here were doing that. The build was green either way.
+        var untyped = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(ViewsDirectory(), "*.axaml", SearchOption.AllDirectories))
+        {
+            var lines = File.ReadAllLines(file);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var start = lines[i].IndexOf("<DataTemplate", StringComparison.Ordinal);
+                if (start < 0)
+                {
+                    continue;
+                }
+
+                var end = EndOfTag(lines[i], start);
+                var tag = end < 0 ? lines[i][start..] : lines[i][start..(end + 1)];
+
+                if (!tag.Contains("x:DataType", StringComparison.Ordinal))
+                {
+                    untyped.Add($"  {Path.GetFileName(file)}:{i + 1} declares a DataTemplate without "
+                        + "x:DataType, so its bindings are not compiled and not checked.");
+                }
+            }
+        }
+
+        Assert.True(untyped.Count == 0, string.Join(Environment.NewLine, untyped));
+    }
+
+    [Fact]
+    public void EveryBoundPropertyThatCanChange_SaysWhenItDoes()
+    {
+        // A compiled binding proves the property exists. Nothing proves it tells anyone when it
+        // changes, and a property that quietly does not is the oldest bug in this framework: the
+        // screen is simply wrong, with nothing in the log and nothing to catch.
+        var silent = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(ViewsDirectory(), "*.axaml", SearchOption.AllDirectories))
+        {
+            var markup = File.ReadAllText(file);
+            var dataType = Regex.Match(markup, @"x:DataType=""vm:(\w+)""");
+            if (!dataType.Success)
+            {
+                continue;
+            }
+
+            var viewModel = Path.Combine(ProjectDirectory(), "ViewModels", dataType.Groups[1].Value + ".cs");
+            if (!File.Exists(viewModel))
+            {
+                continue;
+            }
+
+            var source = File.ReadAllText(viewModel);
+
+            foreach (var name in Regex.Matches(markup, @"\{Binding (\w+)[,}]")
+                         .Select(match => match.Groups[1].Value)
+                         .Distinct(StringComparer.Ordinal))
+            {
+                if (!TryFindProperty(source, name, out var kind, out var body))
+                {
+                    continue;
+                }
+
+                // Read only, so it cannot change behind the view's back.
+                if (!Regex.IsMatch(body, @"\bset\b"))
+                {
+                    continue;
+                }
+
+                // Announced by the setter, or by whichever method changes the state behind it.
+                if (body.Contains("SetProperty", StringComparison.Ordinal)
+                    || body.Contains("OnPropertyChanged", StringComparison.Ordinal)
+                    || source.Contains($"OnPropertyChanged(nameof({name}))", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                // A command is handed over once and never replaced.
+                if (kind.Contains("Command", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                silent.Add($"  {dataType.Groups[1].Value}.{name} is bound in {Path.GetFileName(file)} and "
+                    + "can be set, but never raises a change. The view will show whatever it saw first.");
+            }
+        }
+
+        Assert.True(silent.Count == 0, string.Join(Environment.NewLine, silent));
+    }
+
+    [Fact]
     public void EveryColumnThatFormatsItsValue_BindsOneWay()
     {
         // A DataGridTextColumn binds two ways unless told otherwise, and the grid asks the converter
@@ -390,4 +489,77 @@ public sealed class XamlInteractionTests
 
     private static string Relative(string path) =>
         Path.GetRelativePath(Directory.GetParent(ProjectDirectory())!.FullName, path);
+
+    /// <summary>
+    /// The declared type and body of a property, however it is written.
+    /// </summary>
+    /// <remarks>
+    /// Brace counting rather than a pattern for the shape, because the first version of this matched
+    /// only properties written across several lines - and a one-line <c>{ get; set; }</c> is both the
+    /// commonest way to write one and the likeliest to be the bug this rule is looking for. It found
+    /// nothing until it was asked the question properly.
+    /// </remarks>
+    private static bool TryFindProperty(string source, string name, out string kind, out string body)
+    {
+        kind = string.Empty;
+        body = string.Empty;
+
+        var declaration = Regex.Match(source, @"(?:public|internal) ([\w<>?\[\]\. ]+?) " + Regex.Escape(name) + @"\s*\{");
+        if (!declaration.Success)
+        {
+            return false;
+        }
+
+        int open = source.IndexOf('{', declaration.Index);
+        int depth = 0;
+
+        for (int i = open; i < source.Length; i++)
+        {
+            if (source[i] == '{')
+            {
+                depth++;
+            }
+            else if (source[i] == '}')
+            {
+                depth--;
+                if (depth == 0)
+                {
+                    kind = declaration.Groups[1].Value.Trim();
+                    body = source[(open + 1)..i];
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The closing angle bracket of the tag opening at <paramref name="start"/>.</summary>
+    private static int EndOfTag(string line, int start)
+    {
+        char quote = '\0';
+
+        for (int i = start + 1; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (quote != '\0')
+            {
+                if (c == quote)
+                {
+                    quote = '\0';
+                }
+            }
+            else if (c is '"' or '\'')
+            {
+                quote = c;
+            }
+            else if (c == '>')
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 }
