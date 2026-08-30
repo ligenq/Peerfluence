@@ -1,4 +1,4 @@
-using Peerfluence.Services.Mcp;
+﻿using Peerfluence.Services.Mcp;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
@@ -140,9 +140,39 @@ public class McpToolHandlerTests
     }
 
     [Fact]
+    public async Task ManageTorrentAsync_AnAllZeroHash_RemovesNothing()
+    {
+        // Forty zero characters parse into a perfectly valid InfoHash, and a v2 only torrent stores
+        // exactly that as its v1 hash because it does not have one. Resolving by comparing the
+        // stored hash directly therefore answered this request with a real torrent, and "remove"
+        // does what it says to whatever it is given.
+        var v2Only = Substitute.For<ITorrent>();
+        v2Only.Hash.Returns(InfoHash.Empty);
+        v2Only.HashV2.Returns(new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray()));
+        v2Only.State.Returns(TorrentState.Active);
+
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns([v2Only]);
+
+        var handler = new McpToolHandler(
+            torrentService,
+            Substitute.For<ITopLevelService>(),
+            CreateSettingsService(allowDestructiveTools: true),
+            Substitute.For<IHostApplicationLifetime>());
+
+        var result = await handler.ManageTorrentAsync(
+            new string('0', InfoHash.V1Length * 2), "remove", TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsError);
+        Assert.Contains("not found", Text(result), StringComparison.OrdinalIgnoreCase);
+        await torrentService.DidNotReceive().RemoveAsync(
+            Arg.Any<ITorrent>(), Arg.Any<PeerSharp.Config.RemoveOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ManageTorrentAsync_PauseResumeAndRemove_UseExpectedOperations()
     {
-        var infoHash = new InfoHash(new byte[20]);
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
         torrent.State.Returns(TorrentState.Active, TorrentState.Stopped);
@@ -170,7 +200,7 @@ public class McpToolHandlerTests
     [Fact]
     public async Task ManageTorrentAsync_Remove_IsDenied_WhenDestructiveToolsAreDisabled()
     {
-        var infoHash = new InfoHash(new byte[20]);
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
         var torrentService = Substitute.For<ITorrentService>();
@@ -192,7 +222,7 @@ public class McpToolHandlerTests
     [Fact]
     public async Task ManageTorrentAsync_Resume_ReturnsSuccess_WhenTorrentIsAlreadyActive()
     {
-        var infoHash = new InfoHash(new byte[20]);
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
         torrent.State.Returns(TorrentState.Active);
@@ -215,7 +245,7 @@ public class McpToolHandlerTests
     [Fact]
     public async Task ManageTorrentAsync_Pause_ReturnsSuccess_WhenTorrentIsAlreadyStopped()
     {
-        var infoHash = new InfoHash(new byte[20]);
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
         torrent.State.Returns(TorrentState.Stopped);
@@ -255,7 +285,7 @@ public class McpToolHandlerTests
     [Fact]
     public async Task SetFilePriorityAsync_UpdatesTorrentPriority_WhenInputsAreValid()
     {
-        var infoHash = new InfoHash(new byte[20]);
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
         var torrent = Substitute.For<ITorrent>();
         torrent.Hash.Returns(infoHash);
         torrent.FileCount.Returns(3);
@@ -278,7 +308,7 @@ public class McpToolHandlerTests
     [Fact]
     public async Task GetTorrentDiagnosticsAsync_ReturnsSerializedDiagnostics()
     {
-        var infoHash = new InfoHash(new byte[20]);
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
         var tracker = new TrackerStatus("udp://tracker.example", TrackerStatusType.Working);
 
         var peers = new[]

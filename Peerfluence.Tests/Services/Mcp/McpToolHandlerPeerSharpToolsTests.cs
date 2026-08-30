@@ -19,7 +19,8 @@ namespace Peerfluence.Tests.Services.Mcp;
 /// </remarks>
 public sealed class McpToolHandlerPeerSharpToolsTests
 {
-    private static readonly string Hash = new InfoHash(new byte[20]).ToHexString();
+    private static readonly InfoHash V1Hash = new(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray());
+    private static readonly string Hash = V1Hash.ToHexString();
 
     private static IAppSettingsService Settings(bool allowDestructiveTools = false)
     {
@@ -36,7 +37,8 @@ public sealed class McpToolHandlerPeerSharpToolsTests
         TorrentState state = TorrentState.Stopped)
     {
         var torrent = Substitute.For<ITorrent>();
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(V1Hash);
+        torrent.HashV2.Returns(InfoHash.EmptyV2);
         torrent.State.Returns(state);
 
         var torrentService = Substitute.For<ITorrentService>();
@@ -82,6 +84,28 @@ public sealed class McpToolHandlerPeerSharpToolsTests
         // Left alone rather than reset to zero, which is what an omitted value has to mean if the
         // tool is to be usable for changing one setting.
         Assert.Equal(0, torrent.MaxConnections);
+    }
+
+    [Fact]
+    public async Task ConfiguringAV2OnlyTorrent_ResolvesItsV2Hash()
+    {
+        var v2Hash = new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray());
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Hash.Returns(InfoHash.Empty);
+        torrent.HashV2.Returns(v2Hash);
+
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns([torrent]);
+        var handler = new McpToolHandler(
+            torrentService,
+            Substitute.For<ITopLevelService>(),
+            Settings(),
+            Substitute.For<IHostApplicationLifetime>());
+
+        var result = await handler.ConfigureTorrentAsync(v2Hash.ToHexString(), maxConnections: 12);
+
+        Assert.False(result.IsError);
+        Assert.Equal(12, torrent.MaxConnections);
     }
 
     [Fact]

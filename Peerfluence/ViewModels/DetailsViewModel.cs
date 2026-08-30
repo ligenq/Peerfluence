@@ -838,7 +838,7 @@ public sealed class DetailsViewModel : ViewModelBase
             {
                 RecheckStatus = string.Format(Properties.Resources.Details_Recheck_Complete, validPieces);
                 IsRechecking = false;
-                if (_selectionService.SelectedTorrent?.Hash == torrent.Hash)
+                if (MatchesSelectedTorrent(torrent))
                 {
                     TriggerRefresh();
                 }
@@ -1028,7 +1028,13 @@ public sealed class DetailsViewModel : ViewModelBase
         try
         {
             await torrent.Trackers.ScrapeAsync().ConfigureAwait(false);
-            UIDispatcher(() => UpdateTrackers(torrent.Trackers.GetTrackers()));
+            UIDispatcher(() =>
+            {
+                if (MatchesSelectedTorrent(torrent))
+                {
+                    UpdateTrackers(torrent.Trackers.GetTrackers());
+                }
+            });
         }
         catch (Exception ex)
         {
