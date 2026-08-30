@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 using Peerfluence.Core;
+using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
 using Peerfluence.ViewModels;
 
@@ -18,6 +19,14 @@ namespace Peerfluence.Tests.Architecture;
 /// </remarks>
 public sealed class CompositionTests
 {
+    private static readonly (Type Type, string MethodNamePart)[] AsyncVoidEventHandlers =
+    [
+        // Avalonia's Opened event and FileSystemWatcher's change events require void delegates.
+        // Keep the exceptions exact: a method merely shaped like an event handler is not one.
+        (typeof(App), "OnMainWindowOpened"),
+        (typeof(WatchFolderHostedService), "OnAppeared"),
+    ];
+
     /// <summary>
     /// The interfaces that only work on the UI thread, and do not say so anywhere.
     /// </summary>
@@ -48,9 +57,27 @@ public sealed class CompositionTests
         // method's state machine in a try/catch of its own to hand the exception to the builder, so
         // an author's catch and the compiler's are indistinguishable from here. That part stays a
         // convention, and there are two handlers to keep it in.
+        var offenders = AsyncVoidOffenders(AllProductionTypes());
+
+        Assert.True(offenders.Count == 0, string.Join(Environment.NewLine, offenders));
+    }
+
+    [Fact]
+    public void NoAsyncVoidRule_InspectsCompilerGeneratedTypes()
+    {
+        var fixtureTypes = typeof(CompositionTests).Assembly.GetTypes()
+            .Where(type => IsDeclaredWithin(type, typeof(AsyncVoidFixture)));
+
+        var offenders = AsyncVoidOffenders(fixtureTypes);
+
+        Assert.Contains(offenders, offender => offender.Contains("BadAsyncVoid", StringComparison.Ordinal));
+    }
+
+    private static List<string> AsyncVoidOffenders(IEnumerable<Type> types)
+    {
         var offenders = new List<string>();
 
-        foreach (var type in ProductionTypes())
+        foreach (var type in types)
         {
             foreach (var method in type.GetMethods(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
@@ -61,10 +88,9 @@ public sealed class CompositionTests
                     continue;
                 }
 
-                var parameters = method.GetParameters();
-                var looksLikeAHandler = parameters.Length == 2 && parameters[0].ParameterType == typeof(object);
-
-                if (!looksLikeAHandler)
+                if (!AsyncVoidEventHandlers.Any(handler =>
+                        IsDeclaredWithin(type, handler.Type)
+                        && method.Name.Contains(handler.MethodNamePart, StringComparison.Ordinal)))
                 {
                     offenders.Add(
                         $"  {type.Name}.{method.Name} is async void without being an event handler. "
@@ -73,7 +99,15 @@ public sealed class CompositionTests
             }
         }
 
-        Assert.True(offenders.Count == 0, string.Join(Environment.NewLine, offenders));
+        return offenders;
+    }
+
+    private sealed class AsyncVoidFixture
+    {
+        public static async void BadAsyncVoid()
+        {
+            await Task.Yield();
+        }
     }
 
     [Fact]
@@ -96,7 +130,7 @@ public sealed class CompositionTests
 
         foreach (var type in ProductionTypes())
         {
-            if (type.Namespace?.EndsWith(".Services", StringComparison.Ordinal) != true)
+            if (!IsServicesNamespace(type.Namespace))
             {
                 continue;
             }
@@ -141,27 +175,48 @@ public sealed class CompositionTests
 
         foreach (var method in graph.Callers)
         {
-            var callees = graph.CalleesOf(method);
+            var calls = graph.CallsOf(method);
             // Constructing one of these is not using it: the container makes both managers on
             // whatever thread first asks for a service, which the smoke test does with no UI thread
             // anywhere and no complaint.
-            if (!callees.Any(callee =>
-                    !callee.EndsWith("::.ctor", StringComparison.Ordinal)
-                    && UiThreadOnly.Any(prefix => callee.StartsWith(prefix, StringComparison.Ordinal))))
+            var firstUiCall = -1;
+            var firstVerification = -1;
+
+            for (int i = 0; i < calls.Count; i++)
+            {
+                var callee = calls[i];
+                if (firstVerification < 0
+                    && callee.EndsWith("::VerifyAccess", StringComparison.Ordinal))
+                {
+                    firstVerification = i;
+                }
+
+                if (firstUiCall < 0
+                    && !callee.EndsWith("::.ctor", StringComparison.Ordinal)
+                    && UiThreadOnly.Any(prefix => callee.StartsWith(prefix, StringComparison.Ordinal)))
+                {
+                    firstUiCall = i;
+                }
+            }
+
+            if (firstUiCall < 0)
             {
                 continue;
             }
 
-            // Said out loud: this method requires the UI thread and checks that it has it.
-            if (callees.Any(callee => callee.EndsWith("::VerifyAccess", StringComparison.Ordinal)))
+            // A generated delegate that is the argument to Dispatcher.Post/Invoke is safe by
+            // construction. The call graph records that exact target, rather than trusting every
+            // lambda produced by the same owner.
+            if (graph.MarshalledMethods.Contains(method))
             {
                 continue;
             }
 
-            // Or it is a lambda or state machine belonging to a method that has already answered
-            // for itself, which is where the answer belongs: a lambda cannot call VerifyAccess
-            // before it exists, and it runs wherever the method that made it runs.
-            if (OwnerAnswersForIt(graph, method))
+            // Said before the first thread-affine call, in the same method that makes it. Checking
+            // only for the presence of VerifyAccess let a check after the unsafe call pass. Letting
+            // an owner answer for a generated lambda was weaker still: one posted lambda made an
+            // unrelated background lambda look safe.
+            if (firstVerification >= 0 && firstVerification < firstUiCall)
             {
                 continue;
             }
@@ -176,53 +231,14 @@ public sealed class CompositionTests
             }
 
             offenders.Add(
-                $"  {method} reaches a UI-thread-only interface without marshalling onto the UI "
-                    + "thread or calling Dispatcher.UIThread.VerifyAccess().");
+                $"  {method} reaches a UI-thread-only interface before calling "
+                    + "Dispatcher.UIThread.VerifyAccess() in that same method.");
         }
 
         Assert.True(
             offenders.Count == 0,
             $"{offenders.Count} places touch the interface from wherever they happen to be running:"
                 + $"{Environment.NewLine}{string.Join(Environment.NewLine, offenders)}");
-    }
-
-    /// <summary>
-    /// Whether the method that produced this lambda has already answered for the UI thread.
-    /// </summary>
-    /// <remarks>
-    /// A lambda compiles to a member of a generated type, so the code inside
-    /// <c>Dispatcher.UIThread.Post(() =&gt; ...)</c> - or inside a prompt being described - is a
-    /// separate method that appears to touch the interface from nowhere in particular. Asking who it
-    /// was generated for, and whether that method marshals or declares, is how the shape is
-    /// recognised. An async method's state machine is the same shape and gets the same answer.
-    /// </remarks>
-    private static bool OwnerAnswersForIt(CallGraph graph, string method)
-    {
-        var separator = method.IndexOf("::", StringComparison.Ordinal);
-        if (separator < 0)
-        {
-            return false;
-        }
-
-        if (!CallGraph.TryGetGeneratedOwner(method[..separator], method[(separator + 2)..], out var owner))
-        {
-            return false;
-        }
-
-        // An async owner keeps its body in a state machine, so what it "calls" directly is that
-        // machine and little else. The declaration lives one level in.
-        var ownerCalls = graph.CalleesOf(owner)
-            .SelectMany(callee => callee.Contains(">d__", StringComparison.Ordinal)
-                ? graph.CalleesOf(callee).Append(callee)
-                : [callee])
-            .ToList();
-
-        return ownerCalls.Any(callee => callee.EndsWith("::VerifyAccess", StringComparison.Ordinal))
-            || ownerCalls.Any(callee =>
-                callee.StartsWith("Avalonia.Threading.Dispatcher::", StringComparison.Ordinal)
-                && (callee.EndsWith("::Post", StringComparison.Ordinal)
-                    || callee.EndsWith("::Invoke", StringComparison.Ordinal)
-                    || callee.EndsWith("::InvokeAsync", StringComparison.Ordinal)));
     }
 
     [Fact]
@@ -312,6 +328,47 @@ public sealed class CompositionTests
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Every emitted production type, including static classes and generated lambda containers.
+    /// </summary>
+    /// <remarks>
+    /// Async lambdas live in compiler-generated types. Filtering those types is appropriate for
+    /// architectural ownership rules, but doing it for async-void would exclude the most common way
+    /// to accidentally create one.
+    /// </remarks>
+    private static IEnumerable<Type> AllProductionTypes() =>
+        new[]
+        {
+            typeof(ViewModelBase).Assembly,
+            typeof(Peerfluence.Core.Services.ITorrentService).Assembly,
+        }
+        .SelectMany(assembly => assembly.GetTypes());
+
+    private static bool IsDeclaredWithin(Type candidate, Type owner)
+    {
+        for (var current = candidate; current is not null; current = current.DeclaringType)
+        {
+            if (current == owner)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsServicesNamespace(string? typeNamespace) =>
+        typeNamespace is not null
+        && (typeNamespace.EndsWith(".Services", StringComparison.Ordinal)
+            || typeNamespace.Contains(".Services.", StringComparison.Ordinal));
+
+    [Fact]
+    public void ServiceCollectionRule_IncludesNestedServiceNamespaces()
+    {
+        Assert.True(IsServicesNamespace(typeof(McpServerHostedService).Namespace));
+        Assert.True(IsServicesNamespace(typeof(Peerfluence.Core.Services.Rpc.TransmissionRpcHandler).Namespace));
     }
 
     [Fact]
