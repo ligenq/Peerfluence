@@ -1,4 +1,4 @@
-using Peerfluence.Core.Config;
+﻿using Peerfluence.Core.Config;
 using System.Text.Json.Serialization;
 
 namespace Peerfluence.Core.Services;
@@ -8,6 +8,7 @@ namespace Peerfluence.Core.Services;
 [JsonSerializable(typeof(NetworkSettings))]
 [JsonSerializable(typeof(ThemeSettings))]
 [JsonSerializable(typeof(QueueSettings))]
+[JsonSerializable(typeof(SeedingSettings))]
 [JsonSerializable(typeof(ProxySettings))]
 [JsonSerializable(typeof(UpdateSettings))]
 [JsonSerializable(typeof(CompletionActionSettings))]

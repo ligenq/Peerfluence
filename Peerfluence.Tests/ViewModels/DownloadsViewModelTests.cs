@@ -36,7 +36,7 @@ public class DownloadsViewModelTests
         _settingsService = settingsService;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
         var engineService = new TorrentEngineService(settingsService, loggerFactory);
-        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
         var notificationService = Substitute.For<INotificationService>();
 
         _detailsVm = new DetailsViewModel(

@@ -54,7 +54,7 @@ public sealed class AddRoundTripTests
         });
 
         var engineService = Substitute.For<ITorrentEngineService>();
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(handler));
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(handler), SeedingDefaults.Off);
 
         // The engine is a substitute, so the assertion is on what it was handed rather than on what
         // it did with it - which is the whole question here.
@@ -104,7 +104,7 @@ public sealed class AddRoundTripTests
         });
 
         var engineService = Substitute.For<ITorrentEngineService>();
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(handler));
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(handler), SeedingDefaults.Off);
 
         await Assert.ThrowsAnyAsync<Exception>(() => sut.AddTorrentFromUrlAsync(
             "https://example.invalid/not-a-torrent",

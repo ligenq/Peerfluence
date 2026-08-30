@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -1467,5 +1467,17 @@
   </data>
   <data name="Settings_BindAddressInvalid" xml:space="preserve">
     <value>Not an address this can bind to. Use one of your machine’s own addresses, not 0.0.0.0.</value>
+  </data>
+  <data name="Settings_Seeding" xml:space="preserve">
+    <value>Seeding</value>
+  </data>
+  <data name="Settings_SeedingHint" xml:space="preserve">
+    <value>Applies to torrents added from now on. Each torrent can still be given goals of its own.</value>
+  </data>
+  <data name="Settings_LimitSeedingRatio" xml:space="preserve">
+    <value>Stop at ratio</value>
+  </data>
+  <data name="Settings_LimitSeedingTime" xml:space="preserve">
+    <value>Stop after minutes</value>
   </data>
 </root>

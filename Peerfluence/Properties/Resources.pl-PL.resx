@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -1473,5 +1473,17 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   </data>
   <data name="Settings_BindAddressInvalid" xml:space="preserve">
     <value>To nie jest adres, z którym można się powiązać. Użyj własnego adresu tego komputera, nie 0.0.0.0.</value>
+  </data>
+  <data name="Settings_Seeding" xml:space="preserve">
+    <value>Udostępnianie</value>
+  </data>
+  <data name="Settings_SeedingHint" xml:space="preserve">
+    <value>Dotyczy torrentów dodanych od teraz. Każdy torrent nadal może mieć własne cele.</value>
+  </data>
+  <data name="Settings_LimitSeedingRatio" xml:space="preserve">
+    <value>Zatrzymaj przy współczynniku</value>
+  </data>
+  <data name="Settings_LimitSeedingTime" xml:space="preserve">
+    <value>Zatrzymaj po minutach</value>
   </data>
 </root>

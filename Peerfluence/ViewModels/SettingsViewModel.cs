@@ -761,6 +761,31 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, Math.Max(0, value));
     } = 3;
 
+    // Seeding goals. What a torrent is told when nobody tells it anything.
+    public bool LimitSeedingRatio
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public float SeedingRatioLimit
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0f, value));
+    } = 2.0f;
+
+    public bool LimitSeedingTime
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public int SeedingTimeLimitMinutes
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    } = 1440;
+
     public int MaxActiveSeeds
     {
         get;
@@ -1078,6 +1103,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = settings.Queue.EnableQueueManagement;
         MaxActiveDownloads = settings.Queue.MaxActiveDownloads;
         MaxActiveSeeds = settings.Queue.MaxActiveSeeds;
+        LimitSeedingRatio = settings.Seeding.LimitRatio;
+        SeedingRatioLimit = settings.Seeding.RatioLimit;
+        LimitSeedingTime = settings.Seeding.LimitSeedTime;
+        SeedingTimeLimitMinutes = settings.Seeding.SeedTimeLimitMinutes;
 
         // Misc
         EnableBlocklist = settings.EnableBlocklist;
@@ -1177,6 +1206,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Queue.EnableQueueManagement = EnableQueueManagement;
             settings.Queue.MaxActiveDownloads = MaxActiveDownloads;
             settings.Queue.MaxActiveSeeds = MaxActiveSeeds;
+            settings.Seeding.LimitRatio = LimitSeedingRatio;
+            settings.Seeding.RatioLimit = SeedingRatioLimit;
+            settings.Seeding.LimitSeedTime = LimitSeedingTime;
+            settings.Seeding.SeedTimeLimitMinutes = SeedingTimeLimitMinutes;
 
             // Misc
             settings.EnableBlocklist = EnableBlocklist;
@@ -1311,6 +1344,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
         MaxActiveSeeds = defaults.Queue.MaxActiveSeeds;
+        LimitSeedingRatio = defaults.Seeding.LimitRatio;
+        SeedingRatioLimit = defaults.Seeding.RatioLimit;
+        LimitSeedingTime = defaults.Seeding.LimitSeedTime;
+        SeedingTimeLimitMinutes = defaults.Seeding.SeedTimeLimitMinutes;
         EnableBlocklist = defaults.EnableBlocklist;
         BlocklistPath = defaults.BlocklistPath;
         EnableGeoIp = defaults.EnableGeoIp;

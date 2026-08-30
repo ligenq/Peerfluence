@@ -1,4 +1,4 @@
-namespace Peerfluence.Core.Config;
+﻿namespace Peerfluence.Core.Config;
 
 public sealed class AppSettings
 {
@@ -9,6 +9,8 @@ public sealed class AppSettings
     public ThemeSettings Theme { get; set; } = new();
 
     public QueueSettings Queue { get; set; } = new();
+
+    public SeedingSettings Seeding { get; set; } = new();
 
     public ProxySettings Proxy { get; set; } = new();
 
