@@ -350,7 +350,11 @@ public sealed class TransmissionRpcHandlerTests
     [Fact]
     public async Task FreeSpace_ForSomewhereThatCannotBeMeasured_IsMinusOne()
     {
-        var response = await CallAsync("""{"method":"free-space","arguments":{"path":"::not a path"}}""");
+        // A null character, which is the one thing neither Windows nor Linux allows in a path.
+        // "::not a path" is rejected by Windows and is a perfectly ordinary relative filename on
+        // Linux, where the measurement then succeeded and returned the real free space.
+        var response = await CallAsync(
+            """{"method":"free-space","arguments":{"path":"cannot\u0000measure"}}""");
 
         Assert.Equal(-1, response.GetProperty("arguments").GetProperty("size-bytes").GetInt64());
     }
