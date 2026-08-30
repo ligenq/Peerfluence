@@ -1018,12 +1018,6 @@
   <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
     <value>Example: --path &quot;{downloadPath}&quot; --name &quot;{name}&quot;</value>
   </data>
-  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
-    <value>Working directory</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
-    <value>{downloadPath}</value>
-  </data>
   <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
     <value>Timeout (seconds)</value>
   </data>

@@ -845,6 +845,24 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = string.Empty;
 
+    /// <summary>
+    /// Where the completion action runs. No longer shown on the settings screen.
+    /// </summary>
+    /// <remarks>
+    /// The behaviour is worth having - a script that unpacks or moves what was downloaded works in
+    /// relative paths, and without this it works relative to wherever Peerfluence was started from -
+    /// but the field was not. Its only sensible values were the default and empty, a directory that
+    /// does not exist stops the action running at all rather than falling back, and it was the
+    /// fourth of five boxes in the densest card on the screen.
+    ///
+    /// <para>
+    /// Kept rather than deleted because of Reset defaults, which works by assigning every property
+    /// on this screen from a fresh <c>AppSettings</c>. Without it, resetting would put everything
+    /// back except this, and a hand-edited working directory would outlive the reset that was meant
+    /// to clear it. Saving would preserve the value either way: <c>ApplyToSettings</c> mutates the
+    /// stored settings in place, so what nobody assigns is left alone.
+    /// </para>
+    /// </remarks>
     public string CompletionActionWorkingDirectoryTemplate
     {
         get;

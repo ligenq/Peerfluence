@@ -1018,12 +1018,6 @@
   <data name="Settings_CompletionActionArgumentsWatermark" xml:space="preserve">
     <value>Приклад: --path "{downloadPath}" --name "{name}"</value>
   </data>
-  <data name="Settings_CompletionActionWorkingDirectory" xml:space="preserve">
-    <value>Робочий каталог</value>
-  </data>
-  <data name="Settings_CompletionActionWorkingDirectoryWatermark" xml:space="preserve">
-    <value>{downloadPath}</value>
-  </data>
   <data name="Settings_CompletionActionTimeoutSeconds" xml:space="preserve">
     <value>Час очікування (секунди)</value>
   </data>

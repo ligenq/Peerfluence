@@ -223,11 +223,6 @@
                             <TextBox Text="{Binding CompletionActionArgumentsTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionArgumentsWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionArguments}" AutomationProperties.AutomationId="CompletionActionArgumentsTemplateTextBox"/>
                         </StackPanel>
 
-                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_CompletionActionWorkingDirectory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <TextBox Text="{Binding CompletionActionWorkingDirectoryTemplate, Mode=TwoWay}" PlaceholderText="{m:L Settings_CompletionActionWorkingDirectoryWatermark}" AutomationProperties.Name="{m:L Settings_CompletionActionWorkingDirectory}" AutomationProperties.AutomationId="CompletionActionWorkingDirectoryTemplateTextBox"/>
-                        </StackPanel>
-
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                             <StackPanel Spacing="{StaticResource SpacingXSmall}">
                                 <TextBlock Text="{m:L Settings_CompletionActionTimeoutSeconds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
