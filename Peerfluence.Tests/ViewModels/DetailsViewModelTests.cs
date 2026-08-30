@@ -217,7 +217,7 @@ public class DetailsViewModelTests
     {
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Test Torrent");
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
         torrent.State.Returns(TorrentState.Active);
 
         var files = Substitute.For<IFiles>();
@@ -287,6 +287,31 @@ public class DetailsViewModelTests
         await notified.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
 
         Assert.True(_sut.RenameFileCommand.CanExecute(file));
+    }
+
+    [Fact]
+    public async Task ScrapeCompletingAfterSelectionChanges_DoesNotReplaceTheNewTorrentsTrackers()
+    {
+        var first = CreateRefreshableTorrent("First", 1);
+        var second = CreateRefreshableTorrent("Second", 2);
+        var scrape = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        first.Trackers
+            .ScrapeAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(scrape.Task);
+        first.Trackers.GetTrackers().Returns([
+            new TrackerStatus("https://first.invalid/announce", TrackerStatusType.Working)
+        ]);
+        _sut.Trackers.Add(new TrackerStatusItemViewModel(
+            new TrackerStatus("https://second.invalid/announce", TrackerStatusType.Working)));
+
+        _selectionService.SelectedTorrent = first;
+        var command = _sut.ScrapeCommand.ExecuteAsync(null);
+        _selectionService.SelectedTorrent = second;
+        scrape.SetResult();
+        await command;
+
+        var tracker = Assert.Single(_sut.Trackers);
+        Assert.Equal("https://second.invalid/announce", tracker.Url);
     }
 
     private static ITorrent CreateRefreshableTorrent(string name, byte hashSeed)
@@ -361,7 +386,7 @@ public class DetailsViewModelTests
     private IPeers SelectTorrentWithPeers()
     {
         var torrent = Substitute.For<ITorrent>();
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
         var peers = Substitute.For<IPeers>();
         torrent.Peers.Returns(peers);
         _selectionService.SelectedTorrent = torrent;

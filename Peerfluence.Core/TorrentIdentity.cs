@@ -1,4 +1,4 @@
-using PeerSharp.Core;
+﻿using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Core;
@@ -13,6 +13,20 @@ namespace Peerfluence.Core;
 /// ones. Empty hashes are equal to each other, so comparing the pairs directly says every V1
 /// torrent is every other V1 torrent. An absent hash is not evidence of identity, and this is the
 /// one place that knows it.
+/// </para>
+///
+/// <para>
+/// Written here because PeerSharp 4.0.0 offers no public form of the question. The next version
+/// does - <c>InfoHash.Matches</c> and <c>TorrentIdentity.HasHash</c> - and that one also handles
+/// the BEP 52 truncated V2 hash, which is what the world actually refers to a V2 torrent by and
+/// which this deliberately does not reimplement. When the package moves, this forwards to the
+/// library or goes away.
+/// </para>
+///
+/// <para>
+/// <see cref="SameTorrent"/> would stay even then: <c>ITorrent.HasSameIdentity</c> answers the same
+/// question, but it is an interface method, so under a substitute it answers whatever the substitute
+/// was told to. Reading the two hash properties works with a real torrent and a fake one alike.
 /// </para>
 /// </summary>
 public static class TorrentIdentity

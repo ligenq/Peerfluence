@@ -1,4 +1,5 @@
 ﻿using System;
+using Peerfluence.Core;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -166,7 +167,7 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
                 return Task.FromResult(ResourceError("Invalid info hash format.", "invalid_info_hash"));
             }
 
-            var torrent = _torrentEngineService.Engine.GetTorrents().FirstOrDefault(t => t.Hash == parsedInfoHash);
+            var torrent = _torrentEngineService.Engine.GetTorrents().FirstOrDefault(t => TorrentIdentity.HasHash(t, parsedInfoHash));
             if (torrent == null)
             {
                 return Task.FromResult(ResourceError("Torrent not found.", "torrent_not_found"));
@@ -200,7 +201,7 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
                 return Task.FromResult(ResourceError("Invalid info hash format.", "invalid_info_hash"));
             }
 
-            var torrent = _torrentEngineService.Engine.GetTorrents().FirstOrDefault(t => t.Hash == parsedInfoHash);
+            var torrent = _torrentEngineService.Engine.GetTorrents().FirstOrDefault(t => TorrentIdentity.HasHash(t, parsedInfoHash));
             if (torrent == null)
             {
                 return Task.FromResult(ResourceError("Torrent not found.", "torrent_not_found"));

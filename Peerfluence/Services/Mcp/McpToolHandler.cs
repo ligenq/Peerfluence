@@ -10,6 +10,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Protocol;
+using Peerfluence.Core;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Services.Mcp;
@@ -134,7 +135,7 @@ public class McpToolHandler : IMcpToolHandler
             }
 
             var torrents = _torrentService.GetTorrents();
-            var torrent = torrents.FirstOrDefault(t => t.Hash == infoHash);
+            var torrent = torrents.FirstOrDefault(t => TorrentIdentity.HasHash(t, infoHash));
 
             if (torrent == null)
             {
@@ -416,7 +417,7 @@ public class McpToolHandler : IMcpToolHandler
             return false;
         }
 
-        var found = _torrentService.GetTorrents().FirstOrDefault(t => t.Hash == infoHash);
+        var found = _torrentService.GetTorrents().FirstOrDefault(t => TorrentIdentity.HasHash(t, infoHash));
         if (found == null)
         {
             error = ToolError("Torrent not found.", "torrent_not_found");
@@ -670,7 +671,7 @@ public class McpToolHandler : IMcpToolHandler
             }
 
             var torrents = _torrentService.GetTorrents();
-            var torrent = torrents.FirstOrDefault(t => t.Hash == infoHash);
+            var torrent = torrents.FirstOrDefault(t => TorrentIdentity.HasHash(t, infoHash));
 
             if (torrent == null)
             {
@@ -728,7 +729,7 @@ public class McpToolHandler : IMcpToolHandler
                 return ToolError("Invalid info hash format.", "invalid_info_hash");
             }
 
-            var torrent = _torrentService.GetTorrents().FirstOrDefault(t => t.Hash == infoHash);
+            var torrent = _torrentService.GetTorrents().FirstOrDefault(t => TorrentIdentity.HasHash(t, infoHash));
             if (torrent == null)
             {
                 return ToolError("Torrent not found.", "torrent_not_found");

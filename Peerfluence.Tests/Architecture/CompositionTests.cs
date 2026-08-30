@@ -19,6 +19,71 @@ namespace Peerfluence.Tests.Architecture;
 public sealed class CompositionTests
 {
     [Fact]
+    public void NoTorrentIsIdentifiedByComparingHashesDirectly()
+    {
+        // A torrent carries a v1 and a v2 hash and almost never has both; the missing one is stored
+        // as InfoHash.Empty, an ordinary all-zero value that equals itself. So == on the stored
+        // hashes says every torrent lacking a v2 hash is every other torrent lacking one, and a
+        // lookup for the empty hash - which forty zero characters parse into - answers with the
+        // first torrent that has no hash of that version. The MCP tools do things to whatever they
+        // are answered with, one of which is removing it.
+        //
+        // TorrentIdentity is the one place that knows this. Everywhere else asks it.
+        var offenders = new List<string>();
+
+        foreach (var file in ProductionSourceFiles())
+        {
+            if (Path.GetFileName(file) == "TorrentIdentity.cs")
+            {
+                continue;
+            }
+
+            var lines = File.ReadAllLines(file);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                if (line.Contains(".Hash ==", StringComparison.Ordinal)
+                    || line.Contains(".HashV2 ==", StringComparison.Ordinal)
+                    || line.Contains(".Hash !=", StringComparison.Ordinal)
+                    || line.Contains(".HashV2 !=", StringComparison.Ordinal))
+                {
+                    offenders.Add($"  {Path.GetFileName(file)}:{i + 1}  {line.Trim()}");
+                }
+            }
+        }
+
+        Assert.True(
+            offenders.Count == 0,
+            $"{offenders.Count} places compare info hashes directly. Ask TorrentIdentity.HasHash or "
+                + $"TorrentIdentity.SameTorrent instead:{Environment.NewLine}"
+                + string.Join(Environment.NewLine, offenders));
+    }
+
+    /// <summary>Every .cs file that ships, in either project.</summary>
+    private static IEnumerable<string> ProductionSourceFiles()
+    {
+        var root = Directory.GetParent(ProjectDirectory())!.FullName;
+
+        foreach (var project in new[] { "Peerfluence", "Peerfluence.Core" })
+        {
+            var directory = Path.Combine(root, project);
+            if (!Directory.Exists(directory))
+            {
+                continue;
+            }
+
+            foreach (var file in Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories))
+            {
+                if (!file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
+                    && !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+                {
+                    yield return file;
+                }
+            }
+        }
+    }
+
+    [Fact]
     public void EveryNavigationPage_HasAViewToShowIt()
     {
         // A view model reaching ViewLocator with no entry renders a TextBlock reading "view not

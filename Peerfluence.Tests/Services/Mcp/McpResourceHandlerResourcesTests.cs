@@ -21,7 +21,7 @@ namespace Peerfluence.Tests.Services.Mcp;
 [Collection("Messenger")]
 public sealed class McpResourceHandlerResourcesTests : IDisposable
 {
-    private static readonly string Hash = new InfoHash(new byte[20]).ToHexString();
+    private static readonly string Hash = new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()).ToHexString();
 
     private readonly List<McpResourceHandler> _handlers = [];
 
@@ -59,7 +59,7 @@ public sealed class McpResourceHandlerResourcesTests : IDisposable
     private static ITorrent Torrent()
     {
         var torrent = Substitute.For<ITorrent>();
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
         torrent.Name.Returns("A Torrent");
         torrent.State.Returns(TorrentState.Active);
         torrent.Peers.GetConnectedPeers().Returns([]);
@@ -204,7 +204,7 @@ public sealed class McpResourceHandlerResourcesTests : IDisposable
     {
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns(torrentName);
-        torrent.Hash.Returns(new InfoHash(new byte[20]));
+        torrent.Hash.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V1Length).ToArray()));
 
         WeakReferenceMessenger.Default.Send(
             new TorrentAlertMessage(
