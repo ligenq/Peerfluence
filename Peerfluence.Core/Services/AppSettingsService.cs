@@ -18,6 +18,8 @@ public sealed class AppSettingsService : IAppSettingsService
 
     public AppSettings Current { get; private set; } = new();
 
+    public event Func<CancellationToken, Task>? SettingsSaved;
+
     public AppSettings CreateDefaultSettings()
     {
         var settings = CreateDefaults();
@@ -37,10 +39,22 @@ public sealed class AppSettingsService : IAppSettingsService
         }
     }
 
-    public Task SaveAsync(CancellationToken cancellationToken)
+    public async Task SaveAsync(CancellationToken cancellationToken)
     {
         EnsureDefaultsExist(Current);
-        return _store.SaveAsync(Current, cancellationToken);
+        await _store.SaveAsync(Current, cancellationToken).ConfigureAwait(false);
+
+        if (SettingsSaved is not { } handlers)
+        {
+            return;
+        }
+
+        // Await every subscriber so SaveAsync does not claim the new settings are active while a
+        // service is still switching from the old configuration.
+        foreach (Func<CancellationToken, Task> handler in handlers.GetInvocationList())
+        {
+            await handler(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     private AppSettings CreateDefaults()

@@ -100,6 +100,15 @@ public sealed class ServiceCollectionExtensionsTests
         AssertBefore<TorrentNotificationHostedService, TorrentEngineHostedService>(order);
         AssertBefore<TorrentCompletionActionHostedService, TorrentEngineHostedService>(order);
         AssertBefore<TorrentEngineHostedService, TorrentAlertsHostedService>(order);
+        AssertBefore<TorrentEngineHostedService, WatchFolderHostedService>(order);
+        AssertBefore<TorrentEngineHostedService, BandwidthScheduleHostedService>(order);
+        AssertBefore<TorrentEngineHostedService, AutoSearchHostedService>(order);
+        AssertBefore<TorrentAlertsHostedService, WatchFolderHostedService>(order);
+        AssertBefore<TorrentAlertsHostedService, BandwidthScheduleHostedService>(order);
+        AssertBefore<TorrentAlertsHostedService, AutoSearchHostedService>(order);
+        AssertBefore<WatchFolderHostedService, McpServerHostedService>(order);
+        AssertBefore<BandwidthScheduleHostedService, McpServerHostedService>(order);
+        AssertBefore<AutoSearchHostedService, McpServerHostedService>(order);
         AssertBefore<TorrentAlertsHostedService, McpServerHostedService>(order);
         AssertBefore<TorrentAlertsHostedService, TransmissionRpcHostedService>(order);
     }

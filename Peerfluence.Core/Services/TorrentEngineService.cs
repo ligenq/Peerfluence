@@ -105,6 +105,10 @@ public sealed class TorrentEngineService : ITorrentEngineService
     private IClientEngine CreateEngine()
     {
         var settings = _settingsService.Current;
+        // Restored torrents can begin transferring during initialization, before the schedule's
+        // minute timer has ticked. Start with the limits that are in force now rather than briefly
+        // exposing the ordinary limits inside a scheduled window.
+        var (downloadLimit, uploadLimit) = BandwidthSchedule.LimitsFor(settings, DateTimeOffset.Now);
 
         var udpPlan = ProxyUdpPolicy.Decide(settings.Proxy, settings.Network.EnableDht);
         var bindAddress = ParseBindAddress(settings.Network.BindAddress);
@@ -161,8 +165,8 @@ public sealed class TorrentEngineService : ITorrentEngineService
             },
             Transfer = new TransferSettings
             {
-                MaxDownloadSpeed = ToSpeed(settings.Network.MaxDownloadSpeedBytesPerSecond),
-                MaxUploadSpeed = ToSpeed(settings.Network.MaxUploadSpeedBytesPerSecond)
+                MaxDownloadSpeed = ToSpeed(downloadLimit),
+                MaxUploadSpeed = ToSpeed(uploadLimit)
             },
             Proxy = CreateProxySettings(settings.Proxy)
         };

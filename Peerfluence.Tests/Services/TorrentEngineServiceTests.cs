@@ -96,6 +96,30 @@ public class TorrentEngineServiceTests
         await sut.DisposeAsync();
     }
 
+    [Fact]
+    public async Task InitializeAsync_StartsWithTheCurrentlyScheduledLimits()
+    {
+        var now = DateTimeOffset.Now;
+        var settings = BaseSettings(s =>
+        {
+            s.Network.MaxDownloadSpeedBytesPerSecond = 900;
+            s.Network.MaxUploadSpeedBytesPerSecond = 800;
+            s.Schedule.Enabled = true;
+            s.Schedule.From = now.AddMinutes(-5).ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+            s.Schedule.To = now.AddMinutes(5).ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+            s.Schedule.DownloadLimitBytesPerSecond = 100;
+            s.Schedule.UploadLimitBytesPerSecond = 200;
+        });
+        var sut = CreateSut(settings);
+
+        await sut.InitializeAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(100, sut.Engine.Settings.Transfer.MaxDownloadSpeed);
+        Assert.Equal(200, sut.Engine.Settings.Transfer.MaxUploadSpeed);
+
+        await sut.DisposeAsync();
+    }
+
     /// <summary>
     /// Limits used to be clamped into a <c>uint</c> because that is what the engine took. PeerSharp
     /// 3.2 widened them to <c>long</c>, so a limit above 4 GB/s must now survive rather than quietly
