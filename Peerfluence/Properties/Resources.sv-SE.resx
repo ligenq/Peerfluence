@@ -1534,4 +1534,22 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Settings_ScheduleDays" xml:space="preserve">
     <value>Dagar</value>
   </data>
+  <data name="Settings_AutoSearch" xml:space="preserve">
+    <value>Automatisk sökning</value>
+  </data>
+  <data name="Settings_EnableAutoSearch" xml:space="preserve">
+    <value>Kör en sparad sökning på egen hand</value>
+  </data>
+  <data name="Settings_AutoSearchHint" xml:space="preserve">
+    <value>Frågan körs mot indexeraren ovan och lägger till det som inte redan lagts till. Femton minuter är det kortaste intervallet som används.</value>
+  </data>
+  <data name="Settings_AutoSearchQuery" xml:space="preserve">
+    <value>Fråga</value>
+  </data>
+  <data name="Settings_AutoSearchInterval" xml:space="preserve">
+    <value>Var (minut)</value>
+  </data>
+  <data name="Settings_AutoSearchCategory" xml:space="preserve">
+    <value>Kategori för det som läggs till</value>
+  </data>
 </root>

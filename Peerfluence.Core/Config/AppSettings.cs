@@ -16,6 +16,8 @@ public sealed class AppSettings
 
     public ScheduleSettings Schedule { get; set; } = new();
 
+    public AutoSearchSettings AutoSearch { get; set; } = new();
+
     public ProxySettings Proxy { get; set; } = new();
 
     public UpdateSettings Update { get; set; } = new();
