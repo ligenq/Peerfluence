@@ -145,6 +145,21 @@
                         </Grid>
                     </StackPanel>
 
+                    <!--
+                        A directory that adds what is dropped into it: the other half of the loop
+                        the completion action already gave the end of.
+                    -->
+                    <StackPanel Spacing="{StaticResource SpacingMedium}">
+                        <ToggleSwitch IsChecked="{Binding WatchFolderEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableWatchFolder}" AutomationProperties.AutomationId="EnableWatchFolderSwitch"/>
+                        <TextBlock Text="{m:L Settings_WatchFolderHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding WatchFolderEnabled}">
+                            <TextBox Text="{Binding WatchFolderPath, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_WatchFolder}" AutomationProperties.AutomationId="WatchFolderPathTextBox"/>
+                            <Button Grid.Column="1" Command="{Binding BrowseWatchFolderPathCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseWatchFolderPathButton">
+                                <materialIcons:MaterialIcon Kind="FolderOpenOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
                     <ToggleSwitch IsChecked="{Binding EnableSessionPersistence, Mode=TwoWay}" Content="{m:L Settings_EnableSessionPersistence}" AutomationProperties.AutomationId="EnableSessionPersistenceSwitch"/>
                     <ToggleSwitch IsChecked="{Binding ShowAddTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowAddTorrentOptions}" AutomationProperties.AutomationId="ShowAddTorrentOptionsSwitch"/>
                     <ToggleSwitch IsChecked="{Binding ShowRemoveTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowRemoveTorrentOptions}" AutomationProperties.AutomationId="ShowRemoveTorrentOptionsSwitch"/>

@@ -83,6 +83,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         BrowseCompletionActionProgramCommand = new AsyncRelayCommand(BrowseCompletionActionProgramAsync);
         BrowseDownloadPathCommand = new AsyncRelayCommand(BrowseDownloadPathAsync);
         BrowseSessionPathCommand = new AsyncRelayCommand(BrowseSessionPathAsync);
+        BrowseWatchFolderPathCommand = new AsyncRelayCommand(BrowseWatchFolderPathAsync);
         RefreshPortMappingCommand = new RelayCommand(RefreshPortMapping);
         CheckForUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
         ApplyUpdateAndRestartCommand = new RelayCommand(ApplyUpdateAndRestart);
@@ -1019,6 +1020,21 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IAsyncRelayCommand BrowseSessionPathCommand { get; }
 
+    public IAsyncRelayCommand BrowseWatchFolderPathCommand { get; }
+
+    // The watched folder: torrent files dropped here are added without a dialog.
+    public bool WatchFolderEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string WatchFolderPath
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = string.Empty;
+
     public IRelayCommand RefreshPortMappingCommand { get; }
 
     public IAsyncRelayCommand CheckForUpdatesCommand { get; }
@@ -1103,6 +1119,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = settings.Queue.EnableQueueManagement;
         MaxActiveDownloads = settings.Queue.MaxActiveDownloads;
         MaxActiveSeeds = settings.Queue.MaxActiveSeeds;
+        WatchFolderEnabled = settings.WatchFolder.Enabled;
+        WatchFolderPath = settings.WatchFolder.Path;
         LimitSeedingRatio = settings.Seeding.LimitRatio;
         SeedingRatioLimit = settings.Seeding.RatioLimit;
         LimitSeedingTime = settings.Seeding.LimitSeedTime;
@@ -1206,6 +1224,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Queue.EnableQueueManagement = EnableQueueManagement;
             settings.Queue.MaxActiveDownloads = MaxActiveDownloads;
             settings.Queue.MaxActiveSeeds = MaxActiveSeeds;
+            settings.WatchFolder.Enabled = WatchFolderEnabled;
+            settings.WatchFolder.Path = WatchFolderPath;
             settings.Seeding.LimitRatio = LimitSeedingRatio;
             settings.Seeding.RatioLimit = SeedingRatioLimit;
             settings.Seeding.LimitSeedTime = LimitSeedingTime;
@@ -1344,6 +1364,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
         MaxActiveSeeds = defaults.Queue.MaxActiveSeeds;
+        WatchFolderEnabled = defaults.WatchFolder.Enabled;
+        WatchFolderPath = defaults.WatchFolder.Path;
         LimitSeedingRatio = defaults.Seeding.LimitRatio;
         SeedingRatioLimit = defaults.Seeding.RatioLimit;
         LimitSeedingTime = defaults.Seeding.LimitSeedTime;
@@ -1665,6 +1687,23 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         if (folder != null)
         {
             DownloadPath = folder.Path.LocalPath;
+        }
+    }
+
+    private async Task BrowseWatchFolderPathAsync()
+    {
+        var storageProvider = _topLevelService.GetStorageProvider();
+
+        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = Properties.Resources.Settings_WatchFolderPicker_Title,
+            AllowMultiple = false
+        });
+
+        var folder = folders.FirstOrDefault();
+        if (folder != null)
+        {
+            WatchFolderPath = folder.Path.LocalPath;
         }
     }
 

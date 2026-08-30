@@ -3960,5 +3960,37 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Stats_Hint", resourceCulture);
             }
         }
+        /// <summary>
+        ///   Looks up a localized string similar to Watched folder.
+        /// </summary>
+        public static string Settings_WatchFolder {
+            get {
+                return ResourceManager.GetString("Settings_WatchFolder", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Add torrent files from a folder.
+        /// </summary>
+        public static string Settings_EnableWatchFolder {
+            get {
+                return ResourceManager.GetString("Settings_EnableWatchFolder", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Torrent files dropped here are added automatically..
+        /// </summary>
+        public static string Settings_WatchFolderHint {
+            get {
+                return ResourceManager.GetString("Settings_WatchFolderHint", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a folder to watch.
+        /// </summary>
+        public static string Settings_WatchFolderPicker_Title {
+            get {
+                return ResourceManager.GetString("Settings_WatchFolderPicker_Title", resourceCulture);
+            }
+        }
     }
 }

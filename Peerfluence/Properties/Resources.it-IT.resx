@@ -1504,4 +1504,16 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   <data name="Stats_Hint" xml:space="preserve">
     <value>Contato dall’avvio di Peerfluence e riportato dal motore stesso.</value>
   </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Cartella osservata</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Aggiungi i file torrent da una cartella</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>I file torrent lasciati qui vengono aggiunti automaticamente. Ognuno viene rinominato anziché eliminato una volta preso.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Scegli una cartella da osservare</value>
+  </data>
 </root>

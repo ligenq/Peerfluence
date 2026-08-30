@@ -1504,4 +1504,16 @@ Peerfluence está bajo la MIT License. Al instalar o usar Peerfluence, reconoces
   <data name="Stats_Hint" xml:space="preserve">
     <value>Contado desde que se inició Peerfluence, según el propio motor.</value>
   </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Carpeta vigilada</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Añadir archivos torrent desde una carpeta</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Los archivos torrent que se dejen aquí se añaden automáticamente. Cada uno se renombra en lugar de eliminarse una vez tomado.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Elegir una carpeta que vigilar</value>
+  </data>
 </root>

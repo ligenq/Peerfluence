@@ -1504,4 +1504,16 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="Stats_Hint" xml:space="preserve">
     <value>Підраховано від запуску Peerfluence і повідомлено самим рушієм.</value>
   </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Відстежувана тека</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Додавати торент-файли з теки</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Торент-файли, покладені сюди, додаються автоматично. Кожен перейменовується, а не видаляється.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Виберіть теку для відстеження</value>
+  </data>
 </root>
