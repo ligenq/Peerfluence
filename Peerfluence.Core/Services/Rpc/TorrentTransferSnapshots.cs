@@ -9,7 +9,7 @@ public sealed class TorrentTransferSnapshots : ITorrentTransferSnapshots
     // answering a remote request.
     private readonly ConcurrentDictionary<string, TorrentTransferSnapshot> _snapshots = new(StringComparer.OrdinalIgnoreCase);
 
-    public TorrentTransferSnapshot Get(InfoHash hash)
+    public TorrentTransferSnapshot GetSnapshot(InfoHash hash)
     {
         return Key(hash) is { } key && _snapshots.TryGetValue(key, out var snapshot)
             ? snapshot

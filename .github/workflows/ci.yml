@@ -27,13 +27,19 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 10.0.400
 
       - name: Restore
         run: dotnet restore Peerfluence.slnx
 
+      - name: Verify formatting
+        run: dotnet format Peerfluence.slnx --verify-no-changes --no-restore
+
+      - name: Strict build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Debug --warnaserror
+
       - name: Build
-        run: dotnet build Peerfluence.slnx --no-restore --configuration Release
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Release --warnaserror
 
       # xunit.v3 4.0 is Microsoft.Testing.Platform only - it dropped VSTest, which is what the
       # --logger options above spoke. global.json opts `dotnet test` into MTP; everything after the
@@ -82,3 +88,43 @@ jobs:
           name: ${{ matrix.os }}-test-results
           path: TestResults/*.trx
           if-no-files-found: ignore
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Restore
+        run: dotnet restore Peerfluence.slnx
+
+      - name: Build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Release --warnaserror
+
+      - name: Unit coverage
+        run: >
+          dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj
+          --no-build --configuration Release --
+          --coverage --coverage-output-format cobertura
+          --coverage-output coverage/unit.cobertura.xml
+
+      - name: Headless coverage
+        run: >
+          dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
+          --no-build --configuration Release --
+          --coverage --coverage-output-format cobertura
+          --coverage-output coverage/headless.cobertura.xml
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: TestResults/coverage/*.cobertura.xml
+          if-no-files-found: error

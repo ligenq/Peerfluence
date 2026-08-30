@@ -61,12 +61,11 @@ public sealed class AppSettings
 
     public string EncryptionMode { get; set; } = "Allow";
 
-    public bool EnableBlocklist { get; set; } = false;
+    public bool EnableBlocklist { get; set; }
 
     public string BlocklistPath { get; set; } = string.Empty;
 
-    public bool EnableGeoIp { get; set; } = false;
+    public bool EnableGeoIp { get; set; }
 
     public string GeoIpPath { get; set; } = string.Empty;
 }
-

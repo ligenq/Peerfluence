@@ -8,11 +8,12 @@ namespace Peerfluence.Tests.Live;
 /// that what Peerfluence does with the answer still works.
 ///
 /// <para>
-/// These skip unless <c>live-contract.local.json</c> exists, so they never run on a build machine
-/// and never fail for someone who has no indexer. They are meant to be run on demand, by hand, when
-/// something about searching is in doubt:
+/// These skip unless <c>PEERFLUENCE_RUN_LIVE_TESTS=1</c> and <c>live-contract.local.json</c> exist,
+/// so they never run on a build machine or accidentally depend on a local indexer. They are meant
+/// to be run on demand, by hand, when something about searching is in doubt:
 /// </para>
 /// <code>
+/// $env:PEERFLUENCE_RUN_LIVE_TESTS = "1"
 /// dotnet test Peerfluence.Tests --filter "FullyQualifiedName~Live"
 /// </code>
 ///
@@ -53,7 +54,7 @@ public sealed class TorznabLiveContractTests
     {
         if (TryCreate() is not { } context)
         {
-            Assert.Skip("No live-contract.local.json; this test needs a real Torznab endpoint.");
+            Assert.Skip("Live tests are disabled; set PEERFLUENCE_RUN_LIVE_TESTS=1 and provide live-contract.local.json.");
             return;
         }
 
@@ -74,7 +75,7 @@ public sealed class TorznabLiveContractTests
     {
         if (TryCreate() is not { } context)
         {
-            Assert.Skip("No live-contract.local.json; this test needs a real Torznab endpoint.");
+            Assert.Skip("Live tests are disabled; set PEERFLUENCE_RUN_LIVE_TESTS=1 and provide live-contract.local.json.");
             return;
         }
 
@@ -102,7 +103,7 @@ public sealed class TorznabLiveContractTests
     {
         if (TryCreate() is not { } context)
         {
-            Assert.Skip("No live-contract.local.json; this test needs a real Torznab endpoint.");
+            Assert.Skip("Live tests are disabled; set PEERFLUENCE_RUN_LIVE_TESTS=1 and provide live-contract.local.json.");
             return;
         }
 
@@ -125,7 +126,7 @@ public sealed class TorznabLiveContractTests
     {
         if (TryCreate() is not { } context)
         {
-            Assert.Skip("No live-contract.local.json; this test needs a real Torznab endpoint.");
+            Assert.Skip("Live tests are disabled; set PEERFLUENCE_RUN_LIVE_TESTS=1 and provide live-contract.local.json.");
             return;
         }
 

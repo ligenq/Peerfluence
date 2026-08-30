@@ -19,6 +19,8 @@ public class FileLoggerProviderTests : IDisposable
         {
             try { File.Delete(path); } catch { }
         }
+
+        GC.SuppressFinalize(this);
     }
 
     [Fact]

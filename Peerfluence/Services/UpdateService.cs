@@ -11,7 +11,7 @@ using Velopack.Sources;
 
 namespace Peerfluence.Services;
 
-public sealed class UpdateService : IUpdateService
+public sealed class UpdateService : IUpdateService, IDisposable
 {
     private readonly ILogger<UpdateService> _logger;
     private readonly IAppSettingsService _settingsService;
@@ -162,6 +162,8 @@ public sealed class UpdateService : IUpdateService
             _logger.LogError(ex, "Failed to apply update and restart");
         }
     }
+
+    void IDisposable.Dispose() => _updateLock.Dispose();
 
     private IUpdateManagerAdapter GetUpdateManager()
     {

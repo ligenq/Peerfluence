@@ -32,7 +32,7 @@ public class SettingsViewModelTests
         _settingsService = new AppSettingsService(paths, store, new FileSystem());
 
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        _engineService = new TorrentEngineService(_settingsService, loggerFactory);
+        _engineService = new TorrentEngineService(_settingsService, loggerFactory, TimeProvider.System);
 
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         var updateService = new UpdateService(updateLogger, _settingsService);
@@ -739,7 +739,10 @@ public class SettingsViewModelTests
             _themeService,
             localizationService ?? _localizationService,
             _topLevelService,
-            engineService ?? new TorrentEngineService(settingsService, Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>()),
+            engineService ?? new TorrentEngineService(
+                settingsService,
+                Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>(),
+                TimeProvider.System),
             new UpdateService(updateLogger, settingsService),
             _windowsAssociationService,
             interfaceModeService ?? Substitute.For<IInterfaceModeService>(),

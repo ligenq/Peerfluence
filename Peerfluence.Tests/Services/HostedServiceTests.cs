@@ -90,6 +90,26 @@ public sealed class TransmissionRpcHostedServiceTests
     }
 }
 
+/// <summary>The clock that keeps scheduled bandwidth limits in force.</summary>
+public sealed class BandwidthScheduleHostedServiceTests
+{
+    [Fact]
+    public async Task Starting_AppliesTheCurrentLimitsBeforeTheFirstMinuteElapses()
+    {
+        var engine = Substitute.For<ITorrentEngineService>();
+        var applied = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        engine.When(service => service.ApplySpeedLimits())
+            .Do(_ => applied.TrySetResult());
+        var sut = new BandwidthScheduleHostedService(engine, TimeProvider.System);
+
+        await sut.StartAsync(TestContext.Current.CancellationToken);
+
+        await applied.Task.WaitAsync(TestContext.Current.CancellationToken);
+        engine.Received(1).ApplySpeedLimits();
+        await sut.StopAsync(TestContext.Current.CancellationToken);
+    }
+}
+
 /// <summary>
 /// Where the MCP server writes the token a proxy has to present.
 /// </summary>

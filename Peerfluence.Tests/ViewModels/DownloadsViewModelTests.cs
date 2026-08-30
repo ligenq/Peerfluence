@@ -35,7 +35,7 @@ public class DownloadsViewModelTests
         var settingsService = new AppSettingsService(paths, store, new FileSystem());
         _settingsService = settingsService;
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
-        var engineService = new TorrentEngineService(settingsService, loggerFactory);
+        var engineService = new TorrentEngineService(settingsService, loggerFactory, TimeProvider.System);
         _torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
         var notificationService = Substitute.For<INotificationService>();
 
@@ -45,7 +45,7 @@ public class DownloadsViewModelTests
             _localizationService,
             notificationService,
             _topLevelService,
-            settingsService,Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>());
 
         // Workaround for Dispatcher dependencies in constructor
 #pragma warning disable SYSLIB0050
@@ -517,7 +517,7 @@ public class DownloadsViewModelTests
             await sut.StartSelectedCommand.ExecuteAsync(null);
 
             // The running one is left alone rather than restarted.
-            foreach (var item in sut.Torrents.Where(t => t.Name.StartsWith("stopped")))
+            foreach (var item in sut.Torrents.Where(t => t.Name.StartsWith("stopped", StringComparison.Ordinal)))
             {
                 await item.Torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
             }

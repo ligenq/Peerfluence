@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Peerfluence;
 internal static class CrashHandler
 {
     private static readonly string CrashDirectory;
-    private static bool _hasCrashed;
+    private static bool HasCrashed;
 
     static CrashHandler()
     {
@@ -33,12 +34,12 @@ internal static class CrashHandler
 
     public static void HandleException(Exception exception)
     {
-        if (_hasCrashed)
+        if (HasCrashed)
         {
             return;
         }
 
-        _hasCrashed = true;
+        HasCrashed = true;
 
         string? crashLogPath = null;
         try
@@ -80,13 +81,13 @@ internal static class CrashHandler
     {
         Directory.CreateDirectory(CrashDirectory);
 
-        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
         var fileName = isFatal ? $"crash_{timestamp}.log" : $"unobserved_{timestamp}.log";
         var path = Path.Combine(CrashDirectory, fileName);
 
         var sb = new StringBuilder();
         sb.AppendLine(isFatal ? "=== FATAL CRASH ===" : "=== UNOBSERVED TASK EXCEPTION ===");
-        sb.AppendLine($"Timestamp: {DateTime.Now:O}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Timestamp: {DateTime.Now:O}");
         sb.AppendLine($"OS: {RuntimeInformation.OSDescription}");
         sb.AppendLine($"Runtime: {RuntimeInformation.FrameworkDescription}");
         sb.AppendLine($"Architecture: {RuntimeInformation.ProcessArchitecture}");

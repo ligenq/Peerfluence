@@ -18,7 +18,7 @@ using PeerSharp.Streaming;
 namespace Peerfluence.ViewModels;
 
 [SingletonService]
-public sealed class DetailsViewModel : ViewModelBase
+public sealed class DetailsViewModel : ViewModelBase, IDisposable
 {
     private readonly ITorrentSelectionService _selectionService;
     private readonly ITorrentService _torrentService;
@@ -1308,5 +1308,18 @@ public sealed class DetailsViewModel : ViewModelBase
     private static bool MatchesTorrent(ITorrent left, ITorrent right)
     {
         return TorrentIdentity.SameTorrent(left, right);
+    }
+
+    void IDisposable.Dispose()
+    {
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        _loopCts.Cancel();
+        _refreshChannel.Writer.TryComplete();
+        _streamingCts?.Cancel();
+        _streamingCts?.Dispose();
+        _streamingCts = null;
+        _streamServer?.Dispose();
+        _streamServer = null;
+        _loopCts.Dispose();
     }
 }

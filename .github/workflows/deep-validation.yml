@@ -1,0 +1,73 @@
+name: Deep Validation
+
+on:
+  schedule:
+    - cron: '41 2 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  deep-tests:
+    name: Full tests and mutation analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Restore
+        run: dotnet restore Peerfluence.slnx
+
+      - name: Verify formatting
+        run: dotnet format Peerfluence.slnx --verify-no-changes --no-restore
+
+      - name: Strict Debug build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Debug --warnaserror
+
+      - name: Strict Release build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Release --warnaserror
+
+      - name: Unit tests
+        run: dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj --no-build --configuration Release
+
+      - name: Headless UI tests
+        run: dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --no-build --configuration Release
+
+      - name: Install Stryker
+        run: dotnet tool install --global dotnet-stryker --version 4.16.0
+
+      - name: Mutation analysis
+        run: dotnet stryker --config-file stryker-config.json
+
+  ui-tests:
+    name: Interactive UI tests
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Restore
+        run: dotnet restore Peerfluence.slnx
+
+      - name: Build
+        run: dotnet build Peerfluence.slnx --no-restore --configuration Release --warnaserror
+
+      - name: UI tests
+        run: dotnet test --project Peerfluence.UiTests/Peerfluence.UiTests.csproj --no-build --configuration Release

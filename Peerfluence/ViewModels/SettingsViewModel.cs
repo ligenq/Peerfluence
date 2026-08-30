@@ -541,7 +541,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        if (folders.FirstOrDefault() is { } folder)
+        if (folders.Count > 0 && folders[0] is { } folder)
         {
             NewCategoryPath = folder.Path.LocalPath;
         }
@@ -1671,7 +1671,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             ]
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             BlocklistPath = file.Path.LocalPath;
@@ -1716,7 +1716,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             ]
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             GeoIpPath = file.Path.LocalPath;
@@ -1754,7 +1754,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             FileTypeFilter = filter
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             MediaPlayerPath = file.Path.LocalPath;
@@ -1792,7 +1792,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             FileTypeFilter = filter
         });
 
-        var file = files.FirstOrDefault();
+        var file = files.Count > 0 ? files[0] : null;
         if (file != null)
         {
             CompletionActionProgramPath = file.Path.LocalPath;
@@ -1809,7 +1809,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        var folder = folders.FirstOrDefault();
+        var folder = folders.Count > 0 ? folders[0] : null;
         if (folder != null)
         {
             DownloadPath = folder.Path.LocalPath;
@@ -1851,7 +1851,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        var folder = folders.FirstOrDefault();
+        var folder = folders.Count > 0 ? folders[0] : null;
         if (folder != null)
         {
             WatchFolderPath = folder.Path.LocalPath;
@@ -1868,7 +1868,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             AllowMultiple = false
         });
 
-        var folder = folders.FirstOrDefault();
+        var folder = folders.Count > 0 ? folders[0] : null;
         if (folder != null)
         {
             SessionPath = folder.Path.LocalPath;

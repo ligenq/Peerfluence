@@ -219,6 +219,31 @@ Natural-language test cases and runner guidance live in
 `Testing\AI_UI_Test_Cases.md`. The `Testing` folder also contains fixture torrent data
 and a magnet link used by the test cases.
 
+## Development Quality Gates
+
+The repository pins the .NET SDK in `global.json`, treats compiler and analyzer warnings as
+errors in every configuration, audits NuGet dependencies during restore, and verifies formatting
+with `dotnet format`. The normal CI workflow builds Debug and Release, runs unit/headless tests on
+Linux and Windows, executes an isolated smoke test, and publishes Cobertura coverage artifacts.
+
+Security and depth checks are separate workflows: CodeQL and dependency review run for pull
+requests, while scheduled deep validation runs mutation analysis with Stryker and the interactive
+Windows UI suite. Configure the repository's main-branch ruleset to require the CI, CodeQL, and
+dependency-review checks, require a maintainer review, resolve conversations, and disallow bypasses.
+
+Before opening a pull request, the shortest local gate is:
+
+```powershell
+dotnet restore Peerfluence.slnx
+dotnet format Peerfluence.slnx --verify-no-changes --no-restore
+dotnet build Peerfluence.slnx --configuration Debug --warnaserror
+dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj --configuration Debug
+dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --configuration Debug
+```
+
+Live Torznab contract tests are opt-in so a local configuration cannot make ordinary builds depend
+on a running indexer. Set `PEERFLUENCE_RUN_LIVE_TESTS=1` when intentionally running them.
+
 ## Build And Run
 
 Requirements:

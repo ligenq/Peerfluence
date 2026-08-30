@@ -279,7 +279,7 @@ public sealed class TransmissionRpcHandlerTests
     {
         var torrent = Torrent();
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
+        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
 
         var response = await CallAsync(
             """{"method":"torrent-get","arguments":{"fields":["rateDownload","rateUpload","peersConnected","eta"]}}""");
@@ -297,7 +297,7 @@ public sealed class TransmissionRpcHandlerTests
     {
         var torrent = Torrent();
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.Get(Hash).Returns(default(TorrentTransferSnapshot));
+        _snapshots.GetSnapshot(Hash).Returns(default(TorrentTransferSnapshot));
 
         var response = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["eta"]}}""");
 
@@ -318,7 +318,7 @@ public sealed class TransmissionRpcHandlerTests
         var running = Torrent();
         var stopped = Torrent(name: "stopped", started: false, state: TorrentState.Stopped);
         _torrentService.GetTorrents().Returns([running, stopped]);
-        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(1000, 250, 0, 0, 3));
+        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(1000, 250, 0, 0, 3));
 
         var response = await CallAsync("""{"method":"session-stats"}""");
 
@@ -366,7 +366,7 @@ public sealed class TransmissionRpcHandlerTests
         torrent.RatioLimit.Returns(1.5f);
         torrent.LastException.Returns(new InvalidOperationException("disk full"));
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.Get(Hash).Returns(new TorrentTransferSnapshot(10, 20, 30, 40, 5));
+        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(10, 20, 30, 40, 5));
 
         var response = await CallAsync("""
             {"method":"torrent-get","arguments":{"fields":[

@@ -132,7 +132,7 @@ public sealed class RunningApplication : IDisposable
         Window.FindAllDescendants(by => by.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem));
 
     /// <summary>Selects an element, by the pattern it offers rather than by aiming the mouse at it.</summary>
-    public void Activate(AutomationElement element)
+    public static void Activate(AutomationElement element)
     {
         if (element.Patterns.SelectionItem.IsSupported)
         {

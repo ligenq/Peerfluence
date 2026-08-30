@@ -27,7 +27,7 @@ public readonly record struct TorrentTransferSnapshot(
 public interface ITorrentTransferSnapshots
 {
     /// <summary>The last figures seen for a torrent, or an empty snapshot if none have arrived.</summary>
-    TorrentTransferSnapshot Get(InfoHash hash);
+    TorrentTransferSnapshot GetSnapshot(InfoHash hash);
 
     void Record(InfoHash hash, TorrentTransferSnapshot snapshot);
 }
