@@ -1,4 +1,4 @@
-using Peerfluence.Core.Services;
+﻿using Peerfluence.Core.Services;
 using Peerfluence.Services;
 
 namespace Peerfluence.Tests.Services;
@@ -68,8 +68,12 @@ public sealed class ProfileIpcNamesTests
         // A trailing separator is the same directory, and the scope is resolved to a full path
         // before it is hashed - otherwise a launch from a shortcut and one from the shell could
         // disagree about whether an instance was already running.
-        var plain = Paths(@"C:\profiles\alpha");
-        var trailing = Paths(@"C:\profiles\alpha\");
+        // Built with this platform's separator. Written with backslashes, the trailing one is
+        // an ordinary character on Linux rather than a separator, so the two spellings really are
+        // two different directories there and the test was asserting something untrue.
+        var directory = Path.Combine(Path.GetTempPath(), "profiles", "alpha");
+        var plain = Paths(directory);
+        var trailing = Paths(directory + Path.DirectorySeparatorChar);
 
         Assert.Equal(
             ProfileIpcNames.GetScopeId(plain),

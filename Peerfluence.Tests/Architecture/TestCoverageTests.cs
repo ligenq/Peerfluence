@@ -145,6 +145,10 @@ public sealed class TestCoverageTests
     {
         return ProductionAssemblies()
             .SelectMany(SafeGetTypes)
+            // Ours, rather than everything that ends up in our assemblies. The coverage collector
+            // instruments statically on Linux, which writes a tracker type into the assembly on
+            // disk, and the rule then asked for tests for a type nobody wrote and nobody ships.
+            .Where(type => type.Namespace?.StartsWith("Peerfluence", StringComparison.Ordinal) == true)
             .Where(type => !type.IsInterface)
             .Where(type => !type.IsEnum)
             .Where(type => !typeof(Delegate).IsAssignableFrom(type))
