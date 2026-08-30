@@ -127,7 +127,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// The settings page, so simple mode can show it without the side menu that normally reaches it.
     /// </summary>
-    public ViewModelBase? SettingsPage { get; private set; }
+    /// <summary>
+    /// The settings screen, shown in simple mode where there is no navigation to reach it by.
+    /// </summary>
+    /// <remarks>
+    /// Get only. It is assigned once, from a constructor argument, and a bound property with a
+    /// setter that never announces a change is a screen that shows whatever it saw first - which is
+    /// what the rule about this asks, and the honest answer here is that it cannot change at all.
+    /// </remarks>
+    public ViewModelBase? SettingsPage { get; }
 
     public IRelayCommand ShowSimpleSettingsCommand { get; }
 
