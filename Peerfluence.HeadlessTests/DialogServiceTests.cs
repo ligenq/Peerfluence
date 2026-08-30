@@ -100,8 +100,7 @@ public class DialogServiceTests
         // button that is disabled is not a default button, but that is worth showing rather than
         // assuming, because it is the difference between a greyed-out button and a real refusal.
         var manager = new SukiDialogManager();
-        var service = new DialogService(Substitute.For<ITopLevelService>(), []);
-        ((IDialogHost)service).DialogManager = manager;
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
 
         var window = new Window { Content = new SukiDialogHost { Manager = manager }, Width = 600, Height = 400 };
         window.Show();
@@ -209,8 +208,7 @@ public class DialogServiceTests
     private static (Window Window, Task<bool> Answered) ShowConfirm()
     {
         var manager = new SukiDialogManager();
-        var service = new DialogService(Substitute.For<ITopLevelService>(), []);
-        ((IDialogHost)service).DialogManager = manager;
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
 
         var window = new Window { Content = new SukiDialogHost { Manager = manager }, Width = 600, Height = 400 };
         window.Show();
@@ -247,8 +245,7 @@ public class DialogServiceTests
     private static ISukiDialog Show(Func<IDialogService, Task> prompt)
     {
         var manager = new SukiDialogManager();
-        var service = new DialogService(Substitute.For<ITopLevelService>(), []);
-        ((IDialogHost)service).DialogManager = manager;
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
 
         ISukiDialog? shown = null;
         manager.OnDialogShown += (_, args) => shown = args.Dialog;

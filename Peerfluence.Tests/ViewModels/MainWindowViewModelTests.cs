@@ -15,6 +15,7 @@ namespace Peerfluence.Tests.ViewModels;
 public class MainWindowViewModelTests
 {
     private readonly DetailsViewModel _detailsVm;
+    private readonly DownloadsViewModel _downloadsVm;
     private readonly SettingsViewModel _settingsVm;
     private readonly INotificationService _notificationService;
     private readonly IAppSettingsService _settingsService;
@@ -46,7 +47,8 @@ public class MainWindowViewModelTests
 
         // Create an uninitialized DownloadsViewModel to avoid DispatcherTimer in its constructor
 #pragma warning disable SYSLIB0050
-        var downloadsVm = (DownloadsViewModel)FormatterServices.GetUninitializedObject(typeof(DownloadsViewModel));
+        _downloadsVm = (DownloadsViewModel)FormatterServices.GetUninitializedObject(typeof(DownloadsViewModel));
+        var downloadsVm = _downloadsVm;
 #pragma warning restore SYSLIB0050
 
         // The real constructor always assigns this, and MainWindowViewModel reaches through it to
@@ -70,7 +72,12 @@ public class MainWindowViewModelTests
         var aboutVm = new AboutViewModel(NullLogger<AboutViewModel>.Instance);
 
         var features = new IFeatureViewModel[] { downloadsVm, _settingsVm };
-        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
+        _sut = new MainWindowViewModel(features, aboutVm, _notificationService, _settingsService, _updateService, Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            downloadsVm,
+            _settingsVm,
+            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
+            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
     }
 
     [Fact]
@@ -130,7 +137,12 @@ public class MainWindowViewModelTests
             _notificationService,
             settings,
             updateService,
-            Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            _downloadsVm,
+            _settingsVm,
+            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
+            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -151,7 +163,12 @@ public class MainWindowViewModelTests
             _notificationService,
             settings,
             updateService,
-            Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            _downloadsVm,
+            _settingsVm,
+            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
+            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 

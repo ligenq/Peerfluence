@@ -27,7 +27,7 @@ public sealed class TorrentCompletionActionHostedServiceTests
         });
 
         var runner = new FakeCompletionActionRunner(new CompletionActionResult(true, 0, null));
-        var notifications = new NotificationService();
+        var notifications = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
         var sut = new TorrentCompletionActionHostedService(settingsService, runner, notifications, NullLogger<TorrentCompletionActionHostedService>.Instance);
         var torrent = CreateTorrent("Ubuntu ISO");
 
@@ -66,7 +66,7 @@ public sealed class TorrentCompletionActionHostedServiceTests
         var sut = new TorrentCompletionActionHostedService(
             settingsService,
             runner,
-            new NotificationService(),
+            new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>()),
             NullLogger<TorrentCompletionActionHostedService>.Instance);
         var torrent = CreateTorrent("Ubuntu ISO");
 

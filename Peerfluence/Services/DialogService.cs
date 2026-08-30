@@ -24,30 +24,34 @@ namespace Peerfluence.Services;
 /// line of text or a confirmation without knowing what a dialog looks like. The controls are here.
 /// </para>
 /// </remarks>
-public sealed class DialogService : IDialogService, IDialogHost
+public sealed class DialogService : IDialogService
 {
     private readonly ITopLevelService _topLevelService;
     private readonly IReadOnlyDictionary<Type, DialogRegistration> _registrations;
 
-    public DialogService(ITopLevelService topLevelService, IEnumerable<DialogRegistration> registrations)
+    public DialogService(
+        ITopLevelService topLevelService,
+        IEnumerable<DialogRegistration> registrations,
+        ISukiDialogManager dialogManager)
     {
         _topLevelService = topLevelService;
         _registrations = registrations.ToDictionary(r => r.ViewModelType);
+        DialogManager = dialogManager;
     }
 
+    /// <summary>Where the dialogs appear.</summary>
+    private ISukiDialogManager DialogManager { get; }
+
     /// <summary>
-    /// Where the dialogs appear. Set once by <see cref="ViewModels.MainWindowViewModel"/>, which
-    /// creates the manager the window's dialog host is bound to.
+    /// Whether a prompt would be seen by anybody.
     /// </summary>
     /// <remarks>
-    /// A property rather than a constructor argument because the manager cannot exist until the UI
-    /// thread does, and this service is built with the rest of the container. Null until then, and
-    /// every prompt below answers "dismissed" while it is - which is what a prompt nobody can see
-    /// amounts to.
+    /// Always, now that the manager arrives through the constructor rather than being set afterwards
+    /// by whoever happened to create it. Kept on <see cref="IDialogService"/> because the callers
+    /// that ask still need an answer, and an implementation that genuinely cannot prompt - a headless
+    /// one, an agent-driven one - would say no.
     /// </remarks>
-    public ISukiDialogManager? DialogManager { get; set; }
-
-    public bool CanPrompt => DialogManager is not null;
+    public bool CanPrompt => true;
 
     public async Task ShowAsync<TViewModel>() where TViewModel : class
     {
@@ -66,11 +70,6 @@ public sealed class DialogService : IDialogService, IDialogHost
     public async Task<string?> PromptForTextAsync(TextPrompt prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);
-
-        if (DialogManager is null)
-        {
-            return null;
-        }
 
         var textBox = new TextBox
         {
@@ -103,11 +102,6 @@ public sealed class DialogService : IDialogService, IDialogHost
     {
         ArgumentNullException.ThrowIfNull(prompt);
 
-        if (DialogManager is null)
-        {
-            return Task.FromResult(false);
-        }
-
         return ShowAsync(
             builder => builder
                 .OfType(ToNotificationType(prompt.Severity))
@@ -120,11 +114,6 @@ public sealed class DialogService : IDialogService, IDialogHost
     public async Task<RemoveTorrentChoice?> PromptForRemoveOptionsAsync(RemoveTorrentPrompt prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);
-
-        if (DialogManager is null)
-        {
-            return null;
-        }
 
         var options = new StackPanel();
         var buttons = new Dictionary<RemoveTorrentAction, RadioButton>();
@@ -190,7 +179,7 @@ public sealed class DialogService : IDialogService, IDialogHost
     {
         var answered = new TaskCompletionSource<bool>();
 
-        var builder = describe(DialogManager!.CreateDialog())
+        var builder = describe(DialogManager.CreateDialog())
             .Dismiss().ByClickingBackground()
             .OnDismissed(_ => answered.TrySetResult(false))
             // The affirmative action first, so it sits on the left. Same order as the two dialogs

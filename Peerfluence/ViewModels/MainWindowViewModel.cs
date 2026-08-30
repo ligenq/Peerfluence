@@ -37,7 +37,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         IUpdateService updateService,
         IInterfaceModeService interfaceModeService,
         IDialogService dialogService,
-        IDialogHost dialogHost)
+        DownloadsViewModel downloadsViewModel,
+        SettingsViewModel settingsViewModel,
+        ISukiToastManager toastManager,
+        ISukiDialogManager dialogManager)
     {
         _settingsService = settingsService;
         _updateService = updateService;
@@ -46,40 +49,25 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         _interfaceModeService = interfaceModeService;
         _dialogService = dialogService;
 
-        // Create SukiUI managers here (after UI thread is available)
-        ToastManager = new SukiToastManager();
-        DialogManager = new SukiDialogManager();
+        // Held so the window can bind its toast and dialog hosts to them. Created by the container
+        // rather than here, so the services that raise toasts and show prompts are given the same
+        // two managers as constructor arguments instead of being reached into and configured.
+        ToastManager = toastManager;
+        DialogManager = dialogManager;
 
-        // The prompts are the dialog service's to build; this is the only place that knows where
-        // they should appear, because the manager cannot be created until the UI thread exists.
-        dialogHost.DialogManager = DialogManager;
+        // Asked for by name rather than picked out of the feature list by type. They are the same
+        // singletons either way, and this says which two screens are special instead of discovering
+        // it while building the navigation.
+        DownloadsViewModel = downloadsViewModel;
+        SettingsPage = settingsViewModel;
 
-        // Wire toast manager into notification service
-        if (notificationService is NotificationService ns)
-        {
-            ns.ToastManager = ToastManager;
-        }
-
-        // Build navigation from discovered features
         foreach (var feature in features.OrderBy(f => f.Order))
         {
             var icon = Enum.TryParse<MaterialIconKind>(feature.IconKind, out var parsed)
                 ? parsed
                 : MaterialIconKind.CircleOutline;
 
-            var item = new NavigationItem(feature.Title, icon, (ViewModelBase)feature);
-            _featureItems.Add(item);
-
-            // Wire dialog manager into downloads view model
-            if (feature is DownloadsViewModel dvm)
-            {
-                DownloadsViewModel = dvm;
-            }
-
-            if (feature is SettingsViewModel svm)
-            {
-                SettingsPage = svm;
-            }
+            _featureItems.Add(new NavigationItem(feature.Title, icon, (ViewModelBase)feature));
         }
 
         ShowAboutCommand = new RelayCommand(ShowAbout);

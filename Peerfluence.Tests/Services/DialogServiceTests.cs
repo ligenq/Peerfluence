@@ -17,48 +17,21 @@ public sealed class DialogServiceTests
     private sealed class UnregisteredViewModel;
 
     [Fact]
-    public void WithNoWindowYet_ItSaysItCannotAsk()
+    public void ItCanAlwaysAsk_BecauseItIsGivenSomewhereToAsk()
     {
-        // True at startup and in tests. A caller with a sensible default checks this rather than
-        // reading a dismissed dialog as a refusal.
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), []);
-
-        Assert.False(sut.CanPrompt);
-    }
-
-    [Fact]
-    public void OnceTheWindowHandsOverItsManager_ItCanAsk()
-    {
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), []);
-
-        ((IDialogHost)sut).DialogManager = Substitute.For<SukiUI.Dialogs.ISukiDialogManager>();
+        // The manager used to be set on this service after construction, by the view model that
+        // created it, so there was a window during startup where it existed and could not prompt.
+        // It is a constructor argument now, and there is no such window.
+        var sut = new DialogService(
+            Substitute.For<ITopLevelService>(), [], Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         Assert.True(sut.CanPrompt);
     }
 
     [Fact]
-    public async Task WithNowhereToShowThem_EveryPromptAnswersAsIfItWasDismissed()
-    {
-        // Rather than throwing or hanging. A prompt nobody can see was not answered, and every
-        // caller already handles that.
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), []);
-
-        Assert.Null(await sut.PromptForTextAsync(new TextPrompt("Title", "Confirm")));
-        Assert.False(await sut.ConfirmAsync(new ConfirmPrompt("Title", "Message", "Yes", "No")));
-        Assert.Null(await sut.PromptForRemoveOptionsAsync(new RemoveTorrentPrompt(
-            "Title",
-            "Message",
-            "Remove",
-            "Cancel",
-            RemoveTorrentAction.RemoveOnly,
-            new Dictionary<RemoveTorrentAction, string> { [RemoveTorrentAction.RemoveOnly] = "Remove only" },
-            "Remember")));
-    }
-
-    [Fact]
     public async Task AskingForADialogNobodyRegistered_SaysWhichOneWasMissing()
     {
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), []);
+        var sut = new DialogService(Substitute.For<ITopLevelService>(), [], Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         var error = await Assert.ThrowsAsync<InvalidOperationException>(sut.ShowAsync<UnregisteredViewModel>);
 
@@ -75,7 +48,7 @@ public sealed class DialogServiceTests
             () => throw new InvalidOperationException("no window should be built"),
             () => "not a view model");
 
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), [registration]);
+        var sut = new DialogService(Substitute.For<ITopLevelService>(), [registration], Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
 
         await Assert.ThrowsAsync<InvalidOperationException>(sut.ShowAsync<UnregisteredViewModel>);
     }
