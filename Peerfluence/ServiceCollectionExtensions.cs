@@ -145,6 +145,7 @@ public static class ServiceCollectionExtensions
         // notifications can race their registration.
         services.AddHostedService<TorrentNotificationHostedService>();
         services.AddHostedService<TorrentCompletionActionHostedService>();
+        services.AddHostedService<WatchFolderHostedService>();
         services.AddHostedService<TorrentEngineHostedService>();
         services.AddHostedService<TorrentAlertsHostedService>();
         services.AddHostedService<McpServerHostedService>();

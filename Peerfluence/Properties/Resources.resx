@@ -1498,4 +1498,16 @@
   <data name="Stats_Hint" xml:space="preserve">
     <value>Counted since Peerfluence started, and reported by the engine itself.</value>
   </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Watched folder</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Add torrent files from a folder</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Torrent files dropped here are added automatically. Each one is renamed rather than deleted once it has been taken.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Choose a folder to watch</value>
+  </data>
 </root>

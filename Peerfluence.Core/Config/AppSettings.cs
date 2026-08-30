@@ -12,6 +12,8 @@ public sealed class AppSettings
 
     public SeedingSettings Seeding { get; set; } = new();
 
+    public WatchFolderSettings WatchFolder { get; set; } = new();
+
     public ProxySettings Proxy { get; set; } = new();
 
     public UpdateSettings Update { get; set; } = new();

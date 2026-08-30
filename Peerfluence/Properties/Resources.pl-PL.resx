@@ -1504,4 +1504,16 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="Stats_Hint" xml:space="preserve">
     <value>Liczone od uruchomienia Peerfluence i zgłaszane przez sam silnik.</value>
   </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Obserwowany folder</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Dodawaj pliki torrent z folderu</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Pliki torrent umieszczone tutaj są dodawane automatycznie. Każdy zostaje zmieniony nazwą, a nie usunięty.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Wybierz folder do obserwowania</value>
+  </data>
 </root>

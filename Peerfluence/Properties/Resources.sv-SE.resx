@@ -1504,4 +1504,16 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Stats_Hint" xml:space="preserve">
     <value>Räknat sedan Peerfluence startade, och rapporterat av motorn själv.</value>
   </data>
+  <data name="Settings_WatchFolder" xml:space="preserve">
+    <value>Bevakad mapp</value>
+  </data>
+  <data name="Settings_EnableWatchFolder" xml:space="preserve">
+    <value>Lägg till torrentfiler från en mapp</value>
+  </data>
+  <data name="Settings_WatchFolderHint" xml:space="preserve">
+    <value>Torrentfiler som läggs här läggs till automatiskt. Var och en byter namn i stället för att raderas när den har tagits.</value>
+  </data>
+  <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
+    <value>Välj en mapp att bevaka</value>
+  </data>
 </root>
