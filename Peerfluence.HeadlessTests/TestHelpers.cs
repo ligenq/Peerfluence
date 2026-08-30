@@ -167,6 +167,11 @@ internal static class TestHelpers
             notificationService,
             settingsService,
             updateService,
-            Substitute.For<IInterfaceModeService>(),Substitute.For<IDialogService>(),Substitute.For<IDialogHost>());
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            downloadsVm,
+            settingsVm,
+            new SukiUI.Toasts.SukiToastManager(),
+            new SukiUI.Dialogs.SukiDialogManager());
     }
 }

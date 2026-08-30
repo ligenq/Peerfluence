@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using SukiUI.Toasts;
@@ -10,12 +10,13 @@ public sealed class NotificationService : INotificationService
 {
     private readonly ObservableCollection<NotificationItem> _notifications = new();
 
-    public NotificationService()
+    private readonly ISukiToastManager _toastManager;
+
+    public NotificationService(ISukiToastManager toastManager)
     {
+        _toastManager = toastManager;
         Notifications = new ReadOnlyObservableCollection<NotificationItem>(_notifications);
     }
-
-    public ISukiToastManager? ToastManager { get; set; }
 
     public ReadOnlyObservableCollection<NotificationItem> Notifications { get; }
 
@@ -24,11 +25,6 @@ public sealed class NotificationService : INotificationService
         ArgumentNullException.ThrowIfNull(notification);
 
         _notifications.Add(notification);
-
-        if (ToastManager == null)
-        {
-            return;
-        }
 
         var type = notification.Type switch
         {
@@ -40,7 +36,7 @@ public sealed class NotificationService : INotificationService
 
         Dispatcher.UIThread.Post(() =>
         {
-            var builder = ToastManager.CreateToast()
+            var builder = _toastManager.CreateToast()
                 .OfType(type)
                 .WithTitle(notification.Title)
                 .WithContent(notification.Message)

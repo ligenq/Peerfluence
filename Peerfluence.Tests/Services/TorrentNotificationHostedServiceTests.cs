@@ -12,7 +12,7 @@ public sealed class TorrentNotificationHostedServiceTests
     [Fact]
     public async Task TorrentErrorNotification_IncludesExceptionMessage()
     {
-        var notificationService = new NotificationService();
+        var notificationService = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
         var sut = new TorrentNotificationHostedService(notificationService);
         var torrent = Substitute.For<ITorrent>();
         torrent.Name.Returns("Ubuntu ISO");

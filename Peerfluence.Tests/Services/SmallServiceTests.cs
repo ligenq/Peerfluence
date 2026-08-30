@@ -21,7 +21,7 @@ public sealed class NotificationServiceTests
     [Fact]
     public void APublishedNotification_JoinsTheList()
     {
-        var sut = new NotificationService();
+        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
 
         var notification = Item();
         sut.Publish(notification);
@@ -32,7 +32,7 @@ public sealed class NotificationServiceTests
     [Fact]
     public void ADismissedNotification_LeavesTheList()
     {
-        var sut = new NotificationService();
+        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
         var notification = Item();
         sut.Publish(notification);
 
@@ -44,7 +44,7 @@ public sealed class NotificationServiceTests
     [Fact]
     public void DismissingSomethingThatWasNeverThere_ChangesNothing()
     {
-        var sut = new NotificationService();
+        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
         sut.Publish(Item("kept"));
 
         sut.Dismiss(Item("never published"));
@@ -55,7 +55,7 @@ public sealed class NotificationServiceTests
     [Fact]
     public void PublishingNothing_IsRejectedRatherThanStored()
     {
-        var sut = new NotificationService();
+        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
 
         Assert.Throws<ArgumentNullException>(() => sut.Publish(null!));
     }
