@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,18 +17,24 @@ public sealed class TopLevelService : ITopLevelService
 
     public bool IsWindowAvailable => _topLevel != null;
 
+    /// <summary>The clipboard, which only exists on the thread the window does.</summary>
     public IClipboard GetClipboard()
     {
+        Dispatcher.UIThread.VerifyAccess();
         return _topLevel?.Clipboard ?? throw new InvalidOperationException("TopLevel has not been initialized.");
     }
 
+    /// <summary>The file pickers, which only exist on the thread the window does.</summary>
     public IStorageProvider GetStorageProvider()
     {
+        Dispatcher.UIThread.VerifyAccess();
         return _topLevel?.StorageProvider ?? throw new InvalidOperationException("TopLevel has not been initialized.");
     }
 
     public async Task ShowDialogAsync(Window window)
     {
+        Dispatcher.UIThread.VerifyAccess();
+
         ArgumentNullException.ThrowIfNull(window);
 
         if (_topLevel is Window owner)

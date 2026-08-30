@@ -18,6 +18,213 @@ namespace Peerfluence.Tests.Architecture;
 /// </remarks>
 public sealed class CompositionTests
 {
+    /// <summary>
+    /// The interfaces that only work on the UI thread, and do not say so anywhere.
+    /// </summary>
+    /// <remarks>
+    /// A curated list, and that is the honest limit of this rule: it cannot discover that something
+    /// is thread affine, only hold you to what you already know. Adding to it is the right response
+    /// to learning about another one.
+    /// </remarks>
+    private static readonly string[] UiThreadOnly =
+    [
+        // Namespaces rather than the interfaces, because the fluent API is extension methods: a
+        // toast is queued through SukiUI.Toasts.FluentSukiToastBuilder, and naming
+        // ISukiToastManager matched nothing at all. Found by asking the graph what the code really
+        // calls rather than what it looks like it calls.
+        "SukiUI.Toasts.",
+        "SukiUI.Dialogs.",
+        "Avalonia.Controls.TopLevel::",
+    ];
+
+    [Fact]
+    public void NoAsyncVoid_ExceptWhereAnEventDemandsIt()
+    {
+        // An exception out of an async void method has nowhere to go: there is no task to carry it,
+        // so it reaches the thread pool and ends the process. An event handler has to be one -
+        // the delegate returns void - and everything else has a Task to return instead.
+        //
+        // What this cannot check is whether the handler catches. The compiler wraps every async
+        // method's state machine in a try/catch of its own to hand the exception to the builder, so
+        // an author's catch and the compiler's are indistinguishable from here. That part stays a
+        // convention, and there are two handlers to keep it in.
+        var offenders = new List<string>();
+
+        foreach (var type in ProductionTypes())
+        {
+            foreach (var method in type.GetMethods(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
+            {
+                if (method.ReturnType != typeof(void)
+                    || method.GetCustomAttribute<AsyncStateMachineAttribute>() is null)
+                {
+                    continue;
+                }
+
+                var parameters = method.GetParameters();
+                var looksLikeAHandler = parameters.Length == 2 && parameters[0].ParameterType == typeof(object);
+
+                if (!looksLikeAHandler)
+                {
+                    offenders.Add(
+                        $"  {type.Name}.{method.Name} is async void without being an event handler. "
+                            + "An exception from it ends the process; return a Task instead.");
+                }
+            }
+        }
+
+        Assert.True(offenders.Count == 0, string.Join(Environment.NewLine, offenders));
+    }
+
+    [Fact]
+    public void NoService_ExposesACollectionAViewWouldBindTo()
+    {
+        // An observable collection exists for one purpose: telling a view that something changed.
+        // A service holding one is holding user interface state, and user interface state belongs in
+        // a view model, where it is understood that touching it means being on the UI thread.
+        //
+        // This is the rule that would have caught the notification service. It kept a list of
+        // everything it had published, exposed as a ReadOnlyObservableCollection, and added to that
+        // list without marshalling - from hosted services, on whatever thread an alert arrived on.
+        // Nothing bound the collection, so nothing went wrong, and nothing would have said so if
+        // somebody had bound it later.
+        //
+        // The thread mistake itself cannot be seen from here: mutating the collection is a call on a
+        // constructed generic, which the call graph drops. What can be seen is the shape that let it
+        // happen, which is the collection being there at all.
+        var offenders = new List<string>();
+
+        foreach (var type in ProductionTypes())
+        {
+            if (type.Namespace?.EndsWith(".Services", StringComparison.Ordinal) != true)
+            {
+                continue;
+            }
+
+            foreach (var member in type.GetProperties(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            {
+                if (member.GetMethod is null || member.GetMethod.IsPrivate)
+                {
+                    continue;
+                }
+
+                if (typeof(System.Collections.Specialized.INotifyCollectionChanged)
+                    .IsAssignableFrom(member.PropertyType))
+                {
+                    offenders.Add(
+                        $"  {type.Name}.{member.Name} is a {member.PropertyType.Name}, which exists to "
+                            + "tell a view that something changed. Keep it in a view model.");
+                }
+            }
+        }
+
+        Assert.True(
+            offenders.Count == 0,
+            $"{offenders.Count} services hold interface state:{Environment.NewLine}"
+                + string.Join(Environment.NewLine, offenders));
+    }
+
+    [Fact]
+    public void EverythingThatTouchesTheInterface_SaysItNeedsTheUiThread()
+    {
+        // Nothing about ISukiToastManager says it is thread affine - it is an interface like any
+        // other - so the requirement lives in whoever remembers it. This is the written form of
+        // remembering: a method that reaches one of these either marshals onto the UI thread, or
+        // declares that it is already there with VerifyAccess, and the runtime check makes the
+        // declaration true.
+        var graph = new CallGraph();
+        graph.Add(typeof(McpServerHostedService).Assembly.Location);
+        graph.Add(typeof(Peerfluence.Core.Services.ITorrentService).Assembly.Location);
+
+        var offenders = new List<string>();
+
+        foreach (var method in graph.Callers)
+        {
+            var callees = graph.CalleesOf(method);
+            // Constructing one of these is not using it: the container makes both managers on
+            // whatever thread first asks for a service, which the smoke test does with no UI thread
+            // anywhere and no complaint.
+            if (!callees.Any(callee =>
+                    !callee.EndsWith("::.ctor", StringComparison.Ordinal)
+                    && UiThreadOnly.Any(prefix => callee.StartsWith(prefix, StringComparison.Ordinal))))
+            {
+                continue;
+            }
+
+            // Said out loud: this method requires the UI thread and checks that it has it.
+            if (callees.Any(callee => callee.EndsWith("::VerifyAccess", StringComparison.Ordinal)))
+            {
+                continue;
+            }
+
+            // Or it is a lambda or state machine belonging to a method that has already answered
+            // for itself, which is where the answer belongs: a lambda cannot call VerifyAccess
+            // before it exists, and it runs wherever the method that made it runs.
+            if (OwnerAnswersForIt(graph, method))
+            {
+                continue;
+            }
+
+            // Or it is a view or the application object, both of which Avalonia only ever builds
+            // and calls on the UI thread. Nothing else gets to claim that.
+            if (method.StartsWith("Peerfluence.Views.", StringComparison.Ordinal)
+                || method.StartsWith("Peerfluence.App::", StringComparison.Ordinal)
+                || method.StartsWith("Peerfluence.App+", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            offenders.Add(
+                $"  {method} reaches a UI-thread-only interface without marshalling onto the UI "
+                    + "thread or calling Dispatcher.UIThread.VerifyAccess().");
+        }
+
+        Assert.True(
+            offenders.Count == 0,
+            $"{offenders.Count} places touch the interface from wherever they happen to be running:"
+                + $"{Environment.NewLine}{string.Join(Environment.NewLine, offenders)}");
+    }
+
+    /// <summary>
+    /// Whether the method that produced this lambda has already answered for the UI thread.
+    /// </summary>
+    /// <remarks>
+    /// A lambda compiles to a member of a generated type, so the code inside
+    /// <c>Dispatcher.UIThread.Post(() =&gt; ...)</c> - or inside a prompt being described - is a
+    /// separate method that appears to touch the interface from nowhere in particular. Asking who it
+    /// was generated for, and whether that method marshals or declares, is how the shape is
+    /// recognised. An async method's state machine is the same shape and gets the same answer.
+    /// </remarks>
+    private static bool OwnerAnswersForIt(CallGraph graph, string method)
+    {
+        var separator = method.IndexOf("::", StringComparison.Ordinal);
+        if (separator < 0)
+        {
+            return false;
+        }
+
+        if (!CallGraph.TryGetGeneratedOwner(method[..separator], method[(separator + 2)..], out var owner))
+        {
+            return false;
+        }
+
+        // An async owner keeps its body in a state machine, so what it "calls" directly is that
+        // machine and little else. The declaration lives one level in.
+        var ownerCalls = graph.CalleesOf(owner)
+            .SelectMany(callee => callee.Contains(">d__", StringComparison.Ordinal)
+                ? graph.CalleesOf(callee).Append(callee)
+                : [callee])
+            .ToList();
+
+        return ownerCalls.Any(callee => callee.EndsWith("::VerifyAccess", StringComparison.Ordinal))
+            || ownerCalls.Any(callee =>
+                callee.StartsWith("Avalonia.Threading.Dispatcher::", StringComparison.Ordinal)
+                && (callee.EndsWith("::Post", StringComparison.Ordinal)
+                    || callee.EndsWith("::Invoke", StringComparison.Ordinal)
+                    || callee.EndsWith("::InvokeAsync", StringComparison.Ordinal)));
+    }
+
     [Fact]
     public void NoServiceIsWiredUpAfterItIsConstructed()
     {
