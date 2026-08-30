@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using Avalonia.Media;
 using SukiUI.Dialogs;
 
@@ -71,6 +72,10 @@ public sealed class DialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(prompt);
 
+        // Builds controls and shows them. Declared rather than assumed: every caller is a
+        // command handler today, and the day one is not, this says so immediately.
+        Dispatcher.UIThread.VerifyAccess();
+
         var textBox = new TextBox
         {
             Width = 420,
@@ -102,6 +107,10 @@ public sealed class DialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(prompt);
 
+        // Builds controls and shows them. Declared rather than assumed: every caller is a
+        // command handler today, and the day one is not, this says so immediately.
+        Dispatcher.UIThread.VerifyAccess();
+
         return ShowAsync(
             builder => builder
                 .OfType(ToNotificationType(prompt.Severity))
@@ -114,6 +123,10 @@ public sealed class DialogService : IDialogService
     public async Task<RemoveTorrentChoice?> PromptForRemoveOptionsAsync(RemoveTorrentPrompt prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);
+
+        // Builds controls and shows them. Declared rather than assumed: every caller is a
+        // command handler today, and the day one is not, this says so immediately.
+        Dispatcher.UIThread.VerifyAccess();
 
         var options = new StackPanel();
         var buttons = new Dictionary<RemoveTorrentAction, RadioButton>();
@@ -177,6 +190,8 @@ public sealed class DialogService : IDialogService
         string cancelLabel,
         Action<Button>? configureConfirm = null)
     {
+        Dispatcher.UIThread.VerifyAccess();
+
         var answered = new TaskCompletionSource<bool>();
 
         var builder = describe(DialogManager.CreateDialog())

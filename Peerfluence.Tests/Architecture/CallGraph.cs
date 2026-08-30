@@ -45,6 +45,13 @@ internal sealed class CallGraph
     /// <c>AddTorrentAsync</c> it delegates to, and a test that builds a view model through a helper
     /// exercises what the helper builds - neither is a direct call from the test method itself.
     /// </remarks>
+    /// <summary>Every method this one calls, directly.</summary>
+    public IReadOnlyCollection<string> CalleesOf(string method) =>
+        _callsFrom.TryGetValue(method, out var callees) ? callees : [];
+
+    /// <summary>Every method that calls anything at all, which is every method with a body.</summary>
+    public IEnumerable<string> Callers => _callsFrom.Keys;
+
     public HashSet<string> Reachable(IEnumerable<string> roots)
     {
         var seen = new HashSet<string>(StringComparer.Ordinal);
