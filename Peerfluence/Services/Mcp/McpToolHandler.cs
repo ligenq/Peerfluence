@@ -11,6 +11,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Protocol;
 using Peerfluence.Core;
+using Peerfluence.Core.Services;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Services.Mcp;
@@ -19,6 +20,7 @@ public class McpToolHandler : IMcpToolHandler
 {
     private const int DefaultMaxTorrentPayloadBytes = 10 * 1024 * 1024;
     private readonly ITorrentService _torrentService;
+    private readonly ITorrentSearchService _searchService;
     private readonly ITopLevelService _topLevelService;
     private readonly IAppSettingsService _appSettingsService;
     private readonly IHostApplicationLifetime _hostLifetime;
@@ -29,8 +31,10 @@ public class McpToolHandler : IMcpToolHandler
         ITopLevelService topLevelService,
         IAppSettingsService appSettingsService,
         IHostApplicationLifetime hostLifetime,
+        ITorrentSearchService searchService,
         IMcpRuntimeOptions? runtimeOptions = null)
     {
+        _searchService = searchService;
         _torrentService = torrentService;
         _topLevelService = topLevelService;
         _appSettingsService = appSettingsService;
@@ -658,6 +662,50 @@ public class McpToolHandler : IMcpToolHandler
         catch (Exception ex)
         {
             return ToolError($"Error moving torrent storage: {ex.Message}", "move_storage_failed");
+        }
+    }
+
+    /// <summary>
+    /// Searches the configured indexer.
+    /// </summary>
+    /// <remarks>
+    /// The agent could add a torrent it already had a link for and could not find one, so half of
+    /// "find me something and add it" was missing. The search service treats an unreachable indexer
+    /// as an ordinary outcome rather than an exception, and that outcome is passed on rather than
+    /// turned into an error: nothing found because nothing is configured is worth saying plainly.
+    /// </remarks>
+    public async Task<CallToolResult> SearchTorrentsAsync(string query, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return ToolError("A search needs something to search for.", "empty_query");
+            }
+
+            var response = await _searchService.SearchAsync(query, cancellationToken).ConfigureAwait(false);
+
+            var results = response.Results.Select(result => new McpConstants.SearchResultSummary(
+                Title: result.Title,
+                SizeBytes: result.SizeBytes,
+                Seeders: result.Seeders,
+                Peers: result.Peers,
+                IndexerName: result.IndexerName,
+                PublishedAt: result.PublishedAt,
+                Link: result.Link,
+                IsMagnet: result.IsMagnet)).ToList();
+
+            var payload = new McpConstants.SearchResultsResponse(
+                Query: query,
+                Results: results,
+                Failure: response.Failure == SearchFailure.None ? null : response.Failure.ToString(),
+                FailureDetail: response.FailureDetail);
+
+            return ToolText(JsonSerializer.Serialize(payload, McpJsonContext.Default.SearchResultsResponse));
+        }
+        catch (Exception ex)
+        {
+            return ToolError($"Error searching: {ex.Message}", "search_failed");
         }
     }
 

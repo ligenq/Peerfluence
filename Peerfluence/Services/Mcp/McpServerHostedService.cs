@@ -100,6 +100,10 @@ public class McpServerHostedService : BackgroundService
                         new McpServerToolCreateOptions { Name = McpConstants.ToolAddTorrent, Description = McpConstants.ToolAddTorrentDescription }));
 
                     options.ToolCollection.Add(McpServerTool.Create(
+                        _toolHandler.SearchTorrentsAsync,
+                        new McpServerToolCreateOptions { Name = McpConstants.ToolSearchTorrents, Description = McpConstants.ToolSearchTorrentsDescription }));
+
+                    options.ToolCollection.Add(McpServerTool.Create(
                         _toolHandler.ManageTorrentAsync,
                         new McpServerToolCreateOptions { Name = McpConstants.ToolManageTorrent, Description = McpConstants.ToolManageTorrentDescription }));
 
