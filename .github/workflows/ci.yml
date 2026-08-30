@@ -44,6 +44,10 @@ jobs:
       # xunit.v3 4.0 is Microsoft.Testing.Platform only - it dropped VSTest, which is what the
       # --logger options above spoke. global.json opts `dotnet test` into MTP; everything after the
       # bare -- is passed to the test executable itself, which is where the reporting options moved.
+      #
+      # Not everything, though: `dotnet test` reads --results-directory itself even after the bare
+      # --, and then reads the value after it as a directory to test, which it refuses. The reports
+      # land in ./TestResults without being asked, which is where the upload step looks anyway.
       - name: Unit tests
         run: >
           dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj
@@ -52,7 +56,6 @@ jobs:
           --
           --report-trx
           --report-trx-filename unit-${{ matrix.os }}.trx
-          --results-directory TestResults
 
       - name: Headless UI tests
         run: >
@@ -62,7 +65,6 @@ jobs:
           --
           --report-trx
           --report-trx-filename headless-${{ matrix.os }}.trx
-          --results-directory TestResults
 
       # Peerfluence.UiTests is built by the step above and deliberately not run here. It drives the
       # real application through Windows UI Automation, which needs an interactive desktop session,
