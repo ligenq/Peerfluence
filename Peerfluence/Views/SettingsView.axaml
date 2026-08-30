@@ -395,6 +395,32 @@
                     </Grid>
                 </StackPanel>
             </suki:GlassCard>
+            <!--
+                Seeding goals. The engine has always enforced these per torrent and the add dialog
+                has always been able to set them; what was missing was an answer for the torrents
+                nobody says anything about, which is nearly all of them.
+            -->
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                        <materialIcons:MaterialIcon Kind="SeedOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <TextBlock Text="{m:L Settings_Seeding}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{m:L Settings_SeedingHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                            <ToggleSwitch IsChecked="{Binding LimitSeedingRatio, Mode=TwoWay}" Content="{m:L Settings_LimitSeedingRatio}" AutomationProperties.AutomationId="LimitSeedingRatioSwitch"/>
+                            <NumericUpDown Value="{Binding SeedingRatioLimit}" Minimum="0" Increment="0.1" FormatString="0.0#" IsEnabled="{Binding LimitSeedingRatio}" AutomationProperties.Name="{m:L Settings_LimitSeedingRatio}" AutomationProperties.AutomationId="SeedingRatioLimitInput"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                            <ToggleSwitch IsChecked="{Binding LimitSeedingTime, Mode=TwoWay}" Content="{m:L Settings_LimitSeedingTime}" AutomationProperties.AutomationId="LimitSeedingTimeSwitch"/>
+                            <NumericUpDown Value="{Binding SeedingTimeLimitMinutes}" Minimum="0" IsEnabled="{Binding LimitSeedingTime}" AutomationProperties.Name="{m:L Settings_LimitSeedingTime}" AutomationProperties.AutomationId="SeedingTimeLimitInput"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </suki:GlassCard>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

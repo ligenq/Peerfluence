@@ -33,7 +33,7 @@ public class MainWindowViewModelTests
         _settingsService = new AppSettingsService(paths, store, fileSystem);
         var loggerFactory = Substitute.For<Microsoft.Extensions.Logging.ILoggerFactory>();
         var engineService = new TorrentEngineService(_settingsService, loggerFactory);
-        var torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        var torrentService = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
         var selectionService = new TorrentSelectionService(Substitute.For<IAppMessenger>());
         var topLevelService = Substitute.For<ITopLevelService>();
         var localizationService = new LocalizationService();

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -1473,5 +1473,17 @@ Peerfluence поширюється за MIT License. Установлюючи а
   </data>
   <data name="Settings_BindAddressInvalid" xml:space="preserve">
     <value>До цієї адреси прив’язатися не можна. Вкажіть власну адресу цієї машини, а не 0.0.0.0.</value>
+  </data>
+  <data name="Settings_Seeding" xml:space="preserve">
+    <value>Роздача</value>
+  </data>
+  <data name="Settings_SeedingHint" xml:space="preserve">
+    <value>Застосовується до торентів, доданих відтепер. Кожен торент може мати власні цілі.</value>
+  </data>
+  <data name="Settings_LimitSeedingRatio" xml:space="preserve">
+    <value>Зупинити на рейтингу</value>
+  </data>
+  <data name="Settings_LimitSeedingTime" xml:space="preserve">
+    <value>Зупинити через хвилини</value>
   </data>
 </root>

@@ -9,13 +9,106 @@ namespace Peerfluence.Tests.Services;
 [Collection("Messenger")]
 public sealed class TorrentServiceTests
 {
+    /// <summary>
+    /// A settings service whose seeding defaults say what the test needs them to.
+    /// </summary>
+    private static IAppSettingsService SeedingSettings(
+        bool limitRatio = false,
+        float ratio = 2.0f,
+        bool limitTime = false,
+        int minutes = 1440)
+    {
+        var settings = new Peerfluence.Core.Config.AppSettings();
+        settings.Seeding.LimitRatio = limitRatio;
+        settings.Seeding.RatioLimit = ratio;
+        settings.Seeding.LimitSeedTime = limitTime;
+        settings.Seeding.SeedTimeLimitMinutes = minutes;
+
+        var service = Substitute.For<IAppSettingsService>();
+        service.Current.Returns(settings);
+        return service;
+    }
+
+    /// <summary>An engine that records the options it was handed.</summary>
+    private static (ITorrentEngineService Service, Func<AddTorrentOptions?> Captured) CapturingEngine()
+    {
+        AddTorrentOptions? captured = null;
+        var engine = Substitute.For<IClientEngine>();
+        engine.Settings.Returns(new Settings());
+        engine.AddMagnetAsync(Arg.Any<MagnetLink>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                captured = call.Arg<AddTorrentOptions>();
+                return Task.FromResult(Substitute.For<ITorrent>());
+            });
+
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+        return (engineService, () => captured);
+    }
+
+    private const string Magnet = "magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567";
+
+    [Fact]
+    public async Task AddingATorrent_TakesTheSeedingGoalsFromTheSettings()
+    {
+        // Without a default, every torrent seeds for ever unless somebody sets it individually.
+        var (engineService, captured) = CapturingEngine();
+        var sut = new TorrentService(
+            engineService,
+            Substitute.For<IAppMessenger>(),
+            new HttpClient(),
+            SeedingSettings(limitRatio: true, ratio: 1.5f, limitTime: true, minutes: 90));
+
+        await sut.AddMagnetAsync(Magnet, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(1.5f, captured()!.RatioLimit);
+        Assert.Equal(TimeSpan.FromMinutes(90), captured()!.SeedTimeLimit);
+    }
+
+    [Fact]
+    public async Task ATorrentAddedWithGoalsOfItsOwn_KeepsThem()
+    {
+        // The add dialog and the details pane set these per torrent, and a default must not overrule
+        // somebody who has just said what they want.
+        var (engineService, captured) = CapturingEngine();
+        var sut = new TorrentService(
+            engineService,
+            Substitute.For<IAppMessenger>(),
+            new HttpClient(),
+            SeedingSettings(limitRatio: true, ratio: 1.5f));
+
+        await sut.AddMagnetAsync(
+            Magnet,
+            new AddTorrentOptions { RatioLimit = 9.0f },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(9.0f, captured()!.RatioLimit);
+    }
+
+    [Fact]
+    public async Task WithNoSeedingGoalsSet_ATorrentIsGivenNone()
+    {
+        var (engineService, captured) = CapturingEngine();
+        var sut = new TorrentService(
+            engineService,
+            Substitute.For<IAppMessenger>(),
+            new HttpClient(),
+            SeedingSettings());
+
+        await sut.AddMagnetAsync(Magnet, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(captured()!.RatioLimit);
+        Assert.Null(captured()!.SeedTimeLimit);
+    }
+
     [Fact]
     public void GetStats_ReturnsEmptyStats_WhenEngineIsUnavailable()
     {
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(_ => throw new InvalidOperationException("Torrent engine is not initialized."));
         var messenger = Substitute.For<IAppMessenger>();
-        var sut = new TorrentService(engineService, messenger, new HttpClient());
+        var sut = new TorrentService(engineService, messenger, new HttpClient(), SeedingDefaults.Off);
 
         var stats = sut.GetStats();
 
@@ -31,7 +124,7 @@ public sealed class TorrentServiceTests
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
         var messenger = Substitute.For<IAppMessenger>();
-        var sut = new TorrentService(engineService, messenger, new HttpClient());
+        var sut = new TorrentService(engineService, messenger, new HttpClient(), SeedingDefaults.Off);
 
         var stats = sut.GetStats();
 
@@ -47,7 +140,7 @@ public sealed class TorrentServiceTests
         var engine = Substitute.For<IClientEngine>();
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
 
         var exception = await Assert.ThrowsAsync<NotSupportedException>(
             () => sut.AddMagnetAsync(
@@ -103,7 +196,7 @@ public sealed class TorrentServiceTests
                 return Task.CompletedTask;
             });
 
-        var sut = new TorrentService(engineService, messenger, new HttpClient());
+        var sut = new TorrentService(engineService, messenger, new HttpClient(), SeedingDefaults.Off);
 
         sut.PublishAlert(
             new SimpleMetadataAlert
@@ -131,7 +224,7 @@ public sealed class TorrentServiceTests
         var engineService = Substitute.For<ITorrentEngineService>();
         engineService.Engine.Returns(engine);
 
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient());
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off);
 
         await sut.SaveSessionAsync(TestContext.Current.CancellationToken);
 
