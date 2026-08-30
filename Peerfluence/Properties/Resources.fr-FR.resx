@@ -1516,4 +1516,22 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Choisir un dossier à surveiller</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Limites programmées</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Utiliser d’autres limites à certaines heures</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Tant que la fenêtre est ouverte, ces limites remplacent celles ci-dessus. Une heure de fin antérieure à l’heure de début passe par minuit.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>De</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>À</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Jours</value>
+  </data>
 </root>

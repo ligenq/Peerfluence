@@ -411,6 +411,61 @@
                 </StackPanel>
             </suki:GlassCard>
             <!--
+                Scheduled limits. One window rather than a table of them: what people want is to
+                leave the connection alone while they are using it.
+            -->
+            <suki:GlassCard>
+                <StackPanel Spacing="{StaticResource SpacingStandard}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                        <materialIcons:MaterialIcon Kind="ClockOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <TextBlock Text="{m:L Settings_Schedule}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <ToggleSwitch IsChecked="{Binding ScheduleEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableSchedule}" AutomationProperties.AutomationId="EnableScheduleSwitch"/>
+                    <TextBlock Text="{m:L Settings_ScheduleHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                    <StackPanel Spacing="{StaticResource SpacingMedium}" IsEnabled="{Binding ScheduleEnabled}">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_ScheduleFrom}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding ScheduleFrom, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ScheduleFrom}" AutomationProperties.AutomationId="ScheduleFromTextBox"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_ScheduleTo}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding ScheduleTo, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_ScheduleTo}" AutomationProperties.AutomationId="ScheduleToTextBox"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_DownloadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <NumericUpDown Value="{Binding ScheduleDownloadKibibytesPerSecond}" Minimum="0" AutomationProperties.Name="{m:L Settings_DownloadLimit}" AutomationProperties.AutomationId="ScheduleDownloadLimitInput"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                <TextBlock Text="{m:L Settings_UploadLimit}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <NumericUpDown Value="{Binding ScheduleUploadKibibytesPerSecond}" Minimum="0" AutomationProperties.Name="{m:L Settings_UploadLimit}" AutomationProperties.AutomationId="ScheduleUploadLimitInput"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                            <TextBlock Text="{m:L Settings_ScheduleDays}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                            <ItemsControl ItemsSource="{Binding ScheduleDays}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ScheduleDayViewModel">
+                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </suki:GlassCard>
+            <!--
                 Seeding goals. The engine has always enforced these per torrent and the add dialog
                 has always been able to set them; what was missing was an answer for the torrents
                 nobody says anything about, which is nearly all of them.

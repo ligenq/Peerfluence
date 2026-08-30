@@ -1516,4 +1516,22 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Zu überwachenden Ordner wählen</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Geplante Grenzen</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Zu bestimmten Zeiten andere Grenzen verwenden</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Solange das Fenster offen ist, ersetzen diese Grenzen die obigen. Eine Endzeit vor der Startzeit läuft über Mitternacht.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>Von</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>Bis</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Tage</value>
+  </data>
 </root>

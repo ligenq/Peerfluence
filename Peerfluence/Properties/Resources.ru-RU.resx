@@ -1516,4 +1516,22 @@ Peerfluence распространяется по MIT License. Устанавл�
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Выберите папку для отслеживания</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Ограничения по расписанию</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Использовать другие ограничения в определённое время</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Пока окно открыто, эти ограничения заменяют указанные выше. Время окончания раньше времени начала проходит через полночь.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>С</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>До</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Дни</value>
+  </data>
 </root>

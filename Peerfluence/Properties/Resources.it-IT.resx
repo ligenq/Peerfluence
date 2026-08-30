@@ -1516,4 +1516,22 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Scegli una cartella da osservare</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Limiti programmati</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Usa limiti diversi in certi orari</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Finché la finestra è aperta, questi limiti sostituiscono quelli sopra. Un orario di chiusura precedente a quello di apertura attraversa la mezzanotte.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>Dalle</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Giorni</value>
+  </data>
 </root>

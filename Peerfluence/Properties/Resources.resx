@@ -1510,4 +1510,22 @@
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Choose a folder to watch</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Scheduled limits</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Use different limits at certain times</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>While the window is open these limits replace the ones above. A closing time earlier than the opening time runs through midnight.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Days</value>
+  </data>
 </root>
