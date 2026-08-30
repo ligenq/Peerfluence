@@ -25,7 +25,6 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly AboutViewModel _aboutViewModel;
     private readonly IInterfaceModeService _interfaceModeService;
     private readonly IDialogService _dialogService;
-    private readonly List<NavigationItem> _featureItems = new();
     private bool _startupUpdateCheckStarted;
     private bool _disposed;
 
@@ -61,15 +60,6 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         DownloadsViewModel = downloadsViewModel;
         SettingsPage = settingsViewModel;
 
-        foreach (var feature in features.OrderBy(f => f.Order))
-        {
-            var icon = Enum.TryParse<MaterialIconKind>(feature.IconKind, out var parsed)
-                ? parsed
-                : MaterialIconKind.CircleOutline;
-
-            _featureItems.Add(new NavigationItem(feature.Title, icon, (ViewModelBase)feature));
-        }
-
         ShowAboutCommand = new RelayCommand(ShowAbout);
         ShowSimpleSettingsCommand = new RelayCommand(() => IsSimpleSettingsOpen = true);
         CloseSimpleSettingsCommand = new RelayCommand(() => IsSimpleSettingsOpen = false);
@@ -77,7 +67,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         ChooseAdvancedModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Advanced));
         SwitchToAdvancedModeCommand = new AsyncRelayCommand(() => ChooseModeAsync(InterfaceMode.Advanced));
 
-        NavigationItems = new ObservableCollection<NavigationItem>(_featureItems);
+        NavigationItems = new ObservableCollection<NavigationItem>(BuildNavigation(features));
 
         SelectedNavigationItem = NavigationItems.FirstOrDefault();
 
@@ -194,9 +184,48 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         set => SetProperty(ref field, value);
     }
 
+    /// <summary>
+    /// The navigation, in the order the features asked to appear in.
+    /// </summary>
+    /// <remarks>
+    /// A function of its argument and nothing else, so the ordering and the fallback icon can be
+    /// checked without building a window's worth of view model. It stays on the way in rather than
+    /// moving to an initialise step, because turning a constructor argument into this object's own
+    /// state is the one thing a constructor is unarguably for.
+    /// </remarks>
+    internal static IReadOnlyList<NavigationItem> BuildNavigation(IEnumerable<IFeatureViewModel> features)
+    {
+        ArgumentNullException.ThrowIfNull(features);
+
+        var items = new List<NavigationItem>();
+
+        foreach (var feature in features.OrderBy(f => f.Order))
+        {
+            // Named rather than cast. A feature that is not a view model is a registration mistake,
+            // and an InvalidCastException at startup names neither the feature nor what was expected
+            // of it.
+            if (feature is not ViewModelBase viewModel)
+            {
+                throw new InvalidOperationException(
+                    $"{feature.GetType().Name} is registered as a navigation feature but does not "
+                        + $"derive from {nameof(ViewModelBase)}, so there is nothing to show for it.");
+            }
+
+            // An icon nobody recognises is worth a placeholder rather than a crash: the name is a
+            // string in a view model, and getting it wrong should cost a wrong picture.
+            var icon = Enum.TryParse<MaterialIconKind>(feature.IconKind, out var parsed)
+                ? parsed
+                : MaterialIconKind.CircleOutline;
+
+            items.Add(new NavigationItem(feature.Title, icon, viewModel));
+        }
+
+        return items;
+    }
+
     private void UpdateNavigationTitles()
     {
-        foreach (var item in _featureItems)
+        foreach (var item in NavigationItems)
         {
             if (item.ViewModel is IFeatureViewModel feature)
             {
@@ -288,7 +317,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
         _disposed = true;
         WeakReferenceMessenger.Default.UnregisterAll(this);
-        foreach (var disposable in _featureItems.Select(item => item.ViewModel).OfType<IDisposable>())
+        foreach (var disposable in NavigationItems.Select(item => item.ViewModel).OfType<IDisposable>())
         {
             disposable.Dispose();
         }
