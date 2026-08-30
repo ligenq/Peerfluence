@@ -19,6 +19,95 @@ namespace Peerfluence.Tests.Architecture;
 public sealed class CompositionTests
 {
     [Fact]
+    public void NoServiceIsWiredUpAfterItIsConstructed()
+    {
+        // A service with a settable, interface-typed property is one somebody has to remember to
+        // finish building. The notification service had exactly that shape: ToastManager was a
+        // settable nullable with a null guard, set by the main view model through a downcast from
+        // INotificationService to the concrete type. The day that cast missed - a decorator, a
+        // different registration, a test double - toasts would have stopped appearing and nothing
+        // would have said so, because a service that is half built looks exactly like one that is
+        // not being used.
+        //
+        // Constructor arguments cannot be forgotten. The container fails loudly instead.
+        var offenders = new List<string>();
+
+        foreach (var type in ProductionTypes())
+        {
+            // Settings and other data carried between layers are assigned property by property by
+            // design; the rule is about services, which are things with behaviour.
+            if (type.Namespace?.Contains(".Config", StringComparison.Ordinal) == true)
+            {
+                continue;
+            }
+
+            foreach (var property in type.GetProperties(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            {
+                var setter = property.SetMethod;
+                if (setter is null || setter.IsPrivate || !property.PropertyType.IsInterface)
+                {
+                    continue;
+                }
+
+                // A collection handed over whole is data, not a collaborator.
+                if (typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType))
+                {
+                    continue;
+                }
+
+                // A setter somebody wrote is the type governing its own state, which is a different
+                // thing entirely: TorrentSelectionService.SelectedTorrent is settable because a
+                // selection changing is what that service is for, and it publishes a message when it
+                // does. Only an automatic property is nobody's responsibility.
+                if (setter.GetCustomAttribute<CompilerGeneratedAttribute>() is null)
+                {
+                    continue;
+                }
+
+                // An init-only setter can be assigned while the object is being made and never
+                // after, which is a constructor argument spelled differently.
+                if (setter.ReturnParameter.GetRequiredCustomModifiers()
+                    .Any(modifier => modifier.Name == "IsExternalInit"))
+                {
+                    continue;
+                }
+
+                offenders.Add(
+                    $"  {type.Name}.{property.Name} is a {property.PropertyType.Name} that can be set "
+                        + "after construction. Take it as a constructor argument instead.");
+            }
+        }
+
+        Assert.True(
+            offenders.Count == 0,
+            $"{offenders.Count} services can be reconfigured after they are built:{Environment.NewLine}"
+                + string.Join(Environment.NewLine, offenders));
+    }
+
+    /// <summary>Every type that ships, in both production assemblies.</summary>
+    private static IEnumerable<Type> ProductionTypes()
+    {
+        foreach (var assembly in new[]
+        {
+            typeof(ViewModelBase).Assembly,
+            typeof(Peerfluence.Core.Services.ITorrentService).Assembly,
+        })
+        {
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsClass
+                    && !type.IsAbstract
+                    && type.GetCustomAttribute<CompilerGeneratedAttribute>() is null
+                    && !type.Name.Contains('<', StringComparison.Ordinal))
+                {
+                    yield return type;
+                }
+            }
+        }
+    }
+
+    [Fact]
     public void NoTorrentIsIdentifiedByComparingHashesDirectly()
     {
         // A torrent carries a v1 and a v2 hash and almost never has both; the missing one is stored
