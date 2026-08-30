@@ -18,7 +18,7 @@ public class McpToolHandlerTests
     {
         // Arrange
         // We can pass null for TorrentService because it should fail fast on validation.
-        var handler = new McpToolHandler(null!, null!, null!, null!);
+        var handler = new McpToolHandler(null!, null!, null!, null!, Substitute.For<ITorrentSearchService>());
 
         // Act
         var result = await handler.AddTorrentAsync(string.Empty, TestContext.Current.CancellationToken);
@@ -32,7 +32,7 @@ public class McpToolHandlerTests
     public async Task AddTorrentAsync_ReturnsError_WhenMagnetLinkIsInvalid()
     {
         // Arrange
-        var handler = new McpToolHandler(null!, null!, null!, null!);
+        var handler = new McpToolHandler(null!, null!, null!, null!, Substitute.For<ITorrentSearchService>());
 
         // Act
         var result = await handler.AddTorrentAsync("invalid_magnet_link", TestContext.Current.CancellationToken);
@@ -46,7 +46,7 @@ public class McpToolHandlerTests
     public async Task ManageTorrentAsync_ReturnsError_WhenInfoHashIsInvalid()
     {
         // Arrange
-        var handler = new McpToolHandler(null!, null!, null!, null!);
+        var handler = new McpToolHandler(null!, null!, null!, null!, Substitute.For<ITorrentSearchService>());
 
         // Act
         var result = await handler.ManageTorrentAsync("not_a_hex_hash", "pause", TestContext.Current.CancellationToken);
@@ -66,7 +66,7 @@ public class McpToolHandlerTests
             Substitute.For<ITorrentService>(),
             Substitute.For<ITopLevelService>(),
             settingsService,
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var downloadPath = Path.Combine(Path.GetTempPath(), $"peerfluence-mcp-{Guid.NewGuid():N}");
         var result = await handler.UpdateSettingsAsync($$"""
@@ -98,7 +98,7 @@ public class McpToolHandlerTests
             Substitute.For<ITorrentService>(),
             Substitute.For<ITopLevelService>(),
             settingsService,
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.UpdateSettingsAsync(
             $$"""{ "network": { "bindAddress": "{{invalidAddress}}" } }""",
@@ -127,7 +127,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.AddTorrentAsync(
             Convert.ToBase64String(new byte[] { 1, 2, 3, 4 }),
@@ -158,7 +158,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(allowDestructiveTools: true),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.ManageTorrentAsync(
             new string('0', InfoHash.V1Length * 2), "remove", TestContext.Current.CancellationToken);
@@ -183,7 +183,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(allowDestructiveTools: true),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var pauseResult = await handler.ManageTorrentAsync(infoHash.ToHexString(), "pause", TestContext.Current.CancellationToken);
         var resumeResult = await handler.ManageTorrentAsync(infoHash.ToHexString(), "resume", TestContext.Current.CancellationToken);
@@ -210,7 +210,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.ManageTorrentAsync(infoHash.ToHexString(), "remove", TestContext.Current.CancellationToken);
 
@@ -233,7 +233,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.ManageTorrentAsync(infoHash.ToHexString(), "resume", TestContext.Current.CancellationToken);
 
@@ -256,7 +256,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.ManageTorrentAsync(infoHash.ToHexString(), "pause", TestContext.Current.CancellationToken);
 
@@ -273,7 +273,7 @@ public class McpToolHandlerTests
             Substitute.For<ITorrentService>(),
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(allowDestructiveTools: true),
-            lifetime);
+            lifetime, Substitute.For<ITorrentSearchService>());
 
         var result = await handler.ShutdownApplicationAsync();
 
@@ -297,7 +297,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.SetFilePriorityAsync(infoHash.ToHexString(), 1, "high", TestContext.Current.CancellationToken);
 
@@ -343,7 +343,7 @@ public class McpToolHandlerTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             CreateSettingsService(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.GetTorrentDiagnosticsAsync(infoHash.ToHexString());
 
@@ -374,7 +374,7 @@ public class McpToolHandlerTests
         topLevelService.IsWindowAvailable.Returns(true);
         topLevelService.CaptureWindowPngAsync(Arg.Any<CancellationToken>()).Returns(png);
 
-        var handler = new McpToolHandler(null!, topLevelService, null!, null!);
+        var handler = new McpToolHandler(null!, topLevelService, null!, null!, Substitute.For<ITorrentSearchService>());
 
         var result = await handler.TakeScreenshotAsync(TestContext.Current.CancellationToken);
 
@@ -388,7 +388,7 @@ public class McpToolHandlerTests
         var topLevelService = Substitute.For<ITopLevelService>();
         topLevelService.IsWindowAvailable.Returns(false);
 
-        var handler = new McpToolHandler(null!, topLevelService, null!, null!);
+        var handler = new McpToolHandler(null!, topLevelService, null!, null!, Substitute.For<ITorrentSearchService>());
 
         var result = await handler.TakeScreenshotAsync(TestContext.Current.CancellationToken);
 
@@ -404,7 +404,7 @@ public class McpToolHandlerTests
         topLevelService.IsWindowAvailable.Returns(true);
         topLevelService.CaptureWindowPngAsync(Arg.Any<CancellationToken>()).Returns((byte[]?)null);
 
-        var handler = new McpToolHandler(null!, topLevelService, null!, null!);
+        var handler = new McpToolHandler(null!, topLevelService, null!, null!, Substitute.For<ITorrentSearchService>());
 
         var result = await handler.TakeScreenshotAsync(TestContext.Current.CancellationToken);
 

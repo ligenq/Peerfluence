@@ -48,7 +48,7 @@ public sealed class McpToolHandlerPeerSharpToolsTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             Settings(allowDestructiveTools),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         return (handler, torrent);
     }
@@ -62,7 +62,7 @@ public sealed class McpToolHandlerPeerSharpToolsTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             Settings(allowDestructiveTools: true),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
     }
 
     private static string Text(CallToolResult result) =>
@@ -100,7 +100,7 @@ public sealed class McpToolHandlerPeerSharpToolsTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             Settings(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.ConfigureTorrentAsync(v2Hash.ToHexString(), maxConnections: 12);
 
@@ -356,7 +356,7 @@ public sealed class McpToolHandlerPeerSharpToolsTests
             torrentService,
             Substitute.For<ITopLevelService>(),
             Settings(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         await handler.InvokeUiActionAsync("pause_all", TestContext.Current.CancellationToken);
         await handler.InvokeUiActionAsync("resume_all", TestContext.Current.CancellationToken);
@@ -373,7 +373,7 @@ public sealed class McpToolHandlerPeerSharpToolsTests
             Substitute.For<ITorrentService>(),
             Substitute.For<ITopLevelService>(),
             Settings(),
-            Substitute.For<IHostApplicationLifetime>());
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
 
         var result = await handler.InvokeUiActionAsync("format_disk", TestContext.Current.CancellationToken);
 

@@ -29,6 +29,10 @@ public static class McpConstants
     public const string ToolConfigureTorrentDescription = "Sets a torrent's super-seeding mode, maximum connections, and maximum upload slots. Omitted values are left unchanged.";
     public const string ToolManageWebSeeds = "manage_web_seeds";
     public const string ToolManageWebSeedsDescription = "Lists, adds, or removes BEP 19 web seed URLs for a torrent.";
+    public const string ToolSearchTorrents = "search_torrents";
+    public const string ToolSearchTorrentsDescription =
+        "Searches the configured Torznab indexer for torrents matching a query and returns what it "
+        + "found, including a link that add_torrent accepts. Finds nothing if no indexer is set up.";
     public const string ToolScrapeTrackers = "scrape_trackers";
     public const string ToolScrapeTrackersDescription = "Asks a torrent's trackers for current seeder and leecher counts and returns them.";
     public const string ToolRenameTorrentFile = "rename_torrent_file";
@@ -129,6 +133,26 @@ public static class McpConstants
         int Seeds,
         long Size
     );
+
+    /// <summary>One result of a search, with the link that <c>add_torrent</c> takes.</summary>
+    public record SearchResultSummary(
+        string Title,
+        long SizeBytes,
+        int Seeders,
+        int Peers,
+        string IndexerName,
+        DateTimeOffset? PublishedAt,
+        string Link,
+        bool IsMagnet);
+
+    /// <summary>
+    /// What a search came back with, and why it came back with nothing when it did.
+    /// </summary>
+    public record SearchResultsResponse(
+        string Query,
+        IReadOnlyList<SearchResultSummary> Results,
+        string? Failure = null,
+        string? FailureDetail = null);
 
     public record UiAgentStateResponse(
         bool WindowAvailable,

@@ -17,6 +17,7 @@ namespace Peerfluence.Services.Mcp;
 [JsonSerializable(typeof(List<McpConstants.TorrentFileSummary>))]
 [JsonSerializable(typeof(List<McpConstants.TorrentPeerSummary>))]
 [JsonSerializable(typeof(McpConstants.TorrentDiagnosticsResponse))]
+[JsonSerializable(typeof(McpConstants.SearchResultsResponse))]
 [JsonSerializable(typeof(McpConstants.McpOperationResult))]
 internal partial class McpJsonContext : JsonSerializerContext
 {
