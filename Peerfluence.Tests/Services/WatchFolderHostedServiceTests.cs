@@ -136,7 +136,7 @@ public sealed class WatchFolderHostedServiceTests : IDisposable
                 ? throw new IOException("still being written")
                 : Task.FromResult(Substitute.For<ITorrent>()));
 
-        await service.AddWithRetriesAsync(path, TestContext.Current.CancellationToken, TimeSpan.Zero);
+        await service.AddWithRetriesAsync(path, TimeSpan.Zero, TestContext.Current.CancellationToken);
 
         Assert.Equal(2, attempts);
         Assert.False(File.Exists(path));

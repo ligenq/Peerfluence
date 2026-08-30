@@ -84,11 +84,11 @@ public class McpServerHostedService : BackgroundService
                         continue;
                     }
 
-                    var transport = new StreamServerTransport(pipeServer, pipeServer, "Peerfluence", _loggerFactory);
+                    var transport = new StreamServerTransport(pipeServer, pipeServer, McpConstants.Name, _loggerFactory);
 
                     var options = new McpServerOptions
                     {
-                        ServerInfo = new Implementation { Name = "Peerfluence", Version = "1.0.0" },
+                        ServerInfo = new Implementation { Name = McpConstants.Name, Version = McpConstants.Version },
                         ToolCollection = new McpServerPrimitiveCollection<McpServerTool>(),
                         ResourceCollection = new McpServerResourceCollection(),
                         PromptCollection = new McpServerPrimitiveCollection<McpServerPrompt>()
