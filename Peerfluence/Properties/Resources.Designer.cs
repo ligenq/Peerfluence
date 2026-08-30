@@ -3880,5 +3880,85 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("ViewLocator_NotFound", resourceCulture);
             }
         }
+        /// <summary>
+        ///   Looks up a localized string similar to Seeding.
+        /// </summary>
+        public static string Settings_Seeding {
+            get {
+                return ResourceManager.GetString("Settings_Seeding", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Applies to torrents added from now on. Each torrent can still be given goals of its own..
+        /// </summary>
+        public static string Settings_SeedingHint {
+            get {
+                return ResourceManager.GetString("Settings_SeedingHint", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Stop at ratio.
+        /// </summary>
+        public static string Settings_LimitSeedingRatio {
+            get {
+                return ResourceManager.GetString("Settings_LimitSeedingRatio", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Stop after minutes.
+        /// </summary>
+        public static string Settings_LimitSeedingTime {
+            get {
+                return ResourceManager.GetString("Settings_LimitSeedingTime", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Statistics.
+        /// </summary>
+        public static string Nav_Statistics {
+            get {
+                return ResourceManager.GetString("Nav_Statistics", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Downloaded this session.
+        /// </summary>
+        public static string Stats_Downloaded {
+            get {
+                return ResourceManager.GetString("Stats_Downloaded", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Uploaded this session.
+        /// </summary>
+        public static string Stats_Uploaded {
+            get {
+                return ResourceManager.GetString("Stats_Uploaded", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Share ratio.
+        /// </summary>
+        public static string Stats_Ratio {
+            get {
+                return ResourceManager.GetString("Stats_Ratio", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Torrents.
+        /// </summary>
+        public static string Stats_Torrents {
+            get {
+                return ResourceManager.GetString("Stats_Torrents", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Counted since Peerfluence started, and reported by the engine itself..
+        /// </summary>
+        public static string Stats_Hint {
+            get {
+                return ResourceManager.GetString("Stats_Hint", resourceCulture);
+            }
+        }
     }
 }

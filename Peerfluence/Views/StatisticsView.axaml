@@ -1,0 +1,69 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:m="using:Peerfluence.Markup"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Peerfluence.Views.StatisticsView"
+             x:DataType="vm:StatisticsViewModel">
+
+    <!--
+        Read only, so nothing here carries an automation id for acting on: there is nothing to act
+        on. The page itself has one, because a test and an agent still need to be able to say which
+        screen they are looking at. The numbers are formatted by the same converters the lists use,
+        so a size means the same thing here as it does there.
+    -->
+    <ScrollViewer AutomationProperties.AutomationId="StatisticsPage">
+        <StackPanel Spacing="{StaticResource SpacingStandard}" MaxWidth="{StaticResource ContentMaxWidth}">
+            <TextBlock Text="{m:L Nav_Statistics}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"/>
+            <TextBlock Text="{m:L Stats_Hint}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap"/>
+
+            <suki:GlassCard>
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Stats_Downloaded}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Stats_Uploaded}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding UploadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Stats_Ratio}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding Ratio, StringFormat={}{0:0.00}}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Grid>
+            </suki:GlassCard>
+
+            <suki:GlassCard>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Downloads_Grid_Down}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Downloads_Grid_Up}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Grid>
+            </suki:GlassCard>
+
+            <suki:GlassCard>
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Stats_Torrents}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding Torrents}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Downloads_Active}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding ActiveTorrents}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Downloads_Peers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{Binding ConnectedPeers}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Grid>
+            </suki:GlassCard>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1480,4 +1480,22 @@
   <data name="Settings_LimitSeedingTime" xml:space="preserve">
     <value>Stop after minutes</value>
   </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Downloaded this session</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Uploaded this session</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Share ratio</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Torrents</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Counted since Peerfluence started, and reported by the engine itself.</value>
+  </data>
 </root>

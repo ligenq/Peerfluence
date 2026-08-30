@@ -1486,4 +1486,22 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="Settings_LimitSeedingTime" xml:space="preserve">
     <value>Зупинити через хвилини</value>
   </data>
+  <data name="Nav_Statistics" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="Stats_Downloaded" xml:space="preserve">
+    <value>Завантажено за сеанс</value>
+  </data>
+  <data name="Stats_Uploaded" xml:space="preserve">
+    <value>Роздано за сеанс</value>
+  </data>
+  <data name="Stats_Ratio" xml:space="preserve">
+    <value>Рейтинг роздачі</value>
+  </data>
+  <data name="Stats_Torrents" xml:space="preserve">
+    <value>Торенти</value>
+  </data>
+  <data name="Stats_Hint" xml:space="preserve">
+    <value>Підраховано від запуску Peerfluence і повідомлено самим рушієм.</value>
+  </data>
 </root>
