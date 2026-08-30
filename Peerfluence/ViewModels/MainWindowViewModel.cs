@@ -250,17 +250,20 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     public async Task CheckForUpdatesOnStartupAsync()
     {
-        if (_startupUpdateCheckStarted ||
-            !_settingsService.Current.Update.CheckForUpdatesOnStartup ||
-            !_updateService.CanCheckForUpdates)
-        {
-            return;
-        }
-
-        _startupUpdateCheckStarted = true;
-
         try
         {
+            // Everything, including deciding whether to start, stays inside the catch. App starts
+            // this from a synchronous dispatcher callback and deliberately does not await it, so
+            // this method must never return a faulted Task.
+            if (_startupUpdateCheckStarted ||
+                !_settingsService.Current.Update.CheckForUpdatesOnStartup ||
+                !_updateService.CanCheckForUpdates)
+            {
+                return;
+            }
+
+            _startupUpdateCheckStarted = true;
+
             var hasUpdate = await _updateService.CheckForUpdatesAsync();
             if (!hasUpdate)
             {

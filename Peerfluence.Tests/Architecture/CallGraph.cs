@@ -27,12 +27,16 @@ namespace Peerfluence.Tests.Architecture;
 internal sealed class CallGraph
 {
     private readonly Dictionary<string, HashSet<string>> _callsFrom = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, List<string>> _callsInOrderFrom = new(StringComparer.Ordinal);
 
     /// <summary>Every method the graph knows about, whether or not it calls anything.</summary>
     public HashSet<string> Methods { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Methods carrying a test attribute, which is where a reachability walk starts.</summary>
     public HashSet<string> TestEntryPoints { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Generated methods passed directly to a UI dispatcher invocation.</summary>
+    public HashSet<string> MarshalledMethods { get; } = new(StringComparer.Ordinal);
 
     /// <summary>The key a method is known by: <c>Namespace.Type::Method</c>.</summary>
     public static string Key(string typeFullName, string methodName) => $"{typeFullName}::{methodName}";
@@ -48,6 +52,10 @@ internal sealed class CallGraph
     /// <summary>Every method this one calls, directly.</summary>
     public IReadOnlyCollection<string> CalleesOf(string method) =>
         _callsFrom.TryGetValue(method, out var callees) ? callees : [];
+
+    /// <summary>Every call made by this method, in IL order and including repeated calls.</summary>
+    public IReadOnlyList<string> CallsOf(string method) =>
+        _callsInOrderFrom.TryGetValue(method, out var calls) ? calls : [];
 
     /// <summary>Every method that calls anything at all, which is every method with a body.</summary>
     public IEnumerable<string> Callers => _callsFrom.Keys;
@@ -105,7 +113,7 @@ internal sealed class CallGraph
             // nothing at all - and almost every test here is async.
             if (TryGetGeneratedOwner(declaringType, metadata.GetString(definition.Name), out var owner))
             {
-                Link(owner, caller);
+                Link(owner, caller, isIlCall: false);
             }
 
             // Abstract, extern and interface methods have no body to read.
@@ -115,14 +123,20 @@ internal sealed class CallGraph
             }
 
             var body = peReader.GetMethodBody(definition.RelativeVirtualAddress);
-            foreach (var callee in CalledMethods(metadata, body.GetILBytes() ?? []))
+            var il = body.GetILBytes() ?? [];
+            foreach (var callee in CalledMethods(metadata, il))
             {
                 Link(caller, callee);
+            }
+
+            foreach (var marshalled in DispatcherDelegateTargets(metadata, il))
+            {
+                MarshalledMethods.Add(marshalled);
             }
         }
     }
 
-    private void Link(string caller, string callee)
+    private void Link(string caller, string callee, bool isIlCall = true)
     {
         if (!_callsFrom.TryGetValue(caller, out var set))
         {
@@ -131,6 +145,19 @@ internal sealed class CallGraph
         }
 
         set.Add(callee);
+
+        if (!isIlCall)
+        {
+            return;
+        }
+
+        if (!_callsInOrderFrom.TryGetValue(caller, out var calls))
+        {
+            calls = [];
+            _callsInOrderFrom[caller] = calls;
+        }
+
+        calls.Add(callee);
     }
 
     /// <summary>
@@ -347,6 +374,69 @@ internal sealed class CallGraph
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// Finds the method loaded as a delegate immediately before a dispatcher call.
+    /// </summary>
+    /// <remarks>
+    /// This keeps the UI-thread rule precise for <c>Dispatcher.Post(() =&gt; ...)</c>: a different
+    /// dispatcher call in the same owner cannot bless an unrelated lambda. The compiler emits
+    /// <c>ldftn</c>, delegate construction, then the dispatcher call for this shape.
+    /// </remarks>
+    private static IEnumerable<string> DispatcherDelegateTargets(MetadataReader metadata, byte[] il)
+    {
+        string? lastFunctionPointer = null;
+        int offset = 0;
+
+        while (offset < il.Length)
+        {
+            short opCodeValue = il[offset++];
+            if (opCodeValue == 0xFE && offset < il.Length)
+            {
+                opCodeValue = (short)(0xFE00 | il[offset++]);
+            }
+
+            if (!OperandSizes.TryGetValue(opCodeValue, out var operandType))
+            {
+                yield break;
+            }
+
+            string? referencedMethod = null;
+            if (operandType is OperandType.InlineMethod or OperandType.InlineTok && offset + 4 <= il.Length)
+            {
+                var token = BitConverter.ToInt32([il[offset], il[offset + 1], il[offset + 2], il[offset + 3]], 0);
+                referencedMethod = ResolveMethod(metadata, token);
+            }
+
+            if (opCodeValue == OpCodes.Ldftn.Value || opCodeValue == OpCodes.Ldvirtftn.Value)
+            {
+                lastFunctionPointer = referencedMethod;
+            }
+            else if (referencedMethod is not null
+                && referencedMethod.StartsWith("Avalonia.Threading.Dispatcher::", StringComparison.Ordinal)
+                && (referencedMethod.EndsWith("::Post", StringComparison.Ordinal)
+                    || referencedMethod.EndsWith("::Invoke", StringComparison.Ordinal)
+                    || referencedMethod.EndsWith("::InvokeAsync", StringComparison.Ordinal)))
+            {
+                if (lastFunctionPointer is not null)
+                {
+                    yield return lastFunctionPointer;
+                }
+
+                lastFunctionPointer = null;
+            }
+            else if (referencedMethod is not null
+                && (opCodeValue == OpCodes.Call.Value || opCodeValue == OpCodes.Callvirt.Value))
+            {
+                // A normal call between ldftn and a dispatcher invocation means the function
+                // pointer was not the delegate being dispatched. The compiler's delegate .ctor is
+                // newobj and intentionally leaves the pointer alive until Post/Invoke.
+                lastFunctionPointer = null;
+            }
+
+            offset += OperandLength(operandType, il, offset);
+        }
     }
 
     private static int OperandLength(OperandType operandType, byte[] il, int offset)

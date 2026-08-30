@@ -40,25 +40,18 @@ public sealed class XamlInteractionTests
         // Half the templates here were doing that. The build was green either way.
         var untyped = new List<string>();
 
-        foreach (var file in Directory.EnumerateFiles(ViewsDirectory(), "*.axaml", SearchOption.AllDirectories))
+        foreach (var file in ViewFiles())
         {
-            var lines = File.ReadAllLines(file);
-            for (int i = 0; i < lines.Length; i++)
+            foreach (var template in Load(file).Descendants()
+                         .Where(element => element.Name.LocalName == "DataTemplate"))
             {
-                var start = lines[i].IndexOf("<DataTemplate", StringComparison.Ordinal);
-                if (start < 0)
+                if (template.Attribute(Xaml + "DataType") is not null)
                 {
                     continue;
                 }
 
-                var end = EndOfTag(lines[i], start);
-                var tag = end < 0 ? lines[i][start..] : lines[i][start..(end + 1)];
-
-                if (!tag.Contains("x:DataType", StringComparison.Ordinal))
-                {
-                    untyped.Add($"  {Path.GetFileName(file)}:{i + 1} declares a DataTemplate without "
-                        + "x:DataType, so its bindings are not compiled and not checked.");
-                }
+                untyped.Add($"  {Path.GetFileName(file)}:{Line(template)} declares a DataTemplate without "
+                    + "x:DataType, so its bindings are not compiled and not checked.");
             }
         }
 
@@ -72,59 +65,81 @@ public sealed class XamlInteractionTests
         // changes, and a property that quietly does not is the oldest bug in this framework: the
         // screen is simply wrong, with nothing in the log and nothing to catch.
         var silent = new List<string>();
+        var sources = ViewModelSources();
 
-        foreach (var file in Directory.EnumerateFiles(ViewsDirectory(), "*.axaml", SearchOption.AllDirectories))
+        foreach (var file in ViewFiles())
         {
-            var markup = File.ReadAllText(file);
-            var dataType = Regex.Match(markup, @"x:DataType=""vm:(\w+)""");
-            if (!dataType.Success)
+            var document = Load(file);
+            foreach (var element in document.Root!.DescendantsAndSelf())
             {
-                continue;
-            }
+                // A DataTemplate changes the binding context. Resolve every binding against its
+                // nearest declaration instead of treating the first type in the file as the type of
+                // every row, cell and nested template below it.
+                var dataType = DataTypeFor(element);
 
-            var viewModel = Path.Combine(ProjectDirectory(), "ViewModels", dataType.Groups[1].Value + ".cs");
-            if (!File.Exists(viewModel))
-            {
-                continue;
-            }
-
-            var source = File.ReadAllText(viewModel);
-
-            foreach (var name in Regex.Matches(markup, @"\{Binding (\w+)[,}]")
-                         .Select(match => match.Groups[1].Value)
-                         .Distinct(StringComparer.Ordinal))
-            {
-                if (!TryFindProperty(source, name, out var kind, out var body))
+                if (dataType is null
+                    || !dataType.StartsWith("vm:", StringComparison.Ordinal)
+                    || !sources.TryGetValue(dataType[3..], out var source))
                 {
                     continue;
                 }
 
-                // Read only, so it cannot change behind the view's back.
-                if (!Regex.IsMatch(body, @"\bset\b"))
+                foreach (var name in element.Attributes()
+                             .SelectMany(attribute => BoundPropertyNames(attribute.Value))
+                             .Distinct(StringComparer.Ordinal))
                 {
-                    continue;
-                }
+                    if (!TryFindProperty(source, name, out var kind, out var body))
+                    {
+                        continue;
+                    }
 
-                // Announced by the setter, or by whichever method changes the state behind it.
-                if (body.Contains("SetProperty", StringComparison.Ordinal)
-                    || body.Contains("OnPropertyChanged", StringComparison.Ordinal)
-                    || source.Contains($"OnPropertyChanged(nameof({name}))", StringComparison.Ordinal))
-                {
-                    continue;
-                }
+                    // Read only, so it cannot change behind the view's back.
+                    if (!Regex.IsMatch(body, @"\bset\b"))
+                    {
+                        continue;
+                    }
 
-                // A command is handed over once and never replaced.
-                if (kind.Contains("Command", StringComparison.Ordinal))
-                {
-                    continue;
-                }
+                    // Announced by the setter, by the source generator, or by whichever method
+                    // changes the state behind it.
+                    if (body.Contains("SetProperty", StringComparison.Ordinal)
+                        || body.Contains("OnPropertyChanged", StringComparison.Ordinal)
+                        || IsGeneratedObservableProperty(source, name)
+                        || source.Contains($"OnPropertyChanged(nameof({name}))", StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
 
-                silent.Add($"  {dataType.Groups[1].Value}.{name} is bound in {Path.GetFileName(file)} and "
-                    + "can be set, but never raises a change. The view will show whatever it saw first.");
+                    // A command is handed over once and never replaced.
+                    if (kind.Contains("Command", StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    silent.Add($"  {dataType[3..]}.{name} is bound at {Path.GetFileName(file)}:{Line(element)} "
+                        + "and can be set, but never raises a change. The view will show whatever it saw first.");
+                }
             }
         }
 
         Assert.True(silent.Count == 0, string.Join(Environment.NewLine, silent));
+    }
+
+    [Fact]
+    public void BoundPropertyRule_UsesTheNearestDataType()
+    {
+        var document = XDocument.Parse(
+            """
+            <UserControl xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         x:DataType="vm:RootViewModel">
+                <DataTemplate x:DataType="vm:RowViewModel">
+                    <TextBlock Text="{Binding Path=Value}" />
+                </DataTemplate>
+            </UserControl>
+            """);
+        var text = document.Descendants().Single(element => element.Name.LocalName == "TextBlock");
+
+        Assert.Equal("vm:RowViewModel", DataTypeFor(text));
+        Assert.Equal(["Value"], BoundPropertyNames(text.Attribute("Text")!.Value));
     }
 
     [Fact]
@@ -504,7 +519,10 @@ public sealed class XamlInteractionTests
         kind = string.Empty;
         body = string.Empty;
 
-        var declaration = Regex.Match(source, @"(?:public|internal) ([\w<>?\[\]\. ]+?) " + Regex.Escape(name) + @"\s*\{");
+        var declaration = Regex.Match(
+            source,
+            @"(?:public|internal)\s+(?:(?:static|partial|virtual|override|sealed|required|new)\s+)*"
+                + @"([\w<>?\[\]\., ]+?)\s+" + Regex.Escape(name) + @"\s*\{");
         if (!declaration.Success)
         {
             return false;
@@ -534,32 +552,45 @@ public sealed class XamlInteractionTests
         return false;
     }
 
-    /// <summary>The closing angle bracket of the tag opening at <paramref name="start"/>.</summary>
-    private static int EndOfTag(string line, int start)
+    private static IEnumerable<string> BoundPropertyNames(string value)
     {
-        char quote = '\0';
-
-        for (int i = start + 1; i < line.Length; i++)
+        foreach (Match match in Regex.Matches(
+                     value,
+                     @"\{Binding\s+(?:Path\s*=\s*)?!?([A-Za-z_]\w*)"))
         {
-            char c = line[i];
+            yield return match.Groups[1].Value;
+        }
+    }
 
-            if (quote != '\0')
+    private static string? DataTypeFor(XElement element) =>
+        element.AncestorsAndSelf()
+            .Select(ancestor => ancestor.Attribute(Xaml + "DataType")?.Value)
+            .FirstOrDefault(value => value is not null);
+
+    private static Dictionary<string, string> ViewModelSources()
+    {
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        var directory = Path.Combine(ProjectDirectory(), "ViewModels");
+
+        foreach (var file in Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories))
+        {
+            var source = File.ReadAllText(file);
+
+            foreach (Match declaration in Regex.Matches(
+                         source,
+                         @"\b(?:class|record(?:\s+class)?)\s+(\w+)"))
             {
-                if (c == quote)
-                {
-                    quote = '\0';
-                }
-            }
-            else if (c is '"' or '\'')
-            {
-                quote = c;
-            }
-            else if (c == '>')
-            {
-                return i;
+                result.TryAdd(declaration.Groups[1].Value, source);
             }
         }
 
-        return -1;
+        return result;
     }
+
+    private static bool IsGeneratedObservableProperty(string source, string name) =>
+        Regex.IsMatch(
+            source,
+            @"\[ObservableProperty(?:Attribute)?\]\s*"
+                + @"(?:\[[^\]]+\]\s*)*(?:public|internal)\s+partial\s+"
+                + @"[\w<>?\[\]\., ]+\s+" + Regex.Escape(name) + @"\s*\{");
 }

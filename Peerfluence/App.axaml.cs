@@ -165,7 +165,10 @@ public class App : Application, IDisposable
                 WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage(startupArguments)));
         }
 
-        Dispatcher.UIThread.Post(async () => await viewModel.CheckForUpdatesOnStartupAsync());
+        // The dispatcher accepts Action, so making this lambda async would turn it into async void
+        // and leave any exception with no Task to carry it. The operation owns its exception policy
+        // and catches before doing any work, making this deliberate fire-and-forget safe.
+        Dispatcher.UIThread.Post(() => _ = viewModel.CheckForUpdatesOnStartupAsync());
 
         base.OnFrameworkInitializationCompleted();
     }

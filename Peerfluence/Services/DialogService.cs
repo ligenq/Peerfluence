@@ -95,7 +95,11 @@ public sealed class DialogService : IDialogService
         textBox.SetValue(AutomationProperties.NameProperty, prompt.Title);
 
         var accepted = await ShowAsync(
-            builder => builder.WithTitle(prompt.Title).WithContent(textBox),
+            builder =>
+            {
+                Dispatcher.UIThread.VerifyAccess();
+                return builder.WithTitle(prompt.Title).WithContent(textBox);
+            },
             prompt.ConfirmLabel,
             Properties.Resources.Common_Cancel,
             confirm => EnableOnlyWhenFilledIn(confirm, textBox));
@@ -112,10 +116,14 @@ public sealed class DialogService : IDialogService
         Dispatcher.UIThread.VerifyAccess();
 
         return ShowAsync(
-            builder => builder
-                .OfType(ToNotificationType(prompt.Severity))
-                .WithTitle(prompt.Title)
-                .WithContent(Wrapped(prompt.Message)),
+            builder =>
+            {
+                Dispatcher.UIThread.VerifyAccess();
+                return builder
+                    .OfType(ToNotificationType(prompt.Severity))
+                    .WithTitle(prompt.Title)
+                    .WithContent(Wrapped(prompt.Message));
+            },
             prompt.ConfirmLabel,
             prompt.CancelLabel);
     }
@@ -161,10 +169,14 @@ public sealed class DialogService : IDialogService
         };
 
         var accepted = await ShowAsync(
-            builder => builder
-                .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
-                .WithTitle(prompt.Title)
-                .WithContent(content),
+            builder =>
+            {
+                Dispatcher.UIThread.VerifyAccess();
+                return builder
+                    .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
+                    .WithTitle(prompt.Title)
+                    .WithContent(content);
+            },
             prompt.ConfirmLabel,
             prompt.CancelLabel);
 
