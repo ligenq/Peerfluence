@@ -153,11 +153,13 @@ public static class ServiceCollectionExtensions
         // notifications can race their registration.
         services.AddHostedService<TorrentNotificationHostedService>();
         services.AddHostedService<TorrentCompletionActionHostedService>();
+        services.AddHostedService<TorrentEngineHostedService>();
+        services.AddHostedService<TorrentAlertsHostedService>();
+        // These all consume the running engine. Registering them afterwards also makes the host
+        // stop them first, so no timer or file-system event can race engine disposal.
         services.AddHostedService<WatchFolderHostedService>();
         services.AddHostedService<BandwidthScheduleHostedService>();
         services.AddHostedService<AutoSearchHostedService>();
-        services.AddHostedService<TorrentEngineHostedService>();
-        services.AddHostedService<TorrentAlertsHostedService>();
         services.AddHostedService<McpServerHostedService>();
         // Last of the servers, and does nothing unless switched on.
         services.AddHostedService<TransmissionRpcHostedService>();

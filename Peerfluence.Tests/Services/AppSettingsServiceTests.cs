@@ -124,6 +124,25 @@ public sealed class AppSettingsServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task SaveAsync_WaitsForServicesToApplyTheSavedSettings()
+    {
+        var sut = new AppSettingsService(
+            CreatePaths(),
+            Substitute.For<IAppSettingsStore>(),
+            new FileSystem());
+        var applied = false;
+        sut.SettingsSaved += _ =>
+        {
+            applied = true;
+            return Task.CompletedTask;
+        };
+
+        await sut.SaveAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(applied);
+    }
+
+    [Fact]
     public void CreateDefaultSettings_UsesConfiguredAppPaths()
     {
         var paths = CreatePaths();

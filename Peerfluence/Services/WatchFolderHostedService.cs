@@ -24,9 +24,15 @@ namespace Peerfluence.Services;
 /// </remarks>
 internal sealed class WatchFolderHostedService : IHostedService, IDisposable
 {
+    private const int AddAttempts = 5;
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(500);
+
     private readonly IAppSettingsService _settingsService;
     private readonly ITorrentService _torrentService;
     private readonly ILogger<WatchFolderHostedService> _logger;
+    private readonly CancellationTokenSource _stopping = new();
+    private readonly SemaphoreSlim _configurationLock = new(1, 1);
+    private readonly SemaphoreSlim _addLock = new(1, 1);
 
     private FileSystemWatcher? _watcher;
     private bool _disposed;
@@ -43,30 +49,45 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        var settings = _settingsService.Current.WatchFolder;
-        if (!settings.Enabled || string.IsNullOrWhiteSpace(settings.Path) || !Directory.Exists(settings.Path))
-        {
-            return;
-        }
-
-        await SweepAsync(settings.Path, cancellationToken).ConfigureAwait(false);
-
-        _watcher = new FileSystemWatcher(settings.Path, "*.torrent")
-        {
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
-            EnableRaisingEvents = true,
-        };
-        _watcher.Created += OnAppeared;
-        _watcher.Renamed += OnAppeared;
+        _settingsService.SettingsSaved += OnSettingsSavedAsync;
+        await ReconfigureAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        Dispose();
-        return Task.CompletedTask;
+        BeginStopping();
+
+        // Do not let the engine stop while an event raised just before shutdown is still adding a
+        // torrent. Hosted services stop in reverse registration order, and this service is before
+        // the engine in that sequence precisely so it can drain here.
+        await _configurationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            DisposeWatcher();
+        }
+        finally
+        {
+            _configurationLock.Release();
+        }
+        await _addLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        _addLock.Release();
     }
 
     public void Dispose()
+    {
+        BeginStopping();
+        _configurationLock.Wait();
+        try
+        {
+            DisposeWatcher();
+        }
+        finally
+        {
+            _configurationLock.Release();
+        }
+    }
+
+    private void BeginStopping()
     {
         if (_disposed)
         {
@@ -74,13 +95,88 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
         }
 
         _disposed = true;
+        _settingsService.SettingsSaved -= OnSettingsSavedAsync;
+        _stopping.Cancel();
+    }
 
+    private void DisposeWatcher()
+    {
         if (_watcher is not null)
         {
             _watcher.Created -= OnAppeared;
+            _watcher.Changed -= OnAppeared;
             _watcher.Renamed -= OnAppeared;
             _watcher.Dispose();
             _watcher = null;
+        }
+    }
+
+    /// <summary>Starts, stops, or moves the watcher to match the settings just saved.</summary>
+    internal async Task ReconfigureAsync(CancellationToken cancellationToken)
+    {
+        await _configurationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            var settings = _settingsService.Current.WatchFolder;
+            var desiredPath = settings.Enabled
+                && !string.IsNullOrWhiteSpace(settings.Path)
+                && Directory.Exists(settings.Path)
+                    ? Path.GetFullPath(settings.Path)
+                    : null;
+
+            if (_watcher is not null
+                && string.Equals(_watcher.Path, desiredPath, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            DisposeWatcher();
+            if (desiredPath is null)
+            {
+                return;
+            }
+
+            // Listen before sweeping so a file arriving between those two operations is not lost.
+            // AddAsync serializes and rechecks existence, so seeing the same file in both places is
+            // harmless.
+            var watcher = new FileSystemWatcher(desiredPath, "*.torrent")
+            {
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
+            };
+            watcher.Created += OnAppeared;
+            watcher.Changed += OnAppeared;
+            watcher.Renamed += OnAppeared;
+            _watcher = watcher;
+            watcher.EnableRaisingEvents = true;
+
+            await SweepAsync(desiredPath, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _configurationLock.Release();
+        }
+    }
+
+    private async Task OnSettingsSavedAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await ReconfigureAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (_stopping.IsCancellationRequested)
+        {
+            // The application is shutting down.
+        }
+        catch (Exception ex)
+        {
+            // The settings themselves were saved successfully. A bad or inaccessible watch path
+            // should disable this feature, not make the whole settings save look as though it failed.
+            _logger.LogWarning(ex, "Could not apply the watched-folder settings");
         }
     }
 
@@ -106,22 +202,62 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
     /// the right answer for the usual failure, which is being handed a file the writer has not
     /// finished writing.
     /// </remarks>
-    internal async Task AddAsync(string path, CancellationToken cancellationToken)
+    internal async Task<bool> AddAsync(string path, CancellationToken cancellationToken)
     {
         if (!WatchFolder.ShouldAdd(path))
         {
-            return;
+            return true;
         }
 
+        await _addLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            // The sweep and watcher can both see a newly arrived file. Whichever one gets here
+            // second finds that the first has already renamed it and has nothing left to do.
+            if (!File.Exists(path))
+            {
+                return true;
+            }
+
             await _torrentService.AddTorrentFileAsync(path, cancellationToken: cancellationToken).ConfigureAwait(false);
             File.Move(path, WatchFolder.MarkedPath(path), overwrite: true);
             _logger.LogInformation("Added {File} from the watched folder", Path.GetFileName(path));
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Could not add {File} from the watched folder", Path.GetFileName(path));
+            return false;
+        }
+        finally
+        {
+            _addLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Retries a file that may still be open or incomplete when the file-system event arrives.
+    /// </summary>
+    internal async Task AddWithRetriesAsync(
+        string path,
+        CancellationToken cancellationToken,
+        TimeSpan? retryDelay = null)
+    {
+        var delay = retryDelay ?? RetryDelay;
+        for (var attempt = 1; attempt <= AddAttempts; attempt++)
+        {
+            if (await AddAsync(path, cancellationToken).ConfigureAwait(false)
+                || attempt == AddAttempts
+                || !File.Exists(path))
+            {
+                return;
+            }
+
+            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -132,8 +268,12 @@ internal sealed class WatchFolderHostedService : IHostedService, IDisposable
             // A file is reported the moment it is created, which can be before whatever is writing it
             // has finished. Failing is handled - the file stays for the next sweep - but waiting a
             // moment first turns the common case into a success rather than a retry.
-            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
-            await AddAsync(e.FullPath, CancellationToken.None).ConfigureAwait(false);
+            await Task.Delay(RetryDelay, _stopping.Token).ConfigureAwait(false);
+            await AddWithRetriesAsync(e.FullPath, _stopping.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (_stopping.IsCancellationRequested)
+        {
+            // Shutting down.
         }
         catch (Exception ex)
         {

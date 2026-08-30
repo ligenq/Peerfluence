@@ -22,6 +22,32 @@ public sealed class WatchFolderHostedServiceTests : IDisposable
 
     public WatchFolderHostedServiceTests() => Directory.CreateDirectory(_directory);
 
+    private sealed class MutableSettingsService : IAppSettingsService
+    {
+        public MutableSettingsService(AppSettings settings) => Current = settings;
+
+        public event Func<CancellationToken, Task>? SettingsSaved;
+
+        public AppSettings Current { get; }
+
+        public AppSettings CreateDefaultSettings() => new();
+
+        public Task LoadAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public async Task SaveAsync(CancellationToken cancellationToken)
+        {
+            if (SettingsSaved is not { } handlers)
+            {
+                return;
+            }
+
+            foreach (Func<CancellationToken, Task> handler in handlers.GetInvocationList())
+            {
+                await handler(cancellationToken);
+            }
+        }
+    }
+
     public void Dispose()
     {
         try { Directory.Delete(_directory, recursive: true); }
@@ -93,6 +119,50 @@ public sealed class WatchFolderHostedServiceTests : IDisposable
 
         Assert.True(File.Exists(path));
         Assert.False(File.Exists(WatchFolder.MarkedPath(path)));
+    }
+
+    [Fact]
+    public async Task AFileStillBeingWritten_IsRetriedAndThenAdded()
+    {
+        var path = Drop("slow-copy.torrent");
+        var (service, torrents) = Create();
+        var attempts = 0;
+        torrents.AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions?>(), Arg.Any<CancellationToken>())
+            .Returns<Task<ITorrent>>(_ => ++attempts == 1
+                ? throw new IOException("still being written")
+                : Task.FromResult(Substitute.For<ITorrent>()));
+
+        await service.AddWithRetriesAsync(path, TestContext.Current.CancellationToken, TimeSpan.Zero);
+
+        Assert.Equal(2, attempts);
+        Assert.False(File.Exists(path));
+        Assert.True(File.Exists(WatchFolder.MarkedPath(path)));
+        service.Dispose();
+    }
+
+    [Fact]
+    public async Task EnablingTheFolderAfterStartup_StartsWatchingAndSweepsIt()
+    {
+        var path = Drop("waiting.torrent");
+        var settings = new AppSettings();
+        settings.WatchFolder.Path = _directory;
+        var settingsService = new MutableSettingsService(settings);
+        var torrents = Substitute.For<ITorrentService>();
+        torrents.AddTorrentFileAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Substitute.For<ITorrent>()));
+        var service = new WatchFolderHostedService(
+            settingsService,
+            torrents,
+            NullLogger<WatchFolderHostedService>.Instance);
+        await service.StartAsync(TestContext.Current.CancellationToken);
+
+        settings.WatchFolder.Enabled = true;
+        await settingsService.SaveAsync(TestContext.Current.CancellationToken);
+
+        await torrents.Received(1).AddTorrentFileAsync(
+            path, Arg.Any<AddTorrentOptions?>(), Arg.Any<CancellationToken>());
+        Assert.True(File.Exists(WatchFolder.MarkedPath(path)));
+        await service.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
