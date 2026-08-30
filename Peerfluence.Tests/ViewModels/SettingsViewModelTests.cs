@@ -56,6 +56,26 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public async Task AHandEditedWorkingDirectory_SurvivesTheSettingsScreen()
+    {
+        // The working directory is no longer a field on the screen, but it is still a setting, and
+        // removing the field must not quietly take the capability with it.
+        //
+        // This passes whether or not the view model writes the property back, because ApplyToSettings
+        // mutates the stored settings in place and what nobody touches survives. That is worth
+        // pinning rather than assuming: it is the reason the removal was safe, and it would stop
+        // being true the day saving starts from a fresh AppSettings instead.
+        _settingsService.Current.CompletionAction.WorkingDirectoryTemplate = "D:\tools";
+
+        var sut = Create(_settingsService);
+        sut.CompletionActionTimeoutSeconds = 45;
+        await sut.SaveCommand.ExecuteAsync(null);
+
+        Assert.Equal("D:\tools", _settingsService.Current.CompletionAction.WorkingDirectoryTemplate);
+        Assert.Equal(45, _settingsService.Current.CompletionAction.TimeoutSeconds);
+    }
+
+    [Fact]
     public void InitialState_LoadsFromSettings()
     {
         Assert.Equal(_settingsService.Current.Network.EnableDht, _sut.EnableDht);
