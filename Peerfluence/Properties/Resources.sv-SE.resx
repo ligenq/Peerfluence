@@ -1516,4 +1516,22 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Välj en mapp att bevaka</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Schemalagda gränser</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Använd andra gränser vid vissa tider</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Så länge fönstret är öppet ersätter dessa gränser dem ovan. En sluttid tidigare än starttiden löper över midnatt.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>Från</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>Till</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Dagar</value>
+  </data>
 </root>

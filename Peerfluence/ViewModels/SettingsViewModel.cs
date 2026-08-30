@@ -1022,6 +1022,59 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public IAsyncRelayCommand BrowseWatchFolderPathCommand { get; }
 
+    // The scheduled window: different speed limits while somebody is using the connection.
+    public bool ScheduleEnabled
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string ScheduleFrom
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = "08:00";
+
+    public string ScheduleTo
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = "18:00";
+
+    public long ScheduleDownloadKibibytesPerSecond
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    public long ScheduleUploadKibibytesPerSecond
+    {
+        get;
+        set => SetProperty(ref field, Math.Max(0, value));
+    }
+
+    /// <summary>
+    /// The days the window runs on, named by the culture rather than by the resource files.
+    /// </summary>
+    public System.Collections.Generic.IReadOnlyList<ScheduleDayViewModel> ScheduleDays { get; } =
+        BuildScheduleDays();
+
+    private static System.Collections.Generic.IReadOnlyList<ScheduleDayViewModel> BuildScheduleDays()
+    {
+        var format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat;
+
+        // Starting on the culture's own first day, so a week reads the way the reader expects.
+        var first = (int)format.FirstDayOfWeek;
+        var days = new ScheduleDayViewModel[7];
+        for (int i = 0; i < 7; i++)
+        {
+            var day = (DayOfWeek)((first + i) % 7);
+            days[i] = new ScheduleDayViewModel(day, format.GetAbbreviatedDayName(day), true);
+        }
+
+        return days;
+    }
+
     // The watched folder: torrent files dropped here are added without a dialog.
     public bool WatchFolderEnabled
     {
@@ -1119,6 +1172,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = settings.Queue.EnableQueueManagement;
         MaxActiveDownloads = settings.Queue.MaxActiveDownloads;
         MaxActiveSeeds = settings.Queue.MaxActiveSeeds;
+        ScheduleEnabled = settings.Schedule.Enabled;
+        ScheduleFrom = settings.Schedule.From;
+        ScheduleTo = settings.Schedule.To;
+        ScheduleDownloadKibibytesPerSecond = ToKibibytes(settings.Schedule.DownloadLimitBytesPerSecond);
+        ScheduleUploadKibibytesPerSecond = ToKibibytes(settings.Schedule.UploadLimitBytesPerSecond);
+        ReadScheduleDays(settings.Schedule);
         WatchFolderEnabled = settings.WatchFolder.Enabled;
         WatchFolderPath = settings.WatchFolder.Path;
         LimitSeedingRatio = settings.Seeding.LimitRatio;
@@ -1224,6 +1283,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Queue.EnableQueueManagement = EnableQueueManagement;
             settings.Queue.MaxActiveDownloads = MaxActiveDownloads;
             settings.Queue.MaxActiveSeeds = MaxActiveSeeds;
+            settings.Schedule.Enabled = ScheduleEnabled;
+            settings.Schedule.From = ScheduleFrom;
+            settings.Schedule.To = ScheduleTo;
+            settings.Schedule.DownloadLimitBytesPerSecond = ToBytes(ScheduleDownloadKibibytesPerSecond);
+            settings.Schedule.UploadLimitBytesPerSecond = ToBytes(ScheduleUploadKibibytesPerSecond);
+            WriteScheduleDays(settings.Schedule);
             settings.WatchFolder.Enabled = WatchFolderEnabled;
             settings.WatchFolder.Path = WatchFolderPath;
             settings.Seeding.LimitRatio = LimitSeedingRatio;
@@ -1364,6 +1429,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
         MaxActiveSeeds = defaults.Queue.MaxActiveSeeds;
+        ScheduleEnabled = defaults.Schedule.Enabled;
+        ScheduleFrom = defaults.Schedule.From;
+        ScheduleTo = defaults.Schedule.To;
+        ScheduleDownloadKibibytesPerSecond = ToKibibytes(defaults.Schedule.DownloadLimitBytesPerSecond);
+        ScheduleUploadKibibytesPerSecond = ToKibibytes(defaults.Schedule.UploadLimitBytesPerSecond);
+        ReadScheduleDays(defaults.Schedule);
         WatchFolderEnabled = defaults.WatchFolder.Enabled;
         WatchFolderPath = defaults.WatchFolder.Path;
         LimitSeedingRatio = defaults.Seeding.LimitRatio;
@@ -1687,6 +1758,31 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         if (folder != null)
         {
             DownloadPath = folder.Path.LocalPath;
+        }
+    }
+
+    private void ReadScheduleDays(Peerfluence.Core.Config.ScheduleSettings schedule)
+    {
+        foreach (var day in ScheduleDays)
+        {
+            day.IsSelected = Peerfluence.Core.Services.BandwidthSchedule.IsSelected(schedule, day.Day);
+        }
+    }
+
+    private void WriteScheduleDays(Peerfluence.Core.Config.ScheduleSettings schedule)
+    {
+        foreach (var day in ScheduleDays)
+        {
+            switch (day.Day)
+            {
+                case DayOfWeek.Monday: schedule.Monday = day.IsSelected; break;
+                case DayOfWeek.Tuesday: schedule.Tuesday = day.IsSelected; break;
+                case DayOfWeek.Wednesday: schedule.Wednesday = day.IsSelected; break;
+                case DayOfWeek.Thursday: schedule.Thursday = day.IsSelected; break;
+                case DayOfWeek.Friday: schedule.Friday = day.IsSelected; break;
+                case DayOfWeek.Saturday: schedule.Saturday = day.IsSelected; break;
+                default: schedule.Sunday = day.IsSelected; break;
+            }
         }
     }
 

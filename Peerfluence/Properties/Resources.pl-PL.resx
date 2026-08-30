@@ -1516,4 +1516,22 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="Settings_WatchFolderPicker_Title" xml:space="preserve">
     <value>Wybierz folder do obserwowania</value>
   </data>
+  <data name="Settings_Schedule" xml:space="preserve">
+    <value>Zaplanowane limity</value>
+  </data>
+  <data name="Settings_EnableSchedule" xml:space="preserve">
+    <value>Używaj innych limitów o określonych porach</value>
+  </data>
+  <data name="Settings_ScheduleHint" xml:space="preserve">
+    <value>Gdy okno jest otwarte, te limity zastępują powyższe. Godzina zakończenia wcześniejsza niż rozpoczęcia przechodzi przez północ.</value>
+  </data>
+  <data name="Settings_ScheduleFrom" xml:space="preserve">
+    <value>Od</value>
+  </data>
+  <data name="Settings_ScheduleTo" xml:space="preserve">
+    <value>Do</value>
+  </data>
+  <data name="Settings_ScheduleDays" xml:space="preserve">
+    <value>Dni</value>
+  </data>
 </root>

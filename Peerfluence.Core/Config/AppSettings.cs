@@ -14,6 +14,8 @@ public sealed class AppSettings
 
     public WatchFolderSettings WatchFolder { get; set; } = new();
 
+    public ScheduleSettings Schedule { get; set; } = new();
+
     public ProxySettings Proxy { get; set; } = new();
 
     public UpdateSettings Update { get; set; } = new();

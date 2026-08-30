@@ -186,9 +186,12 @@ public sealed class TorrentEngineService : ITorrentEngineService
 
         // Properties rather than a replacement Transfer object. The engine reads these from its own
         // loops and does not support having a sub-settings object swapped underneath it.
-        var network = _settingsService.Current.Network;
-        engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(network.MaxDownloadSpeedBytesPerSecond);
-        engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(network.MaxUploadSpeedBytesPerSecond);
+        // Through the schedule, which answers with the ordinary limits outside its window. So this
+        // one method is what the settings screen calls when a limit changes and what the clock calls
+        // when the window opens, and there is only ever one answer to what the limits are.
+        var (download, upload) = BandwidthSchedule.LimitsFor(_settingsService.Current, DateTimeOffset.Now);
+        engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(download);
+        engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(upload);
     }
 
     /// <summary>

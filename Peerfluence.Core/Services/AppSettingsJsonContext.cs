@@ -10,6 +10,7 @@ namespace Peerfluence.Core.Services;
 [JsonSerializable(typeof(QueueSettings))]
 [JsonSerializable(typeof(SeedingSettings))]
 [JsonSerializable(typeof(WatchFolderSettings))]
+[JsonSerializable(typeof(ScheduleSettings))]
 [JsonSerializable(typeof(ProxySettings))]
 [JsonSerializable(typeof(UpdateSettings))]
 [JsonSerializable(typeof(CompletionActionSettings))]
