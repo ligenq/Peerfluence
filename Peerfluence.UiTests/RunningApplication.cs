@@ -29,15 +29,29 @@ public sealed class RunningApplication : IDisposable
     private bool _ownsProfile = true;
     private bool _disposed;
 
-    public RunningApplication()
-        : this(Path.Combine(Path.GetTempPath(), "peerfluence-uitests", Guid.NewGuid().ToString("n")))
+    public RunningApplication(string? settingsJson = null)
+        : this(Path.Combine(Path.GetTempPath(), "peerfluence-uitests", Guid.NewGuid().ToString("n")), settingsJson)
     {
     }
 
-    private RunningApplication(string profileDirectory)
+    /// <summary>
+    /// Starts the application on a throwaway profile, optionally one that already has settings.
+    /// </summary>
+    /// <remarks>
+    /// The settings are written before the application is started, so it reads them rather than
+    /// being driven through the screens that would set them. That is worth having for the state a
+    /// test needs to arrive in rather than to demonstrate - having chosen an interface already, or
+    /// having a speed limit in place before a real download begins.
+    /// </remarks>
+    private RunningApplication(string profileDirectory, string? settingsJson = null)
     {
         ProfileDirectory = profileDirectory;
         Directory.CreateDirectory(ProfileDirectory);
+
+        if (settingsJson is not null)
+        {
+            File.WriteAllText(Path.Combine(ProfileDirectory, "settings.json"), settingsJson);
+        }
 
         var start = new ProcessStartInfo(ExecutablePath())
         {
@@ -72,7 +86,7 @@ public sealed class RunningApplication : IDisposable
     {
         _ownsProfile = false;
         Dispose();
-        return new RunningApplication(ProfileDirectory);
+        return new RunningApplication(ProfileDirectory, settingsJson: null);
     }
 
     /// <summary>The modal windows this one has opened.</summary>
@@ -130,22 +144,50 @@ public sealed class RunningApplication : IDisposable
     }
 
     /// <summary>
-    /// Navigates to the settings destination, whichever position it occupies.
+    /// Navigates to whichever destination shows <paramref name="landmarkAutomationId"/>.
     /// </summary>
-    public void GoToSettings()
+    /// <remarks>
+    /// By what a screen contains rather than by which position it occupies or what it is called: the
+    /// destinations are titled in whichever of the ten languages the machine is set to, and their
+    /// order is a property of the features that registered.
+    /// </remarks>
+    public void GoTo(string landmarkAutomationId)
     {
+        if (Exists(landmarkAutomationId))
+        {
+            return;
+        }
+
         foreach (var destination in NavigationItems())
         {
             Activate(destination);
 
-            if (Exists("AppearanceTab"))
+            if (Exists(landmarkAutomationId))
             {
                 return;
             }
         }
 
         throw new InvalidOperationException(
-            $"no navigation destination led to the settings. What was there:{Environment.NewLine}{Describe()}");
+            $"no navigation destination showed '{landmarkAutomationId}'. What was there:"
+                + $"{Environment.NewLine}{Describe()}");
+    }
+
+    /// <summary>Navigates to the settings, whichever position they occupy.</summary>
+    public void GoToSettings() => GoTo("AppearanceTab");
+
+    /// <summary>What the element with this id currently reads, or null if it is not there.</summary>
+    public string? Text(string automationId)
+    {
+        var element = Window.FindFirstDescendant(by => by.ByAutomationId(automationId));
+        return element?.Properties.Name.ValueOrDefault;
+    }
+
+    /// <summary>Whether anything on screen says this.</summary>
+    public bool ShowsText(string fragment)
+    {
+        return Window.FindAllDescendants().Any(element =>
+            element.Properties.Name.ValueOrDefault?.Contains(fragment, StringComparison.OrdinalIgnoreCase) == true);
     }
 
     public bool Exists(string automationId) =>
