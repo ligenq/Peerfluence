@@ -14,7 +14,7 @@
     <PackageReference Include="xunit.v3.extensibility.core" Version="4.0.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
-    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.9.0" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.10.0" />
     <!--
       Registers the TRX reporting option CI asks for. Without it the test host starts,
       finds no option by that name, runs nothing and exits 5 - which reads as "Zero tests
