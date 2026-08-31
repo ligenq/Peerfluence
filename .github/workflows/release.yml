@@ -25,7 +25,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Read version
         id: version
         shell: bash
@@ -54,13 +54,13 @@ jobs:
         rid: [linux-x64, linux-arm64]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.400
       - name: Build Linux packages
         run: ./ReleasePackaging/build-linux.sh --version "${{ needs.prepare.outputs.version }}" --rid "${{ matrix.rid }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Peerfluence-${{ needs.prepare.outputs.version }}-${{ matrix.rid }}
           path: |
@@ -78,15 +78,15 @@ jobs:
         rid: [win-x64, linux-x64, linux-arm64]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.400
       - name: Install CycloneDX
         run: dotnet tool install -g CycloneDX
       - name: Generate SBOM
         run: ./ReleasePackaging/build-sbom.sh --version "${{ needs.prepare.outputs.version }}" --rid "${{ matrix.rid }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Peerfluence-${{ needs.prepare.outputs.version }}-sbom-${{ matrix.rid }}
           path: artifacts/sbom/*.json
@@ -95,8 +95,8 @@ jobs:
     needs: [prepare, test]
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.400
       - name: Install Velopack CLI
@@ -104,7 +104,7 @@ jobs:
       - name: Build Windows release
         shell: pwsh
         run: ./ReleasePackaging/build-velopack.ps1 -Version "${{ needs.prepare.outputs.version }}" -CleanReleaseOutput
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Peerfluence-${{ needs.prepare.outputs.version }}-win-x64
           path: artifacts/velopack/releases/win-x64/*
@@ -120,8 +120,8 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           path: release-artifacts
           pattern: Peerfluence-${{ needs.prepare.outputs.version }}-*
@@ -129,7 +129,7 @@ jobs:
       # Attested here rather than in the build jobs, so what is signed is byte for byte what people
       # download - after the artifacts have made the round trip through upload and download.
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: release-artifacts/*
       - name: Create GitHub release
