@@ -130,3 +130,35 @@ jobs:
           name: coverage
           path: TestResults/coverage/*.cobertura.xml
           if-no-files-found: error
+
+  ci:
+    # Branch protection requires one stable check name. Requiring every matrix expansion directly
+    # makes the repository rule drift whenever a lane or operating system changes, while this gate
+    # still fails unless every required job (and every member of each matrix) succeeded.
+    #
+    # CodeQL and dependency review are deliberately absent: they are separate workflows, so they
+    # cannot be needs of a job here and have to stay required in their own right.
+    name: CI
+    if: ${{ always() }}
+    needs:
+      - test
+      - coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify required jobs
+        env:
+          TEST: ${{ needs.test.result }}
+          COVERAGE: ${{ needs.coverage.result }}
+        run: |
+          failed=0
+          for result in \
+            "test=$TEST" \
+            "coverage=$COVERAGE"
+          do
+            echo "$result"
+            if [ "${result#*=}" != "success" ]; then
+              failed=1
+            fi
+          done
+          exit "$failed"
