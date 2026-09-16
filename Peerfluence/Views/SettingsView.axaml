@@ -805,14 +805,14 @@
                         <TextBlock Text="{Binding ApplicationVersion}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                     </StackPanel>
 
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
                         <TextBlock Text="{m:L Settings_UpdateUrl}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                         <TextBox Text="{Binding UpdateUrl, Mode=TwoWay}" PlaceholderText="{m:L Settings_UpdateUrlWatermark}" AutomationProperties.Name="{m:L Settings_UpdateUrl}" AutomationProperties.AutomationId="UpdateUrlTextBox"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" IsVisible="{Binding IsDirectDownloadUpdateChannel}" AutomationProperties.AutomationId="CheckForUpdatesOnStartupSwitch"/>
+                    <ToggleSwitch IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}" Content="{m:L Settings_CheckForUpdatesOnStartup}" AutomationProperties.AutomationId="CheckForUpdatesOnStartupSwitch"/>
 
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" IsVisible="{Binding IsDirectDownloadUpdateChannel}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}">
                         <Button Command="{Binding CheckForUpdatesCommand}" AutomationProperties.Name="{m:L Settings_CheckForUpdates}" AutomationProperties.AutomationId="CheckForUpdatesButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="CloudDownloadOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>

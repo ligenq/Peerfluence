@@ -169,7 +169,7 @@ public sealed class TorrentServiceTests
         var engine = Substitute.For<IClientEngine>();
         engine.Settings.Returns(new Settings
         {
-            Files = new FilesSettings
+            Files =
             {
                 DefaultDownloadPath = defaultRoot
             }

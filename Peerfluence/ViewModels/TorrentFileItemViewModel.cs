@@ -29,38 +29,19 @@ public sealed class TorrentFileItemViewModel : ObservableObject
         Progress = info.Progress;
         IsStreamable = isStreamable;
 
-        // Sync Selected state:
-        // 1. If we are already in sync with server, update both.
-        // 2. If UI != Server, but UI == last known server, then server changed. Update.
-        // 3. Otherwise user changed it, keep UI value.
-        if (selection.Selected == IsSelected)
-        {
-            _lastServerSelected = selection.Selected;
-        }
-        else if (IsSelected == _lastServerSelected)
+        // Follow engine changes only when the user has not edited the last observed value.
+        if (IsSelected == _lastServerSelected)
         {
             IsSelected = selection.Selected;
-            _lastServerSelected = selection.Selected;
-        }
-        else
-        {
-            _lastServerSelected = selection.Selected;
         }
 
-        // Sync Priority:
-        if (selection.Priority == Priority)
-        {
-            _lastServerPriority = selection.Priority;
-        }
-        else if (Priority == _lastServerPriority)
+        if (Priority == _lastServerPriority)
         {
             Priority = selection.Priority;
-            _lastServerPriority = selection.Priority;
         }
-        else
-        {
-            _lastServerPriority = selection.Priority;
-        }
+
+        _lastServerSelected = selection.Selected;
+        _lastServerPriority = selection.Priority;
     }
 
     public int Index { get; }

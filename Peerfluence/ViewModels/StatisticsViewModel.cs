@@ -12,25 +12,23 @@ namespace Peerfluence.ViewModels;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The numbers come from <see cref="IEngineMetricsReader"/>, which listens to the meter PeerSharp
-/// publishes. That reader has existed for a while and had exactly one consumer: the MCP resource
-/// handler. So the engine's own account of itself was available to an AI agent and to nobody
-/// sitting in front of the application.
+/// The numbers come from <see cref="ITorrentService"/>, which reads PeerSharp's engine
+/// statistics, including transfer totals for torrents that have since been removed.
 /// </para>
 /// <para>
 /// Everything here is for a session rather than for all time. The counters live in the engine, and
-/// the engine starts when the application does.
+/// include restored torrent counters and reset when a new engine is created.
 /// </para>
 /// </remarks>
 public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDisposable
 {
-    private readonly IEngineMetricsReader _metrics;
+    private readonly ITorrentService _torrentService;
     private readonly CancellationTokenSource _stopping = new();
     private bool _disposed;
 
-    public StatisticsViewModel(IEngineMetricsReader metrics)
+    public StatisticsViewModel(ITorrentService torrentService)
     {
-        _metrics = metrics;
+        _torrentService = torrentService;
         Refresh();
         _ = KeepFreshAsync(_stopping.Token);
     }
@@ -101,18 +99,18 @@ public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDis
     /// <summary>Takes one reading and publishes it.</summary>
     public void Refresh()
     {
-        var snapshot = _metrics.Read();
+        var snapshot = _torrentService.GetStats();
 
-        DownloadedBytes = snapshot.LifetimeDownloadedBytes;
-        UploadedBytes = snapshot.LifetimeUploadedBytes;
-        Ratio = snapshot.LifetimeDownloadedBytes > 0
-            ? (double)snapshot.LifetimeUploadedBytes / snapshot.LifetimeDownloadedBytes
+        DownloadedBytes = snapshot.LifetimeDownloaded;
+        UploadedBytes = snapshot.LifetimeUploaded;
+        Ratio = snapshot.LifetimeDownloaded > 0
+            ? (double)snapshot.LifetimeUploaded / snapshot.LifetimeDownloaded
             : 0d;
-        DownloadSpeedBytesPerSecond = snapshot.DownloadSpeedBytesPerSecond;
-        UploadSpeedBytesPerSecond = snapshot.UploadSpeedBytesPerSecond;
-        Torrents = snapshot.Torrents;
+        DownloadSpeedBytesPerSecond = snapshot.DownloadSpeed;
+        UploadSpeedBytesPerSecond = snapshot.UploadSpeed;
+        Torrents = snapshot.TorrentCount;
         ActiveTorrents = snapshot.ActiveTorrents;
-        ConnectedPeers = snapshot.ConnectedPeers;
+        ConnectedPeers = snapshot.TotalPeers;
     }
 
     public void Dispose()
@@ -132,7 +130,7 @@ public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDis
     /// Reads once a second for as long as the application is running.
     /// </summary>
     /// <remarks>
-    /// A second, because these are counters rather than an animation, and reading the meter is not
+    /// A second, because these are counters rather than an animation, and reading the engine statistics is not
     /// free. The screen is calm at that rate and still obviously live.
     /// </remarks>
     private async Task KeepFreshAsync(CancellationToken cancellationToken)

@@ -19,7 +19,6 @@ public sealed class TransmissionRpcHandlerTests
 
     private readonly ITorrentService _torrentService = Substitute.For<ITorrentService>();
     private readonly IAppSettingsService _settingsService = Substitute.For<IAppSettingsService>();
-    private readonly ITorrentTransferSnapshots _snapshots = Substitute.For<ITorrentTransferSnapshots>();
     private readonly ITorrentCategoryService _categoryService = Substitute.For<ITorrentCategoryService>();
     private readonly AppSettings _settings = new();
 
@@ -275,11 +274,11 @@ public sealed class TransmissionRpcHandlerTests
     }
 
     [Fact]
-    public async Task Rates_ComeFromTheLastFiguresSeen()
+    public async Task Rates_ComeDirectlyFromTheTorrentWithoutAlerts()
     {
         var torrent = Torrent();
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(1024, 512, 4096, 2048, 7));
+        torrent.GetTransferStats().Returns(new TransferStats { DownloadSpeed = 1024, UploadSpeed = 512, Downloaded = 4096, Uploaded = 2048, ConnectedPeers = 7 });
 
         var response = await CallAsync(
             """{"method":"torrent-get","arguments":{"fields":["rateDownload","rateUpload","peersConnected","eta"]}}""");
@@ -297,7 +296,7 @@ public sealed class TransmissionRpcHandlerTests
     {
         var torrent = Torrent();
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.GetSnapshot(Hash).Returns(default(TorrentTransferSnapshot));
+        torrent.GetTransferStats().Returns(default(TransferStats));
 
         var response = await CallAsync("""{"method":"torrent-get","arguments":{"fields":["eta"]}}""");
 
@@ -318,7 +317,7 @@ public sealed class TransmissionRpcHandlerTests
         var running = Torrent();
         var stopped = Torrent(name: "stopped", started: false, state: TorrentState.Stopped);
         _torrentService.GetTorrents().Returns([running, stopped]);
-        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(1000, 250, 0, 0, 3));
+        running.GetTransferStats().Returns(new TransferStats { DownloadSpeed = 1000, UploadSpeed = 250, ConnectedPeers = 3 });
 
         var response = await CallAsync("""{"method":"session-stats"}""");
 
@@ -326,9 +325,8 @@ public sealed class TransmissionRpcHandlerTests
         Assert.Equal(2, arguments.GetProperty("torrentCount").GetInt32());
         Assert.Equal(1, arguments.GetProperty("activeTorrentCount").GetInt32());
         Assert.Equal(1, arguments.GetProperty("pausedTorrentCount").GetInt32());
-        // Both fixtures carry the same hash, so both read the same snapshot.
-        Assert.Equal(2000, arguments.GetProperty("downloadSpeed").GetInt64());
-        Assert.Equal(500, arguments.GetProperty("uploadSpeed").GetInt64());
+        Assert.Equal(1000, arguments.GetProperty("downloadSpeed").GetInt64());
+        Assert.Equal(250, arguments.GetProperty("uploadSpeed").GetInt64());
     }
 
     /// <summary>
@@ -370,7 +368,7 @@ public sealed class TransmissionRpcHandlerTests
         torrent.RatioLimit.Returns(1.5f);
         torrent.LastException.Returns(new InvalidOperationException("disk full"));
         _torrentService.GetTorrents().Returns([torrent]);
-        _snapshots.GetSnapshot(Hash).Returns(new TorrentTransferSnapshot(10, 20, 30, 40, 5));
+        torrent.GetTransferStats().Returns(new TransferStats { DownloadSpeed = 10, UploadSpeed = 20, Downloaded = 30, Uploaded = 40, ConnectedPeers = 5 });
 
         var response = await CallAsync("""
             {"method":"torrent-get","arguments":{"fields":[
@@ -531,9 +529,124 @@ public sealed class TransmissionRpcHandlerTests
         Assert.Equal(Path.Combine("D:", "Downloads"), reported);
     }
 
+    [Fact]
+    public async Task V2Torrents_HaveDistinctRpcIdsAndLiveStatistics()
+    {
+        var first = Torrent(hash: InfoHash.Empty);
+        first.HashV2.Returns(new InfoHash(Enumerable.Repeat((byte)0x11, InfoHash.V2Length).ToArray()));
+        first.GetTransferStats().Returns(new TransferStats { DownloadSpeed = 100, Downloaded = 300 });
+        var second = Torrent(hash: InfoHash.Empty);
+        second.HashV2.Returns(new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray()));
+        second.GetTransferStats().Returns(new TransferStats { DownloadSpeed = 200, Downloaded = 400 });
+        _torrentService.GetTorrents().Returns([first, second]);
+
+        var response = await CallAsync(
+            """{"method":"torrent-get","arguments":{"fields":["id","hashString","rateDownload","downloadedEver"]}}""");
+
+        var rows = response.GetProperty("arguments").GetProperty("torrents");
+        Assert.NotEqual(rows[0].GetProperty("id").GetInt32(), rows[1].GetProperty("id").GetInt32());
+        Assert.Equal(first.HashV2.ToHexString(), rows[0].GetProperty("hashString").GetString());
+        Assert.Equal(second.HashV2.ToHexString(), rows[1].GetProperty("hashString").GetString());
+        Assert.Equal(100, rows[0].GetProperty("rateDownload").GetInt64());
+        Assert.Equal(200, rows[1].GetProperty("rateDownload").GetInt64());
+        Assert.Equal(300, rows[0].GetProperty("downloadedEver").GetInt64());
+        Assert.Equal(400, rows[1].GetProperty("downloadedEver").GetInt64());
+        first.Received(1).GetTransferStats();
+        second.Received(1).GetTransferStats();
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TorrentGet_ResolvesV2ByItsFullOrTruncatedHash(bool truncated)
+    {
+        var torrent = Torrent(hash: InfoHash.Empty);
+        var hash = new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray());
+        torrent.HashV2.Returns(hash);
+        var unrelated = Torrent();
+        _torrentService.GetTorrents().Returns([unrelated, torrent]);
+        var lookup = truncated ? hash.TruncateToV1() : hash;
+
+        var response = await CallAsync(
+            $$$"""{"method":"torrent-get","arguments":{"ids":["{{{lookup}}}"],"fields":["hashString"]}}""");
+
+        var row = Assert.Single(response.GetProperty("arguments").GetProperty("torrents").EnumerateArray());
+        Assert.Equal(hash.ToHexString(), row.GetProperty("hashString").GetString());
+    }
+
+    [Fact]
+    public async Task TorrentRemove_AnAllZeroHashNeverSelectsV2Torrents()
+    {
+        var torrent = Torrent(hash: InfoHash.Empty);
+        torrent.HashV2.Returns(new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray()));
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        await CallAsync(
+            """{"method":"torrent-remove","arguments":{"ids":["0000000000000000000000000000000000000000"]}}""");
+
+        await _torrentService.DidNotReceive().RemoveAsync(
+            Arg.Any<ITorrent>(), Arg.Any<RemoveOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// Categories are keyed by hash, and a v2 only torrent's v1 hash is empty. Reading and writing
+    /// its label has to use the hash it actually has, or the assignment is dropped on the floor and
+    /// the read answers with nothing - both without an error, which is the part that hides it.
+    /// </summary>
+    [Fact]
+    public async Task TorrentSet_FilesALabelAgainstAV2OnlyTorrentsRealHash()
+    {
+        var torrent = Torrent(hash: InfoHash.Empty);
+        var v2 = new InfoHash(Enumerable.Repeat((byte)0x33, InfoHash.V2Length).ToArray());
+        torrent.HashV2.Returns(v2);
+        _torrentService.GetTorrents().Returns([torrent]);
+
+        await CallAsync(
+            $$$"""{"method":"torrent-set","arguments":{"ids":["{{{v2}}}"],"labels":["movies"]}}""");
+
+        await _categoryService.Received(1).AssignAsync(v2, "movies", Arg.Any<CancellationToken>());
+        await _categoryService.DidNotReceive().AssignAsync(
+            InfoHash.Empty, Arg.Any<string?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task TorrentGet_ReadsAV2OnlyTorrentsLabelByItsRealHash()
+    {
+        var torrent = Torrent(hash: InfoHash.Empty);
+        var v2 = new InfoHash(Enumerable.Repeat((byte)0x33, InfoHash.V2Length).ToArray());
+        torrent.HashV2.Returns(v2);
+        _torrentService.GetTorrents().Returns([torrent]);
+        _categoryService.GetCategory(v2).Returns("movies");
+
+        var response = await CallAsync(
+            """{"method":"torrent-get","arguments":{"fields":["labels"]}}""");
+
+        var row = Assert.Single(response.GetProperty("arguments").GetProperty("torrents").EnumerateArray());
+        var label = Assert.Single(row.GetProperty("labels").EnumerateArray());
+        Assert.Equal("movies", label.GetString());
+    }
+
+    /// <summary>
+    /// Guards the id filter: entries that are not hashes at all must not stop the ones that are from
+    /// matching, however the parsing is arranged.
+    /// </summary>
+    [Fact]
+    public async Task TorrentGet_IgnoresUnparsableIds_WithoutDroppingTheValidOnes()
+    {
+        var wanted = Torrent();
+        var other = Torrent(hash: InfoHash.FromHex("1111222233334444555566667777888899990000"), name: "other");
+        _torrentService.GetTorrents().Returns([wanted, other]);
+
+        var response = await CallAsync(
+            $$$"""{"method":"torrent-get","arguments":{"ids":["not-a-hash","{{{Hash}}}"],"fields":["name"]}}""");
+
+        var row = Assert.Single(response.GetProperty("arguments").GetProperty("torrents").EnumerateArray());
+        Assert.Equal("ubuntu.iso", row.GetProperty("name").GetString());
+    }
+
     private async Task<JsonElement> CallAsync(string request)
     {
-        var handler = new TransmissionRpcHandler(_torrentService, _settingsService, _snapshots, _categoryService, "1.2.3");
+        var handler = new TransmissionRpcHandler(_torrentService, _settingsService, _categoryService, "1.2.3");
         var json = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
         return JsonDocument.Parse(json).RootElement.Clone();
     }
