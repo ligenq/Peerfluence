@@ -1,4 +1,4 @@
-using System.Buffers;
+﻿using System.Buffers;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -34,7 +34,6 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
 
     private readonly ITorrentService _torrentService;
     private readonly IAppSettingsService _settingsService;
-    private readonly ITorrentTransferSnapshots _snapshots;
     private readonly ITorrentCategoryService _categoryService;
     private readonly string _version;
 
@@ -50,13 +49,11 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
     public TransmissionRpcHandler(
         ITorrentService torrentService,
         IAppSettingsService settingsService,
-        ITorrentTransferSnapshots snapshots,
         ITorrentCategoryService categoryService,
         string version)
     {
         _torrentService = torrentService;
         _settingsService = settingsService;
-        _snapshots = snapshots;
         _categoryService = categoryService;
         _version = version;
     }
@@ -159,7 +156,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
 
         foreach (var torrent in torrents)
         {
-            var snapshot = _snapshots.GetSnapshot(torrent.Hash);
+            var snapshot = torrent.GetTransferStats();
             down += snapshot.DownloadSpeed;
             up += snapshot.UploadSpeed;
             if (torrent.Started)
@@ -222,10 +219,11 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
             writer.WriteStartArray("torrents");
             foreach (var torrent in selected)
             {
+                var snapshot = torrent.GetTransferStats();
                 writer.WriteStartObject();
                 foreach (var field in fields)
                 {
-                    WriteField(writer, torrent, field);
+                    WriteField(writer, torrent, field, snapshot);
                 }
 
                 writer.WriteEndObject();
@@ -235,17 +233,15 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
         });
     }
 
-    private void WriteField(Utf8JsonWriter writer, ITorrent torrent, string field)
+    private void WriteField(Utf8JsonWriter writer, ITorrent torrent, string field, TransferStats snapshot)
     {
-        var snapshot = _snapshots.GetSnapshot(torrent.Hash);
-
         switch (field)
         {
             case "id":
-                writer.WriteNumber(field, IdFor(torrent.Hash));
+                writer.WriteNumber(field, IdFor(torrent.PrimaryHash()));
                 break;
             case "hashString":
-                writer.WriteString(field, torrent.Hash.ToHexString());
+                writer.WriteString(field, torrent.PrimaryHash().ToHexString());
                 break;
             case "name":
                 writer.WriteString(field, torrent.Name);
@@ -304,7 +300,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
                 break;
             case "labels":
                 writer.WriteStartArray(field);
-                if (_categoryService.GetCategory(torrent.Hash) is { } category)
+                if (_categoryService.GetCategory(torrent.PrimaryHash()) is { } category)
                 {
                     // Categories are the nearest thing this application has to Transmission's labels,
                     // and the automation tools use labels to tell their downloads from everyone's.
@@ -345,7 +341,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
         return torrent.Finished ? 6 : 4;
     }
 
-    private static int EtaOf(ITorrent torrent, TorrentTransferSnapshot snapshot)
+    private static int EtaOf(ITorrent torrent, TransferStats snapshot)
     {
         if (torrent.Finished)
         {
@@ -412,15 +408,15 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
         // Labels arrive with the add, and are how the automation tools mark what is theirs.
         if (ReadStringArray(arguments, "labels").FirstOrDefault() is { Length: > 0 } label)
         {
-            await _categoryService.AssignAsync(added.Hash, label, cancellationToken).ConfigureAwait(false);
+            await _categoryService.AssignAsync(added.PrimaryHash(), label, cancellationToken).ConfigureAwait(false);
         }
 
         return Write(tag, writer =>
         {
             writer.WriteStartObject("torrent-added");
-            writer.WriteNumber("id", IdFor(added.Hash));
+            writer.WriteNumber("id", IdFor(added.PrimaryHash()));
             writer.WriteString("name", added.Name);
-            writer.WriteString("hashString", added.Hash.ToHexString());
+            writer.WriteString("hashString", added.PrimaryHash().ToHexString());
             writer.WriteEndObject();
         });
     }
@@ -468,7 +464,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
             if (hasLabels)
             {
                 // An empty labels array means "no label", which is how a client clears one.
-                await _categoryService.AssignAsync(torrent.Hash, labels.FirstOrDefault(), cancellationToken)
+                await _categoryService.AssignAsync(torrent.PrimaryHash(), labels.FirstOrDefault(), cancellationToken)
                     .ConfigureAwait(false);
             }
 
@@ -531,8 +527,22 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
             return torrents.ToList();
         }
 
+        // Parsed once rather than once per torrent: a client polling with an explicit id list sends
+        // every hash it knows about, and re-parsing each of them for each torrent is quadratic in the
+        // size of the session. Entries that are not hashes at all - an all zero one among them - drop
+        // out here and match nothing, which is the point.
+        var wantedHashes = new List<InfoHash>(wanted.Count);
+        foreach (var value in wanted)
+        {
+            if (InfoHash.TryFromHex(value, out var hash))
+            {
+                wantedHashes.Add(hash);
+            }
+        }
+
         return torrents
-            .Where(torrent => wanted.Contains(torrent.Hash.ToHexString()) || wantedIds.Contains(IdFor(torrent.Hash)))
+            .Where(torrent => wantedHashes.Any(hash => TorrentIdentity.HasHash(torrent, hash))
+                || wantedIds.Contains(IdFor(torrent.PrimaryHash())))
             .ToList();
 
         void Collect(JsonElement entry)

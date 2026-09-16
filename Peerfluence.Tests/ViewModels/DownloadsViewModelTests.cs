@@ -235,6 +235,31 @@ public class DownloadsViewModelTests
         }
     }
 
+    /// <summary>
+    /// A v2 only torrent stores InfoHash.Empty as its v1 hash, so copying that field hands the user
+    /// forty zero characters. Copy magnet, in the same menu, reports the real identity.
+    /// </summary>
+    [Fact]
+    public async Task CopyHashCommand_CopiesTheV2HashWhenThereIsNoV1()
+    {
+        var clipboard = Substitute.For<IClipboard>();
+        var sut = CreateViewModelWithSelectedTorrent(clipboard, out var torrent);
+        var v2 = new InfoHash(Enumerable.Repeat((byte)0xAB, InfoHash.V2Length).ToArray());
+        torrent.Hash.Returns(InfoHash.Empty);
+        torrent.HashV2.Returns(v2);
+
+        try
+        {
+            await sut.CopyHashCommand.ExecuteAsync(null);
+
+            Assert.Equal(v2.ToString(), await CapturedTextAsync(clipboard));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
     [Fact]
     public async Task CopyMagnetCommand_PutsAMagnetForTheHashOnTheClipboard()
     {
@@ -245,7 +270,39 @@ public class DownloadsViewModelTests
         {
             await sut.CopyMagnetCommand.ExecuteAsync(null);
 
-            Assert.Equal($"magnet:?xt=urn:btih:{torrent.Hash}", await CapturedTextAsync(clipboard));
+            var magnet = PeerSharp.Core.MagnetLink.Parse((await CapturedTextAsync(clipboard))!);
+            Assert.Equal(torrent.Hash, magnet.InfoHash);
+            Assert.Equal(torrent.Name, magnet.DisplayName);
+            await clipboard.Received(1).FlushAsync();
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CopyMagnetCommand_PreservesV2AndHybridIdentityAndEscapesTheName(bool hybrid)
+    {
+        var clipboard = Substitute.For<IClipboard>();
+        var sut = CreateViewModelWithSelectedTorrent(clipboard, out var torrent);
+        torrent.Hash.Returns(hybrid ? torrent.Hash : InfoHash.Empty);
+        torrent.HashV2.Returns(new InfoHash(Enumerable.Repeat((byte)0xCD, InfoHash.V2Length).ToArray()));
+        torrent.Name.Returns("Example & notes #1 + extras");
+
+        try
+        {
+            await sut.CopyMagnetCommand.ExecuteAsync(null);
+
+            var text = (await CapturedTextAsync(clipboard))!;
+            var magnet = PeerSharp.Core.MagnetLink.Parse(text);
+            Assert.Equal(torrent.Hash, magnet.InfoHash);
+            Assert.Equal(torrent.HashV2, magnet.InfoHashV2);
+            Assert.Equal(torrent.Name, magnet.DisplayName);
+            Assert.Contains("xt=urn:btmh:1220", text, StringComparison.Ordinal);
+            Assert.Equal(hybrid, text.Contains("xt=urn:btih:", StringComparison.Ordinal));
             await clipboard.Received(1).FlushAsync();
         }
         finally

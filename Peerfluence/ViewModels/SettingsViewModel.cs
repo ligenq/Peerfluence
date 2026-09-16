@@ -1139,8 +1139,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool IsUpdateServiceInstalled => _updateService.IsInstalled;
 
-    public bool IsDirectDownloadUpdateChannel => _updateService.Channel == UpdateChannel.DirectDownload;
-
     public bool CanCheckForUpdates => _updateService.CanCheckForUpdates;
 
     public bool ShouldShowUpdateNotInstalled => !_updateService.IsInstalled;
