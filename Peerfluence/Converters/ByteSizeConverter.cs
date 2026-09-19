@@ -16,12 +16,21 @@ public sealed class ByteSizeConverter : IValueConverter
             return "0 B";
         }
 
-        if (!TryGetDouble(value, out var bytes))
+        double? bytes = value switch
         {
-            return value;
-        }
+            byte number => number,
+            short number => number,
+            int number => number,
+            long number => number,
+            float number => number,
+            double number => number,
+            ulong number => number,
+            uint number => number,
+            ushort number => number,
+            _ => null
+        };
 
-        return FormatBytes(bytes);
+        return bytes.HasValue ? FormatBytes(bytes.Value) : value;
     }
 
     /// <summary>
@@ -43,43 +52,6 @@ public sealed class ByteSizeConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return BindingOperations.DoNothing;
-    }
-
-    private static bool TryGetDouble(object value, out double bytes)
-    {
-        switch (value)
-        {
-            case byte b:
-                bytes = b;
-                return true;
-            case short s:
-                bytes = s;
-                return true;
-            case int i:
-                bytes = i;
-                return true;
-            case long l:
-                bytes = l;
-                return true;
-            case float f:
-                bytes = f;
-                return true;
-            case double d:
-                bytes = d;
-                return true;
-            case ulong ul:
-                bytes = ul;
-                return true;
-            case uint ui:
-                bytes = ui;
-                return true;
-            case ushort us:
-                bytes = us;
-                return true;
-            default:
-                bytes = 0;
-                return false;
-        }
     }
 
     private static string FormatBytes(double bytes)

@@ -42,8 +42,6 @@ public sealed class UpdateService : IUpdateService, IDisposable
     public bool IsUpdateAvailable { get; private set; }
     public string? AvailableVersion { get; private set; }
 
-    public UpdateChannel Channel => UpdateChannel.DirectDownload;
-
     public bool IsInstalled
     {
         get

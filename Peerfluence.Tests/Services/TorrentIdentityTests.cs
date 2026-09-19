@@ -1,4 +1,3 @@
-using Peerfluence.Core;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
@@ -68,9 +67,19 @@ public sealed class TorrentIdentityTests
     [Fact]
     public void SameHash_TreatsAnEmptyHashAsNamingNothing()
     {
-        Assert.False(TorrentIdentity.SameHash(InfoHash.Empty, InfoHash.Empty));
-        Assert.False(TorrentIdentity.SameHash(InfoHash.EmptyV2, InfoHash.EmptyV2));
-        Assert.True(TorrentIdentity.SameHash(V1(1), V1(1)));
+        Assert.False(InfoHash.Empty.Matches(InfoHash.Empty));
+        Assert.False(InfoHash.EmptyV2.Matches(InfoHash.EmptyV2));
+        Assert.True(V1(1).Matches(V1(1)));
+    }
+
+    [Fact]
+    public void HasHash_RecognisesFullAndTruncatedV2Hashes()
+    {
+        var torrent = Torrent(InfoHash.Empty, V2(7));
+
+        Assert.True(TorrentIdentity.HasHash(torrent, V2(7)));
+        Assert.True(TorrentIdentity.HasHash(torrent, V2(7).TruncateToV1()));
+        Assert.False(TorrentIdentity.HasHash(torrent, V2(8).TruncateToV1()));
     }
 
     private static InfoHash V1(byte seed) => new(Enumerable.Repeat(seed, InfoHash.V1Length).ToArray());

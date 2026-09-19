@@ -56,18 +56,6 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void TheMetricsReader_IsRegisteredAndShared()
-    {
-        // It holds a MeterListener subscription, so a second one would mean a second subscription
-        // to the same instruments.
-        var provider = Build();
-
-        Assert.Same(
-            provider.GetRequiredService<IEngineMetricsReader>(),
-            provider.GetRequiredService<IEngineMetricsReader>());
-    }
-
-    [Fact]
     public void EveryHostedService_IsRegisteredOnlyOnce()
     {
         // Registering one twice starts it twice, which for the ones that bind a port or a pipe

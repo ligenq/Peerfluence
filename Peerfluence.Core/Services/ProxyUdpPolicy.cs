@@ -1,4 +1,6 @@
 using Peerfluence.Core.Config;
+using PeerSharp.Config;
+using ProxySettings = Peerfluence.Core.Config.ProxySettings;
 
 namespace Peerfluence.Core.Services;
 
@@ -30,50 +32,38 @@ public static class ProxyUdpPolicy
     {
         ArgumentNullException.ThrowIfNull(proxy);
 
-        // A type without a host is not a usable proxy, and PeerSharp treats it as none everywhere
-        // else that asks this question. Matching that keeps a half-filled proxy form from disabling
-        // DHT for someone who never finished setting one up.
-        bool carriesUdp = ParseProxyType(proxy.ProxyType) != ProxyKind.Http
-            || string.IsNullOrWhiteSpace(proxy.ProxyHost);
+        var engineProxy = new PeerSharp.Config.ProxySettings();
+        ApplySettings(proxy, engineProxy);
+        var udp = engineProxy.GetUdpCapabilities();
 
-        if (carriesUdp)
-        {
-            return new ProxyUdpPlan(dhtRequested, EnableUtp: true, RestrictedByProxy: false);
-        }
-
-        // uTP is only refused when peer traffic is configured to go through the proxy. Left alone
-        // otherwise, because then it is not the proxy's to carry.
-        bool enableUtp = !proxy.ProxyPeers;
-
+        // Disable unsupported DHT before enabling uTP: they share a listener in the engine.
         return new ProxyUdpPlan(
-            EnableDht: false,
-            EnableUtp: enableUtp,
-            RestrictedByProxy: dhtRequested || !enableUtp);
+            EnableDht: dhtRequested && udp.SupportsDht,
+            EnableUtp: udp.SupportsUtp,
+            RestrictedByProxy: (dhtRequested && !udp.SupportsDht) || !udp.SupportsUtp);
+    }
+
+    internal static void ApplySettings(ProxySettings source, PeerSharp.Config.ProxySettings target)
+    {
+        target.Type = ParseProxyType(source.ProxyType);
+        target.Host = source.ProxyHost;
+        target.Port = (ushort)Math.Clamp(source.ProxyPort, 0, 65535);
+        target.Username = source.ProxyUsername;
+        target.Password = source.ProxyPassword;
+        target.ProxyPeers = source.ProxyPeers;
+        target.ProxyTrackers = source.ProxyTrackers;
     }
 
     /// <summary>
     /// Reads the stored proxy type. Anything unrecognised is no proxy, which is what the engine
     /// setup has always done with it.
     /// </summary>
-    public static ProxyKind ParseProxyType(string? type) => type switch
+    public static ProxyType ParseProxyType(string? type) => type switch
     {
-        "Socks5" => ProxyKind.Socks5,
-        "Http" => ProxyKind.Http,
-        _ => ProxyKind.None
+        "Socks5" => ProxyType.Socks5,
+        "Http" => ProxyType.Http,
+        _ => ProxyType.None
     };
-}
-
-/// <summary>The proxy types the settings can hold.</summary>
-public enum ProxyKind
-{
-    /// <summary>No proxy.</summary>
-    None,
-
-    /// <summary>A SOCKS5 proxy, which can tunnel UDP.</summary>
-    Socks5,
-
-    /// <summary>An HTTP proxy, which cannot carry UDP at all.</summary>
-    Http
 }
 
 /// <summary>
