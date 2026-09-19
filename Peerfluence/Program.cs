@@ -1,10 +1,12 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -102,9 +104,24 @@ internal sealed class Program
 
             // 7. Run Avalonia App (This is a blocking call)
             var appBuilder = BuildAvaloniaApp(host.Services);
+
+            // The host can decide to stop without anyone closing the window: SIGTERM from a service
+            // manager, or a desktop session ending. ConsoleLifetime answers that signal by telling
+            // the operating system not to terminate the process and raising ApplicationStopping
+            // instead, on the understanding that something will bring the application down. Nothing
+            // did. The dispatcher below kept running, the line after it was never reached, and the
+            // process outlived the signal asking it to stop - until it was killed outright.
+            var shutdownBridge = BridgeHostShutdownToTheDesktop(
+                host.Services.GetRequiredService<IHostApplicationLifetime>(),
+                ShutDownTheDesktop);
+
             appBuilder.StartWithClassicDesktopLifetime(avaloniaArgs);
 
             // 8. Graceful Shutdown
+            // Withdrawn first: the dispatcher is gone once the call above returns, so the bridge has
+            // nowhere left to post and the host is about to raise the very event it listens for.
+            shutdownBridge.Dispose();
+
             // Clear Avalonia's SynchronizationContext — the dispatcher is dead after
             // StartWithClassicDesktopLifetime returns, so any await that captures it
             // would deadlock.
@@ -123,6 +140,41 @@ internal sealed class Program
         {
             CrashHandler.HandleException(ex);
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Makes the host stopping close the window, so the two agree on when the application ends.
+    /// </summary>
+    /// <remarks>
+    /// Returned rather than left registered, because the same event is raised on the ordinary way
+    /// out too - the window closes, the dispatcher ends, and only then is the host stopped. Posting
+    /// to a dispatcher that has already gone is at best pointless, so the caller withdraws this as
+    /// soon as the window is no longer running.
+    /// </remarks>
+    internal static IDisposable BridgeHostShutdownToTheDesktop(
+        IHostApplicationLifetime lifetime,
+        Action shutDownTheDesktop)
+    {
+        ArgumentNullException.ThrowIfNull(lifetime);
+        ArgumentNullException.ThrowIfNull(shutDownTheDesktop);
+
+        return lifetime.ApplicationStopping.Register(shutDownTheDesktop);
+    }
+
+    /// <summary>
+    /// Asks the desktop lifetime to close, from whichever thread noticed that it should.
+    /// </summary>
+    /// <remarks>
+    /// Posted rather than called: ApplicationStopping is raised on whatever thread stopped the host,
+    /// and for a signal that is not the UI thread. Same shape the MCP quit tool uses, for the same
+    /// reason.
+    /// </remarks>
+    private static void ShutDownTheDesktop()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            Dispatcher.UIThread.Post(() => desktop.Shutdown());
         }
     }
 
