@@ -114,7 +114,7 @@ internal sealed class AutoSearchHostedService : BackgroundService
             {
                 // The hash it actually has: a v2 only torrent stores InfoHash.Empty as its v1 hash,
                 // and filing something under the empty hash files nothing.
-                var hash = torrent.Hash.IsEmpty ? torrent.HashV2 : torrent.Hash;
+                var hash = torrent.PrimaryHash();
                 await _categoryService.AssignAsync(hash, category, cancellationToken).ConfigureAwait(false);
             }
 

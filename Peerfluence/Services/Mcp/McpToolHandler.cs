@@ -750,7 +750,7 @@ public class McpToolHandler : IMcpToolHandler
 
             var diagnostics = new McpConstants.TorrentDiagnosticsResponse(
                 Name: torrent.Name,
-                Hash: torrent.Hash.ToHexString(),
+                Hash: torrent.PrimaryHash().ToHexString(),
                 State: torrent.State.ToString(),
                 Exception: torrent.LastException?.ToString(),
                 PieceCount: torrent.PieceCount,

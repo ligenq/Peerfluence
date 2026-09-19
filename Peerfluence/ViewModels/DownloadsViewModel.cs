@@ -1097,10 +1097,10 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             {
                 while (_alertChannel.Reader.TryRead(out var alert))
                 {
-                    if (!pendingAlerts.TryGetValue(alert.Torrent.Hash, out var pending))
+                    if (!pendingAlerts.TryGetValue(alert.Torrent.PrimaryHash(), out var pending))
                     {
                         pending = new PendingAlerts();
-                        pendingAlerts[alert.Torrent.Hash] = pending;
+                        pendingAlerts[alert.Torrent.PrimaryHash()] = pending;
                     }
 
                     switch (alert.Alert.Id)
@@ -1175,7 +1175,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
                 AddOrUpdateTorrent(torrent);
                 break;
             case AlertId.TorrentRemoved:
-                RemoveTorrent(torrent.Hash);
+                RemoveTorrent(torrent.PrimaryHash());
                 break;
             default:
                 UpdateTorrent(torrent, e.Alert);
@@ -1195,7 +1195,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         var viewModel = new TorrentListItemViewModel(torrent)
         {
             Actions = this,
-            Category = _categoryService.GetCategory(torrent.Hash) ?? string.Empty
+            Category = _categoryService.GetCategory(torrent.PrimaryHash()) ?? string.Empty
         };
         _torrentLookup[key] = viewModel;
         Torrents.Add(viewModel);

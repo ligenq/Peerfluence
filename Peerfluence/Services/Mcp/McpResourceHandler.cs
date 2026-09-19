@@ -36,7 +36,7 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
         _recentAlerts.Enqueue(new McpConstants.AlertSummary(
             Timestamp: DateTimeOffset.Now,
             AlertType: msg.Alert.GetType().Name,
-            TorrentHash: msg.Torrent.Hash.ToHexString(),
+            TorrentHash: msg.Torrent.PrimaryHash().ToHexString(),
             TorrentName: msg.Torrent.Name,
             Message: msg.Alert.ToString()
         ));
@@ -119,7 +119,7 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
                 var connectedPeers = t.Peers.GetConnectedPeers();
                 return new McpConstants.TorrentSummary(
                     Name: t.Name,
-                    Hash: t.Hash.ToHexString(),
+                    Hash: t.PrimaryHash().ToHexString(),
                     State: t.State.ToString(),
                     Progress: t.Progress,
                     DownloadSpeed: connectedPeers.Sum(p => p.DownloadSpeed),

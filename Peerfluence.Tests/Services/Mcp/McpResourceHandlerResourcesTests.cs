@@ -110,6 +110,19 @@ public sealed class McpResourceHandlerResourcesTests : IDisposable
     }
 
     [Fact]
+    public async Task V2OnlyTorrents_ExposeTheirUsableHashInTheActiveList()
+    {
+        var torrent = Torrent();
+        var hash = new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray());
+        torrent.Hash.Returns(InfoHash.Empty);
+        torrent.HashV2.Returns(hash);
+
+        using var document = JsonDocument.Parse(await HandlerWith(torrent).GetActiveTorrentsAsync());
+
+        Assert.Equal(hash.ToHexString(), document.RootElement.EnumerateArray().Single().GetProperty("Hash").GetString());
+    }
+
+    [Fact]
     public async Task AnEngineThatIsNotUp_ProducesACodedErrorRatherThanThrowing()
     {
         // Asked before startup finishes, or after shutdown began. The pipe stays usable either way.
