@@ -19,6 +19,8 @@ Velopack update path are in place.
 ## Main Capabilities
 
 - Add torrents from `.torrent` files, magnet links, or the clipboard.
+- Find torrents through a configured Torznab endpoint, such as Jackett or Prowlarr, and
+  add a result without leaving the application. Nothing is shipped preconfigured.
 - Optionally associate `.torrent` files and `magnet:` links with Peerfluence on Windows.
 - Preview add-torrent options before adding, including torrent name, size, files,
   destination, limits, trackers, and metadata.
@@ -117,6 +119,7 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 - Queue management: enable queueing, max active downloads, max active seeds.
 - Security and privacy: encryption mode, blocklist, GeoIP, proxy type/host/port,
   credentials, proxy peers, and proxy trackers.
+- Search: Torznab endpoint URL and API key used by the Find Torrents page.
 - Media player: external media player path.
 - Completion action: program/script, arguments, working directory, timeout, run hidden.
 - Updates: Velopack update URL and restart/apply controls for direct builds.
@@ -153,6 +156,7 @@ mode is a stdio JSON-RPC proxy that connects to the already-running app.
 ### MCP Tools
 
 - `add_torrent`: add by magnet link, `.torrent` file path, or base64 `.torrent` data.
+- `search_torrents`: search the configured Torznab endpoint for torrents.
 - `manage_torrent`: pause, resume, or remove by info hash.
 - `take_screenshot`: capture the current application window.
 - `shutdown_application`: gracefully shut down Peerfluence.
@@ -228,8 +232,16 @@ Linux and Windows, executes an isolated smoke test, and publishes Cobertura cove
 
 Security and depth checks are separate workflows: CodeQL and dependency review run for pull
 requests, while scheduled deep validation runs mutation analysis with Stryker and the interactive
-Windows UI suite. Configure the repository's main-branch ruleset to require the CI, CodeQL, and
-dependency-review checks, require a maintainer review, resolve conversations, and disallow bypasses.
+Windows UI suite.
+
+A ruleset protects `main`: force pushes and deletion are refused, changes arrive by pull request
+with conversations resolved, the branch must be current, and `CI`, `Analyze C#` and
+`Review dependencies` must pass. `CI` is an aggregate job that fails unless every lane and every
+matrix entry of the CI workflow succeeded, so adding an operating system or renaming a lane does
+not also mean editing the ruleset. CodeQL and dependency review are separate workflows that no job
+there can wait on, which is why they are required in their own right. No bypasses are granted, and
+approvals are set to zero rather than one: every path in `CODEOWNERS` belongs to the sole
+maintainer, who cannot approve their own pull request, so requiring one would lock `main`.
 
 Before opening a pull request, the shortest local gate is:
 
@@ -294,13 +306,13 @@ The Debian package registers the application launcher, `.torrent` MIME handler, 
 `magnet:` URL handler. Build one locally with:
 
 ```shell
-./ReleasePackaging/build-linux.sh --version 1.0.0 --rid linux-x64
+./ReleasePackaging/build-linux.sh --version 2.1.0 --rid linux-x64
 ```
 
 Build a Velopack release:
 
 ```powershell
-.\ReleasePackaging\build-velopack.ps1 -Version 1.0.0
+.\ReleasePackaging\build-velopack.ps1 -Version 2.1.0
 ```
 
 The script publishes the app, creates the Velopack release, and writes artifacts to
@@ -320,6 +332,7 @@ the unit/headless test suite on Windows and Linux and can create a combined GitH
   services.
 - `Peerfluence.Tests`: unit tests.
 - `Peerfluence.HeadlessTests`: Avalonia/headless UI tests.
+- `Peerfluence.UiTests`: Windows UI Automation tests that drive the built application.
 - `Testing`: AI-executable UI test cases and fixtures.
 - `ReleasePackaging`: Velopack release packaging script and instructions.
 - `DebuggerApp`: local helper/debug harness.
