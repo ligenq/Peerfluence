@@ -1337,13 +1337,49 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         };
     }
 
+    /// <summary>
+    /// How long the clipboard is given to answer before the prompt is offered instead.
+    /// </summary>
+    /// <remarks>
+    /// Not a latency budget: anything actually on the clipboard comes back in microseconds, so
+    /// this only ever elapses when the owner is not going to answer at all.
+    /// </remarks>
+    private static readonly TimeSpan ClipboardReadTimeout = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// Reads a magnet from the clipboard, or gives up and lets the caller ask for one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Bounded, which the plain await was not. Reading a clipboard is a request to another
+    /// process, and the owner is under no obligation to reply: one that accepts the request and
+    /// then goes quiet leaves the read pending for the life of the application. Giving up and
+    /// showing the prompt is what an empty clipboard already does, so there is no new path here -
+    /// only a way out of a wait that otherwise has no end.
+    /// </para>
+    /// <para>
+    /// Observed under WSLg, whose clipboard bridge claims ownership of the X11 selection and then
+    /// never answers a request for it while the Windows clipboard is empty. The window also stops
+    /// repainting for as long as the request is outstanding, which this cannot help: the clipboard
+    /// offers no way to withdraw one. That part is not ours to fix, and this is not a fix for it.
+    /// </para>
+    /// </remarks>
     private async Task<string?> TryGetMagnetFromClipboardAsync()
     {
         try
         {
             var clipboard = _topLevelService.GetClipboard();
-            var text = await clipboard.TryGetTextAsync();
-            return text?.Trim();
+            var read = clipboard.TryGetTextAsync();
+
+            if (await Task.WhenAny(read, Task.Delay(ClipboardReadTimeout)).ConfigureAwait(true) != read)
+            {
+                // Abandoned rather than cancelled, for want of any way to cancel it. Its result is
+                // still observed, so a failure arriving later is not an unobserved exception.
+                _ = read.ContinueWith(static t => _ = t.Exception, TaskScheduler.Default);
+                return null;
+            }
+
+            return (await read.ConfigureAwait(true))?.Trim();
         }
         catch (InvalidOperationException)
         {
