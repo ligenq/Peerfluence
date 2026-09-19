@@ -455,7 +455,7 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
     {
         // 1. Capture basic info (fast)
         var name = torrent.Name;
-        var infoHash = torrent.Hash.ToString();
+        var infoHash = torrent.PrimaryHash().ToString();
         var torrentState = torrent.State;
         var state = torrentState.ToDisplayString();
         var progress = torrent.Progress;

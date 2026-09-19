@@ -179,7 +179,7 @@ internal sealed class CompletionActionRunner : ICompletionActionRunner
 
         return template
             .Replace("{name}", torrent.Name, StringComparison.OrdinalIgnoreCase)
-            .Replace("{hash}", torrent.Hash.ToHexString(), StringComparison.OrdinalIgnoreCase)
+            .Replace("{hash}", torrent.PrimaryHash().ToHexString(), StringComparison.OrdinalIgnoreCase)
             .Replace("{downloadPath}", torrent.Files.DownloadPath, StringComparison.OrdinalIgnoreCase)
             .Replace("{totalSize}", torrent.TotalSize.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.OrdinalIgnoreCase);
     }

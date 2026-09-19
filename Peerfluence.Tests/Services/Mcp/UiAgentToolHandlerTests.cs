@@ -35,6 +35,26 @@ public sealed class UiAgentToolHandlerTests
     }
 
     [Fact]
+    public async Task V2OnlyTorrent_StateUsesTheSameUsableHashForSelectionAndSummary()
+    {
+        var torrent = CreateTorrent("V2", 0.25f, TorrentState.Active);
+        var hash = new InfoHash(Enumerable.Repeat((byte)0x33, InfoHash.V2Length).ToArray());
+        torrent.Hash.Returns(InfoHash.Empty);
+        torrent.HashV2.Returns(hash);
+        var service = Substitute.For<ITorrentService>();
+        service.GetTorrents().Returns([torrent]);
+        var selection = Substitute.For<ITorrentSelectionService>();
+        selection.SelectedTorrent.Returns(torrent);
+        var sut = new UiAgentToolHandler(service, selection, Substitute.For<ITopLevelService>(), new UiAgentTimeline());
+
+        var result = await sut.GetUiTestStateAsync(TestContext.Current.CancellationToken);
+        using var document = System.Text.Json.JsonDocument.Parse(Text(result));
+
+        Assert.Equal(hash.ToHexString(), document.RootElement.GetProperty("SelectedTorrentHash").GetString());
+        Assert.Equal(hash.ToHexString(), document.RootElement.GetProperty("Torrents")[0].GetProperty("Hash").GetString());
+    }
+
+    [Fact]
     public async Task LoadTorrentFileAsync_LoadsTorrentAndSelectsIt()
     {
         var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.torrent");
