@@ -17,20 +17,17 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
     private readonly ITorrentEngineService _torrentEngineService;
     private readonly IAppPaths _appPaths;
     private readonly ILogger<McpResourceHandler> _logger;
-    private readonly IEngineMetricsReader _metricsReader;
     private readonly ConcurrentQueue<McpConstants.AlertSummary> _recentAlerts = new();
     private const int MaxAlerts = 100;
 
     public McpResourceHandler(
         ITorrentEngineService torrentEngineService,
         IAppPaths appPaths,
-        ILogger<McpResourceHandler> logger,
-        IEngineMetricsReader metricsReader)
+        ILogger<McpResourceHandler> logger)
     {
         _torrentEngineService = torrentEngineService;
         _appPaths = appPaths;
         _logger = logger;
-        _metricsReader = metricsReader;
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
     }
 
@@ -91,7 +88,6 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
         try
         {
             var stats = _torrentEngineService.Engine.GetStats();
-            var metrics = _metricsReader.Read();
             var response = new McpConstants.EngineStatsResponse(
                 stats.TotalDownloaded,
                 stats.TotalUploaded,
@@ -100,8 +96,8 @@ public sealed class McpResourceHandler : IMcpResourceHandler, IDisposable
                 stats.DownloadSpeed,
                 stats.UploadSpeed,
                 stats.TorrentCount,
-                metrics.LifetimeDownloadedBytes,
-                metrics.LifetimeUploadedBytes
+                stats.LifetimeDownloaded,
+                stats.LifetimeUploaded
             );
             var json = JsonSerializer.Serialize(response, McpJsonContext.Default.EngineStatsResponse);
             return Task.FromResult(json);

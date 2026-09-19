@@ -48,17 +48,17 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
-    <PackageReference Include="FlaUI.Core" Version="4.0.0" />
+    <PackageReference Include="FlaUI.Core" Version="5.0.0" />
 
     <!--
       FlaUI drags in System.Drawing.Common 5.0.2 for its screenshot support, and that version has a
       critical advisory (GHSA-rxg9-xrhp-64gj). Pinned forward to a patched one, which the repository
       policy of failing on any warning is what surfaced. Windows only, which this project already is.
     -->
-    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
-    <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
-    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.12" />
+    <PackageReference Include="FlaUI.UIA3" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit.v3" Version="4.0.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

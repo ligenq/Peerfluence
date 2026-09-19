@@ -65,15 +65,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ITopLevelService, TopLevelService>();
         services.AddSingleton<ICompletionActionRunner, CompletionActionRunner>();
         services.AddSingleton<ITorrentEngineService, TorrentEngineService>();
-        services.AddSingleton<IEngineMetricsReader, EngineMetricsReader>();
         services.AddSingleton<IInterfaceModeService, InterfaceModeService>();
         services.AddSingleton<ITorrentSelectionService, TorrentSelectionService>();
         services.AddSingleton<ITorrentCategoryService, TorrentCategoryService>();
-        services.AddSingleton<ITorrentTransferSnapshots, TorrentTransferSnapshots>();
         services.AddSingleton<ITransmissionRpcHandler>(sp => new TransmissionRpcHandler(
             sp.GetRequiredService<ITorrentService>(),
             sp.GetRequiredService<IAppSettingsService>(),
-            sp.GetRequiredService<ITorrentTransferSnapshots>(),
             sp.GetRequiredService<ITorrentCategoryService>(),
             ApplicationVersionInfo.Version));
 
