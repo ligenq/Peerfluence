@@ -372,7 +372,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             // usable one until the engine has taken it.
             if (SelectedCategory.Length > 0 && _categoryService != null)
             {
-                await _categoryService.AssignAsync(added.Hash, SelectedCategory);
+                await _categoryService.AssignAsync(added.PrimaryHash(), SelectedCategory);
             }
 
             if (SkipThisStepNextTime)

@@ -34,7 +34,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
         var selected = _selectionService.SelectedTorrent;
         var state = new McpConstants.UiAgentStateResponse(
             WindowAvailable: _topLevelService.IsWindowAvailable,
-            SelectedTorrentHash: selected?.Hash.ToHexString(),
+            SelectedTorrentHash: selected?.PrimaryHash().ToHexString(),
             SelectedTorrentName: selected?.Name,
             Torrents: _torrentService.GetTorrents().Select(ToSummary).ToList());
 
@@ -64,7 +64,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
         {
             var torrent = await _torrentService.AddTorrentFileAsync(path, null, cancellationToken);
             _selectionService.SelectedTorrent = torrent;
-            _timeline.Record("action", $"Loaded torrent file and selected {torrent.Hash.ToHexString()}.");
+            _timeline.Record("action", $"Loaded torrent file and selected {torrent.PrimaryHash().ToHexString()}.");
             return McpResultFactory.Text(JsonSerializer.Serialize(
                 ToSummary(torrent),
                 McpJsonContext.Default.TorrentSummary));
@@ -91,8 +91,8 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
 
             await TorrentService.StopAsync(torrent, cancellationToken);
             _selectionService.SelectedTorrent = torrent;
-            _timeline.Record("action", $"Stopped torrent {torrent.Hash.ToHexString()}.");
-            return McpResultFactory.Success($"Stopped torrent {torrent.Hash.ToHexString()}.");
+            _timeline.Record("action", $"Stopped torrent {torrent.PrimaryHash().ToHexString()}.");
+            return McpResultFactory.Success($"Stopped torrent {torrent.PrimaryHash().ToHexString()}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -124,8 +124,8 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
             }
 
             _selectionService.SelectedTorrent = torrent;
-            _timeline.Record("action", $"Resumed torrent {torrent.Hash.ToHexString()}.");
-            return McpResultFactory.Success($"Resumed torrent {torrent.Hash.ToHexString()}.");
+            _timeline.Record("action", $"Resumed torrent {torrent.PrimaryHash().ToHexString()}.");
+            return McpResultFactory.Success($"Resumed torrent {torrent.PrimaryHash().ToHexString()}.");
         }
         catch (InvalidOperationException ex)
         {
@@ -152,8 +152,8 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
             }
 
             _selectionService.SelectedTorrent = torrent;
-            _timeline.Record("action", $"Selected torrent {torrent.Hash.ToHexString()}.");
-            return Task.FromResult(McpResultFactory.Success($"Selected torrent {torrent.Hash.ToHexString()}."));
+            _timeline.Record("action", $"Selected torrent {torrent.PrimaryHash().ToHexString()}.");
+            return Task.FromResult(McpResultFactory.Success($"Selected torrent {torrent.PrimaryHash().ToHexString()}."));
         }
         catch (InvalidOperationException ex)
         {
@@ -389,7 +389,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
         var peers = torrent.Peers.GetConnectedPeers();
         return new McpConstants.TorrentSummary(
             Name: torrent.Name,
-            Hash: torrent.Hash.ToHexString(),
+            Hash: torrent.PrimaryHash().ToHexString(),
             State: torrent.State.ToString(),
             Progress: torrent.Progress,
             DownloadSpeed: peers.Sum(p => p.DownloadSpeed),

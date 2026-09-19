@@ -90,6 +90,17 @@ public sealed class TorrentCompletionActionHostedServiceTests
     }
 
     [Fact]
+    public void ExpandTokens_UsesTheV2HashForAV2OnlyTorrent()
+    {
+        var torrent = CreateTorrent("V2");
+        var hash = new InfoHash(Enumerable.Repeat((byte)0x44, InfoHash.V2Length).ToArray());
+        torrent.Hash.Returns(InfoHash.Empty);
+        torrent.HashV2.Returns(hash);
+
+        Assert.Equal(hash.ToHexString(), CompletionActionRunner.ExpandTokens("{hash}", torrent));
+    }
+
+    [Fact]
     public void ExpandTokens_ReplacesTorrentValues()
     {
         var torrent = CreateTorrent("Ubuntu ISO");
