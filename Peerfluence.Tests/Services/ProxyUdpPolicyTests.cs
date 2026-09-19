@@ -1,5 +1,6 @@
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Services;
+using ProxyType = PeerSharp.Config.ProxyType;
 
 namespace Peerfluence.Tests.Services;
 
@@ -86,12 +87,12 @@ public sealed class ProxyUdpPolicyTests
     }
 
     [Theory]
-    [InlineData("Socks5", ProxyKind.Socks5)]
-    [InlineData("Http", ProxyKind.Http)]
-    [InlineData("None", ProxyKind.None)]
-    [InlineData("something else", ProxyKind.None)]
-    [InlineData(null, ProxyKind.None)]
-    public void ParseProxyType_TreatsAnythingUnrecognisedAsNoProxy(string? stored, ProxyKind expected)
+    [InlineData("Socks5", ProxyType.Socks5)]
+    [InlineData("Http", ProxyType.Http)]
+    [InlineData("None", ProxyType.None)]
+    [InlineData("something else", ProxyType.None)]
+    [InlineData(null, ProxyType.None)]
+    public void ParseProxyType_TreatsAnythingUnrecognisedAsNoProxy(string? stored, ProxyType expected)
     {
         Assert.Equal(expected, ProxyUdpPolicy.ParseProxyType(stored));
     }

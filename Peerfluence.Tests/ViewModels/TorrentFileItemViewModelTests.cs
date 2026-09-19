@@ -6,6 +6,42 @@ namespace Peerfluence.Tests.ViewModels;
 public class TorrentFileItemViewModelTests
 {
     [Fact]
+    public void UpdateFrom_FollowsEngineChangesWhenThereAreNoPendingEdits()
+    {
+        var info = new TorrentFileInfo("test.txt", 100, 0, 0);
+        var sut = new TorrentFileItemViewModel(info, new FileSelection(true, Priority.Normal));
+
+        sut.UpdateFrom(new TorrentFileInfo("test.txt", 100, 0, 50), new FileSelection(false, Priority.Low), true);
+
+        Assert.False(sut.IsSelected);
+        Assert.Equal(Priority.Low, sut.Priority);
+        Assert.Equal(50, sut.DownloadedBytes);
+        Assert.True(sut.IsStreamable);
+    }
+
+    [Fact]
+    public void UpdateFrom_KeepsPendingEditsUntilTheEngineAcknowledgesThem()
+    {
+        var info = new TorrentFileInfo("test.txt", 100, 0, 0);
+        var sut = new TorrentFileItemViewModel(info, new FileSelection(true, Priority.Normal))
+        {
+            IsSelected = false,
+            Priority = Priority.High
+        };
+
+        sut.UpdateFrom(info, new FileSelection(true, Priority.Low), false);
+
+        Assert.False(sut.IsSelected);
+        Assert.Equal(Priority.High, sut.Priority);
+
+        sut.UpdateFrom(info, new FileSelection(false, Priority.High), false);
+        sut.UpdateFrom(info, new FileSelection(true, Priority.Normal), false);
+
+        Assert.True(sut.IsSelected);
+        Assert.Equal(Priority.Normal, sut.Priority);
+    }
+
+    [Fact]
     public void Constructor_SetsPropertiesFromFileInfo()
     {
         var fileInfo = new TorrentFileInfo("movies/test.mkv", 1024 * 1024 * 700, 0, 350 * 1024 * 1024L);

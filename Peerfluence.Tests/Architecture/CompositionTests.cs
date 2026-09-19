@@ -381,16 +381,11 @@ public sealed class CompositionTests
         // first torrent that has no hash of that version. The MCP tools do things to whatever they
         // are answered with, one of which is removing it.
         //
-        // TorrentIdentity is the one place that knows this. Everywhere else asks it.
+        // PeerSharp owns these identity rules. Application code must use its predicates.
         var offenders = new List<string>();
 
         foreach (var file in ProductionSourceFiles())
         {
-            if (Path.GetFileName(file) == "TorrentIdentity.cs")
-            {
-                continue;
-            }
-
             var lines = File.ReadAllLines(file);
             for (int i = 0; i < lines.Length; i++)
             {

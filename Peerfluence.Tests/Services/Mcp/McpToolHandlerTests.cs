@@ -142,10 +142,8 @@ public class McpToolHandlerTests
     [Fact]
     public async Task ManageTorrentAsync_AnAllZeroHash_RemovesNothing()
     {
-        // Forty zero characters parse into a perfectly valid InfoHash, and a v2 only torrent stores
-        // exactly that as its v1 hash because it does not have one. Resolving by comparing the
-        // stored hash directly therefore answered this request with a real torrent, and "remove"
-        // does what it says to whatever it is given.
+        // PeerSharp 5 rejects all-zero input during parsing. It must never resolve to a v2-only
+        // torrent whose absent v1 hash is stored as zero.
         var v2Only = Substitute.For<ITorrent>();
         v2Only.Hash.Returns(InfoHash.Empty);
         v2Only.HashV2.Returns(new InfoHash(Enumerable.Repeat((byte)0x22, InfoHash.V2Length).ToArray()));
@@ -164,7 +162,7 @@ public class McpToolHandlerTests
             new string('0', InfoHash.V1Length * 2), "remove", TestContext.Current.CancellationToken);
 
         Assert.True(result.IsError);
-        Assert.Contains("not found", Text(result), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Invalid info hash format", Text(result), StringComparison.OrdinalIgnoreCase);
         await torrentService.DidNotReceive().RemoveAsync(
             Arg.Any<ITorrent>(), Arg.Any<PeerSharp.Config.RemoveOptions>(), Arg.Any<CancellationToken>());
     }

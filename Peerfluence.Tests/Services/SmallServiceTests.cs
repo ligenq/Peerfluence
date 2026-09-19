@@ -1,12 +1,10 @@
-﻿using System.Diagnostics.Metrics;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Peerfluence.Core;
 using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
-using PeerSharp.Diagnostics;
 
 namespace Peerfluence.Tests.Services;
 
@@ -21,90 +19,6 @@ public sealed class NotificationServiceTests
         var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
 
         Assert.Throws<ArgumentNullException>(() => sut.Publish(null!));
-    }
-}
-
-/// <summary>
-/// Reading the engine's metrics, which is how lifetime byte totals are obtained.
-/// </summary>
-/// <remarks>
-/// Driven through a real <see cref="Meter"/> named the same as PeerSharp's, because that is the
-/// whole contract: this subscribes by name and by instrument name, and a rename at either end would
-/// leave it silently reporting zeroes.
-/// </remarks>
-public sealed class EngineMetricsReaderTests
-{
-    [Fact]
-    public void WithNothingPublishing_EverythingReadsZero()
-    {
-        using var sut = new EngineMetricsReader();
-
-        var snapshot = sut.Read();
-
-        Assert.Equal(0, snapshot.LifetimeDownloadedBytes);
-        Assert.Equal(0, snapshot.LifetimeUploadedBytes);
-    }
-
-    [Fact]
-    public void TheInstrumentsPeerSharpPublishes_AreTheOnesRead()
-    {
-        using var sut = new EngineMetricsReader();
-
-        using var meter = new Meter(PeerSharpMetrics.MeterName);
-        meter.CreateObservableGauge(PeerSharpMetrics.DownloadedInstrument, () => 4096L);
-        meter.CreateObservableGauge(PeerSharpMetrics.UploadedInstrument, () => 2048L);
-        meter.CreateObservableGauge(PeerSharpMetrics.ConnectedPeersInstrument, () => 7L);
-
-        var snapshot = sut.Read();
-
-        Assert.Equal(4096, snapshot.LifetimeDownloadedBytes);
-        Assert.Equal(2048, snapshot.LifetimeUploadedBytes);
-        Assert.Equal(7, snapshot.ConnectedPeers);
-    }
-
-    [Fact]
-    public void AnotherMetersNumbers_AreNotMistakenForTheEngines()
-    {
-        using var sut = new EngineMetricsReader();
-
-        using var stranger = new Meter("SomethingElse");
-        stranger.CreateObservableGauge(PeerSharpMetrics.DownloadedInstrument, () => 999L);
-
-        Assert.Equal(0, sut.Read().LifetimeDownloadedBytes);
-    }
-
-    [Fact]
-    public void ReadingTwice_ReportsTheCurrentValueRatherThanTheSum()
-    {
-        // The values are cleared before each poll. Without that, an observable gauge read twice
-        // would appear to double.
-        using var sut = new EngineMetricsReader();
-
-        using var meter = new Meter(PeerSharpMetrics.MeterName);
-        meter.CreateObservableGauge(PeerSharpMetrics.DownloadedInstrument, () => 100L);
-
-        sut.Read();
-
-        Assert.Equal(100, sut.Read().LifetimeDownloadedBytes);
-    }
-
-    [Fact]
-    public void ReadingAfterDisposal_AnswersZeroRatherThanThrowing()
-    {
-        // The MCP resource can be asked for stats while the application is shutting down.
-        var sut = new EngineMetricsReader();
-        sut.Dispose();
-
-        Assert.Equal(default, sut.Read());
-    }
-
-    [Fact]
-    public void DisposingTwice_IsSafe()
-    {
-        var sut = new EngineMetricsReader();
-
-        sut.Dispose();
-        sut.Dispose();
     }
 }
 

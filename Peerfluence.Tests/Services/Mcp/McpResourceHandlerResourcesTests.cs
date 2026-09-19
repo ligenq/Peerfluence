@@ -30,8 +30,7 @@ public sealed class McpResourceHandlerResourcesTests : IDisposable
         var handler = new McpResourceHandler(
             engineService,
             new AppPaths(Path.Combine(Path.GetTempPath(), $"peerfluence-mcp-resource-{Guid.NewGuid():N}")),
-            NullLogger<McpResourceHandler>.Instance,
-            Substitute.For<IEngineMetricsReader>());
+            NullLogger<McpResourceHandler>.Instance);
 
         _handlers.Add(handler);
         return handler;
@@ -70,6 +69,27 @@ public sealed class McpResourceHandlerResourcesTests : IDisposable
 
     private static string ErrorCode(string json) =>
         JsonDocument.Parse(json).RootElement.GetProperty("Code").GetString() ?? string.Empty;
+
+    [Fact]
+    public async Task EngineStatistics_ReportLifetimeTotalsFromTheSameSnapshot()
+    {
+        var engine = Substitute.For<IClientEngine>();
+        engine.GetStats().Returns(new EngineStats(TotalDownloaded: 100, TotalUploaded: 50)
+        {
+            LifetimeDownloaded = 1000,
+            LifetimeUploaded = 500
+        });
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+
+        var json = await Handler(engineService).GetEngineStatsAsync();
+
+        using var document = JsonDocument.Parse(json);
+        var stats = document.RootElement;
+        Assert.Equal(1000, stats.GetProperty("LifetimeDownloaded").GetInt64());
+        Assert.Equal(500, stats.GetProperty("LifetimeUploaded").GetInt64());
+        engine.Received(1).GetStats();
+    }
 
     [Fact]
     public async Task TheActiveTorrentList_IsJsonEvenWhenThereAreNone()
