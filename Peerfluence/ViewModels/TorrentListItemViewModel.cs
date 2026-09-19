@@ -13,7 +13,7 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     public TorrentListItemViewModel(ITorrent torrent)
     {
         Torrent = torrent;
-        Hash = torrent.Hash;
+        Hash = torrent.PrimaryHash();
         WeakReferenceMessenger.Default.Register<LanguageChangedMessage>(this, (_, _) => UpdateStatusDetail());
         UpdateFrom(torrent);
     }
