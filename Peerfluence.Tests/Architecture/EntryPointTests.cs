@@ -1,4 +1,5 @@
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.Extensions.Hosting;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -32,6 +33,53 @@ public class EntryPointTests
         Assert.True(
             main.IsDefined(typeof(STAThreadAttribute), inherit: false),
             "The entry point must be [STAThread]: the Windows clipboard, drag and drop and the shell dialogs are all OLE.");
+    }
+
+    /// <summary>
+    /// A host that stops has to take the window with it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The window closing stops the host, and that direction always worked. The other one did not
+    /// exist. ConsoleLifetime answers SIGTERM by telling the operating system not to terminate the
+    /// process and raising ApplicationStopping instead; with nothing listening, the dispatcher kept
+    /// running and the process survived the signal indefinitely - observed on Linux, where it had
+    /// to be killed outright after logging "Application is shutting down..." and nothing more.
+    /// </para>
+    /// <para>
+    /// The hang itself needs a real process and a real signal to reproduce. This pins the wiring
+    /// whose absence caused it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void HostShutdown_ClosesTheDesktop()
+    {
+        using var stopping = new CancellationTokenSource();
+        var lifetime = Substitute.For<IHostApplicationLifetime>();
+        lifetime.ApplicationStopping.Returns(stopping.Token);
+        var closed = false;
+
+        using var bridge = Peerfluence.Program.BridgeHostShutdownToTheDesktop(lifetime, () => closed = true);
+        stopping.Cancel();
+
+        Assert.True(closed, "Stopping the host must ask the desktop lifetime to shut down.");
+    }
+
+    [Fact]
+    public void TheBridge_StopsListeningOnceTheWindowHasGone()
+    {
+        // The ordinary way out raises the same event, after the dispatcher has ended. Posting to it
+        // then is at best pointless, so the registration is withdrawn first.
+        using var stopping = new CancellationTokenSource();
+        var lifetime = Substitute.For<IHostApplicationLifetime>();
+        lifetime.ApplicationStopping.Returns(stopping.Token);
+        var closed = false;
+
+        var bridge = Peerfluence.Program.BridgeHostShutdownToTheDesktop(lifetime, () => closed = true);
+        bridge.Dispose();
+        stopping.Cancel();
+
+        Assert.False(closed);
     }
 
     private static MethodInfo EntryPoint()
