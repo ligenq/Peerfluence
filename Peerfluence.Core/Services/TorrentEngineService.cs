@@ -130,18 +130,18 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
 
         var clientSettings = new Settings
         {
-            Dht = new DhtSettings
+            Dht =
             {
                 Enabled = udpPlan.EnableDht,
                 AnswerInfoHashSampling = settings.Network.AnswerInfoHashSampling
             },
-            Files = new FilesSettings
+            Files =
             {
                 DefaultDownloadPath = settings.Storage.DownloadPath,
                 MaxDiskReadSpeed = ToSpeed(settings.Network.MaxDiskReadSpeedBytesPerSecond),
                 MaxDiskWriteSpeed = ToSpeed(settings.Network.MaxDiskWriteSpeedBytesPerSecond)
             },
-            Connection = new ConnectionSettings
+            Connection =
             {
                 TcpPort = GetListeningPort(settings.Network),
                 UdpPort = GetListeningPort(settings.Network),
@@ -156,25 +156,25 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
                 EnableUtpOut = udpPlan.EnableUtp,
                 Encryption = ParseEncryption(settings.EncryptionMode)
             },
-            Session = new SessionSettings
+            Session =
             {
                 Enabled = settings.Storage.EnableSessionPersistence,
                 SessionPath = settings.Storage.SessionPath
             },
-            Queue = new PeerSharp.Config.QueueSettings
+            Queue =
             {
                 Enabled = settings.Queue.EnableQueueManagement,
                 MaxActiveDownloads = settings.Queue.MaxActiveDownloads,
                 MaxActiveSeeds = settings.Queue.MaxActiveSeeds,
                 EnforceAutoStop = true
             },
-            Transfer = new TransferSettings
+            Transfer =
             {
                 MaxDownloadSpeed = ToSpeed(downloadLimit),
                 MaxUploadSpeed = ToSpeed(uploadLimit)
-            },
-            Proxy = CreateProxySettings(settings.Proxy)
+            }
         };
+        ProxyUdpPolicy.ApplySettings(settings.Proxy, clientSettings.Proxy);
 
         var options = new TorrentClientOptions
         {
@@ -225,33 +225,11 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             : (ushort)Math.Clamp(settings.ListeningPort, 1, 65535);
     }
 
-    private static PeerSharp.Config.ProxySettings CreateProxySettings(Config.ProxySettings proxy)
-    {
-        var proxySettings = new PeerSharp.Config.ProxySettings
-        {
-            Type = ParseProxyType(proxy.ProxyType),
-            Host = proxy.ProxyHost,
-            Port = (ushort)Math.Clamp(proxy.ProxyPort, 0, 65535),
-            Username = proxy.ProxyUsername,
-            Password = proxy.ProxyPassword,
-            ProxyPeers = proxy.ProxyPeers,
-            ProxyTrackers = proxy.ProxyTrackers
-        };
-        return proxySettings;
-    }
-
     private static Encryption ParseEncryption(string mode) => mode switch
     {
         "Refuse" => Encryption.Refuse,
         "Require" => Encryption.Require,
         _ => Encryption.Allow
-    };
-
-    private static ProxyType ParseProxyType(string type) => ProxyUdpPolicy.ParseProxyType(type) switch
-    {
-        ProxyKind.Socks5 => ProxyType.Socks5,
-        ProxyKind.Http => ProxyType.Http,
-        _ => ProxyType.None
     };
 
     /// <summary>

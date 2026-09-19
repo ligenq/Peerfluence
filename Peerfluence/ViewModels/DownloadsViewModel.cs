@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Interfaces;
 using PeerSharp.Config;
@@ -992,7 +993,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         var selected = SelectedTorrent;
         return selected == null
             ? Task.CompletedTask
-            : CopyToClipboardAsync(selected.Torrent.Hash.ToString());
+            : CopyToClipboardAsync(selected.Torrent.PrimaryHash().ToString());
     }
 
     private Task CopyMagnetAsync()
@@ -1003,8 +1004,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             return Task.CompletedTask;
         }
 
-        // ITorrent interface might not have MagnetLink property, but we can generate it from hash
-        return CopyToClipboardAsync($"magnet:?xt=urn:btih:{selected.Torrent.Hash}");
+        return CopyToClipboardAsync(PeerSharp.Core.MagnetLink.FromTorrent(selected.Torrent).ToString());
     }
 
     /// <summary>

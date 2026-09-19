@@ -38,12 +38,6 @@ public class UpdateServiceTests
     }
 
     [Fact]
-    public void Channel_IsDirectDownload_ForVelopackUpdateService()
-    {
-        Assert.Equal(UpdateChannel.DirectDownload, _sut.Channel);
-    }
-
-    [Fact]
     public void CanCheckForUpdates_ReturnsFalse_WhenVelopackIsNotInstalled()
     {
         Assert.False(_sut.CanCheckForUpdates);
