@@ -175,6 +175,36 @@ public class DownloadsViewModelTests
         }
     }
 
+    /// <summary>
+    /// A clipboard that takes the request and never answers must not take the application with it.
+    /// </summary>
+    /// <remarks>
+    /// Found running the Linux build under WSLg: with an empty clipboard, "Paste magnet" never
+    /// came back. The await had no bound, so the command stayed running for the life of the
+    /// process and no prompt was ever offered. Reproduces here with no X11 involved, because the
+    /// defect is the unbounded wait rather than anything platform specific.
+    /// </remarks>
+    [Fact]
+    public async Task AddMagnetCommand_FallsBackToThePrompt_WhenTheClipboardNeverAnswers()
+    {
+        var clipboard = Substitute.For<IClipboard>();
+        clipboard.TryGetDataAsync().Returns(new TaskCompletionSource<IAsyncDataTransfer?>().Task);
+        var sut = CreateViewModelWithSelectedTorrent(clipboard, out _);
+
+        try
+        {
+            var run = sut.AddMagnetCommand.ExecuteAsync(null);
+            var finished = await Task.WhenAny(
+                run, Task.Delay(TimeSpan.FromSeconds(20), TestContext.Current.CancellationToken));
+
+            Assert.Same(run, finished);
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
     [Fact]
     public async Task AddMagnetCommand_DoesNotAddInvalidClipboardText()
     {
