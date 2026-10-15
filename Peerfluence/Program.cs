@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -315,6 +315,10 @@ internal sealed class Program
         var builder = AppBuilder
             .Configure<App>(() => new App(services))
             .UsePlatformDetect()
+
+            // Inter, as the default for everything. The package was already referenced but never
+            // registered, because the previous control theme supplied its own face.
+            .WithInterFont()
             .With(new X11PlatformOptions
             {
                 EnableSessionManagement = false

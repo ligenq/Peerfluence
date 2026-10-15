@@ -1,111 +1,146 @@
-﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:vm="using:Peerfluence.ViewModels"
-                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-                 xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls"
-                 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-                 xmlns:m="using:Peerfluence.Markup"
-                 xmlns:views="using:Peerfluence.Views"
-                 mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
-                 x:Class="Peerfluence.Views.MainWindowView"
-                 x:Name="Root"
-                 x:DataType="vm:MainWindowViewModel"
-                 BackgroundStyle="GradientSoft"
-                 BackgroundTransitionsEnabled="True"
-                 Icon="/Assets/application-icon.png"
-                 Title="{m:L App_Title}"
-                 TransparencyLevelHint="None">
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Peerfluence.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:overlay="using:Peerfluence.Theme.Controls"
+        xmlns:m="using:Peerfluence.Markup"
+        xmlns:views="using:Peerfluence.Views"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
+        x:Class="Peerfluence.Views.MainWindowView"
+        x:Name="Root"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/application-icon.png"
+        Title="{m:L App_Title}"
+        MinWidth="900"
+        MinHeight="560"
+        Background="{DynamicResource PfCanvas}">
 
     <!--
-        SukiWindow's template carries no VisualLayerManager, so nothing under it had an
-        OverlayLayer. A popup's light dismiss lives in that layer, which left every context menu
-        in the app unable to close on a click. Supplying one here gives the whole content tree a
-        layer to find.
+        Native window decorations rather than drawn ones. A custom title bar has to be rebuilt for
+        each platform's buttons, snapping and accessibility, and Peerfluence targets three; the
+        interface earns its character below the title bar instead.
     -->
-    <primitives:VisualLayerManager>
+
     <Panel>
-    <suki:SukiSideMenu ZIndex="0"
-                       ItemsSource="{Binding NavigationItems}"
-                       SelectedItem="{Binding SelectedNavigationItem}"
-                       IsVisible="{Binding !IsSimpleMode}"
-                       UseCustomContent="True">
-        <suki:SukiSideMenu.HeaderContent>
-            <StackPanel Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource LargeLeftRightTopBottomMargin}">
-                <TextBlock Text="{m:L App_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold" Foreground="{DynamicResource SukiPrimaryColor}" />
-                <TextBlock Text="{m:L App_Tagline}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource SukiLowText}"/>
-            </StackPanel>
-        </suki:SukiSideMenu.HeaderContent>
-        <suki:SukiSideMenu.ItemTemplate>
-            <DataTemplate x:DataType="vm:NavigationItem">
-                <suki:SukiSideMenuItem Header="{Binding Title}" AutomationProperties.Name="{Binding Title}">
-                    <suki:SukiSideMenuItem.Icon>
-                        <materialIcons:MaterialIcon Kind="{Binding Icon}" Width="{StaticResource IconSizeLarge}" Height="{StaticResource IconSizeLarge}" />
-                    </suki:SukiSideMenuItem.Icon>
-                </suki:SukiSideMenuItem>
-            </DataTemplate>
-        </suki:SukiSideMenu.ItemTemplate>
-        <suki:SukiSideMenu.FooterContent>
-            <!--
-                The speeds used to be repeated here as well as on the downloads screen. They live in
-                the status strip now, where the rest of the numbers are.
-            -->
-            <StackPanel Margin="{StaticResource StandardLeftTopBottomMargin}" Spacing="{StaticResource SpacingSmall}">
-                <Button Classes="Basic" Command="{Binding ShowAboutCommand}" Padding="{StaticResource ZeroThickness}" Margin="{StaticResource TinyTopMargin}" AutomationProperties.Name="{m:L Nav_About}" AutomationProperties.AutomationId="ShowAboutButton">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="InformationOutline" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacityDisabled}"/>
-                        <TextBlock Text="{m:L Nav_About}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacityDisabled}"/>
+        <!-- Advanced: a sidebar of destinations beside the current one. -->
+        <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding !IsSimpleMode}">
+
+            <Border Grid.Column="0"
+                    Width="{StaticResource PfSidebarWidth}"
+                    Background="{DynamicResource PfSurface}"
+                    BorderBrush="{DynamicResource PfBorder}"
+                    BorderThickness="0,0,1,0">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                    <!--
+                        The name, stated once and quietly. It was a large coloured wordmark, which
+                        is an advertisement; the application is already open, so the reader knows
+                        what they launched.
+                    -->
+                    <StackPanel Grid.Row="0" Margin="{StaticResource SidebarHeaderMargin}" Spacing="{StaticResource SpacingTiny}">
+                        <TextBlock Text="{m:L App_Title}" FontWeight="SemiBold" FontSize="{StaticResource PfFontBodyLarge}" />
+                        <TextBlock Text="{m:L App_Tagline}" Classes="caption" />
                     </StackPanel>
-                </Button>
-            </StackPanel>
-        </suki:SukiSideMenu.FooterContent>
-        <suki:SukiSideMenu.Content>
-            <ContentControl Content="{Binding CurrentPage}" Margin="{StaticResource MediumLeftTopRightBottomMargin}" />
-        </suki:SukiSideMenu.Content>
-    </suki:SukiSideMenu>
+
+                    <ListBox Grid.Row="1"
+                             Classes="nav"
+                             AutomationProperties.AutomationId="NavigationList"
+                             AutomationProperties.Name="{m:L Nav_Navigation}"
+                             ItemsSource="{Binding NavigationItems}"
+                             SelectedItem="{Binding SelectedNavigationItem}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NavigationItem">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="{StaticResource SpacingMedium}"
+                                            AutomationProperties.Name="{Binding Title}">
+                                    <materialIcons:MaterialIcon Kind="{Binding Icon}" Width="17" Height="17" />
+                                    <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Button Grid.Row="2"
+                            Classes="ghost nav"
+                            Classes.selected="{Binding IsAboutSelected}"
+                            Margin="{StaticResource SidebarFooterMargin}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Command="{Binding ShowAboutCommand}"
+                            AutomationProperties.Name="{m:L Nav_About}"
+                            AutomationProperties.AutomationId="ShowAboutButton">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                            <materialIcons:MaterialIcon Kind="InformationOutline" Width="17" Height="17" />
+                            <TextBlock Text="{m:L Nav_About}" />
+                        </StackPanel>
+                    </Button>
+
+                </Grid>
+            </Border>
+
+            <ContentControl Grid.Column="1"
+                            Padding="{StaticResource MediumLeftTopRightBottomMargin}"
+                            Content="{Binding CurrentPage}" />
+        </Grid>
 
         <!--
-            Simple mode: the one screen, and a quiet way back to everything else. No side menu,
+            Simple mode: the one screen, and a quiet way back to everything else. No sidebar,
             because there is nowhere else to navigate to.
         -->
-        <Grid ZIndex="0" RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
-            <!--
-                The only chrome simple mode gets: a way into settings and a way out to advanced,
-                muted and out of the way of the one thing the screen is for.
-            -->
-            <StackPanel Grid.Row="0"
-                        Orientation="Horizontal"
-                        Spacing="{StaticResource SpacingMedium}"
-                        HorizontalAlignment="Right">
-                <Button Classes="Basic"
-                        Command="{Binding ShowSimpleSettingsCommand}"
-                        IsVisible="{Binding !IsSimpleSettingsOpen}" AutomationProperties.Name="{m:L Settings_Title}" AutomationProperties.AutomationId="ShowSimpleSettingsButton">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="Cog" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
-                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
-                    </StackPanel>
-                </Button>
-                <Button Classes="Basic"
-                        Command="{Binding CloseSimpleSettingsCommand}"
-                        IsVisible="{Binding IsSimpleSettingsOpen}" AutomationProperties.Name="{m:L Nav_Downloads}" AutomationProperties.AutomationId="CloseSimpleSettingsButton">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
-                        <TextBlock Text="{m:L Nav_Downloads}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
-                    </StackPanel>
-                </Button>
-                <Button Classes="Basic" Command="{Binding SwitchToAdvancedModeCommand}" AutomationProperties.Name="{m:L Simple_SwitchToAdvanced}" AutomationProperties.AutomationId="SwitchToAdvancedModeButton">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="TuneVariant" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Opacity="{StaticResource OpacitySecondary}"/>
-                        <TextBlock Text="{m:L Simple_SwitchToAdvanced}" FontSize="{StaticResource FontSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+        <Grid RowDefinitions="Auto,*" IsVisible="{Binding IsSimpleMode}">
+            <Border Grid.Row="0"
+                    Background="{DynamicResource PfSurface}"
+                    BorderBrush="{DynamicResource PfBorder}"
+                    BorderThickness="0,0,0,1"
+                    Padding="{StaticResource HeaderBarPadding}">
+                <StackPanel Orientation="Horizontal"
+                            Height="{StaticResource PfHeaderHeight}"
+                            Spacing="{StaticResource SpacingSmall}"
+                            HorizontalAlignment="Right">
+                    <Button Classes="ghost"
+                            VerticalAlignment="Center"
+                            Command="{Binding ShowSimpleSettingsCommand}"
+                            IsVisible="{Binding !IsSimpleSettingsOpen}"
+                            AutomationProperties.Name="{m:L Settings_Title}"
+                            AutomationProperties.AutomationId="ShowSimpleSettingsButton">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="Cog" Width="15" Height="15" />
+                            <TextBlock Text="{m:L Settings_Title}" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="ghost"
+                            VerticalAlignment="Center"
+                            Command="{Binding CloseSimpleSettingsCommand}"
+                            IsVisible="{Binding IsSimpleSettingsOpen}"
+                            AutomationProperties.Name="{m:L Nav_Downloads}"
+                            AutomationProperties.AutomationId="CloseSimpleSettingsButton">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="ArrowLeft" Width="15" Height="15" />
+                            <TextBlock Text="{m:L Nav_Downloads}" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="ghost"
+                            VerticalAlignment="Center"
+                            Command="{Binding SwitchToAdvancedModeCommand}"
+                            AutomationProperties.Name="{m:L Simple_SwitchToAdvanced}"
+                            AutomationProperties.AutomationId="SwitchToAdvancedModeButton">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                            <materialIcons:MaterialIcon Kind="TuneVariant" Width="15" Height="15" />
+                            <TextBlock Text="{m:L Simple_SwitchToAdvanced}" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
 
-            <Panel Grid.Row="1" IsVisible="{Binding !IsSimpleSettingsOpen}">
+            <Panel Grid.Row="1"
+                   Margin="{StaticResource MediumLeftTopRightBottomMargin}"
+                   IsVisible="{Binding !IsSimpleSettingsOpen}">
                 <views:SimpleDownloadsView DataContext="{Binding DownloadsViewModel}"/>
             </Panel>
             <ContentControl Grid.Row="1"
+                            Padding="{StaticResource MediumLeftTopRightBottomMargin}"
                             Content="{Binding SettingsPage}"
                             IsVisible="{Binding IsSimpleSettingsOpen}"/>
         </Grid>
@@ -115,40 +150,45 @@
             hero and no decoration. The thing being chosen is which interface to show, not a product
             to be sold.
         -->
-        <Border ZIndex="10" IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource SukiGlassCardOpaqueBackground}">
+        <Border ZIndex="40" IsVisible="{Binding IsWelcomeVisible}" Background="{DynamicResource PfCanvas}">
             <StackPanel VerticalAlignment="Center"
                         HorizontalAlignment="Center"
-                        Spacing="{StaticResource SpacingStandard}"
+                        Spacing="{StaticResource SpacingMedium}"
                         MaxWidth="420">
-                <TextBlock Text="{m:L Welcome_Title}"
-                           FontSize="{StaticResource FontSizeLarge}"
-                           FontWeight="SemiBold"/>
+                <TextBlock Text="{m:L Welcome_Title}" Classes="subtitle" />
                 <TextBlock Text="{m:L Welcome_Subtitle}"
-                           Opacity="{StaticResource OpacitySecondary}"
+                           Classes="secondary"
                            TextWrapping="Wrap"
-                           Margin="{StaticResource StandardBottomMargin}"/>
+                           Margin="{StaticResource NormalBottomMargin}"/>
 
                 <Button Command="{Binding ChooseSimpleModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.Name="{m:L Welcome_Simple_Title}" AutomationProperties.AutomationId="ChooseSimpleModeButton">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        Padding="{StaticResource ChoiceCardPadding}"
+                        AutomationProperties.Name="{m:L Welcome_Simple_Title}"
+                        AutomationProperties.AutomationId="ChooseSimpleModeButton">
+                    <StackPanel Spacing="{StaticResource SpacingTiny}">
                         <TextBlock Text="{m:L Welcome_Simple_Title}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{m:L Welcome_Simple_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
+                        <TextBlock Text="{m:L Welcome_Simple_Body}" Classes="secondary" TextWrapping="Wrap" MaxWidth="360"/>
                     </StackPanel>
                 </Button>
 
                 <Button Command="{Binding ChooseAdvancedModeCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
-                        Padding="{StaticResource NormalLeftTopRightBottomMargin}" AutomationProperties.Name="{m:L Welcome_Advanced_Title}" AutomationProperties.AutomationId="ChooseAdvancedModeButton">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        Padding="{StaticResource ChoiceCardPadding}"
+                        AutomationProperties.Name="{m:L Welcome_Advanced_Title}"
+                        AutomationProperties.AutomationId="ChooseAdvancedModeButton">
+                    <StackPanel Spacing="{StaticResource SpacingTiny}">
                         <TextBlock Text="{m:L Welcome_Advanced_Title}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap" MaxWidth="360"/>
+                        <TextBlock Text="{m:L Welcome_Advanced_Body}" Classes="secondary" TextWrapping="Wrap" MaxWidth="360"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
         </Border>
+
+        <!-- Above everything, and hit-testing nothing while closed. -->
+        <overlay:ToastHost ZIndex="20" Manager="{Binding ToastManager}" DismissLabel="{m:L Common_Close}" />
+        <overlay:DialogHost ZIndex="30" Manager="{Binding DialogManager}" />
     </Panel>
-    </primitives:VisualLayerManager>
-</suki:SukiWindow>
+</Window>

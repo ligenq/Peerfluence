@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+using Peerfluence.Theme.Controls;
+using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
 using System.Threading.Channels;
@@ -171,7 +172,7 @@ internal static class TestHelpers
             Substitute.For<IDialogService>(),
             downloadsVm,
             settingsVm,
-            new SukiUI.Toasts.SukiToastManager(),
-            new SukiUI.Dialogs.SukiDialogManager());
+            new ToastManager(),
+            new DialogManager());
     }
 }

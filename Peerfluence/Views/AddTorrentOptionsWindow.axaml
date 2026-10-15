@@ -1,8 +1,7 @@
-﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                  xmlns:vm="using:Peerfluence.ViewModels"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
@@ -14,11 +13,11 @@
                  MinWidth="760" MinHeight="640"
                  WindowStartupLocation="CenterOwner">
 
-    <suki:BusyArea IsBusy="{Binding IsBusy}">
+    <Panel>
         <Grid RowDefinitions="*, Auto" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
             <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
                 <StackPanel Spacing="{StaticResource SpacingLarge}">
-                    <suki:GlassCard>
+                    <Border Classes="panel">
                         <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
                             <materialIcons:MaterialIcon Grid.RowSpan="2"
                                                         Kind="DownloadBoxOutline"
@@ -41,9 +40,9 @@
                                 </StackPanel>
                             </UniformGrid>
                         </Grid>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <suki:GlassCard>
+                    <Border Classes="panel">
                         <StackPanel Spacing="{StaticResource SpacingStandard}">
                             <TextBlock Text="{m:L AddTorrent_Destination}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                             <!-- Above the folder, because choosing a category is what fills the folder
@@ -63,9 +62,9 @@
                             </Grid>
                             <CheckBox Content="{m:L AddTorrent_StartImmediately}" IsChecked="{Binding StartImmediately}" AutomationProperties.AutomationId="StartImmediatelyCheckBox"/>
                         </StackPanel>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <suki:GlassCard IsVisible="{Binding IsMetadataPending}">
+                    <Border Classes="panel" IsVisible="{Binding IsMetadataPending}">
                         <StackPanel Spacing="{StaticResource SpacingNormal}">
                             <TextBlock Text="{m:L AddTorrent_MetadataPendingTitle}" FontWeight="SemiBold"/>
                             <TextBlock Text="{m:L AddTorrent_MetadataPendingBody}"
@@ -81,9 +80,9 @@
                                          IsVisible="{Binding IsFetchingMetadata}"
                                          Height="{StaticResource ProgressBarHeightSlim}"/>
                         </StackPanel>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <suki:GlassCard IsVisible="{Binding HasFiles}">
+                    <Border Classes="panel" IsVisible="{Binding HasFiles}">
                         <Grid RowDefinitions="Auto, *" RowSpacing="{StaticResource SpacingStandard}">
                             <TextBlock Text="{m:L Details_FilesTab}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                             <DataGrid Grid.Row="1"
@@ -119,11 +118,11 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
-                    </suki:GlassCard>
+                    </Border>
 
                     <Expander Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch">
                         <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource SmallTopMargin}">
-                            <suki:GlassCard>
+                            <Border Classes="panel">
                                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                                     <TextBlock Text="{m:L AddTorrent_Metadata}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                     <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
@@ -150,9 +149,9 @@
                                                   IsEnabled="False" AutomationProperties.AutomationId="PrivateCheckBox"/>
                                     </Grid>
                                 </StackPanel>
-                            </suki:GlassCard>
+                            </Border>
 
-                            <suki:GlassCard>
+                            <Border Classes="panel">
                                 <Grid ColumnDefinitions="*, *" ColumnSpacing="{StaticResource SpacingLarge}">
                                     <StackPanel Spacing="{StaticResource SpacingStandard}">
                                         <TextBlock Text="{m:L AddTorrent_Limits}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
@@ -196,7 +195,7 @@
                                                  PlaceholderText="{m:L AddTorrent_AdditionalTrackersWatermark}" AutomationProperties.Name="{m:L AddTorrent_AdditionalTrackersWatermark}" AutomationProperties.AutomationId="AdditionalTrackersTextBox"/>
                                     </StackPanel>
                                 </Grid>
-                            </suki:GlassCard>
+                            </Border>
                         </StackPanel>
                     </Expander>
 
@@ -218,10 +217,17 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             Spacing="{StaticResource SpacingStandard}">
-                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
+                    <Button Content="{m:L AddTorrent_Add}" Classes="accent" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
                     <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
                 </StackPanel>
             </Grid>
         </Grid>
-    </suki:BusyArea>
-</suki:SukiWindow>
+    <!-- Covers the form while work is in flight, so nothing can be edited mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsBusy}">
+            <ProgressBar IsIndeterminate="True"
+                         Width="180"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+        </Border>
+    </Panel>
+</Window>

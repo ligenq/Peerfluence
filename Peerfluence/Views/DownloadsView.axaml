@@ -1,13 +1,13 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pf="using:Peerfluence.Theme.Controls"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:m="using:Peerfluence.Markup"
              xmlns:views="using:Peerfluence.Views"
              x:Class="Peerfluence.Views.DownloadsView"
              x:DataType="vm:DownloadsViewModel">
-    <suki:BusyArea IsBusy="{Binding IsBusy}">
+    <Panel>
         <!--
             The last two rows carry the details pane. Their heights are set from code-behind rather
             than here: hiding a control leaves its star-sized row reserving space, which is what left
@@ -15,20 +15,17 @@
         -->
         <Grid x:Name="ContentGrid" RowDefinitions="Auto,Auto,Auto,Auto,2*,0,0">
             <!--
-                One line instead of four cards. The same four numbers, in the place a status bar
-                belongs, leaving the list the room the window was opened for.
+                The page title and session totals share one line, leaving room for the torrent list.
             -->
-            <Border Margin="{StaticResource StandardBottomMargin}"
-                    Padding="{StaticResource NormalLeftTopRightBottomMargin}"
-                    Background="{DynamicResource SukiGlassCardBackground}"
-                    CornerRadius="{StaticResource CornerRadiusNormal}">
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingLarge}">
+            <Grid ColumnDefinitions="*,Auto" Margin="{StaticResource MediumBottomMargin}">
+                <TextBlock Text="{m:L Nav_Downloads}" Classes="title" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingLarge}" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="Download" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" VerticalAlignment="Center"/>
+                        <materialIcons:MaterialIcon Kind="Download" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding TotalDownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <materialIcons:MaterialIcon Kind="Upload" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" VerticalAlignment="Center"/>
+                        <materialIcons:MaterialIcon Kind="Upload" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding TotalUploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
@@ -40,24 +37,24 @@
                         <TextBlock Text="{Binding TotalPeers}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
-            </Border>
+            </Grid>
 
         <!--
             Actions say what they do. The destructive one especially: it used to be an unlabelled
             glyph one click away, which is not a thing to leave to a guess.
         -->
-        <suki:GlassCard Grid.Row="1" Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+        <Border Classes="panel" Grid.Row="1" Margin="{StaticResource StandardBottomMargin}" Padding="{StaticResource NormalLeftTopRightBottomMargin}">
             <DockPanel>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" DockPanel.Dock="Left">
-                    <Button Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.Name="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="AddTorrentButton">
+                    <Button Classes="accent" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.Name="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="AddTorrentButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddTorrent}"/>
                         </StackPanel>
                     </Button>
 
-                    <!-- Same weight as Add Torrent: two ways to start the same thing. -->
-                    <Button Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}" AutomationProperties.Name="{m:L Downloads_AddMagnet}" AutomationProperties.AutomationId="AddMagnetButton">
+                    <!-- A second route to adding a download. -->
+                    <Button Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_AddMagnet}" AutomationProperties.Name="{m:L Downloads_AddMagnet}" AutomationProperties.AutomationId="AddMagnetButton">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                             <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                             <TextBlock Text="{m:L Downloads_AddMagnet}"/>
@@ -85,29 +82,30 @@
                         </StackPanel>
                     </Button>
 
-                    <Separator Width="1" Height="24" Background="{DynamicResource SukiBorderBrush}" Margin="{StaticResource XXSmallLeftRightMargin}"/>
+                    <Separator Width="1" Height="24" Background="{DynamicResource PfBorder}" Margin="{StaticResource XXSmallLeftRightMargin}"/>
 
                     <!--
                         Session-wide, unlike Start and Stop beside it, which act on what is selected.
                         Two buttons rather than one that relabels itself: which one is showing is then
                         also the answer to "is anything running?".
                     -->
-                    <Button Command="{Binding ToggleSessionPauseCommand}"
+                    <Button Classes="ghost icon" Command="{Binding ToggleSessionPauseCommand}"
                             ToolTip.Tip="{m:L Downloads_PauseAll}"
                             IsVisible="{Binding !IsSessionPaused}" AutomationProperties.Name="{m:L Downloads_PauseAll}" AutomationProperties.AutomationId="PauseAllButton">
                         <materialIcons:MaterialIcon Kind="PauseCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
-                    <Button Command="{Binding ToggleSessionPauseCommand}"
+                    <Button Classes="ghost icon" Command="{Binding ToggleSessionPauseCommand}"
                             ToolTip.Tip="{m:L Downloads_ResumeAll}"
                             IsVisible="{Binding IsSessionPaused}" AutomationProperties.Name="{m:L Downloads_ResumeAll}" AutomationProperties.AutomationId="ResumeAllButton">
-                        <materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                        <materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}" Foreground="{DynamicResource PfAccent}"/>
                     </Button>
 
-                    <Button Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}" AutomationProperties.Name="{m:L CreateTorrent_Title}" AutomationProperties.AutomationId="CreateTorrentButton">
+                    <Button Classes="ghost icon" Command="{Binding CreateTorrentCommand}" ToolTip.Tip="{m:L CreateTorrent_Title}" AutomationProperties.Name="{m:L CreateTorrent_Title}" AutomationProperties.AutomationId="CreateTorrentButton">
                         <materialIcons:MaterialIcon Kind="File" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                     </Button>
 
                     <ToggleButton x:Name="DetailsPaneToggle"
+                                  Classes="toolbar"
                                   IsChecked="{Binding IsDetailsPaneVisible, Mode=OneWay}"
                                   Command="{Binding ToggleDetailsPaneCommand}"
                                   ToolTip.Tip="{m:L Downloads_ToggleDetails}" AutomationProperties.Name="{m:L Downloads_ToggleDetails}" AutomationProperties.AutomationId="ToggleDetailsPaneToggle">
@@ -115,7 +113,7 @@
                     </ToggleButton>
                 </StackPanel>
             </DockPanel>
-        </suki:GlassCard>
+        </Border>
 
         <!-- Finding one torrent among many: search by name, and narrow by what it is doing. -->
         <Grid Grid.Row="2"
@@ -134,24 +132,24 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
-                            <RadioButton Classes="Chips" GroupName="CategoryFilter"
+                            <RadioButton Classes="chip" GroupName="CategoryFilter"
                                          Content="{Binding}"
                                          Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).SetCategoryFilterCommand}"
                                          CommandParameter="{Binding}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <RadioButton Classes="Chips" GroupName="CategoryFilter"
+                <RadioButton Classes="chip" GroupName="CategoryFilter"
                              IsVisible="{Binding HasCategories}"
                              IsChecked="{Binding IsAllCategories, Mode=TwoWay}"
                              Content="{m:L Downloads_Category_All}" AutomationProperties.AutomationId="CategoryFilterAllRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=TwoWay}"
+                <RadioButton Classes="chip" GroupName="TorrentFilter" IsChecked="{Binding IsFilterAll, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_All}" AutomationProperties.AutomationId="FilterAllRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterDownloading, Mode=TwoWay}"
+                <RadioButton Classes="chip" GroupName="TorrentFilter" IsChecked="{Binding IsFilterDownloading, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_Downloading}" AutomationProperties.AutomationId="FilterDownloadingRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterSeeding, Mode=TwoWay}"
+                <RadioButton Classes="chip" GroupName="TorrentFilter" IsChecked="{Binding IsFilterSeeding, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_Seeding}" AutomationProperties.AutomationId="FilterSeedingRadioButton"/>
-                <RadioButton Classes="Chips" GroupName="TorrentFilter" IsChecked="{Binding IsFilterCompleted, Mode=TwoWay}"
+                <RadioButton Classes="chip" GroupName="TorrentFilter" IsChecked="{Binding IsFilterCompleted, Mode=TwoWay}"
                              Content="{m:L Downloads_Filter_Completed}" AutomationProperties.AutomationId="FilterCompletedRadioButton"/>
             </StackPanel>
             <TextBox Grid.Column="1"
@@ -161,10 +159,11 @@
                      HorizontalAlignment="Right" AutomationProperties.Name="{m:L Downloads_Search}" AutomationProperties.AutomationId="SearchTextTextBox"/>
         </Grid>
 
-        <suki:InfoBar x:Name="DownloadsStatusInfoBar"
+        <pf:InfoBar x:Name="DownloadsStatusInfoBar"
                       Grid.Row="3"
                       IsVisible="{Binding HasStatusMessage}"
                       IsClosable="True"
+                      DismissLabel="{m:L Common_Close}"
                       Message="{Binding StatusMessage}"
                       Margin="{StaticResource StandardBottomMargin}" />
 
@@ -177,7 +176,7 @@
                    VerticalAlignment="Center"/>
 
         <!-- Torrent List -->
-        <suki:GlassCard x:Name="TorrentTableCard"
+        <Border Classes="panel" x:Name="TorrentTableCard"
                         Grid.Row="4"
                         Padding="{StaticResource ZeroThickness}"
                         IsVisible="{Binding HasTorrents}">
@@ -291,7 +290,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
-                                    <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                                    <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource PfAccent}"/>
                                     <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -302,7 +301,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
-                                    <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource SukiPrimaryColor}"/>
+                                    <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource PfAccent}"/>
                                     <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -312,7 +311,7 @@
                     <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}" Binding="{Binding ConnectedPeers}" Width="80"/>
                 </DataGrid.Columns>
             </DataGrid>
-        </suki:GlassCard>
+        </Border>
 
         <!--
             Nothing added yet. The same restraint as simple mode: the two buttons that add a
@@ -326,7 +325,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     MaxWidth="460"
-                    Spacing="{StaticResource SpacingSmall}">
+                    Spacing="{StaticResource SpacingNormal}">
             <TextBlock Text="{m:L Downloads_EmptyTitle}"
                        FontSize="{StaticResource FontSizeLarge}"
                        FontWeight="SemiBold"
@@ -339,12 +338,17 @@
         <!-- Detail Pane (Resizable) -->
         <GridSplitter Grid.Row="5" Height="4" HorizontalAlignment="Stretch" Background="Transparent"
                       IsVisible="{Binding IsDetailsPaneVisible}" />
-        <suki:GlassCard Grid.Row="6"
+        <Border Classes="panel" Grid.Row="6"
                         IsVisible="{Binding IsDetailsPaneVisible}"
                         Margin="{StaticResource ZeroThickness}"
                         Padding="{StaticResource ZeroThickness}">
             <ContentControl Content="{Binding SelectedTorrentDetailViewModel}" />
-        </suki:GlassCard>
+        </Border>
     </Grid>
-    </suki:BusyArea>
+    <!-- Covers the content while work is in flight, so nothing can be acted on mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsBusy}">
+            <ProgressBar IsIndeterminate="True" Width="180"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+    </Panel>
 </UserControl>

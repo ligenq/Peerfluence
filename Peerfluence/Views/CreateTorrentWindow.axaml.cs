@@ -1,11 +1,11 @@
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using SukiUI.Controls;
 using Peerfluence.ViewModels;
 using System;
 
 namespace Peerfluence.Views;
 
-public partial class CreateTorrentWindow : SukiWindow
+public partial class CreateTorrentWindow : Window
 {
     private CreateTorrentViewModel? _currentViewModel;
 

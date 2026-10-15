@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using System.Globalization;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Config;
@@ -105,13 +105,6 @@ public class SettingsViewModelTests
         Assert.Contains("Indigo", _sut.ColorThemes);
         Assert.Contains("Cobalt", _sut.ColorThemes);
         Assert.Contains("Rose", _sut.ColorThemes);
-    }
-
-    [Fact]
-    public void BackgroundStyles_ContainsExpectedValues()
-    {
-        Assert.Contains("GradientSoft", _sut.BackgroundStyles);
-        Assert.Contains("Flat", _sut.BackgroundStyles);
     }
 
     [Fact]
@@ -383,7 +376,6 @@ public class SettingsViewModelTests
         {
             _sut.SelectedThemeVariant = "Dark";
             _sut.SelectedColorTheme = "Emerald";
-            _sut.SelectedBackgroundStyle = "Flat";
             _sut.SelectedEncryptionMode = "Require";
             _sut.SelectedProxyType = "Socks5";
             _sut.SelectedLanguage = "sv-SE";
@@ -392,7 +384,6 @@ public class SettingsViewModelTests
 
             Assert.Equal("Dark", _sut.SelectedThemeVariant);
             Assert.Equal("Emerald", _sut.SelectedColorTheme);
-            Assert.Equal("Flat", _sut.SelectedBackgroundStyle);
             Assert.Equal("Require", _sut.SelectedEncryptionMode);
             Assert.Equal("Socks5", _sut.SelectedProxyType);
             Assert.Equal("sv-SE", _sut.SelectedLanguage);
@@ -483,13 +474,11 @@ public class SettingsViewModelTests
 
         _sut.SelectedColorTheme = null!;
         _sut.SelectedThemeVariant = null!;
-        _sut.SelectedBackgroundStyle = null!;
         _sut.SelectedEncryptionMode = string.Empty;
         _sut.SelectedProxyType = string.Empty;
 
         Assert.Equal(before, _sut.SelectedColorTheme);
         Assert.False(string.IsNullOrEmpty(_sut.SelectedThemeVariant));
-        Assert.False(string.IsNullOrEmpty(_sut.SelectedBackgroundStyle));
         Assert.False(string.IsNullOrEmpty(_sut.SelectedEncryptionMode));
         Assert.False(string.IsNullOrEmpty(_sut.SelectedProxyType));
     }
@@ -511,7 +500,6 @@ public class SettingsViewModelTests
 
             Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.ColorTheme));
             Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.ThemeVariant));
-            Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.BackgroundStyle));
         }
         finally
         {

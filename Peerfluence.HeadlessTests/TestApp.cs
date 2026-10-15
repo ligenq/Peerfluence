@@ -1,10 +1,10 @@
+using Peerfluence.Theme.Controls;
 using Avalonia;
 using Avalonia.Headless;
 using Material.Icons.Avalonia;
 using Peerfluence.Converters;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;
-using SukiUI;
 
 [assembly: AvaloniaTestApplication(typeof(Peerfluence.HeadlessTests.TestAppBuilder))]
 [assembly: AvaloniaTestFramework]
@@ -18,7 +18,8 @@ public class TestApp : Application
         // Initialize localization singleton (required by {m:L} markup extension)
         _ = new LocalizationService();
 
-        Styles.Add(new SukiTheme());
+        Styles.Add(new Avalonia.Themes.Fluent.FluentTheme());
+        Styles.Add(new Peerfluence.Theme.PeerfluenceTheme());
         Styles.Add(new MaterialIconStyles(null));
 
         Resources.MergedDictionaries.Add(new Avalonia.Markup.Xaml.Styling.ResourceInclude(new Uri("avares://Peerfluence/")) { Source = new Uri("avares://Peerfluence/Resources/_Colors.axaml") });

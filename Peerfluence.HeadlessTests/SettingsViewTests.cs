@@ -1,4 +1,5 @@
-﻿using Avalonia.Automation;
+using Peerfluence.Theme.Controls;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using CommunityToolkit.Mvvm.Messaging;
@@ -7,7 +8,6 @@ using Peerfluence.Core.Messaging;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
-using SukiUI.Controls;
 
 namespace Peerfluence.HeadlessTests;
 
@@ -49,8 +49,8 @@ public class SettingsViewTests
         var (view, _) = CreateView();
 
         var combos = view.GetLogicalDescendants().OfType<ComboBox>().ToList();
-        // ThemeVariant, ColorTheme, BackgroundStyle, Language, EncryptionMode, ProxyType
-        Assert.True(combos.Count >= 6, $"Expected at least 6 ComboBoxes, found {combos.Count}");
+        // ThemeVariant, ColorTheme, Language, EncryptionMode, ProxyType
+        Assert.True(combos.Count >= 5, $"Expected at least 5 ComboBoxes, found {combos.Count}");
     }
 
     [AvaloniaFact]

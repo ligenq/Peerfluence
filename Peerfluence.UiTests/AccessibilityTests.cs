@@ -18,8 +18,8 @@ namespace Peerfluence.UiTests;
 public sealed class AccessibilityTests
 {
     /// <summary>
-    /// Window chrome supplied by Avalonia and SukiUI rather than by this application. Not ours to
-    /// name, and not what these tests are about.
+    /// Window chrome supplied by Avalonia and the operating system rather than by this
+    /// application. Not ours to name, and not what these tests are about.
     /// </summary>
     private static readonly HashSet<string> NotOurs =
     [

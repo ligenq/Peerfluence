@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+using Peerfluence.Theme.Controls;
+using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
@@ -7,7 +8,6 @@ using PeerSharp.Interfaces;
 using PeerSharp.Core;
 using Peerfluence.Core.Services;
 using Peerfluence.Services;
-using SukiUI.Controls;
 
 namespace Peerfluence.HeadlessTests;
 

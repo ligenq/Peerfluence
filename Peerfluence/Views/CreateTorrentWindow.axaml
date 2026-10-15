@@ -1,8 +1,7 @@
-﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                  xmlns:vm="using:Peerfluence.ViewModels"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
@@ -14,9 +13,9 @@
                  WindowStartupLocation="CenterOwner"
                  CanResize="False">
 
-    <suki:BusyArea IsBusy="{Binding IsCreating}">
+    <Panel>
         <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <!-- Source -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
@@ -41,9 +40,9 @@
                         <CheckBox Grid.Column="1" Content="{m:L CreateTorrent_Private}" IsChecked="{Binding IsPrivate}" VerticalAlignment="Bottom" Margin="{StaticResource XXSmallBottomMargin}" AutomationProperties.AutomationId="CreateTorrentPrivateCheckBox"/>
                     </Grid>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
 
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <!-- Trackers -->
                     <StackPanel Spacing="{StaticResource SpacingNormal}">
@@ -63,15 +62,22 @@
                         <TextBox Text="{Binding Comment, Mode=TwoWay}" AutomationProperties.Name="{m:L CreateTorrent_Comment}" AutomationProperties.AutomationId="CommentTextBox"/>
                     </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
 
             <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="{StaticResource ErrorColor}" TextWrapping="Wrap" FontSize="{StaticResource FontSizeNormal}"/>
 
             <!-- Actions -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource NormalTopMargin}">
-                <Button Content="{m:L CreateTorrent_Create}" Classes="Flat" Command="{Binding CreateCommand}" IsDefault="True" Width="120" AutomationProperties.AutomationId="CreateButton"/>
+                <Button Content="{m:L CreateTorrent_Create}" Classes="accent" Command="{Binding CreateCommand}" IsDefault="True" Width="120" AutomationProperties.AutomationId="CreateButton"/>
                 <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" Width="120" AutomationProperties.AutomationId="CreateTorrentCancelButton"/>
             </StackPanel>
         </StackPanel>
-    </suki:BusyArea>
-</suki:SukiWindow>
+    <!-- Covers the form while work is in flight, so nothing can be edited mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsCreating}">
+            <ProgressBar IsIndeterminate="True"
+                         Width="180"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+        </Border>
+    </Panel>
+</Window>

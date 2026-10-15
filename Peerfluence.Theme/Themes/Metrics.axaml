@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+  <!--
+    Spacing, radii and type. One scale each, deliberately short: a long scale is the same as no
+    scale, because every value becomes available and nothing is a decision.
+
+    The type sizes are small by web standards and ordinary by desktop ones. This is a workstation
+    tool that shows hundreds of rows of file names, sizes and speeds, so density is a feature.
+  -->
+
+  <!-- Spacing. A 4px grid, with 6 kept because 4 is tight and 8 is loose for inline gaps. -->
+  <sys:Double x:Key="PfSpaceXs">4</sys:Double>
+  <sys:Double x:Key="PfSpaceSm">6</sys:Double>
+  <sys:Double x:Key="PfSpaceMd">8</sys:Double>
+  <sys:Double x:Key="PfSpaceLg">12</sys:Double>
+  <sys:Double x:Key="PfSpaceXl">16</sys:Double>
+  <sys:Double x:Key="PfSpace2Xl">24</sys:Double>
+  <sys:Double x:Key="PfSpace3Xl">32</sys:Double>
+
+  <Thickness x:Key="PfPadControl">10,6</Thickness>
+  <Thickness x:Key="PfPadControlWide">14,7</Thickness>
+  <Thickness x:Key="PfPadPanel">16</Thickness>
+  <Thickness x:Key="PfPadPage">20,18</Thickness>
+  <Thickness x:Key="PfPageHeaderMargin">0,0,0,20</Thickness>
+
+  <!--
+    Radii stay modest. Large radii on every surface is the single clearest marker of a generated
+    interface, and it also wastes the corner of dense rows.
+  -->
+  <CornerRadius x:Key="PfRadiusSm">3</CornerRadius>
+  <CornerRadius x:Key="PfRadius">5</CornerRadius>
+  <CornerRadius x:Key="PfRadiusLg">8</CornerRadius>
+  <CornerRadius x:Key="PfRadiusPill">999</CornerRadius>
+
+  <Thickness x:Key="PfBorderThin">1</Thickness>
+
+  <!--
+    Type sizes only. The theme deliberately names no font family: a theme that hardcodes one the
+    consuming application has not registered fails at startup rather than falling back, and the
+    choice of typeface belongs to the application anyway. Register one on the AppBuilder, which
+    sets it as the default for everything.
+  -->
+
+  <sys:Double x:Key="PfFontCaption">12</sys:Double>
+  <sys:Double x:Key="PfFontSmall">12</sys:Double>
+  <sys:Double x:Key="PfFontBody">13</sys:Double>
+  <sys:Double x:Key="PfLineHeightBody">20</sys:Double>
+  <sys:Double x:Key="PfFontBodyLarge">14</sys:Double>
+  <sys:Double x:Key="PfFontSubtitle">16</sys:Double>
+  <sys:Double x:Key="PfFontTitle">24</sys:Double>
+  <sys:Double x:Key="PfFontDisplay">26</sys:Double>
+
+  <!-- Fixed heights, so rows and controls line up across screens without each view guessing. -->
+  <sys:Double x:Key="PfControlHeight">30</sys:Double>
+  <sys:Double x:Key="PfControlHeightSm">26</sys:Double>
+  <sys:Double x:Key="PfRowHeight">34</sys:Double>
+  <sys:Double x:Key="PfHeaderHeight">48</sys:Double>
+  <sys:Double x:Key="PfSidebarWidth">212</sys:Double>
+
+</ResourceDictionary>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -63,6 +63,12 @@
   </data>
   <data name="App_Tagline" xml:space="preserve">
     <value>Робоча станція BitTorrent</value>
+  </data>
+  <data name="Nav_Navigation" xml:space="preserve">
+    <value>Навігація</value>
+  </data>
+  <data name="Find_Hint" xml:space="preserve">
+    <value>Шукайте в підключених індексаторах і додавайте результати до завантажень.</value>
   </data>
   <data name="Nav_Downloads" xml:space="preserve">
     <value>Завантаження</value>
@@ -435,6 +441,12 @@
   </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>М'ятний</value>
+  </data>
+  <data name="Settings_ColorTheme_Teal" xml:space="preserve">
+    <value>Синьо-зелений</value>
+  </data>
+  <data name="Settings_ColorTheme_Violet" xml:space="preserve">
+    <value>Фіолетовий</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Смарагдовий</value>

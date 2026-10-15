@@ -1,28 +1,27 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pf="using:Peerfluence.Theme.Controls"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:m="using:Peerfluence.Markup"
              x:Class="Peerfluence.Views.SimpleDownloadsView"
              x:DataType="vm:DownloadsViewModel">
-    <suki:BusyArea IsBusy="{Binding IsBusy}">
+    <Panel>
         <Grid RowDefinitions="Auto,Auto,*" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Stretch">
 
             <!-- One action, said in words. Everything else lives on the rows. -->
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}"
                   Margin="{StaticResource StandardBottomMargin}">
                 <TextBlock Text="{m:L Nav_Downloads}"
-                           FontSize="{StaticResource FontSizeHeader}"
-                           FontWeight="Bold"
+                           Classes="title"
                            VerticalAlignment="Center"/>
-                <Button Grid.Column="1" Classes="Flat" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.Name="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="SimpleDownloadsAddTorrentButton">
+                <Button Grid.Column="1" Classes="accent" Command="{Binding AddTorrentCommand}" ToolTip.Tip="{m:L Downloads_AddTorrent}" AutomationProperties.Name="{m:L Downloads_AddTorrent}" AutomationProperties.AutomationId="SimpleDownloadsAddTorrentButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Downloads_AddTorrent}"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="2" Classes="Flat" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}" AutomationProperties.Name="{m:L Downloads_PasteMagnet}" AutomationProperties.AutomationId="SimpleDownloadsAddMagnetButton">
+                <Button Grid.Column="2" Command="{Binding AddMagnetCommand}" ToolTip.Tip="{m:L Downloads_PasteMagnet}" AutomationProperties.Name="{m:L Downloads_PasteMagnet}" AutomationProperties.AutomationId="SimpleDownloadsAddMagnetButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Magnet" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Downloads_PasteMagnet}"/>
@@ -30,9 +29,10 @@
                 </Button>
             </Grid>
 
-            <suki:InfoBar Grid.Row="1"
+            <pf:InfoBar Grid.Row="1"
                           IsVisible="{Binding HasStatusMessage}"
                           IsClosable="True"
+                          DismissLabel="{m:L Common_Close}"
                           Message="{Binding StatusMessage}"
                           Margin="{StaticResource StandardBottomMargin}"/>
 
@@ -60,7 +60,7 @@
                         <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                             <Border Padding="{StaticResource NormalLeftTopRightBottomMargin}"
                                     BorderThickness="0,0,0,1"
-                                    BorderBrush="{DynamicResource SukiBorderBrush}"
+                                    BorderBrush="{DynamicResource PfBorder}"
                                     Background="Transparent">
                                 <Border.ContextMenu>
                                     <ContextMenu>
@@ -105,7 +105,7 @@
                                     </StackPanel>
 
                                     <Button Grid.Column="1"
-                                            Classes="Basic"
+                                            Classes="ghost"
                                             VerticalAlignment="Center"
                                             Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).ToggleTorrentCommand}"
                                             CommandParameter="{Binding}"
@@ -117,7 +117,7 @@
                                     </Button>
 
                                     <Button Grid.Column="2"
-                                            Classes="Basic"
+                                            Classes="ghost"
                                             VerticalAlignment="Center"
                                             Command="{Binding $parent[ItemsControl].((vm:DownloadsViewModel)DataContext).OpenTorrentFolderCommand}"
                                             CommandParameter="{Binding}"
@@ -131,5 +131,10 @@
                 </ItemsControl>
             </ScrollViewer>
         </Grid>
-    </suki:BusyArea>
+    <!-- Covers the content while work is in flight, so nothing can be acted on mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsBusy}">
+            <ProgressBar IsIndeterminate="True" Width="180"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+    </Panel>
 </UserControl>

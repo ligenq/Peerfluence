@@ -1,4 +1,4 @@
-﻿using Peerfluence.Core.Config;
+using Peerfluence.Core.Config;
 using System.IO.Abstractions;
 
 namespace Peerfluence.Core.Services;
@@ -82,8 +82,7 @@ public sealed class AppSettingsService : IAppSettingsService
             Theme =
             {
                 ThemeVariant = "System",
-                ColorTheme = "Indigo",
-                BackgroundStyle = "GradientSoft"
+                ColorTheme = "Teal"
             },
             ShowRemoveTorrentOptions = true,
             ShowDetailsPane = false,
@@ -125,13 +124,7 @@ public sealed class AppSettingsService : IAppSettingsService
 
         if (string.IsNullOrWhiteSpace(settings.Theme.ColorTheme))
         {
-            settings.Theme.ColorTheme = "Indigo";
-            changed = true;
-        }
-
-        if (string.IsNullOrWhiteSpace(settings.Theme.BackgroundStyle))
-        {
-            settings.Theme.BackgroundStyle = "GradientSoft";
+            settings.Theme.ColorTheme = "Teal";
             changed = true;
         }
 

@@ -53,17 +53,26 @@ public class ByteSizeConverterBindingTests
         return spy.BackwardCalls;
     }
 
+    /// <summary>
+    /// What the size columns actually rely on: the converter is never asked to go backwards.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This used to be a pair, because the other half reproduced the reason: under the previous
+    /// control theme a <see cref="DataGridTextColumn"/> with a default-mode binding asked for the
+    /// way back while merely showing a row, on a grid that is IsReadOnly with nobody editing
+    /// anything, and a converter that throws there threw while a download was on screen.
+    /// </para>
+    /// <para>
+    /// That no longer reproduces: with Avalonia's Fluent grid template the default-mode binding
+    /// does not round-trip. The reproduction was removed rather than inverted, because asserting
+    /// that a quirk is absent holds nothing to account - it would pass for any reason at all,
+    /// including the row never being realized. The columns stay one-way regardless, and this is
+    /// the assertion that says so.
+    /// </para>
+    /// </remarks>
     [AvaloniaFact]
-    public void ADefaultColumnBinding_AsksTheConverterToGoBackwards()
-    {
-        // The reproduction. DataGridTextColumn binds two ways by default, and the grid asks for the
-        // way back while merely showing a row - on a grid that is IsReadOnly, with nobody editing
-        // anything. A converter that throws there throws while a download is on screen.
-        Assert.NotEqual(0, BackwardCallsFor(BindingMode.Default));
-    }
-
-    [AvaloniaFact]
-    public void AOneWayColumnBinding_DoesNot()
+    public void AOneWayColumnBinding_NeverAsksTheConverterToGoBackwards()
     {
         Assert.Equal(0, BackwardCallsFor(BindingMode.OneWay));
     }

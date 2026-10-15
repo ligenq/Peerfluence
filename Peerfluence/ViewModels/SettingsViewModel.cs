@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -24,7 +24,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private readonly IWindowsAssociationService _windowsAssociationService;
     private IReadOnlyList<SettingsOption> _themeVariantOptions = CreateThemeVariantOptions();
     private IReadOnlyList<SettingsOption> _colorThemeOptions = CreateColorThemeOptions();
-    private IReadOnlyList<SettingsOption> _backgroundStyleOptions = CreateBackgroundStyleOptions();
     private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
 
@@ -182,7 +181,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(NewCategoryPath),
         nameof(ThemeVariantOptions),
         nameof(ColorThemeOptions),
-        nameof(BackgroundStyleOptions),
         nameof(EncryptionModeOptions),
         nameof(ProxyTypeOptions)
     };
@@ -735,13 +733,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         get;
         set => SetChoice(ref field, value);
-    } = "Indigo";
-
-    public string SelectedBackgroundStyle
-    {
-        get;
-        set => SetChoice(ref field, value);
-    } = "GradientSoft";
+    } = Theme.PeerfluenceTheme.DefaultAccent;
 
     public string SelectedLanguage
     {
@@ -974,20 +966,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         private set => SetProperty(ref _themeVariantOptions, value);
     }
 
-    public IReadOnlyList<string> ColorThemes { get; } = ["Indigo", "Cobalt", "Mint", "Emerald", "Rose", "Vibrant", "Amber", "Slate", "Solar"];
+    /// <summary>
+    /// The accents on offer, taken from the theme rather than restated here.
+    /// </summary>
+    /// <remarks>
+    /// This used to be its own list, which is how it came to offer three accents the theme no
+    /// longer has and to omit the default. Settings already on disk naming a removed one are
+    /// mapped by <see cref="Services.ThemeService"/>.
+    /// </remarks>
+    public IReadOnlyList<string> ColorThemes { get; } = Theme.PeerfluenceTheme.Accents;
 
     public IReadOnlyList<SettingsOption> ColorThemeOptions
     {
         get => _colorThemeOptions;
         private set => SetProperty(ref _colorThemeOptions, value);
-    }
-
-    public IReadOnlyList<string> BackgroundStyles { get; } = ["GradientSoft", "Gradient", "GradientDarker", "Flat", "Bubble"];
-
-    public IReadOnlyList<SettingsOption> BackgroundStyleOptions
-    {
-        get => _backgroundStyleOptions;
-        private set => SetProperty(ref _backgroundStyleOptions, value);
     }
 
     public IReadOnlyList<SettingsOption> LanguageOptions { get; } =
@@ -1164,7 +1156,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private string CurrentThemeKey()
     {
-        return $"{SelectedThemeVariant}|{SelectedColorTheme}|{SelectedBackgroundStyle}";
+        return $"{SelectedThemeVariant}|{SelectedColorTheme}";
     }
 
     private void LoadFromSettingsCore()
@@ -1206,7 +1198,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Theme
         SelectedThemeVariant = settings.Theme.ThemeVariant;
         SelectedColorTheme = settings.Theme.ColorTheme;
-        SelectedBackgroundStyle = settings.Theme.BackgroundStyle;
         SelectedLanguage = settings.Language;
 
         // Queue
@@ -1321,7 +1312,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             // Theme
             settings.Theme.ThemeVariant = SelectedThemeVariant;
             settings.Theme.ColorTheme = SelectedColorTheme;
-            settings.Theme.BackgroundStyle = SelectedBackgroundStyle;
             settings.Language = SelectedLanguage;
 
             // Queue
@@ -1473,7 +1463,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         MaxDiskWriteSpeedBytesPerSecond = defaults.Network.MaxDiskWriteSpeedBytesPerSecond;
         SelectedThemeVariant = defaults.Theme.ThemeVariant;
         SelectedColorTheme = defaults.Theme.ColorTheme;
-        SelectedBackgroundStyle = defaults.Theme.BackgroundStyle;
         SelectedLanguage = defaults.Language;
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
@@ -1563,24 +1552,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         var selectedThemeVariant = SelectedThemeVariant;
         var selectedColorTheme = SelectedColorTheme;
-        var selectedBackgroundStyle = SelectedBackgroundStyle;
         var selectedEncryptionMode = SelectedEncryptionMode;
         var selectedProxyType = SelectedProxyType;
 
         ThemeVariantOptions = CreateThemeVariantOptions();
         ColorThemeOptions = CreateColorThemeOptions();
-        BackgroundStyleOptions = CreateBackgroundStyleOptions();
         EncryptionModeOptions = CreateEncryptionModeOptions();
         ProxyTypeOptions = CreateProxyTypeOptions();
 
         SelectedThemeVariant = selectedThemeVariant;
         SelectedColorTheme = selectedColorTheme;
-        SelectedBackgroundStyle = selectedBackgroundStyle;
         SelectedEncryptionMode = selectedEncryptionMode;
         SelectedProxyType = selectedProxyType;
         OnPropertyChanged(nameof(SelectedThemeVariant));
         OnPropertyChanged(nameof(SelectedColorTheme));
-        OnPropertyChanged(nameof(SelectedBackgroundStyle));
         OnPropertyChanged(nameof(SelectedEncryptionMode));
         OnPropertyChanged(nameof(SelectedProxyType));
         OnPropertyChanged(nameof(UpdateManagementMessage));
@@ -1600,33 +1585,31 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         ];
     }
 
+    /// <summary>
+    /// The accents the theme offers, each with its name in the reader's language.
+    /// </summary>
+    /// <remarks>
+    /// Driven by the theme's own list rather than restated. The restated version drifted the
+    /// moment the theme changed: it offered three accents that no longer existed and omitted the
+    /// default, which left the box blank for anyone whose settings named the default.
+    /// </remarks>
     private static IReadOnlyList<SettingsOption> CreateColorThemeOptions()
     {
-        return
-        [
-            new SettingsOption("Indigo", Properties.Resources.Settings_ColorTheme_Indigo),
-            new SettingsOption("Cobalt", Properties.Resources.Settings_ColorTheme_Cobalt),
-            new SettingsOption("Mint", Properties.Resources.Settings_ColorTheme_Mint),
-            new SettingsOption("Emerald", Properties.Resources.Settings_ColorTheme_Emerald),
-            new SettingsOption("Rose", Properties.Resources.Settings_ColorTheme_Rose),
-            new SettingsOption("Vibrant", Properties.Resources.Settings_ColorTheme_Vibrant),
-            new SettingsOption("Amber", Properties.Resources.Settings_ColorTheme_Amber),
-            new SettingsOption("Slate", Properties.Resources.Settings_ColorTheme_Slate),
-            new SettingsOption("Solar", Properties.Resources.Settings_ColorTheme_Solar)
-        ];
+        return [.. Theme.PeerfluenceTheme.Accents.Select(
+            accent => new SettingsOption(accent, ColorThemeName(accent)))];
     }
 
-    private static IReadOnlyList<SettingsOption> CreateBackgroundStyleOptions()
-    {
-        return
-        [
-            new SettingsOption("GradientSoft", Properties.Resources.Settings_BackgroundStyle_GradientSoft),
-            new SettingsOption("Gradient", Properties.Resources.Settings_BackgroundStyle_Gradient),
-            new SettingsOption("GradientDarker", Properties.Resources.Settings_BackgroundStyle_GradientDarker),
-            new SettingsOption("Flat", Properties.Resources.Settings_BackgroundStyle_Flat),
-            new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
-        ];
-    }
+    /// <summary>
+    /// An accent's translated name, or the accent itself if this version has no string for it.
+    /// </summary>
+    /// <remarks>
+    /// By lookup rather than a switch, so adding an accent to the theme does not require editing
+    /// here as well. An accent with no string shows its English name, which is wrong but legible;
+    /// the localization test is what stops one shipping that way.
+    /// </remarks>
+    private static string ColorThemeName(string accent) =>
+        Properties.Resources.ResourceManager.GetString(
+            $"Settings_ColorTheme_{accent}", Properties.Resources.Culture) ?? accent;
 
     private static IReadOnlyList<SettingsOption> CreateEncryptionModeOptions()
     {

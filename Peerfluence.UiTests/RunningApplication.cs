@@ -128,8 +128,13 @@ public sealed class RunningApplication : IDisposable
     /// Found by control type rather than by an id: they come from a template, so one id would name
     /// every one of them. Position is the only stable handle, and it is the same in every language.
     /// </remarks>
+    /// <summary>The navigation destinations, as the accessibility tree reports them.</summary>
+    /// <remarks>
+    /// List items. The sidebar is a ListBox, which is what a single-selection list of destinations
+    /// is; the control it replaced reported itself as a tree, which it never was.
+    /// </remarks>
     public AutomationElement[] NavigationItems() =>
-        Window.FindAllDescendants(by => by.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem));
+        Window.FindAllDescendants(by => by.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
 
     /// <summary>Selects an element, by the pattern it offers rather than by aiming the mouse at it.</summary>
     public static void Activate(AutomationElement element)

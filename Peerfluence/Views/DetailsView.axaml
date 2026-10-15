@@ -1,14 +1,13 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:services="using:Peerfluence.Services"
              xmlns:controls="using:Peerfluence.Controls"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:m="using:Peerfluence.Markup"
              x:Class="Peerfluence.Views.DetailsView"
              x:DataType="vm:DetailsViewModel">
-	<suki:BusyArea IsBusy="{Binding IsStreaming}">
+	<Panel>
 		<Grid RowDefinitions="Auto,*" Margin="{StaticResource StandardLeftTopRightBottomMargin}">
 			<!-- Header Info -->
 			<Grid ColumnDefinitions="*,Auto" Margin="{StaticResource NormalBottomMargin}">
@@ -105,14 +104,12 @@
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding IsStreamable}"
                                                         ToolTip.Tip="{m:L Details_Stream}"
-                                                        Classes="Flat"
                                                         Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
 													<materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 												</Button>
 												<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RenameFileCommand}"
                                                         CommandParameter="{Binding}"
                                                         ToolTip.Tip="{m:L Details_Files_Rename}"
-                                                        Classes="Flat"
                                                         Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
 													<materialIcons:MaterialIcon Kind="RenameOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 												</Button>
@@ -125,7 +122,7 @@
 						</DataGrid>
 						<Button Grid.Row="1" Content="{m:L Details_ApplyFileSelection}"
                                 Command="{Binding ApplyFileSelectionCommand}"
-                                Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource XSmallTopMargin}" AutomationProperties.AutomationId="ApplyFileSelectionButton"/>
+                                HorizontalAlignment="Right" Margin="{StaticResource XSmallTopMargin}" AutomationProperties.AutomationId="ApplyFileSelectionButton"/>
 					</Grid>
 				</TabItem>
 
@@ -134,7 +131,7 @@
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewTrackerUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_Trackers_AddWatermark}" AutomationProperties.Name="{m:L Details_Trackers_AddWatermark}" AutomationProperties.AutomationId="NewTrackerUrlTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Trackers_Add}" AutomationProperties.Name="{m:L Details_Trackers_Add}" AutomationProperties.AutomationId="AddTrackerButton">
+							<Button Grid.Column="1" Command="{Binding AddTrackerCommand}" ToolTip.Tip="{m:L Details_Trackers_Add}" AutomationProperties.Name="{m:L Details_Trackers_Add}" AutomationProperties.AutomationId="AddTrackerButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 							<Button Grid.Column="2" Command="{Binding AnnounceCommand}" ToolTip.Tip="{m:L Details_Trackers_Announce}" AutomationProperties.Name="{m:L Details_Trackers_Announce}" AutomationProperties.AutomationId="AnnounceButton">
@@ -157,7 +154,7 @@
 											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveTrackerCommand}"
                                                     CommandParameter="{Binding}"
                                                     ToolTip.Tip="{m:L Downloads_Remove}"
-                                                    Classes="Flat" Padding="{StaticResource TinyLeftTopRightBottomMargin}">
+                                                    Padding="{StaticResource TinyLeftTopRightBottomMargin}">
 												<materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{StaticResource ErrorColor}"/>
 											</Button>
 										</DataTemplate>
@@ -173,7 +170,7 @@
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewPeerAddresses, Mode=TwoWay}" PlaceholderText="{m:L Details_Peers_AddWatermark}" AutomationProperties.Name="{m:L Details_Peers_AddWatermark}" AutomationProperties.AutomationId="NewPeerAddressesTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" Classes="Flat" ToolTip.Tip="{m:L Details_Peers_AddTitle}" AutomationProperties.Name="{m:L Details_Peers_AddTitle}" AutomationProperties.AutomationId="AddPeersButton">
+							<Button Grid.Column="1" Command="{Binding AddPeersCommand}" ToolTip.Tip="{m:L Details_Peers_AddTitle}" AutomationProperties.Name="{m:L Details_Peers_AddTitle}" AutomationProperties.AutomationId="AddPeersButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -195,7 +192,7 @@
 					<Grid RowDefinitions="Auto,*">
 						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalBottomMargin}">
 							<TextBox Text="{Binding NewWebSeedUrl, Mode=TwoWay}" PlaceholderText="{m:L Details_WebSeeds_Watermark}" AutomationProperties.Name="{m:L Details_WebSeeds_Watermark}" AutomationProperties.AutomationId="NewWebSeedUrlTextBox"/>
-							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" Classes="Flat" AutomationProperties.Name="{m:L Details_WebSeeds_Add}" AutomationProperties.AutomationId="AddWebSeedButton">
+							<Button Grid.Column="1" Command="{Binding AddWebSeedCommand}" ToolTip.Tip="{m:L Details_WebSeeds_Add}" AutomationProperties.Name="{m:L Details_WebSeeds_Add}" AutomationProperties.AutomationId="AddWebSeedButton">
 								<materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 							</Button>
 						</Grid>
@@ -214,7 +211,7 @@
 											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveWebSeedCommand}"
                                                     CommandParameter="{Binding}"
                                                     ToolTip.Tip="{m:L Downloads_Remove}"
-                                                    Classes="Flat" Padding="{StaticResource TinyLeftTopRightBottomMargin}">
+                                                    Padding="{StaticResource TinyLeftTopRightBottomMargin}">
 												<materialIcons:MaterialIcon Kind="Close" Width="{StaticResource IconSizeSmall}" Height="{StaticResource IconSizeSmall}" Foreground="{StaticResource ErrorColor}"/>
 											</Button>
 										</DataTemplate>
@@ -319,11 +316,16 @@
 
 							<Button Grid.Row="6" Grid.ColumnSpan="2" Content="{m:L Details_Apply}"
                                     Command="{Binding ApplyTorrentSettingsCommand}"
-                                    Classes="Flat" HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}" AutomationProperties.AutomationId="ApplyTorrentSettingsButton"/>
+                                    HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}" AutomationProperties.AutomationId="ApplyTorrentSettingsButton"/>
 						</Grid>
 					</ScrollViewer>
 				</TabItem>
 			</TabControl>
 		</Grid>
-	</suki:BusyArea>
+	<!-- Covers the content while work is in flight, so nothing can be acted on mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsStreaming}">
+            <ProgressBar IsIndeterminate="True" Width="180"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+    </Panel>
 </UserControl>

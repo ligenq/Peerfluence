@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,8 +11,7 @@ using Material.Icons;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Messaging;
 using Peerfluence.Properties;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
+using Peerfluence.Theme.Controls;
 
 namespace Peerfluence.ViewModels;
 
@@ -38,8 +37,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         IDialogService dialogService,
         DownloadsViewModel downloadsViewModel,
         SettingsViewModel settingsViewModel,
-        ISukiToastManager toastManager,
-        ISukiDialogManager dialogManager)
+        IToastManager toastManager,
+        IDialogManager dialogManager)
     {
         _settingsService = settingsService;
         _updateService = updateService;
@@ -163,9 +162,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     public ObservableCollection<NavigationItem> NavigationItems { get; }
 
-    public ISukiToastManager ToastManager { get; }
+    public IToastManager ToastManager { get; }
 
-    public ISukiDialogManager DialogManager { get; }
+    public IDialogManager DialogManager { get; }
 
     public IRelayCommand ShowAboutCommand { get; }
 
@@ -189,8 +188,16 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public ViewModelBase? CurrentPage
     {
         get;
-        set => SetProperty(ref field, value);
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(IsAboutSelected));
+            }
+        }
     }
+
+    public bool IsAboutSelected => ReferenceEquals(CurrentPage, _aboutViewModel);
 
     /// <summary>
     /// The navigation, in the order the features asked to appear in.

@@ -1,0 +1,130 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Peerfluence.Theme.Controls">
+
+  <!-- Templates for the two overlay hosts. Both sit above the content and own no layout space. -->
+
+  <ControlTheme x:Key="{x:Type controls:DialogHost}" TargetType="controls:DialogHost">
+    <!-- Closed, it must not swallow clicks meant for the interface behind it. -->
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Scrim"
+                Background="{DynamicResource PfScrim}"
+                IsVisible="{TemplateBinding IsOpen}">
+          <Border MinWidth="360"
+                  MaxWidth="520"
+                  Margin="24"
+                  Padding="20"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Background="{DynamicResource PfSurface}"
+                  BorderBrush="{DynamicResource PfBorder}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource PfRadiusLg}"
+                  BoxShadow="0 16 48 0 #33000000">
+            <ContentPresenter Content="{TemplateBinding DialogContent}" />
+          </Border>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^[IsOpen=True]">
+      <Setter Property="IsHitTestVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:ToastHost}" TargetType="controls:ToastHost"
+                BasedOn="{StaticResource {x:Type ItemsControl}}">
+    <Setter Property="IsHitTestVisible" Value="True" />
+    <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="Margin" Value="16" />
+    <Setter Property="MaxWidth" Value="380" />
+
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Spacing="8" />
+      </ItemsPanelTemplate>
+    </Setter>
+
+    <Setter Property="ItemTemplate">
+      <DataTemplate x:DataType="controls:Toast">
+        <Border Background="{DynamicResource PfSurface}"
+                BorderBrush="{DynamicResource PfBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource PfRadius}"
+                Padding="4"
+                BoxShadow="0 8 24 0 #26000000">
+          <Grid ColumnDefinitions="*,Auto">
+            <Button Name="PART_ActivateToast" Classes="ghost"
+                    Padding="8,6" FontWeight="Normal" HorizontalContentAlignment="Stretch"
+                    AutomationProperties.Name="{Binding Title}"
+                    AutomationProperties.HelpText="{Binding Message}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Title}"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"
+                           Classes.toastSuccess="{Binding IsSuccess}"
+                           Classes.toastWarning="{Binding IsWarning}"
+                           Classes.toastError="{Binding IsError}" />
+                <TextBlock Text="{Binding Message}"
+                           IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Foreground="{DynamicResource PfTextSecondary}"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </Button>
+            <Button Name="PART_DismissToast" Grid.Column="1" Classes="ghost icon"
+                    VerticalAlignment="Top" Content="&#x2715;"
+                    AutomationProperties.Name="{Binding $parent[controls:ToastHost].DismissLabel}"
+                    ToolTip.Tip="{Binding $parent[controls:ToastHost].DismissLabel}" />
+          </Grid>
+        </Border>
+      </DataTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:InfoBar}" TargetType="controls:InfoBar">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource PfSurfaceAlt}"
+                BorderBrush="{DynamicResource PfBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource PfRadius}"
+                Padding="12,8">
+          <DockPanel LastChildFill="True">
+            <Button Name="PART_CloseButton"
+                    AutomationProperties.Name="{TemplateBinding DismissLabel}"
+                    ToolTip.Tip="{TemplateBinding DismissLabel}"
+                    DockPanel.Dock="Right"
+                    Classes="ghost icon"
+                    Padding="4"
+                    MinWidth="0"
+                    MinHeight="0"
+                    VerticalAlignment="Center"
+                    IsVisible="{TemplateBinding IsClosable}"
+                    Content="&#x2715;"
+                    FontSize="{DynamicResource PfFontSmall}"
+                    Foreground="{DynamicResource PfTextTertiary}" />
+            <TextBlock Name="PART_Message"
+                       Text="{TemplateBinding Message}"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center" />
+          </DockPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Severity by property selector: no converter, and it follows a change at run time. -->
+    <Style Selector="^[Severity=Warning] /template/ TextBlock#PART_Message">
+      <Setter Property="Foreground" Value="{DynamicResource PfWarning}" />
+    </Style>
+    <Style Selector="^[Severity=Error] /template/ TextBlock#PART_Message">
+      <Setter Property="Foreground" Value="{DynamicResource PfDanger}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
