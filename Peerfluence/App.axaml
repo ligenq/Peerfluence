@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Peerfluence"
              xmlns:converters="using:Peerfluence.Converters"
-             xmlns:suki="clr-namespace:SukiUI;assembly=SukiUI"
+             xmlns:theme="using:Peerfluence.Theme"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Peerfluence.App"
              RequestedThemeVariant="Default">
@@ -33,10 +33,12 @@
     </Application.Resources>
   
     <Application.Styles>
-        <suki:SukiTheme ThemeColor="Blue" />
-        <StyleInclude Source="avares://Peerfluence/Resources/SukiSeparatorFix.axaml" />
+        <!--
+            Fluent supplies the control templates; the Peerfluence theme supplies the palette,
+            the metrics and the styling, and must come after it to win.
+        -->
+        <FluentTheme />
+        <theme:PeerfluenceTheme />
         <materialIcons:MaterialIconStyles />
-
-
     </Application.Styles>
 </Application>

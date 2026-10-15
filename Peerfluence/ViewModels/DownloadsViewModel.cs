@@ -11,8 +11,6 @@ using Peerfluence.Core;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Interfaces;
 using PeerSharp.Config;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
 
 using System.Linq;
 using Avalonia.Platform.Storage;

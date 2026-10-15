@@ -1,0 +1,169 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    Every accent, declared at compile time.
+
+    Generated; edit the base colours in tools/generate-accents.py and re-run it rather than editing
+    here. Each accent needs one base colour per variant and derives its hover, pressed and tint
+    steps, so the steps stay even across accents instead of each being eyeballed.
+
+    Declared rather than loaded on demand because the application publishes with NativeAOT and
+    trimming, where constructing a ResourceInclude at run time is not safe. PeerfluenceTheme.UseAccent
+    therefore copies the chosen colours into the light and dark variant dictionaries, preserving
+    the shared Pf* brushes and their Fluent aliases.
+  -->
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="TealAccentColor">#0F8C86</Color>
+      <Color x:Key="TealAccentHoverColor">#0D7B76</Color>
+      <Color x:Key="TealAccentPressedColor">#0C6D69</Color>
+      <Color x:Key="TealAccentSubtleColor">#E7F4F3</Color>
+      <Color x:Key="TealAccentMutedColor">#BCDFDD</Color>
+      <Color x:Key="TealTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="IndigoAccentColor">#4F46E5</Color>
+      <Color x:Key="IndigoAccentHoverColor">#463ECA</Color>
+      <Color x:Key="IndigoAccentPressedColor">#3E37B3</Color>
+      <Color x:Key="IndigoAccentSubtleColor">#EDECFC</Color>
+      <Color x:Key="IndigoAccentMutedColor">#CECBF8</Color>
+      <Color x:Key="IndigoTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="CobaltAccentColor">#1D6FD0</Color>
+      <Color x:Key="CobaltAccentHoverColor">#1A62B7</Color>
+      <Color x:Key="CobaltAccentPressedColor">#1757A2</Color>
+      <Color x:Key="CobaltAccentSubtleColor">#E8F1FA</Color>
+      <Color x:Key="CobaltAccentMutedColor">#C0D7F2</Color>
+      <Color x:Key="CobaltTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="EmeraldAccentColor">#047857</Color>
+      <Color x:Key="EmeraldAccentHoverColor">#046A4D</Color>
+      <Color x:Key="EmeraldAccentPressedColor">#035E44</Color>
+      <Color x:Key="EmeraldAccentSubtleColor">#E6F2EE</Color>
+      <Color x:Key="EmeraldAccentMutedColor">#B9D9D0</Color>
+      <Color x:Key="EmeraldTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="AmberAccentColor">#B45309</Color>
+      <Color x:Key="AmberAccentHoverColor">#9E4908</Color>
+      <Color x:Key="AmberAccentPressedColor">#8C4107</Color>
+      <Color x:Key="AmberAccentSubtleColor">#F8EEE6</Color>
+      <Color x:Key="AmberAccentMutedColor">#EACFBA</Color>
+      <Color x:Key="AmberTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="RoseAccentColor">#BE123C</Color>
+      <Color x:Key="RoseAccentHoverColor">#A71035</Color>
+      <Color x:Key="RoseAccentPressedColor">#940E2F</Color>
+      <Color x:Key="RoseAccentSubtleColor">#F8E7EC</Color>
+      <Color x:Key="RoseAccentMutedColor">#EDBDC8</Color>
+      <Color x:Key="RoseTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="VioletAccentColor">#7C3AED</Color>
+      <Color x:Key="VioletAccentHoverColor">#6D33D1</Color>
+      <Color x:Key="VioletAccentPressedColor">#612DB9</Color>
+      <Color x:Key="VioletAccentSubtleColor">#F2EBFD</Color>
+      <Color x:Key="VioletAccentMutedColor">#DAC8FA</Color>
+      <Color x:Key="VioletTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="SlateAccentColor">#475569</Color>
+      <Color x:Key="SlateAccentHoverColor">#3E4B5C</Color>
+      <Color x:Key="SlateAccentPressedColor">#374252</Color>
+      <Color x:Key="SlateAccentSubtleColor">#EDEEF0</Color>
+      <Color x:Key="SlateAccentMutedColor">#CBCFD5</Color>
+      <Color x:Key="SlateTextOnAccentColor">#FFFFFF</Color>
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="TealAccentColor">#2DD4BF</Color>
+      <Color x:Key="TealAccentHoverColor">#46D9C7</Color>
+      <Color x:Key="TealAccentPressedColor">#5BDDCD</Color>
+      <Color x:Key="TealAccentSubtleColor">#182C30</Color>
+      <Color x:Key="TealAccentMutedColor">#1C4D4D</Color>
+      <Color x:Key="TealTextOnAccentColor">#0F1115</Color>
+      <Color x:Key="IndigoAccentColor">#818CF8</Color>
+      <Color x:Key="IndigoAccentHoverColor">#909AF9</Color>
+      <Color x:Key="IndigoAccentPressedColor">#9DA5FA</Color>
+      <Color x:Key="IndigoAccentSubtleColor">#212436</Color>
+      <Color x:Key="IndigoAccentMutedColor">#34395C</Color>
+      <Color x:Key="IndigoTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="CobaltAccentColor">#60A5FA</Color>
+      <Color x:Key="CobaltAccentHoverColor">#73B0FB</Color>
+      <Color x:Key="CobaltAccentPressedColor">#83B9FB</Color>
+      <Color x:Key="CobaltAccentSubtleColor">#1D2736</Color>
+      <Color x:Key="CobaltAccentMutedColor">#2B405D</Color>
+      <Color x:Key="CobaltTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="EmeraldAccentColor">#34D399</Color>
+      <Color x:Key="EmeraldAccentHoverColor">#4CD8A5</Color>
+      <Color x:Key="EmeraldAccentPressedColor">#61DDAF</Color>
+      <Color x:Key="EmeraldAccentSubtleColor">#192C2C</Color>
+      <Color x:Key="EmeraldAccentMutedColor">#1E4D42</Color>
+      <Color x:Key="EmeraldTextOnAccentColor">#0F1115</Color>
+      <Color x:Key="AmberAccentColor">#FBBF24</Color>
+      <Color x:Key="AmberAccentHoverColor">#FBC73E</Color>
+      <Color x:Key="AmberAccentPressedColor">#FCCD54</Color>
+      <Color x:Key="AmberAccentSubtleColor">#2D2A20</Color>
+      <Color x:Key="AmberAccentMutedColor">#564721</Color>
+      <Color x:Key="AmberTextOnAccentColor">#0F1115</Color>
+      <Color x:Key="RoseAccentColor">#FB7185</Color>
+      <Color x:Key="RoseAccentHoverColor">#FB8294</Color>
+      <Color x:Key="RoseAccentPressedColor">#FC90A0</Color>
+      <Color x:Key="RoseAccentSubtleColor">#2D222A</Color>
+      <Color x:Key="RoseAccentMutedColor">#56323C</Color>
+      <Color x:Key="RoseTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="VioletAccentColor">#A78BFA</Color>
+      <Color x:Key="VioletAccentHoverColor">#B299FB</Color>
+      <Color x:Key="VioletAccentPressedColor">#BAA5FB</Color>
+      <Color x:Key="VioletAccentSubtleColor">#242436</Color>
+      <Color x:Key="VioletAccentMutedColor">#3F395D</Color>
+      <Color x:Key="VioletTextOnAccentColor">#FFFFFF</Color>
+      <Color x:Key="SlateAccentColor">#94A3B8</Color>
+      <Color x:Key="SlateAccentHoverColor">#A1AEC1</Color>
+      <Color x:Key="SlateAccentPressedColor">#ACB7C8</Color>
+      <Color x:Key="SlateAccentSubtleColor">#23272F</Color>
+      <Color x:Key="SlateAccentMutedColor">#39404B</Color>
+      <Color x:Key="SlateTextOnAccentColor">#FFFFFF</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <SolidColorBrush x:Key="TealAccent" Color="{DynamicResource TealAccentColor}" />
+  <SolidColorBrush x:Key="TealAccentHover" Color="{DynamicResource TealAccentHoverColor}" />
+  <SolidColorBrush x:Key="TealAccentPressed" Color="{DynamicResource TealAccentPressedColor}" />
+  <SolidColorBrush x:Key="TealAccentSubtle" Color="{DynamicResource TealAccentSubtleColor}" />
+  <SolidColorBrush x:Key="TealAccentMuted" Color="{DynamicResource TealAccentMutedColor}" />
+  <SolidColorBrush x:Key="TealTextOnAccent" Color="{DynamicResource TealTextOnAccentColor}" />
+  <SolidColorBrush x:Key="IndigoAccent" Color="{DynamicResource IndigoAccentColor}" />
+  <SolidColorBrush x:Key="IndigoAccentHover" Color="{DynamicResource IndigoAccentHoverColor}" />
+  <SolidColorBrush x:Key="IndigoAccentPressed" Color="{DynamicResource IndigoAccentPressedColor}" />
+  <SolidColorBrush x:Key="IndigoAccentSubtle" Color="{DynamicResource IndigoAccentSubtleColor}" />
+  <SolidColorBrush x:Key="IndigoAccentMuted" Color="{DynamicResource IndigoAccentMutedColor}" />
+  <SolidColorBrush x:Key="IndigoTextOnAccent" Color="{DynamicResource IndigoTextOnAccentColor}" />
+  <SolidColorBrush x:Key="CobaltAccent" Color="{DynamicResource CobaltAccentColor}" />
+  <SolidColorBrush x:Key="CobaltAccentHover" Color="{DynamicResource CobaltAccentHoverColor}" />
+  <SolidColorBrush x:Key="CobaltAccentPressed" Color="{DynamicResource CobaltAccentPressedColor}" />
+  <SolidColorBrush x:Key="CobaltAccentSubtle" Color="{DynamicResource CobaltAccentSubtleColor}" />
+  <SolidColorBrush x:Key="CobaltAccentMuted" Color="{DynamicResource CobaltAccentMutedColor}" />
+  <SolidColorBrush x:Key="CobaltTextOnAccent" Color="{DynamicResource CobaltTextOnAccentColor}" />
+  <SolidColorBrush x:Key="EmeraldAccent" Color="{DynamicResource EmeraldAccentColor}" />
+  <SolidColorBrush x:Key="EmeraldAccentHover" Color="{DynamicResource EmeraldAccentHoverColor}" />
+  <SolidColorBrush x:Key="EmeraldAccentPressed" Color="{DynamicResource EmeraldAccentPressedColor}" />
+  <SolidColorBrush x:Key="EmeraldAccentSubtle" Color="{DynamicResource EmeraldAccentSubtleColor}" />
+  <SolidColorBrush x:Key="EmeraldAccentMuted" Color="{DynamicResource EmeraldAccentMutedColor}" />
+  <SolidColorBrush x:Key="EmeraldTextOnAccent" Color="{DynamicResource EmeraldTextOnAccentColor}" />
+  <SolidColorBrush x:Key="AmberAccent" Color="{DynamicResource AmberAccentColor}" />
+  <SolidColorBrush x:Key="AmberAccentHover" Color="{DynamicResource AmberAccentHoverColor}" />
+  <SolidColorBrush x:Key="AmberAccentPressed" Color="{DynamicResource AmberAccentPressedColor}" />
+  <SolidColorBrush x:Key="AmberAccentSubtle" Color="{DynamicResource AmberAccentSubtleColor}" />
+  <SolidColorBrush x:Key="AmberAccentMuted" Color="{DynamicResource AmberAccentMutedColor}" />
+  <SolidColorBrush x:Key="AmberTextOnAccent" Color="{DynamicResource AmberTextOnAccentColor}" />
+  <SolidColorBrush x:Key="RoseAccent" Color="{DynamicResource RoseAccentColor}" />
+  <SolidColorBrush x:Key="RoseAccentHover" Color="{DynamicResource RoseAccentHoverColor}" />
+  <SolidColorBrush x:Key="RoseAccentPressed" Color="{DynamicResource RoseAccentPressedColor}" />
+  <SolidColorBrush x:Key="RoseAccentSubtle" Color="{DynamicResource RoseAccentSubtleColor}" />
+  <SolidColorBrush x:Key="RoseAccentMuted" Color="{DynamicResource RoseAccentMutedColor}" />
+  <SolidColorBrush x:Key="RoseTextOnAccent" Color="{DynamicResource RoseTextOnAccentColor}" />
+  <SolidColorBrush x:Key="VioletAccent" Color="{DynamicResource VioletAccentColor}" />
+  <SolidColorBrush x:Key="VioletAccentHover" Color="{DynamicResource VioletAccentHoverColor}" />
+  <SolidColorBrush x:Key="VioletAccentPressed" Color="{DynamicResource VioletAccentPressedColor}" />
+  <SolidColorBrush x:Key="VioletAccentSubtle" Color="{DynamicResource VioletAccentSubtleColor}" />
+  <SolidColorBrush x:Key="VioletAccentMuted" Color="{DynamicResource VioletAccentMutedColor}" />
+  <SolidColorBrush x:Key="VioletTextOnAccent" Color="{DynamicResource VioletTextOnAccentColor}" />
+  <SolidColorBrush x:Key="SlateAccent" Color="{DynamicResource SlateAccentColor}" />
+  <SolidColorBrush x:Key="SlateAccentHover" Color="{DynamicResource SlateAccentHoverColor}" />
+  <SolidColorBrush x:Key="SlateAccentPressed" Color="{DynamicResource SlateAccentPressedColor}" />
+  <SolidColorBrush x:Key="SlateAccentSubtle" Color="{DynamicResource SlateAccentSubtleColor}" />
+  <SolidColorBrush x:Key="SlateAccentMuted" Color="{DynamicResource SlateAccentMutedColor}" />
+  <SolidColorBrush x:Key="SlateTextOnAccent" Color="{DynamicResource SlateTextOnAccentColor}" />
+
+</ResourceDictionary>

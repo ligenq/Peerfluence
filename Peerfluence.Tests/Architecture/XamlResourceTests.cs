@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -116,17 +116,16 @@ public sealed class XamlResourceTests
                 {
                     var key = match.Groups[1].Value;
 
-                    // Only the keys this application defines can be checked. SukiUI and Avalonia
-                    // bring their own, and their names are not knowable from here.
-                    if (key.StartsWith("Suki", StringComparison.Ordinal)
-                        || key.StartsWith("System", StringComparison.Ordinal)
+                    // Only the keys this application and its theme define can be checked.
+                    // Avalonia brings its own, and their names are not knowable from here.
+                    if (key.StartsWith("System", StringComparison.Ordinal)
                         || key.StartsWith("Theme", StringComparison.Ordinal)
                         || defined.Contains(key))
                     {
                         continue;
                     }
 
-                    missing.Add($"  {Relative(file)}:{i + 1}  {{StaticResource {key}}} is not defined in Peerfluence/Resources");
+                    missing.Add($"  {Relative(file)}:{i + 1}  resource key '{key}' is not defined by the application or its theme");
                 }
             }
         }
@@ -166,8 +165,9 @@ public sealed class XamlResourceTests
         var declaration = new Regex(@"x:Key\s*=\s*""([^""]+)""", RegexOptions.Compiled);
 
         // Anywhere a key is declared, not only the dictionaries: App.axaml holds the converter
-        // instances, and a view may declare its own.
-        foreach (var file in XamlFiles().Concat(ResourceDictionaries()))
+        // instances, and a view may declare its own. The theme is a separate project and declares
+        // the palette, so a view naming one of its brushes is naming something that does exist.
+        foreach (var file in XamlFiles().Concat(ResourceDictionaries()).Concat(ThemeDictionaries()))
         {
             foreach (Match match in declaration.Matches(File.ReadAllText(file)))
             {
@@ -195,13 +195,35 @@ public sealed class XamlResourceTests
     }
 
     /// <summary>
+    /// The theme package's dictionaries, which define the palette and the control metrics.
+    /// </summary>
+    /// <remarks>
+    /// A sibling project rather than this one. Without it every <c>Pf</c> brush a view names reads
+    /// as undefined, which is the opposite of the truth.
+    /// </remarks>
+    private static IEnumerable<string> ThemeDictionaries()
+    {
+        var directory = Path.Combine(
+            Path.GetDirectoryName(ProjectDirectory())!, "Peerfluence.Theme");
+
+        if (!Directory.Exists(directory))
+        {
+            return [];
+        }
+
+        return Directory
+            .EnumerateFiles(directory, "*.axaml", SearchOption.AllDirectories)
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .ToList();
+    }
+
+    /// <summary>
     /// Where the literals belong. These files exist to say what a spacing is.
     /// </summary>
     private static IEnumerable<string> ResourceDictionaries()
     {
-        return Directory
-            .EnumerateFiles(Path.Combine(ProjectDirectory(), "Resources"), "*.axaml")
-            .Where(path => !Path.GetFileName(path).Equals("SukiSeparatorFix.axaml", StringComparison.Ordinal));
+        return Directory.EnumerateFiles(Path.Combine(ProjectDirectory(), "Resources"), "*.axaml");
     }
 
     private static bool IsResourceDictionary(string path)

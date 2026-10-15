@@ -66,6 +66,18 @@ jobs:
           --report-trx
           --report-trx-filename headless-${{ matrix.os }}.trx
 
+      - name: Render the control gallery
+        run: >
+          dotnet run --project Peerfluence.Theme.Gallery --no-build --configuration Release --
+          --capture TestResults/theme-gallery
+
+      - name: Upload the control gallery
+        uses: actions/upload-artifact@v4
+        with:
+          name: theme-gallery-${{ matrix.os }}
+          path: TestResults/theme-gallery/
+          if-no-files-found: error
+
       # Peerfluence.UiTests is built by the step above and deliberately not run here. It drives the
       # real application through Windows UI Automation, which needs an interactive desktop session,
       # and it is slower and less certain than the suites that gate a merge. Building it keeps it

@@ -1,0 +1,163 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Fluent sets these states on its presenters. Class-specific variants therefore need
+       presenter overrides; standard controls and accent buttons use FluentResources.axaml.
+       Disabled is last so hover/selection cannot make an unavailable action look enabled. -->
+
+  <Style Selector="Button.ghost /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceHover}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.ghost:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceActive}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.danger /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfDanger}" />
+  </Style>
+
+  <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfDanger}" />
+  </Style>
+
+  <Style Selector="Button.danger:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfDanger}" />
+  </Style>
+
+  <Style Selector="Button.nav /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextSecondary}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.nav:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceHover}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.nav:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceActive}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.nav.selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.nav.selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.nav.selected:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.ghost:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.danger:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceAlt}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+  </Style>
+
+  <Style Selector="Button.nav:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextSecondary}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceHover}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceActive}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:checked /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentMuted}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentMuted}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:checked:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceAlt}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:indeterminate /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:indeterminate:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentMuted}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:indeterminate:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentMuted}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.toolbar:indeterminate:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceAlt}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+  </Style>
+
+</Styles>

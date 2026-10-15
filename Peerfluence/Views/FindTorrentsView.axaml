@@ -1,15 +1,19 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pf="using:Peerfluence.Theme.Controls"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:m="using:Peerfluence.Markup"
              x:Class="Peerfluence.Views.FindTorrentsView"
              x:DataType="vm:FindTorrentsViewModel">
-    <suki:BusyArea IsBusy="{Binding IsSearching}">
-        <Grid RowDefinitions="Auto,Auto,*" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+    <Panel>
+        <Grid RowDefinitions="Auto,Auto,Auto,*">
+            <StackPanel Grid.Row="0" Classes="pageHeader">
+                <TextBlock Text="{m:L Nav_FindTorrents}" Classes="title"/>
+                <TextBlock Text="{m:L Find_Hint}" Classes="secondary" TextWrapping="Wrap"/>
+            </StackPanel>
 
-            <Grid Grid.Row="0"
+            <Grid Grid.Row="1"
                   x:Name="QueryBar"
                   ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource SpacingMedium}"
@@ -21,7 +25,7 @@
                         <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}"/>
                     </TextBox.KeyBindings>
                 </TextBox>
-                <Button Grid.Column="1" Classes="Flat" Command="{Binding SearchCommand}" AutomationProperties.Name="{m:L Find_Search}" AutomationProperties.AutomationId="SearchButton">
+                <Button Grid.Column="1" Classes="accent" Command="{Binding SearchCommand}" AutomationProperties.Name="{m:L Find_Search}" AutomationProperties.AutomationId="SearchButton">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                         <materialIcons:MaterialIcon Kind="Magnify" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                         <TextBlock Text="{m:L Find_Search}"/>
@@ -34,15 +38,14 @@
                 out is a different problem from one that found nothing, and only the user can tell
                 which they care about.
             -->
-            <StackPanel Grid.Row="1"
+            <StackPanel Grid.Row="2"
                         IsVisible="{Binding HasStatusMessage}"
                         Spacing="{StaticResource SpacingSmall}"
                         Margin="{StaticResource StandardBottomMargin}">
-                <suki:InfoBar IsClosable="False" Message="{Binding StatusMessage}"/>
+                <pf:InfoBar IsClosable="False" Message="{Binding StatusMessage}"/>
                 <!-- Only where it would help: a timeout on someone else's tracker is not a settings
                      problem, and offering the settings for it wastes the trip. -->
                 <Button x:Name="FixInSettingsButton"
-                        Classes="Flat"
                         HorizontalAlignment="Left"
                         IsVisible="{Binding CanFixInSettings}"
                         Command="{Binding OpenSearchSettingsCommand}" AutomationProperties.Name="{m:L Find_OpenSearchSettings}" AutomationProperties.AutomationId="OpenSearchSettingsButton">
@@ -53,7 +56,7 @@
                 </Button>
             </StackPanel>
 
-            <suki:GlassCard Grid.Row="2"
+            <Border Classes="panel" Grid.Row="3"
                             x:Name="ResultsCard"
                             IsVisible="{Binding IsConfigured}"
                             Padding="{StaticResource ZeroThickness}">
@@ -96,15 +99,15 @@
                         <DataGridTextColumn Header="{m:L Find_Column_Age}" Binding="{Binding AgeText}" Width="80"/>
                     </DataGrid.Columns>
                 </DataGrid>
-            </suki:GlassCard>
+            </Border>
 
-            <StackPanel Grid.Row="2"
+            <StackPanel Grid.Row="3"
                         x:Name="EmptyState"
                         IsVisible="{Binding IsNotConfigured}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         MaxWidth="420"
-                        Spacing="{StaticResource SpacingSmall}">
+                        Spacing="{StaticResource SpacingNormal}">
                 <TextBlock Text="{m:L Find_NotConfiguredTitle}"
                            FontSize="{StaticResource FontSizeLarge}"
                            FontWeight="SemiBold"
@@ -115,12 +118,16 @@
                            TextAlignment="Center"/>
                 <!-- Naming the settings and leaving the user to find them is half an answer. -->
                 <Button x:Name="SetUpIndexerButton"
-                        Classes="Flat"
                         HorizontalAlignment="Center"
                         Margin="{StaticResource SmallTopMargin}"
                         Command="{Binding OpenSearchSettingsCommand}"
                         Content="{m:L Find_SetUpIndexer}" AutomationProperties.AutomationId="FindTorrentsOpenSearchSettingsButton"/>
             </StackPanel>
         </Grid>
-    </suki:BusyArea>
+    <!-- Covers the content while work is in flight, so nothing can be acted on mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsSearching}">
+            <ProgressBar IsIndeterminate="True" Width="180"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+    </Panel>
 </UserControl>

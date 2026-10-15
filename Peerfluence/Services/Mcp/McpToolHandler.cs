@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -329,7 +329,6 @@ public class McpToolHandler : IMcpToolHandler
             case "maxdiskwritespeedbytespersecond": current.Network.MaxDiskWriteSpeedBytesPerSecond = value.GetInt64(); break;
             case "themevariant": current.Theme.ThemeVariant = value.GetString() ?? current.Theme.ThemeVariant; break;
             case "colortheme": current.Theme.ColorTheme = value.GetString() ?? current.Theme.ColorTheme; break;
-            case "backgroundstyle": current.Theme.BackgroundStyle = value.GetString() ?? current.Theme.BackgroundStyle; break;
             case "language": current.Language = value.GetString() ?? current.Language; break;
             case "showremovetorrentoptions": current.ShowRemoveTorrentOptions = value.GetBoolean(); break;
             case "defaultremovetorrentaction": current.DefaultRemoveTorrentAction = value.GetString() ?? current.DefaultRemoveTorrentAction; break;

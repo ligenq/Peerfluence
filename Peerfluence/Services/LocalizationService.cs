@@ -3,7 +3,6 @@ using System.Globalization;
 using Avalonia;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Messaging;
-using SukiUI;
 
 namespace Peerfluence.Services;
 
@@ -32,8 +31,6 @@ public sealed class LocalizationService : ILocalizationService
 
         Properties.Resources.Culture = culture;
 
-        UpdateSukiLocale(culture);
-
         WeakReferenceMessenger.Default.Send(new LanguageChangedMessage(resolvedLanguage));
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
@@ -46,15 +43,4 @@ public sealed class LocalizationService : ILocalizationService
     }
 
     public string this[string key] => GetString(key);
-
-    private static void UpdateSukiLocale(CultureInfo culture)
-    {
-        if (Application.Current == null)
-        {
-            return;
-        }
-
-        var theme = SukiTheme.GetInstance(Application.Current);
-        theme.Locale = culture.Name;
-    }
 }

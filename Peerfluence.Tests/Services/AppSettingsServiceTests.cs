@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using Peerfluence.Core.Services;
 using Peerfluence.Core.Config;
 
@@ -30,7 +30,6 @@ public sealed class AppSettingsServiceTests : IDisposable
             {
                 ThemeVariant = "",
                 ColorTheme = "",
-                BackgroundStyle = "",
             },
             Language = "",
             DefaultRemoveTorrentAction = "Nope",
@@ -47,8 +46,7 @@ public sealed class AppSettingsServiceTests : IDisposable
         Assert.Equal(paths.DefaultDownloadDirectory, sut.Current.Storage.DownloadPath);
         Assert.Equal(paths.SessionDirectory, sut.Current.Storage.SessionPath);
         Assert.Equal("System", sut.Current.Theme.ThemeVariant);
-        Assert.Equal("Indigo", sut.Current.Theme.ColorTheme);
-        Assert.Equal("GradientSoft", sut.Current.Theme.BackgroundStyle);
+        Assert.Equal("Teal", sut.Current.Theme.ColorTheme);
         Assert.Equal("en-US", sut.Current.Language);
         Assert.True(sut.Current.ShowRemoveTorrentOptions);
         Assert.Equal("RemoveOnly", sut.Current.DefaultRemoveTorrentAction);
@@ -85,8 +83,7 @@ public sealed class AppSettingsServiceTests : IDisposable
             Theme =
             {
                 ThemeVariant = "System",
-                ColorTheme = "Indigo",
-                BackgroundStyle = "GradientSoft",
+                ColorTheme = "Teal",
             },
             Language = "en-US",
             DefaultRemoveTorrentAction = "RemoveOnly",

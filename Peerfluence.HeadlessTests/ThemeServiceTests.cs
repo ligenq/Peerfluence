@@ -22,8 +22,7 @@ public sealed class ThemeServiceTests
         new ThemeService().Apply(new ThemeSettings
         {
             ThemeVariant = "System",
-            ColorTheme = colorTheme!,
-            BackgroundStyle = "GradientSoft"
+            ColorTheme = colorTheme!
         });
     }
 
@@ -33,8 +32,7 @@ public sealed class ThemeServiceTests
         new ThemeService().Apply(new ThemeSettings
         {
             ThemeVariant = null!,
-            ColorTheme = null!,
-            BackgroundStyle = null!
+            ColorTheme = null!
         });
     }
 }

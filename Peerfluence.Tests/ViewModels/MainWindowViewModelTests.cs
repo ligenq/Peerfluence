@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+using Peerfluence.Theme.Controls;
+using System.IO.Abstractions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
@@ -76,8 +77,8 @@ public class MainWindowViewModelTests
             Substitute.For<IDialogService>(),
             downloadsVm,
             _settingsVm,
-            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
-            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
     }
 
     [Fact]
@@ -141,8 +142,8 @@ public class MainWindowViewModelTests
             Substitute.For<IDialogService>(),
             _downloadsVm,
             _settingsVm,
-            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
-            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -167,8 +168,8 @@ public class MainWindowViewModelTests
             Substitute.For<IDialogService>(),
             _downloadsVm,
             _settingsVm,
-            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
-            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 

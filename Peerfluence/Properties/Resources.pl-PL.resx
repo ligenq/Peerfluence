@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -63,6 +63,12 @@
   </data>
   <data name="App_Tagline" xml:space="preserve">
     <value>Stacja robocza BitTorrent</value>
+  </data>
+  <data name="Nav_Navigation" xml:space="preserve">
+    <value>Nawigacja</value>
+  </data>
+  <data name="Find_Hint" xml:space="preserve">
+    <value>Przeszukuj połączone indeksatory i dodawaj wyniki do pobierania.</value>
   </data>
   <data name="Nav_Downloads" xml:space="preserve">
     <value>Pobieranie</value>
@@ -435,6 +441,12 @@
   </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>Miętowy</value>
+  </data>
+  <data name="Settings_ColorTheme_Teal" xml:space="preserve">
+    <value>Morski</value>
+  </data>
+  <data name="Settings_ColorTheme_Violet" xml:space="preserve">
+    <value>Fioletowy</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Szmaragd</value>

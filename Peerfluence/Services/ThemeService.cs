@@ -1,109 +1,73 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Media;
 using Avalonia.Styling;
-using SukiUI;
-using SukiUI.Controls;
-using SukiUI.Enums;
-using SukiUI.Models;
+using Peerfluence.Theme;
 
 namespace Peerfluence.Services;
 
 public sealed class ThemeService : IThemeService
 {
-    private static readonly IReadOnlyDictionary<string, ThemePalette> Palettes = new Dictionary<string, ThemePalette>
-    {
-        ["Indigo"] = new("#3f51b5", "#283593", "#ff6f00", "#e65100"),
-        ["Cobalt"] = new("#1565c0", "#0d47a1", "#00acc1", "#00838f"),
-        ["Mint"] = new("#2e7d32", "#1b5e20", "#00c853", "#00a152"),
-        ["Emerald"] = new("#059669", "#064e3b", "#34d399", "#059669"),
-        ["Rose"] = new("#c2185b", "#880e4f", "#ff5252", "#ff1744"),
-        ["Vibrant"] = new("#9333ea", "#581c87", "#f97316", "#c2410c"),
-        ["Amber"] = new("#d97706", "#78350f", "#fbbf24", "#d97706"),
-        ["Slate"] = new("#455a64", "#263238", "#90a4ae", "#607d8b"),
-        ["Solar"] = new("#f9a825", "#f57f17", "#fdd835", "#f9a825")
-    };
+    /// <summary>
+    /// Accent names that existed before the theme was replaced, and what they became.
+    /// </summary>
+    /// <remarks>
+    /// Settings already on disk name these. Mapping them is three lines; the alternative is every
+    /// existing installation silently reverting to the default accent on upgrade, which reads as
+    /// the update having lost a preference.
+    /// </remarks>
+    private static readonly IReadOnlyDictionary<string, string> Renamed =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Mint"] = "Emerald",
+            ["Vibrant"] = "Violet",
+            ["Solar"] = "Amber",
+        };
 
     public void Apply(ThemeSettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings);
+
         ApplyVariant(settings.ThemeVariant);
-        ApplyPalette(settings.ColorTheme);
-        ApplyBackgroundStyle(settings.BackgroundStyle);
+        ApplyAccent(settings.ColorTheme);
     }
 
     private static void ApplyVariant(string variant)
     {
-        if (Application.Current == null)
+        if (Application.Current is not { } application)
         {
             return;
         }
 
-        if (variant is "Light" or "Dark")
+        application.RequestedThemeVariant = variant switch
         {
-            var theme = SukiTheme.GetInstance(Application.Current);
-            theme.ChangeBaseTheme(variant == "Light" ? ThemeVariant.Light : ThemeVariant.Dark);
-            return;
-        }
+            "Light" => ThemeVariant.Light,
+            "Dark" => ThemeVariant.Dark,
 
-        Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+            // Anything else, including "System" and a value this version does not know, follows
+            // the operating system.
+            _ => ThemeVariant.Default,
+        };
     }
 
-    private static void ApplyPalette(string? themeName)
+    private static void ApplyAccent(string? accent)
     {
-        // Named palette or nothing. The name arrives from settings, so it can be absent or something
-        // this version does not know; the other two Apply methods already shrug such a value off,
-        // while a dictionary lookup throws on a null key rather than missing.
-        if (Application.Current == null
-            || string.IsNullOrEmpty(themeName)
-            || !Palettes.TryGetValue(themeName, out var palette))
+        if (Application.Current?.Styles.OfType<PeerfluenceTheme>().FirstOrDefault() is not { } theme)
         {
             return;
         }
 
-        var theme = SukiTheme.GetInstance(Application.Current);
-        var existingTheme = theme.ColorThemes.FirstOrDefault(candidate => candidate.DisplayName == themeName);
-        if (existingTheme == null)
+        if (accent is not null && Renamed.TryGetValue(accent, out string? current))
         {
-            existingTheme = new SukiColorTheme(themeName, palette.Primary, palette.Accent);
-            theme.AddColorTheme(existingTheme);
+            accent = current;
         }
 
-        theme.ChangeColorTheme(existingTheme);
-
-        var resources = Application.Current.Resources;
-        resources["SukiPrimaryDarkColor"] = palette.PrimaryDark;
-        resources["SukiAccentDarkColor"] = palette.AccentDark;
-    }
-
-    private static void ApplyBackgroundStyle(string styleName)
-    {
-        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+        // Falls back rather than throwing: the name arrives from a settings file, so it can be
+        // absent, or something a later version wrote.
+        if (!theme.UseAccent(accent))
         {
-            return;
-        }
-
-        if (desktop.MainWindow is not SukiWindow sukiWindow)
-        {
-            return;
-        }
-
-        if (!Enum.TryParse<SukiBackgroundStyle>(styleName, out var style))
-        {
-            style = SukiBackgroundStyle.GradientSoft;
-        }
-
-        sukiWindow.BackgroundStyle = style;
-    }
-
-    private sealed record ThemePalette(Color Primary, Color PrimaryDark, Color Accent, Color AccentDark)
-    {
-        public ThemePalette(string primary, string primaryDark, string accent, string accentDark)
-            : this(Color.Parse(primary), Color.Parse(primaryDark), Color.Parse(accent), Color.Parse(accentDark))
-        {
+            theme.UseAccent(PeerfluenceTheme.DefaultAccent);
         }
     }
 }
-

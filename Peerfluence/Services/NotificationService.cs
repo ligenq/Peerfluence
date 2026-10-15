@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using Avalonia.Threading;
-using SukiUI.Toasts;
+using Peerfluence.Theme.Controls;
 
 namespace Peerfluence.Services;
 
 public sealed class NotificationService : INotificationService
 {
-    private readonly ISukiToastManager _toastManager;
+    private readonly IToastManager _toastManager;
 
-    public NotificationService(ISukiToastManager toastManager)
+    public NotificationService(IToastManager toastManager)
     {
         _toastManager = toastManager;
     }
@@ -33,36 +33,28 @@ public sealed class NotificationService : INotificationService
     /// Queues the toast. Must be on the UI thread.
     /// </summary>
     /// <remarks>
-    /// The check is the point. Nothing about <see cref="ISukiToastManager"/> says it is thread
-    /// affine - it is an interface like any other - so the requirement lived in whoever remembered
-    /// it, and half of this method used to marshal while the other half did not. Verifying it here
-    /// turns losing the Post into an exception on the first notification in every build, rather than
-    /// into a collection mutated from a background thread that misbehaves for somebody else, later,
-    /// occasionally.
+    /// <see cref="ToastManager"/> verifies this for itself, so a lost Post is an exception on the
+    /// first notification in every build rather than a collection mutated from a background thread
+    /// that misbehaves for somebody else, later, occasionally.
     /// </remarks>
     private void Show(NotificationItem notification, TimeSpan? autoDismiss)
     {
-        Dispatcher.UIThread.VerifyAccess();
-
-        var type = notification.Type switch
+        var severity = notification.Type switch
         {
-            NotificationType.Success => Avalonia.Controls.Notifications.NotificationType.Success,
-            NotificationType.Warning => Avalonia.Controls.Notifications.NotificationType.Warning,
-            NotificationType.Error => Avalonia.Controls.Notifications.NotificationType.Error,
-            _ => Avalonia.Controls.Notifications.NotificationType.Information
+            NotificationType.Success => ToastSeverity.Success,
+            NotificationType.Warning => ToastSeverity.Warning,
+            NotificationType.Error => ToastSeverity.Error,
+            _ => ToastSeverity.Information,
         };
 
-        var builder = _toastManager.CreateToast()
-            .OfType(type)
-            .WithTitle(notification.Title)
-            .WithContent(notification.Message)
-            .Dismiss().ByClicking();
-
-        if (autoDismiss.HasValue)
-        {
-            builder.Dismiss().After(autoDismiss.Value);
-        }
-
-        builder.Queue();
+        _toastManager.Show(
+            new Toast
+            {
+                Title = notification.Title,
+                Message = notification.Message,
+                Severity = severity,
+                Clicked = notification.OnClick,
+            },
+            autoDismiss);
     }
 }

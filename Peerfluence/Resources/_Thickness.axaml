@@ -66,4 +66,10 @@
 	<!--Zero margin-->
 	<Thickness x:Key="ZeroThickness">0,0,0,0</Thickness>
 
+	<!-- The shell: the sidebar's header and footer, the simple-mode bar, and the first-run options. -->
+	<Thickness x:Key="SidebarHeaderMargin">16,18,16,14</Thickness>
+	<Thickness x:Key="SidebarFooterMargin">8,8,8,12</Thickness>
+	<Thickness x:Key="HeaderBarPadding">16,0</Thickness>
+	<Thickness x:Key="ChoiceCardPadding">14,12</Thickness>
+
 </ResourceDictionary>
