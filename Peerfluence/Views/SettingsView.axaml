@@ -190,6 +190,37 @@
                             </Button>
                         </Grid>
                     </StackPanel>
+                      <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                          <TextBlock Text="{m:L Settings_StreamingAddress}" Classes="secondary" />
+                          <TextBox Text="{Binding StreamingBindAddress, Mode=TwoWay}"
+                                   AutomationProperties.Name="{m:L Settings_StreamingAddress}" AutomationProperties.AutomationId="StreamingBindAddressTextBox" />
+                          <TextBlock Text="{m:L Settings_StreamingAddressHint}" Classes="secondary" TextWrapping="Wrap" />
+                          <TextBlock Text="{m:L Settings_StreamingAddressInvalid}" IsVisible="{Binding HasInvalidStreamingAddress}"
+                                     Foreground="{DynamicResource PfDanger}" TextWrapping="Wrap" />
+                          <TextBlock Text="{m:L Settings_StreamingPort}" Classes="secondary" />
+                          <NumericUpDown Value="{Binding StreamingPort}" Minimum="0" Maximum="65535"
+                                         AutomationProperties.Name="{m:L Settings_StreamingPort}" AutomationProperties.AutomationId="StreamingPortInput" />
+                      </StackPanel>
+                      <Expander Header="{m:L Settings_StreamingBuffer}" Classes="disclosure" AutomationProperties.AutomationId="StreamingOptionsExpander">
+                          <StackPanel Spacing="{StaticResource SpacingSmall}">
+                              <TextBlock Text="{m:L Settings_StreamingReadAheadMiB}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingReadAheadMiB}" Minimum="1" Maximum="512"
+                                             AutomationProperties.Name="{m:L Settings_StreamingReadAheadMiB}" AutomationProperties.AutomationId="StreamingReadAheadMiBInput" />
+                              <TextBlock Text="{m:L Settings_StreamingReadAheadSeconds}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingReadAheadSeconds}" Minimum="0" Maximum="3600"
+                                             AutomationProperties.Name="{m:L Settings_StreamingReadAheadSeconds}" AutomationProperties.AutomationId="StreamingReadAheadSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingQueueSeconds}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingQueueSeconds}" Minimum="0" Maximum="60"
+                                             AutomationProperties.Name="{m:L Settings_StreamingQueueSeconds}" AutomationProperties.AutomationId="StreamingQueueSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingDataTimeout}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingDataTimeoutSeconds}" Minimum="0" Maximum="86400"
+                                             AutomationProperties.Name="{m:L Settings_StreamingDataTimeout}" AutomationProperties.AutomationId="StreamingDataTimeoutSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingMetadataTimeout}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingMetadataTimeoutSeconds}" Minimum="0" Maximum="86400"
+                                             AutomationProperties.Name="{m:L Settings_StreamingMetadataTimeout}" AutomationProperties.AutomationId="StreamingMetadataTimeoutSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingTimeoutHint}" Classes="secondary" TextWrapping="Wrap" />
+                          </StackPanel>
+                      </Expander>
                 </StackPanel>
             </Border>
             <Border Classes="panel">

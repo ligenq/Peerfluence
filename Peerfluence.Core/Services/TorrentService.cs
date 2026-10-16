@@ -130,12 +130,12 @@ public sealed class TorrentService : ITorrentService
     {
         var seeding = _settings.Current.Seeding;
 
-        if (seeding.LimitRatio)
+        if (seeding.LimitRatio && float.IsFinite(seeding.RatioLimit) && seeding.RatioLimit >= 0)
         {
             options.RatioLimit ??= seeding.RatioLimit;
         }
 
-        if (seeding.LimitSeedTime)
+        if (seeding.LimitSeedTime && seeding.SeedTimeLimitMinutes >= 0)
         {
             options.SeedTimeLimit ??= TimeSpan.FromMinutes(seeding.SeedTimeLimitMinutes);
         }

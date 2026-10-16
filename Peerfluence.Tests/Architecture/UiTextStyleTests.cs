@@ -35,7 +35,7 @@ public sealed class UiTextStyleTests
         "Windows", "GitHub", "Transmission", "Avalonia",
         "DHT", "UPnP", "NAT-PMP", "UDP", "TCP", "IP", "IPv4", "IPv6", "URL", "URLs", "BEP",
         "GeoIP", "MCP", "RPC", "API", "UI", "OS", "SOCKS5", "HTTP", "HTTPS", "V1", "V2",
-        "B/s", "KiB/s", "MB", "GB", "KB", "TB",
+        "B/s", "KiB/s", "MiB", "MB", "GB", "KB", "TB",
     ];
 
     [Fact]

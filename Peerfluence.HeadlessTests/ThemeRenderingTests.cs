@@ -20,6 +20,102 @@ public sealed class ThemeRenderingTests
 {
     private sealed record TorrentRow(string Name);
 
+    [AvaloniaFact]
+    public void NarrowTextCells_ShowEllipsisAndKeepTheFullValueWhenResizedOrRebound()
+    {
+        const string fullValue = "A long torrent filename that must remain complete.mkv";
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            IsReadOnly = true,
+            ClipboardCopyMode = DataGridClipboardCopyMode.ExcludeHeader,
+            ItemsSource = new[] { new TorrentRow(fullValue) },
+        };
+        var column = new DataGridTextColumn
+        {
+            Binding = new Binding(nameof(TorrentRow.Name)),
+            Width = new DataGridLength(100),
+        };
+        grid.Columns.Add(column);
+        var window = new Window { Content = grid, Width = 800, Height = 250 };
+        window.Show();
+        try
+        {
+            Layout(window);
+            var text = grid.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "CellTextBlock");
+            Assert.Contains(text.TextLayout.TextLines, line => line.HasCollapsed);
+            Assert.Equal(fullValue, text.Text);
+            Assert.Equal(fullValue, ToolTip.GetTip(text));
+            object? copiedValue = null;
+            grid.CopyingRowClipboardContent += (_, args) => copiedValue = Assert.Single(args.ClipboardRowContent).Content;
+            ClickCell(window, VisibleCells(grid).First());
+            window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+            Layout(window);
+            Assert.Equal(fullValue, copiedValue);
+
+            column.Width = new DataGridLength(700);
+            Layout(window);
+            Assert.DoesNotContain(text.TextLayout.TextLines, line => line.HasCollapsed);
+            Assert.Equal(fullValue, text.Text);
+            // The tooltip goes away with the ellipsis. Left attached it would pop up to repeat
+            // text the cell is now showing in full.
+            Assert.Null(ToolTip.GetTip(text));
+
+            column.Width = new DataGridLength(100);
+            Layout(window);
+            Assert.Equal(fullValue, ToolTip.GetTip(text));
+
+            grid.ItemsSource = new[] { new TorrentRow("Replacement value") };
+            Layout(window);
+            text = grid.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "CellTextBlock");
+            Assert.Equal("Replacement value", ToolTip.GetTip(text));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>
+    /// A cell with room for its text carries no tooltip at all.
+    /// </summary>
+    /// <remarks>
+    /// The theme trims cell text, and the obvious way to make the hidden part reachable is a
+    /// ToolTip.Tip setter in the same style. That attaches one to every cell, so the short ones -
+    /// a percentage, a speed, a peer count - pop up to repeat what is already on screen. The
+    /// tooltip has to follow the ellipsis, and the only way to prove it does is to check a cell
+    /// that never gets one.
+    /// </remarks>
+    [AvaloniaFact]
+    public void AWideTextCell_CarriesNoTooltipAtAll()
+    {
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            IsReadOnly = true,
+            ItemsSource = new[] { new TorrentRow("12.3%") },
+        };
+        grid.Columns.Add(new DataGridTextColumn
+        {
+            Binding = new Binding(nameof(TorrentRow.Name)),
+            Width = new DataGridLength(400),
+        });
+        var window = new Window { Content = grid, Width = 800, Height = 250 };
+        window.Show();
+        try
+        {
+            Layout(window);
+            var text = grid.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "CellTextBlock");
+            Assert.DoesNotContain(text.TextLayout.TextLines, line => line.HasCollapsed);
+            Assert.Equal("12.3%", text.Text);
+            Assert.Null(ToolTip.GetTip(text));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaTheory]
     [InlineData(DataGridSelectionMode.Single)]
     [InlineData(DataGridSelectionMode.Extended)]

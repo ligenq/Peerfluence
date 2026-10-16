@@ -1558,4 +1558,46 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Kategorie für Neuzugänge</value>
   </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Geben Sie eine bestimmte lokale IP-Adresse für freigegebene Streams ein; Platzhalteradressen werden nicht unterstützt.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Die ausgewählte Datei enthält keine abspielbaren Daten.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Streaming-Link kopieren</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Streaming beenden</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Adresse für freigegebene Streams</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Leer lassen, um nur diesen Computer zu verwenden. Zum Teilen mit einem Fernseher oder anderen Gerät die IP-Adresse dieses Computers im gemeinsamen Netzwerk eingeben. Jeder mit dem Link kann die Datei abspielen, bis Sie das Streaming beenden.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Port für freigegebene Streams (0: automatisch)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Streaming-Puffer und Zeitlimits</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Minimales Vorausladen (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Vorausladen bei Wiedergabegeschwindigkeit (Sekunden)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Auftragswarteschlange beim Puffern (Sekunden)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Wartezeit auf Wiedergabedaten (Sekunden)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Wartezeit auf Torrent-Metadaten (Sekunden)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Null hebt das Zeitlimit auf. Änderungen gelten für danach geöffnete Streams.</value>
+  </data>
 </root>

@@ -1,5 +1,7 @@
 using Peerfluence.Theme.Controls;
 using Avalonia.Controls;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Avalonia.LogicalTree;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
@@ -13,6 +15,48 @@ namespace Peerfluence.HeadlessTests;
 
 public class DownloadsViewTests
 {
+    [AvaloniaTheory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(6)]
+    [InlineData(7)]
+    public void NarrowTemplateCells_TrimTextWithinTheCellAndExposeTheFullValue(int columnIndex)
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Name.Returns("A very long torrent name that cannot fit in a narrow column.mkv");
+        torrent.Hash.Returns(InfoHash.CreateRandom());
+        torrent.HashV2.Returns(InfoHash.EmptyV2);
+        var item = new TorrentListItemViewModel(torrent)
+        {
+            Progress = 0.1234f,
+            DownloadSpeedBytesPerSecond = long.MaxValue,
+            UploadSpeedBytesPerSecond = long.MaxValue,
+        };
+        var view = new DownloadsView();
+        var sourceGrid = view.FindControl<DataGrid>("TorrentDataGrid")!;
+        var template = Assert.IsType<DataGridTemplateColumn>(sourceGrid.Columns[columnIndex]).CellTemplate;
+        var grid = new DataGrid { AutoGenerateColumns = false, ItemsSource = new[] { item }, IsReadOnly = true };
+        int columnWidth = columnIndex == 0 ? 100 : 60;
+        grid.Columns.Add(new DataGridTemplateColumn { CellTemplate = template, Width = new DataGridLength(columnWidth) });
+        var window = new Window { Content = grid, Width = 400, Height = 200 };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            var text = grid.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Classes.Contains("gridCellText"));
+            Assert.Contains(text.TextLayout.TextLines, line => line.HasCollapsed);
+            Assert.False(string.IsNullOrEmpty(text.Text));
+            Assert.Equal(text.Text, ToolTip.GetTip(text));
+            Assert.True(text.Bounds.Width < columnWidth);
+        }
+        finally
+        {
+            window.Close();
+            item.Detach();
+        }
+    }
+
     private static (DownloadsView View, DownloadsViewModel Vm) CreateView()
     {
         var vm = TestHelpers.CreateDownloadsViewModel();

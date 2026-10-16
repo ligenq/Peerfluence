@@ -164,8 +164,8 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             Queue =
             {
                 Enabled = settings.Queue.EnableQueueManagement,
-                MaxActiveDownloads = settings.Queue.MaxActiveDownloads,
-                MaxActiveSeeds = settings.Queue.MaxActiveSeeds,
+                MaxActiveDownloads = Math.Max(0, settings.Queue.MaxActiveDownloads),
+                MaxActiveSeeds = Math.Max(0, settings.Queue.MaxActiveSeeds),
                 EnforceAutoStop = true
             },
             Transfer =
@@ -174,6 +174,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
                 MaxUploadSpeed = ToSpeed(uploadLimit)
             }
         };
+        ApplyStreamingSettings(settings.Streaming, clientSettings.Streaming);
         ProxyUdpPolicy.ApplySettings(settings.Proxy, clientSettings.Proxy);
 
         var options = new TorrentClientOptions
@@ -201,6 +202,28 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         var (download, upload) = BandwidthSchedule.LimitsFor(_settingsService.Current, _timeProvider.GetLocalNow());
         engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(download);
         engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(upload);
+    }
+
+    public void ApplyStreamingSettings()
+    {
+        if (_engine is { } engine)
+        {
+            ApplyStreamingSettings(_settingsService.Current.Streaming, engine.Settings.Streaming);
+        }
+    }
+
+    private static void ApplyStreamingSettings(Peerfluence.Core.Config.StreamingSettings source, PeerSharp.Config.StreamingSettings target)
+    {
+        // Clamped again on the way in, rather than trusted: the engine rejects an out-of-range
+        // value, and this runs against whatever is in Current, not only against a freshly loaded
+        // file. The bounds are the stored ones, so the two cannot disagree.
+        target.ReadAheadBytes = Math.Clamp(source.ReadAheadBytes,
+            Config.StreamingSettings.MinReadAheadBytes, Config.StreamingSettings.MaxReadAheadBytes);
+        target.ReadAheadSeconds = Math.Clamp(source.ReadAheadSeconds, 0, Config.StreamingSettings.MaxReadAheadSeconds);
+        target.RequestQueueSecondsWhileBuffering = Math.Clamp(
+            source.RequestQueueSecondsWhileBuffering, 0, Config.StreamingSettings.MaxRequestQueueSeconds);
+        target.DataWaitTimeoutSeconds = Math.Clamp(source.DataWaitTimeoutSeconds, 0, Config.StreamingSettings.MaxWaitTimeoutSeconds);
+        target.MetadataWaitTimeoutSeconds = Math.Clamp(source.MetadataWaitTimeoutSeconds, 0, Config.StreamingSettings.MaxWaitTimeoutSeconds);
     }
 
     /// <summary>

@@ -6,6 +6,100 @@ namespace Peerfluence.Tests.Services;
 
 public sealed class AppSettingsServiceTests : IDisposable
 {
+    [Fact]
+    public async Task LoadAsync_NormalizesLimitsRejectedByPeerSharp51()
+    {
+        var paths = Substitute.For<IAppPaths>();
+        paths.DefaultDownloadDirectory.Returns("downloads");
+        paths.SessionDirectory.Returns("session");
+        var store = Substitute.For<IAppSettingsStore>();
+        var loaded = new AppSettings
+        {
+            Queue = { MaxActiveDownloads = -1, MaxActiveSeeds = -2 },
+            Seeding = { LimitRatio = true, RatioLimit = float.NaN, LimitSeedTime = true, SeedTimeLimitMinutes = -1 },
+            Streaming = null!,
+        };
+        store.LoadAsync(Arg.Any<CancellationToken>()).Returns(loaded);
+        var sut = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
+        await sut.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(0, sut.Current.Queue.MaxActiveDownloads);
+        Assert.Equal(0, sut.Current.Queue.MaxActiveSeeds);
+        Assert.False(sut.Current.Seeding.LimitRatio);
+        Assert.False(sut.Current.Seeding.LimitSeedTime);
+        Assert.Equal(2, sut.Current.Seeding.RatioLimit);
+        Assert.NotNull(sut.Current.Streaming);
+        var defaults = new PeerSharp.Config.StreamingSettings();
+        Assert.Equal(defaults.ReadAheadBytes, sut.Current.Streaming.ReadAheadBytes);
+        Assert.Equal(defaults.ReadAheadSeconds, sut.Current.Streaming.ReadAheadSeconds);
+        Assert.Equal(defaults.RequestQueueSecondsWhileBuffering, sut.Current.Streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(defaults.DataWaitTimeoutSeconds, sut.Current.Streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(defaults.MetadataWaitTimeoutSeconds, sut.Current.Streaming.MetadataWaitTimeoutSeconds);
+        await store.Received(1).SaveAsync(loaded, Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// An out-of-range streaming number is corrected on load, like every other stored limit.
+    /// </summary>
+    /// <remarks>
+    /// The port matters most: the stream listener rejects one outside 0-65535 rather than clamping
+    /// it, so an uncorrected 70000 would break every shared link with a raw argument error, while
+    /// the settings screen showed a clamped value that disagreed with the file.
+    /// </remarks>
+    [Fact]
+    public async Task LoadAsync_NormalizesStreamingRangesAndRewritesTheFile()
+    {
+        var paths = Substitute.For<IAppPaths>();
+        paths.DefaultDownloadDirectory.Returns("downloads");
+        paths.SessionDirectory.Returns("session");
+        var store = Substitute.For<IAppSettingsStore>();
+        var loaded = new AppSettings
+        {
+            Streaming =
+            {
+                Port = 70000,
+                ReadAheadBytes = 1,
+                ReadAheadSeconds = -5,
+                RequestQueueSecondsWhileBuffering = 9000,
+                DataWaitTimeoutSeconds = -1,
+                MetadataWaitTimeoutSeconds = int.MaxValue,
+            },
+        };
+        store.LoadAsync(Arg.Any<CancellationToken>()).Returns(loaded);
+        var sut = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
+
+        await sut.LoadAsync(TestContext.Current.CancellationToken);
+
+        var streaming = sut.Current.Streaming;
+        Assert.Equal(StreamingSettings.MaxPort, streaming.Port);
+        Assert.Equal(StreamingSettings.MinReadAheadBytes, streaming.ReadAheadBytes);
+        Assert.Equal(0, streaming.ReadAheadSeconds);
+        Assert.Equal(StreamingSettings.MaxRequestQueueSeconds, streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(0, streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(StreamingSettings.MaxWaitTimeoutSeconds, streaming.MetadataWaitTimeoutSeconds);
+        await store.Received(1).SaveAsync(loaded, Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>Defaults are already in range, so loading a sound file does not rewrite it.</summary>
+    [Fact]
+    public async Task LoadAsync_LeavesStreamingDefaultsAloneAndDoesNotRewrite()
+    {
+        var paths = Substitute.For<IAppPaths>();
+        paths.DefaultDownloadDirectory.Returns("downloads");
+        paths.SessionDirectory.Returns("session");
+        var store = Substitute.For<IAppSettingsStore>();
+        var loaded = new AppSettings { Storage = { DownloadPath = "downloads", SessionPath = "session" } };
+        var defaults = new StreamingSettings();
+        store.LoadAsync(Arg.Any<CancellationToken>()).Returns(loaded);
+        var sut = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
+
+        await sut.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.False(new StreamingSettings().Normalize());
+        Assert.Equal(defaults.ReadAheadBytes, sut.Current.Streaming.ReadAheadBytes);
+        Assert.Equal(defaults.Port, sut.Current.Streaming.Port);
+        await store.DidNotReceive().SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
     private readonly string _rootPath;
 
     public AppSettingsServiceTests()

@@ -17,6 +17,38 @@ namespace Peerfluence.Tests.ViewModels;
 [Collection("Messenger")]
 public class SettingsViewModelTests
 {
+    [Fact]
+    public async Task StreamingPreferences_AreSavedAppliedAndRestored()
+    {
+        _sut.StreamingReadAheadMiB = 80;
+        _sut.StreamingReadAheadSeconds = 45;
+        _sut.StreamingQueueSeconds = 0;
+        _sut.StreamingDataTimeoutSeconds = 0;
+        _sut.StreamingMetadataTimeoutSeconds = 120;
+        _sut.StreamingBindAddress = "192.168.1.23";
+        _sut.StreamingPort = 8087;
+        await _sut.SaveCommand.ExecuteAsync(null);
+        Assert.Equal(80L * 1024 * 1024, _settingsService.Current.Streaming.ReadAheadBytes);
+        Assert.Equal(45, _settingsService.Current.Streaming.ReadAheadSeconds);
+        Assert.Equal(0, _settingsService.Current.Streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(0, _settingsService.Current.Streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(120, _settingsService.Current.Streaming.MetadataWaitTimeoutSeconds);
+        Assert.Equal("192.168.1.23", _settingsService.Current.Streaming.BindAddress);
+        Assert.Equal(8087, _settingsService.Current.Streaming.Port);
+        var restored = Create(_settingsService);
+        Assert.Equal(80, restored.StreamingReadAheadMiB);
+        Assert.Equal(45, restored.StreamingReadAheadSeconds);
+        Assert.Equal(0, restored.StreamingQueueSeconds);
+        Assert.Equal(0, restored.StreamingDataTimeoutSeconds);
+        Assert.Equal(120, restored.StreamingMetadataTimeoutSeconds);
+        Assert.Equal("192.168.1.23", restored.StreamingBindAddress);
+        Assert.Equal(8087, restored.StreamingPort);
+        restored.StreamingBindAddress = "0.0.0.0";
+        Assert.True(restored.HasInvalidStreamingAddress);
+        restored.StreamingBindAddress = string.Empty;
+        Assert.False(restored.HasInvalidStreamingAddress);
+    }
+
     private readonly IAppSettingsService _settingsService;
     private readonly ThemeService _themeService = new();
     private readonly LocalizationService _localizationService = new();

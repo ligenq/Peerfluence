@@ -32,7 +32,31 @@ public sealed class ScreenshotGallery
     [Theory]
     [InlineData("Light")]
     [InlineData("Dark")]
-    public void CaptureAboutLegalNotice(string variant)
+    public async Task CaptureStreamingOptions(string variant)
+    {
+        Assert.SkipUnless(Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOTS") == "1",
+            "Set PEERFLUENCE_SCREENSHOTS=1 to capture the interface.");
+        string directory = Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOT_DIR")
+            ?? Path.Combine(Path.GetTempPath(), "peerfluence-screenshots");
+        Directory.CreateDirectory(directory);
+        string settings = $$"""
+            { "Theme": { "ThemeVariant": "{{variant}}", "ColorTheme": "Teal" }, "InterfaceMode": "Advanced" }
+            """;
+        using var application = new RunningApplication(settings);
+        Resize(application.Window);
+        RunningApplication.Activate(application.NavigationItems().Single(item => item.Name == "Settings"));
+        application.Find("StorageAndSessionTab").AsTabItem().Select();
+        var options = application.Find("StreamingOptionsExpander");
+        options.Patterns.ExpandCollapse.Pattern.Expand();
+        application.Find("StreamingMetadataTimeoutSecondsInput").Focus();
+        Thread.Sleep(700);
+        await Capture(application, directory, $"{Slug(variant)}-streaming-options", []);
+    }
+
+    [Theory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public async Task CaptureAboutLegalNotice(string variant)
     {
         Assert.SkipUnless(
             Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOTS") == "1",
@@ -52,10 +76,10 @@ public sealed class ScreenshotGallery
 
         var captured = new List<string>();
         string prefix = $"{Slug(variant)}-about";
-        Capture(application.Window, directory, $"{prefix}-collapsed", captured);
+        await Capture(application, directory, $"{prefix}-collapsed", captured);
         application.Find("LegalNoticeExpander").Patterns.ExpandCollapse.Pattern.Expand();
         Thread.Sleep(900);
-        Capture(application.Window, directory, $"{prefix}-expanded", captured);
+        await Capture(application, directory, $"{prefix}-expanded", captured);
     }
 
     /// <summary>
@@ -67,7 +91,7 @@ public sealed class ScreenshotGallery
     /// set to. A theme reviewed in one variant is a theme half reviewed.
     /// </remarks>
     [Fact]
-    public void CaptureDarkVariant()
+    public async Task CaptureDarkVariant()
     {
         Assert.SkipUnless(
             Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOTS") == "1",
@@ -86,7 +110,7 @@ public sealed class ScreenshotGallery
         Thread.Sleep(1800);
 
         var captured = new List<string>();
-        Capture(application.Window, directory, "dark-00-start", captured);
+        await Capture(application, directory, "dark-00-start", captured);
 
         var destinations = application.NavigationItems();
         for (var i = 0; i < destinations.Length; i++)
@@ -100,14 +124,14 @@ public sealed class ScreenshotGallery
             string name = items[i].Properties.Name.ValueOrDefault ?? $"destination-{i}";
             RunningApplication.Activate(items[i]);
             Thread.Sleep(900);
-            Capture(application.Window, directory, $"dark-{i + 1:D2}-{Slug(name)}", captured);
+            await Capture(application, directory, $"dark-{i + 1:D2}-{Slug(name)}", captured);
         }
 
         Assert.NotEmpty(captured);
     }
 
     [Fact]
-    public void CaptureEveryDestination()
+    public async Task CaptureEveryDestination()
     {
         Assert.SkipUnless(
             Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOTS") == "1",
@@ -126,14 +150,14 @@ public sealed class ScreenshotGallery
         // A throwaway profile is a first run, so the interface picker is what is on screen and it
         // blocks navigation. Photograph it, then choose the advanced interface, which is the one
         // with something to look at.
-        Capture(application.Window, directory, "00-first-run", captured);
+        await Capture(application, directory, "00-first-run", captured);
         application.Find("ChooseAdvancedModeButton").AsButton().Invoke();
         RunningApplication.Until(() => application.Exists("AddMagnetButton"), "the advanced interface");
 
         // Let the shell settle before capturing: a still-laying-out window photographs as a
         // half-built one, which then reads as a visual defect that is not there.
         Thread.Sleep(1500);
-        Capture(application.Window, directory, "01-downloads", captured);
+        await Capture(application, directory, "01-downloads", captured);
 
         var destinations = application.NavigationItems();
         Assert.NotEmpty(destinations);
@@ -153,7 +177,7 @@ public sealed class ScreenshotGallery
             RunningApplication.Activate(destination);
             Thread.Sleep(900);
 
-            Capture(application.Window, directory, $"{i + 2:D2}-{Slug(name)}", captured);
+            await Capture(application, directory, $"{i + 2:D2}-{Slug(name)}", captured);
         }
 
         Assert.NotEmpty(captured);
@@ -182,10 +206,10 @@ public sealed class ScreenshotGallery
         }
     }
 
-    private static void Capture(Window window, string directory, string name, List<string> captured)
+    private static async Task Capture(RunningApplication application, string directory, string name, List<string> captured)
     {
         string path = Path.Combine(directory, name + ".png");
-        window.CaptureToFile(path);
+        await application.CaptureWindowToFileAsync(path, TestContext.Current.CancellationToken);
         captured.Add(path);
     }
 

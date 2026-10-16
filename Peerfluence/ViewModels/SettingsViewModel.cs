@@ -818,6 +818,63 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = string.Empty;
 
+    public int StreamingReadAheadMiB
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, MinReadAheadMiB, MaxReadAheadMiB));
+    } = 20;
+
+    public int StreamingReadAheadSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxReadAheadSeconds));
+    } = 30;
+
+    public int StreamingQueueSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxRequestQueueSeconds));
+    } = 1;
+
+    public int StreamingDataTimeoutSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxWaitTimeoutSeconds));
+    } = 60;
+
+    public int StreamingMetadataTimeoutSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxWaitTimeoutSeconds));
+    } = 60;
+
+    public string StreamingBindAddress
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value)) OnPropertyChanged(nameof(HasInvalidStreamingAddress));
+        }
+    } = string.Empty;
+
+    public int StreamingPort
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxPort));
+    }
+
+    /// <summary>Set to something, but not to an address a shared link could name.</summary>
+    /// <remarks>
+    /// Blank is not invalid - it means nothing is shared - so this stays false for it. Asking for a
+    /// shared link while it is blank is refused where the link would be handed out.
+    /// </remarks>
+    public bool HasInvalidStreamingAddress => !string.IsNullOrWhiteSpace(StreamingBindAddress)
+        && !StreamingSettings.IsShareableAddress(StreamingBindAddress);
+
+    // The stored value is bytes; the screen asks for whole MiB.
+    private const int MinReadAheadMiB = (int)(StreamingSettings.MinReadAheadBytes / (1024 * 1024));
+    private const int MaxReadAheadMiB = (int)(StreamingSettings.MaxReadAheadBytes / (1024 * 1024));
+
     // Completion action
     public bool CompletionActionEnabled
     {
@@ -1227,6 +1284,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableGeoIp = settings.EnableGeoIp;
         GeoIpPath = settings.GeoIpPath;
         MediaPlayerPath = settings.MediaPlayerPath;
+        StreamingReadAheadMiB = (int)Math.Clamp(settings.Streaming.ReadAheadBytes / (1024 * 1024), MinReadAheadMiB, MaxReadAheadMiB);
+        StreamingReadAheadSeconds = settings.Streaming.ReadAheadSeconds;
+        StreamingQueueSeconds = settings.Streaming.RequestQueueSecondsWhileBuffering;
+        StreamingDataTimeoutSeconds = settings.Streaming.DataWaitTimeoutSeconds;
+        StreamingMetadataTimeoutSeconds = settings.Streaming.MetadataWaitTimeoutSeconds;
+        StreamingBindAddress = settings.Streaming.BindAddress;
+        StreamingPort = settings.Streaming.Port;
+
         SelectedEncryptionMode = settings.EncryptionMode;
         CompletionActionEnabled = settings.CompletionAction.Enabled;
         CompletionActionProgramPath = settings.CompletionAction.ProgramPath;
@@ -1341,6 +1406,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.EnableGeoIp = EnableGeoIp;
             settings.GeoIpPath = GeoIpPath;
             settings.MediaPlayerPath = MediaPlayerPath;
+            settings.Streaming.ReadAheadBytes = (long)StreamingReadAheadMiB * 1024 * 1024;
+            settings.Streaming.ReadAheadSeconds = StreamingReadAheadSeconds;
+            settings.Streaming.RequestQueueSecondsWhileBuffering = StreamingQueueSeconds;
+            settings.Streaming.DataWaitTimeoutSeconds = StreamingDataTimeoutSeconds;
+            settings.Streaming.MetadataWaitTimeoutSeconds = StreamingMetadataTimeoutSeconds;
+            settings.Streaming.BindAddress = StreamingBindAddress.Trim();
+            settings.Streaming.Port = StreamingPort;
+
             settings.EncryptionMode = SelectedEncryptionMode;
             settings.CompletionAction.Enabled = CompletionActionEnabled;
             settings.CompletionAction.ProgramPath = CompletionActionProgramPath;
@@ -1415,6 +1488,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Unconditional, unlike the three above: pushing two numbers at a running engine costs
         // nothing, and there is no side effect to avoid repeating.
         _engineService.ApplySpeedLimits();
+        _engineService.ApplyStreamingSettings();
     }
 
     /// <summary>
@@ -1488,6 +1562,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableGeoIp = defaults.EnableGeoIp;
         GeoIpPath = defaults.GeoIpPath;
         MediaPlayerPath = defaults.MediaPlayerPath;
+        StreamingReadAheadMiB = (int)(defaults.Streaming.ReadAheadBytes / (1024 * 1024));
+        StreamingReadAheadSeconds = defaults.Streaming.ReadAheadSeconds;
+        StreamingQueueSeconds = defaults.Streaming.RequestQueueSecondsWhileBuffering;
+        StreamingDataTimeoutSeconds = defaults.Streaming.DataWaitTimeoutSeconds;
+        StreamingMetadataTimeoutSeconds = defaults.Streaming.MetadataWaitTimeoutSeconds;
+        StreamingBindAddress = defaults.Streaming.BindAddress;
+        StreamingPort = defaults.Streaming.Port;
+
         SelectedEncryptionMode = defaults.EncryptionMode;
         CompletionActionEnabled = defaults.CompletionAction.Enabled;
         CompletionActionProgramPath = defaults.CompletionAction.ProgramPath;

@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:pf="using:Peerfluence.Theme.Controls">
 
   <!-- Layout and intentional visual differences. Fluent resource mappings live in FluentResources.axaml. -->
 
@@ -290,6 +291,16 @@
     <Setter Property="Padding" Value="10,0" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+  </Style>
+
+  <!-- Generated text-column content and explicitly marked template text share the same
+       overflow behavior. Do not style labels inside cell buttons or editors.
+       The tooltip is the trimmed text only: see OverflowTooltip for why a plain Tip setter is
+       wrong here - it would repeat text the cell is already showing in full. -->
+  <Style Selector="DataGridCell TextBlock#CellTextBlock, DataGridCell TextBlock.gridCellText">
+    <Setter Property="TextWrapping" Value="NoWrap" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="pf:OverflowTooltip.IsEnabled" Value="True" />
   </Style>
 
   <!-- Selection belongs to the row. Keep cell focus for keyboard navigation and embedded

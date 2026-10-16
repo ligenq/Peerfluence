@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:pf="using:Peerfluence.Theme.Controls"
              xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:controls="using:Peerfluence.Controls"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:m="using:Peerfluence.Markup"
              xmlns:views="using:Peerfluence.Views"
@@ -256,23 +257,23 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Name}" Width="*">
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Name}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentName}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:TorrentListItemViewModel">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalLeftRightMargin}">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpacingMedium}" Margin="{StaticResource NormalLeftRightMargin}">
                                     <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeNormal}" Height="{StaticResource IconSizeNormal}" Opacity="{StaticResource OpacitySecondary}"/>
-                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
-                                </StackPanel>
+                                    <TextBlock Grid.Column="1" Classes="gridCellText" Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
+                                </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Progress}" Width="150">
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Progress}" Width="150" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentProgress}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:TorrentListItemViewModel">
                                 <StackPanel VerticalAlignment="Center" Margin="{StaticResource NormalLeftRightMargin}" Spacing="{StaticResource SpacingTiny}">
                                     <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource CornerRadiusSmall}" />
-                                    <TextBlock Text="{Binding ProgressPercent, StringFormat='{}{0:F1}%'}" FontSize="{StaticResource FontSizeTiny}" HorizontalAlignment="Right" Opacity="{StaticResource OpacitySecondary}"/>
+                                    <TextBlock Classes="gridCellText" Text="{Binding ProgressPercent, StringFormat='{}{0:F1}%'}" FontSize="{StaticResource FontSizeTiny}" HorizontalAlignment="Right" Opacity="{StaticResource OpacitySecondary}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -280,35 +281,34 @@
 
                     <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
                                         Binding="{Binding TotalSizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}"
-                                        SortMemberPath="TotalSizeBytes"
-                                        Width="100"/>
-                    <DataGridTextColumn Header="{m:L Downloads_Grid_Category}" Binding="{Binding Category}" Width="120"/>
-                    <DataGridTextColumn Header="{m:L Downloads_Grid_State}" Binding="{Binding State}" Width="100"/>
-                    <DataGridTextColumn Header="{m:L Downloads_Grid_Eta}" Binding="{Binding Eta}" Width="100"/>
+                                        Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentSize}"/>
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Category}" Binding="{Binding Category}" Width="120" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentCategory}"/>
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_State}" Binding="{Binding State}" Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentState}"/>
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Eta}" Binding="{Binding Eta}" Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentEta}"/>
 
-                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Down}" Width="100">
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Down}" Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentDownloadSpeed}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:TorrentListItemViewModel">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
                                     <materialIcons:MaterialIcon Kind="ArrowDown" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource PfAccent}"/>
-                                    <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
-                                </StackPanel>
+                                    <TextBlock Grid.Column="1" Classes="gridCellText" Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
+                                </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Up}" Width="100">
+                    <DataGridTemplateColumn Header="{m:L Downloads_Grid_Up}" Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentUploadSpeed}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:TorrentListItemViewModel">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpacingSmall}" Margin="{StaticResource NormalLeftRightMargin}" VerticalAlignment="Center">
                                     <materialIcons:MaterialIcon Kind="ArrowUp" Width="{StaticResource IconSizeMicro}" Height="{StaticResource IconSizeMicro}" Foreground="{DynamicResource PfAccent}"/>
-                                    <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
-                                </StackPanel>
+                                    <TextBlock Grid.Column="1" Classes="gridCellText" Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}" FontSize="{StaticResource FontSizeNormal}"/>
+                                </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}" Binding="{Binding ConnectedPeers}" Width="80"/>
+                    <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}" Binding="{Binding ConnectedPeers}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TorrentPeers}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

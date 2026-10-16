@@ -102,7 +102,7 @@ internal static class TestHelpers
             localizationService,
             notificationService,
             topLevelService,
-            settingsService, Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>(), Substitute.For<IMediaStreamingService>());
 
         // Replace Dispatcher call with synchronous execution for tests
         vm.UIDispatcher = action => action();

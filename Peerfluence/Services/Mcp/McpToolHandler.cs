@@ -290,6 +290,9 @@ public class McpToolHandler : IMcpToolHandler
             case "mcp":
                 ApplyMcpSettings(current, value);
                 return;
+            case "streaming":
+                ApplyStreamingSettings(current, value);
+                return;
         }
 
         switch (propertyName.ToLowerInvariant())
@@ -369,6 +372,48 @@ public class McpToolHandler : IMcpToolHandler
     private static void ApplyUpdateSettings(AppSettings current, JsonElement value) => ApplyNested(current, value);
 
     private static void ApplyMcpSettings(AppSettings current, JsonElement value) => ApplyNested(current, value);
+
+    private static void ApplyStreamingSettings(AppSettings current, JsonElement value)
+    {
+        foreach (var property in value.EnumerateObject())
+        {
+            switch (property.Name.ToLowerInvariant())
+            {
+                case "readaheadbytes":
+                    current.Streaming.ReadAheadBytes = Math.Clamp(property.Value.GetInt64(),
+                        StreamingSettings.MinReadAheadBytes, StreamingSettings.MaxReadAheadBytes);
+                    break;
+                case "readaheadseconds":
+                    current.Streaming.ReadAheadSeconds = Math.Clamp(property.Value.GetInt32(), 0, StreamingSettings.MaxReadAheadSeconds);
+                    break;
+                case "requestqueuesecondswhilebuffering":
+                    current.Streaming.RequestQueueSecondsWhileBuffering = Math.Clamp(
+                        property.Value.GetInt32(), 0, StreamingSettings.MaxRequestQueueSeconds);
+                    break;
+                case "datawaittimeoutseconds":
+                    current.Streaming.DataWaitTimeoutSeconds = Math.Clamp(property.Value.GetInt32(), 0, StreamingSettings.MaxWaitTimeoutSeconds);
+                    break;
+                case "metadatawaittimeoutseconds":
+                    current.Streaming.MetadataWaitTimeoutSeconds = Math.Clamp(property.Value.GetInt32(), 0, StreamingSettings.MaxWaitTimeoutSeconds);
+                    break;
+                case "port":
+                    current.Streaming.Port = Math.Clamp(property.Value.GetInt32(), 0, StreamingSettings.MaxPort);
+                    break;
+                case "bindaddress":
+                    // Blank is accepted and stored: it means nothing is shared. Asking for a shared
+                    // link while it is blank is what gets refused, where the link would be handed out.
+                    string address = property.Value.GetString()?.Trim() ?? string.Empty;
+                    if (address.Length > 0 && !StreamingSettings.IsShareableAddress(address))
+                    {
+                        throw new ArgumentException("A shared stream requires a specific local IP address, or blank to share nothing.");
+                    }
+
+                    current.Streaming.BindAddress = address;
+                    break;
+                default: throw new ArgumentException($"Unknown streaming setting: {property.Name}.");
+            }
+        }
+    }
 
     private static void ApplyNested(AppSettings current, JsonElement value)
     {

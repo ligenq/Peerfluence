@@ -1558,4 +1558,46 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Categoria para o que adicionar</value>
   </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Introduza um endereço IP local específico para partilhar fluxos; os endereços genéricos não são suportados.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>O ficheiro selecionado não contém dados reproduzíveis.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Copiar ligação de transmissão</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Parar transmissão</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Endereço de partilha de fluxos</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Deixe em branco para usar apenas este computador. Para partilhar com uma televisão ou outro dispositivo, introduza o endereço IP deste computador na rede comum. Qualquer pessoa com a ligação pode reproduzir o ficheiro até parar a transmissão.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Porta de transmissão partilhada (0: automática)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Memória intermédia e tempos de espera</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Leitura antecipada mínima (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Leitura antecipada ao ritmo de reprodução (segundos)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Fila por par durante o armazenamento em memória (segundos)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Espera por dados de reprodução (segundos)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Espera por metadados do torrent (segundos)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Zero remove o tempo de espera. As alterações aplicam-se aos fluxos abertos posteriormente.</value>
+  </data>
 </root>
