@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using FlaUI.Core.AutomationElements;
 using FlaUI.UIA3;
+using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol;
 
 namespace Peerfluence.UiTests;
 
@@ -70,6 +72,22 @@ public sealed class RunningApplication : IDisposable
     }
 
     public Window Window { get; }
+
+    /// <summary>Renders only this application's visual tree, even when another window covers it.</summary>
+    public async Task CaptureWindowToFileAsync(string path, CancellationToken cancellationToken)
+    {
+        var transport = new StdioClientTransport(new StdioClientTransportOptions
+        {
+            Command = ExecutablePath(),
+            Arguments = ["--mcp", "--profile", ProfileDirectory],
+            Name = "Peerfluence gallery",
+        });
+        await using var client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken);
+        var result = await client.CallToolAsync("take_screenshot", cancellationToken: cancellationToken);
+        var image = result.Content.OfType<ImageContentBlock>().SingleOrDefault()
+            ?? throw new InvalidOperationException("The application did not return a rendered window image.");
+        await File.WriteAllBytesAsync(path, image.DecodedData.ToArray(), cancellationToken);
+    }
 
     /// <summary>The throwaway directory this instance keeps everything in.</summary>
     public string ProfileDirectory { get; }

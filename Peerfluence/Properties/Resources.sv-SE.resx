@@ -1558,4 +1558,46 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Kategori för det som läggs till</value>
   </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Ange en specifik lokal IP-adress för delade strömmar; jokeradresser stöds inte.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Den valda filen innehåller inga spelbara data.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Kopiera strömningslänk</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Stoppa strömning</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Adress för delad strömning</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Lämna tomt för endast den här datorn. Ange datorns IP-adress på det gemensamma nätverket för att dela en länk med en TV eller annan enhet. Alla med länken kan spela filen tills du stoppar strömningen.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Port för delad strömning (0: automatiskt)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Strömningsbuffert och tidsgränser</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Minsta förläsning (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Förläsning vid uppspelningshastighet (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Kötid per klient vid buffring (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Väntetid för uppspelningsdata (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Väntetid för torrentmetadata (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Noll tar bort tidsgränsen. Ändringar gäller strömmar som öppnas därefter.</value>
+  </data>
 </root>

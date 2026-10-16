@@ -6,6 +6,35 @@ namespace Peerfluence.Tests.Services;
 
 public sealed class JsonAppSettingsStoreTests : IDisposable
 {
+    [Fact]
+    public async Task StreamingPolicy_SurvivesASourceGeneratedJsonRoundTrip()
+    {
+        var store = new JsonAppSettingsStore(_paths, new FileSystem());
+        var settings = new AppSettings
+        {
+            Streaming =
+            {
+                ReadAheadBytes = 80L * 1024 * 1024,
+                ReadAheadSeconds = 45,
+                RequestQueueSecondsWhileBuffering = 0,
+                DataWaitTimeoutSeconds = 0,
+                MetadataWaitTimeoutSeconds = 120,
+                BindAddress = "192.168.1.23",
+                Port = 8087,
+            },
+        };
+        await store.SaveAsync(settings, TestContext.Current.CancellationToken);
+        var loaded = await store.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.NotNull(loaded);
+        Assert.Equal(80L * 1024 * 1024, loaded.Streaming.ReadAheadBytes);
+        Assert.Equal(45, loaded.Streaming.ReadAheadSeconds);
+        Assert.Equal(0, loaded.Streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(0, loaded.Streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(120, loaded.Streaming.MetadataWaitTimeoutSeconds);
+        Assert.Equal("192.168.1.23", loaded.Streaming.BindAddress);
+        Assert.Equal(8087, loaded.Streaming.Port);
+    }
+
     private readonly string _rootPath;
     private readonly TestAppPaths _paths;
 

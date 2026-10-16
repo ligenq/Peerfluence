@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
@@ -44,22 +44,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="12.1.2" />
-		<PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.2" />
+		<PackageReference Include="Avalonia" Version="12.1.4" />
+		<PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.4" />
 		<PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
-		<PackageReference Include="Avalonia.Themes.Simple" Version="12.1.2" />
-		<PackageReference Include="System.IO.Abstractions" Version="22.2.0" />
-		<PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+		<PackageReference Include="Avalonia.Themes.Simple" Version="12.1.4" />
+		<PackageReference Include="System.IO.Abstractions" Version="22.3.0" />
+		<PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.4" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Material.Icons.Avalonia" Version="3.0.2" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.13" />
 		<PackageReference Include="ModelContextProtocol" Version="2.2.0" />
 		<PackageReference Include="PeerSharp" Version="$(PeerSharpPackageVersion)" />
-		<PackageReference Include="Velopack" Version="1.2.0" />
+		<PackageReference Include="Velopack" Version="1.2.161" />
 	</ItemGroup>
 
 	<ItemGroup>

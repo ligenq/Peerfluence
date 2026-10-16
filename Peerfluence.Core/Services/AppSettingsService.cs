@@ -151,6 +151,38 @@ public sealed class AppSettingsService : IAppSettingsService
             settings.Mcp = new McpSettings();
             changed = true;
         }
+        if (settings.Streaming == null)
+        {
+            settings.Streaming = new StreamingSettings();
+            changed = true;
+        }
+        if (settings.Streaming.Normalize())
+        {
+            changed = true;
+        }
+
+        if (settings.Queue.MaxActiveDownloads < 0)
+        {
+            settings.Queue.MaxActiveDownloads = 0;
+            changed = true;
+        }
+        if (settings.Queue.MaxActiveSeeds < 0)
+        {
+            settings.Queue.MaxActiveSeeds = 0;
+            changed = true;
+        }
+        if (!float.IsFinite(settings.Seeding.RatioLimit) || settings.Seeding.RatioLimit < 0)
+        {
+            settings.Seeding.RatioLimit = 2;
+            settings.Seeding.LimitRatio = false;
+            changed = true;
+        }
+        if (settings.Seeding.SeedTimeLimitMinutes < 0)
+        {
+            settings.Seeding.SeedTimeLimitMinutes = 1440;
+            settings.Seeding.LimitSeedTime = false;
+            changed = true;
+        }
         if (settings.CompletionAction.TimeoutSeconds <= 0)
         {
             settings.CompletionAction.TimeoutSeconds = 300;

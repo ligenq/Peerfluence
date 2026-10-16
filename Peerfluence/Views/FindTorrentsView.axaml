@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:pf="using:Peerfluence.Theme.Controls"
              xmlns:vm="using:Peerfluence.ViewModels"
+             xmlns:controls="using:Peerfluence.Controls"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:m="using:Peerfluence.Markup"
              x:Class="Peerfluence.Views.FindTorrentsView"
@@ -82,21 +83,18 @@
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="{m:L Find_Column_Name}" Binding="{Binding Title}" Width="*"/>
+                        <DataGridTextColumn Header="{m:L Find_Column_Name}" Binding="{Binding Title}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchTitle}"/>
                         <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
                                             Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}"
-                                            SortMemberPath="SizeBytes"
-                                            Width="100"/>
+                                            Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchSize}"/>
                         <DataGridTextColumn Header="{m:L Find_Column_Seeds}"
                                             Binding="{Binding SeedersText}"
-                                            SortMemberPath="Seeders"
-                                            Width="80"/>
+                                            Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchSeeds}"/>
                         <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}"
                                             Binding="{Binding PeersText}"
-                                            SortMemberPath="Peers"
-                                            Width="80"/>
-                        <DataGridTextColumn Header="{m:L Find_Column_Indexer}" Binding="{Binding IndexerName}" Width="140"/>
-                        <DataGridTextColumn Header="{m:L Find_Column_Age}" Binding="{Binding AgeText}" Width="80"/>
+                                            Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchPeers}"/>
+                        <DataGridTextColumn Header="{m:L Find_Column_Indexer}" Binding="{Binding IndexerName}" Width="140" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchIndexer}"/>
+                        <DataGridTextColumn Header="{m:L Find_Column_Age}" Binding="{Binding AgeText}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchAge}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>

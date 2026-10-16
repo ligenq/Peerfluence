@@ -41,7 +41,7 @@ public class MainWindowViewModelTests
         var localizationService = new LocalizationService();
         var themeService = new ThemeService();
 
-        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService, Substitute.For<IDialogService>());
+        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService, Substitute.For<IDialogService>(), Substitute.For<IMediaStreamingService>());
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
         _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>(), Substitute.For<ITorrentCategoryService>());

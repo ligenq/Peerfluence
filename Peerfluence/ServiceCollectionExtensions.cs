@@ -58,6 +58,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAddTorrentDialogService, AddTorrentDialogService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IMagnetMetadataPreviewService, MagnetMetadataPreviewService>();
+        services.AddSingleton<IMediaStreamingService, MediaStreamingService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<ISingleInstanceService, SingleInstanceService>();
         services.AddSingleton<IThemeService, ThemeService>();

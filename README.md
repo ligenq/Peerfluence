@@ -6,7 +6,7 @@ installer and desktop-association integration focused on Windows. It is built on
 control over torrent downloads while also exposing a local MCP interface that can be used
 by AI agents for diagnostics, automation, and repeatable UI testing.
 
-The application is written in C#/.NET, uses Avalonia and SukiUI for the desktop UI,
+The application is written in C#/.NET, uses Avalonia Fluent with the Peerfluence theme for the desktop UI,
 Material.Icons.Avalonia for icons, Microsoft.Extensions.Hosting for application
 lifecycle, and PeerSharp for BitTorrent engine behavior.
 
@@ -52,6 +52,9 @@ Velopack update path are in place.
 - Set per-torrent connection and upload-slot limits, and turn on BEP 16 super-seeding for
   an initial seed introducing content to an empty swarm.
 - Stream eligible files through the configured external media player.
+- Share token-protected streaming links with another device on a configured local address.
+- Tune streaming read-ahead, buffering queues and timeouts without changing the torrent's
+  configured download strategy.
 - Show notifications for finished downloads, metadata readiness, torrent errors, and
   completion actions.
 - Persist session data and settings across restarts.
@@ -63,13 +66,35 @@ Velopack update path are in place.
 - Configure disk read/write limits separately from network settings.
 - Configure queue management with maximum active downloads/seeds.
 - Configure a completion action program/script that runs when a torrent finishes.
-- Customize theme variant, color palette, background style, and language.
+- Customize theme variant, accent color, and language.
 - Self-update through Velopack for direct-download builds.
 - Expose a local MCP server for AI-assisted control and diagnostics.
 - Run a UI-agent mode for natural-language, AI-executable UI test cases.
 - Handle crashes with native platform dialogs and crash logs.
 
 ## User-Facing Workflows
+
+### Streaming while downloading
+
+Open the details pane and use Play beside a supported audio or video file. PeerSharp 5.1
+prioritizes the pieces that open streams need and restores ordinary selection when the last
+stream closes; playing a file does not overwrite the configured download strategy. Cancel
+stops preparation, and Stop streaming closes the listener and its connections.
+
+To play on another device, set this computer's address under Settings → Storage & session →
+Media player, then use Copy streaming link beside the file. Sharing produces a link with a
+generated access token. While the address is blank nothing is shared and Copy streaming link
+reports what to set, rather than copying a loopback link no other device could reach. The link
+remains available until streaming stops, another file starts streaming, the selected torrent
+changes, or Peerfluence exits. Anyone with the link can access the stream while it is active. A
+shared port of zero selects a free port automatically. Local Play always stays on loopback,
+regardless of the sharing address.
+
+The streaming options expand to show minimum read-ahead in MiB, adaptive read-ahead in seconds,
+the peer queue while buffering, and data/metadata timeouts. Zero disables a timeout. Policy
+changes apply to streams opened afterward. The MCP settings tool accepts the same policy as a
+`Streaming` object with `ReadAheadBytes`, `ReadAheadSeconds`, `RequestQueueSecondsWhileBuffering`,
+`DataWaitTimeoutSeconds`, `MetadataWaitTimeoutSeconds`, `BindAddress`, and `Port`.
 
 ### Adding Torrents
 

@@ -45,7 +45,7 @@ public class DownloadsViewModelTests
             _localizationService,
             notificationService,
             _topLevelService,
-            settingsService, Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>(), Substitute.For<IMediaStreamingService>());
 
         // Workaround for Dispatcher dependencies in constructor
 #pragma warning disable SYSLIB0050

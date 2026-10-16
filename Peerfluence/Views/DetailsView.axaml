@@ -69,14 +69,14 @@
                                   IsReadOnly="False"
                                   GridLinesVisibility="None" AutomationProperties.AutomationId="DetailsFilesGrid">
 							<DataGrid.Columns>
-								<DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="50">
+								<DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="50" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.FileSelected}">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
 											<CheckBox IsChecked="{Binding IsSelected}" HorizontalAlignment="Center"/>
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
-								<DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="200">
+								<DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="200" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.FilePriority}">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
 											<ComboBox ItemsSource="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).PriorityChoices}"
@@ -92,21 +92,30 @@
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
-								<DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
-								<DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="100" IsReadOnly="True"/>
-								<DataGridTextColumn Header="{m:L Details_Grid_Downloaded}" Binding="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="140" IsReadOnly="True"/>
-								<DataGridTextColumn Header="{m:L Details_Grid_Progress}" Binding="{Binding Progress, StringFormat='{}{0:P1}'}" Width="120" IsReadOnly="True"/>
-								<DataGridTemplateColumn Width="120">
+								<DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.FilePath}"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="100" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.FileSize}"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Downloaded}" Binding="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="140" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.FileDownloaded}"/>
+								<DataGridTextColumn Header="{m:L Details_Grid_Progress}" Binding="{Binding Progress, StringFormat='{}{0:P1}'}" Width="120" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.FileProgress}"/>
+								<DataGridTemplateColumn Width="150" CanUserSort="False">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="vm:TorrentFileItemViewModel">
 											<StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
 												<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).StreamFileCommand}"
                                                         CommandParameter="{Binding}"
                                                         IsVisible="{Binding IsStreamable}"
+                                                        AutomationProperties.Name="{m:L Details_Stream}"
                                                         ToolTip.Tip="{m:L Details_Stream}"
                                                         Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
 													<materialIcons:MaterialIcon Kind="PlayCircleOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
 												</Button>
+                                                <Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).CopyStreamLinkCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        IsVisible="{Binding IsStreamable}"
+                                                        ToolTip.Tip="{m:L Details_CopyStreamLink}"
+                                                        AutomationProperties.Name="{m:L Details_CopyStreamLink}"
+                                                        Padding="{StaticResource XXSmallLeftTopRightBottomMargin}">
+                                                    <materialIcons:MaterialIcon Kind="LinkVariant" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                                </Button>
 												<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RenameFileCommand}"
                                                         CommandParameter="{Binding}"
                                                         ToolTip.Tip="{m:L Details_Files_Rename}"
@@ -117,12 +126,20 @@
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
-								<DataGridTextColumn Width="20"/>
+								<DataGridTextColumn Width="20" CanUserSort="False"/>
 							</DataGrid.Columns>
 						</DataGrid>
-						<Button Grid.Row="1" Content="{m:L Details_ApplyFileSelection}"
-                                Command="{Binding ApplyFileSelectionCommand}"
-                                HorizontalAlignment="Right" Margin="{StaticResource XSmallTopMargin}" AutomationProperties.AutomationId="ApplyFileSelectionButton"/>
+						<!-- A column each, rather than two buttons aligned to opposite edges of one
+						     cell: at a narrow pane width, or with the longer labels some languages
+						     need, opposing alignments overlap instead of running out of room. -->
+						<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="{StaticResource XSmallTopMargin}">
+							<Button Content="{m:L Details_StopStreaming}"
+                                    Command="{Binding StopStreamingCommand}" IsVisible="{Binding HasActiveStream}"
+                                    AutomationProperties.AutomationId="StopStreamingButton"/>
+							<Button Grid.Column="2" Content="{m:L Details_ApplyFileSelection}"
+                                    Command="{Binding ApplyFileSelectionCommand}"
+                                    AutomationProperties.AutomationId="ApplyFileSelectionButton"/>
+						</Grid>
 					</Grid>
 				</TabItem>
 
@@ -143,12 +160,12 @@
 						</Grid>
 						<DataGrid Grid.Row="1" ItemsSource="{Binding Trackers}" AutoGenerateColumns="False" IsReadOnly="True" AutomationProperties.AutomationId="TrackersGrid">
 							<DataGrid.Columns>
-								<DataGridTextColumn Header="{m:L Details_Trackers_Url}" Binding="{Binding Url}" Width="*"/>
-								<DataGridTextColumn Header="{m:L Details_Trackers_State}" Binding="{Binding State}" Width="120"/>
-								<DataGridTextColumn Header="{m:L Details_Trackers_Seeds}" Binding="{Binding SeedCount}" Width="70"/>
-								<DataGridTextColumn Header="{m:L Details_Trackers_Leeches}" Binding="{Binding LeechCount}" Width="70"/>
-								<DataGridTextColumn Header="{m:L Details_Trackers_LastError}" Binding="{Binding LastError}" Width="*"/>
-								<DataGridTemplateColumn Width="40">
+								<DataGridTextColumn Header="{m:L Details_Trackers_Url}" Binding="{Binding Url}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TrackerUrl}"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_State}" Binding="{Binding State}" Width="120" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TrackerState}"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_Seeds}" Binding="{Binding SeedCount}" Width="70" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TrackerSeeds}"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_Leeches}" Binding="{Binding LeechCount}" Width="70" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TrackerLeeches}"/>
+								<DataGridTextColumn Header="{m:L Details_Trackers_LastError}" Binding="{Binding LastError}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.TrackerError}"/>
+								<DataGridTemplateColumn Width="40" CanUserSort="False">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="vm:TrackerStatusItemViewModel">
 											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveTrackerCommand}"
@@ -176,12 +193,12 @@
 						</Grid>
 						<DataGrid Grid.Row="1" ItemsSource="{Binding Peers}" AutoGenerateColumns="False" IsReadOnly="True" AutomationProperties.AutomationId="PeersGrid">
 							<DataGrid.Columns>
-								<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Country}" Binding="{Binding Country}" Width="80"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" Width="100"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" Width="100"/>
-								<DataGridTextColumn Header="{m:L Details_Peers_Progress}" Binding="{Binding ProgressText}" Width="80"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Endpoint}" Binding="{Binding EndPoint}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.PeerEndpoint}"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Client}" Binding="{Binding Client}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.PeerClient}"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Country}" Binding="{Binding Country}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.PeerCountry}"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Down}" Binding="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.PeerDownloadSpeed}"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Up}" Binding="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.PeerUploadSpeed}"/>
+								<DataGridTextColumn Header="{m:L Details_Peers_Progress}" Binding="{Binding ProgressText}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.PeerProgress}"/>
 							</DataGrid.Columns>
 						</DataGrid>
 					</Grid>
@@ -204,8 +221,8 @@
                                    IsVisible="{Binding !HasWebSeeds}"/>
 						<DataGrid Grid.Row="1" ItemsSource="{Binding WebSeeds}" AutoGenerateColumns="False" IsReadOnly="True" IsVisible="{Binding HasWebSeeds}" AutomationProperties.AutomationId="WebSeedsGrid">
 							<DataGrid.Columns>
-								<DataGridTextColumn Header="{m:L Details_WebSeeds_Url}" Binding="{Binding}" Width="*"/>
-								<DataGridTemplateColumn Width="40">
+								<DataGridTextColumn Header="{m:L Details_WebSeeds_Url}" Binding="{Binding}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.WebSeedUrl}"/>
+								<DataGridTemplateColumn Width="40" CanUserSort="False">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate x:DataType="x:String">
 											<Button Command="{Binding $parent[DataGrid].((vm:DetailsViewModel)DataContext).RemoveWebSeedCommand}"
@@ -324,8 +341,11 @@
 		</Grid>
 	<!-- Covers the content while work is in flight, so nothing can be acted on mid-flight. -->
         <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsStreaming}">
-            <ProgressBar IsIndeterminate="True" Width="180"
-                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <StackPanel Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="180" />
+                <Button Content="{m:L Common_Cancel}" Command="{Binding StopStreamingCommand}"
+                        HorizontalAlignment="Center" AutomationProperties.AutomationId="CancelStreamingButton" />
+            </StackPanel>
         </Border>
     </Panel>
 </UserControl>

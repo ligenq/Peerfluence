@@ -1558,4 +1558,46 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Категорія для доданого</value>
   </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Укажіть конкретну локальну IP-адресу для спільних потоків; адреси із символами підстановки не підтримуються.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Вибраний файл не містить даних для відтворення.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Копіювати посилання на потік</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Зупинити трансляцію</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Адреса спільного доступу до потоків</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Залиште порожнім для доступу лише з цього комп&#x27;ютера. Для телевізора або іншого пристрою вкажіть IP-адресу цього комп&#x27;ютера в спільній мережі. Кожен, хто має посилання, може відтворювати файл до зупинки трансляції.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Порт спільного потоку (0: автоматично)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Буфер і час очікування</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Мінімальне випереджальне читання (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Випереджальне читання зі швидкістю відтворення (секунди)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Черга запитів піра під час буферизації (секунди)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Очікування даних відтворення (секунди)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Очікування метаданих торента (секунди)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Нуль скасовує обмеження часу. Зміни застосовуються до потоків, відкритих після цього.</value>
+  </data>
 </root>

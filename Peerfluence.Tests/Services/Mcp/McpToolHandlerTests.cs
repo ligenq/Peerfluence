@@ -13,6 +13,39 @@ namespace Peerfluence.Tests.Services.Mcp;
 
 public class McpToolHandlerTests
 {
+    [Theory]
+    [InlineData("192.168.1.23", false)]
+    [InlineData("0.0.0.0", true)]
+    public async Task UpdatingStreamingPolicy_ValidatesSharingAndPreservesUnlimitedTimeouts(string address, bool invalid)
+    {
+        var settings = new AppSettings { Mcp = { AllowDestructiveTools = true } };
+        var service = Substitute.For<IAppSettingsService>();
+        service.Current.Returns(settings);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            service, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+        var result = await handler.UpdateSettingsAsync($$"""
+            { "Streaming": { "BindAddress": "{{address}}", "Port": 8087, "ReadAheadBytes": 83886080,
+              "ReadAheadSeconds": 45, "RequestQueueSecondsWhileBuffering": 0,
+              "DataWaitTimeoutSeconds": 0, "MetadataWaitTimeoutSeconds": 120 } }
+            """, TestContext.Current.CancellationToken);
+        Assert.Equal(invalid, result.IsError);
+        if (invalid)
+        {
+            Assert.Equal(string.Empty, settings.Streaming.BindAddress);
+            await service.DidNotReceive().SaveAsync(Arg.Any<CancellationToken>());
+            return;
+        }
+
+        Assert.Equal(address, settings.Streaming.BindAddress);
+        Assert.Equal(8087, settings.Streaming.Port);
+        Assert.Equal(83886080, settings.Streaming.ReadAheadBytes);
+        Assert.Equal(45, settings.Streaming.ReadAheadSeconds);
+        Assert.Equal(0, settings.Streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(0, settings.Streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(120, settings.Streaming.MetadataWaitTimeoutSeconds);
+        await service.Received(1).SaveAsync(Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task AddTorrentAsync_ReturnsError_WhenMagnetLinkIsEmpty()
     {

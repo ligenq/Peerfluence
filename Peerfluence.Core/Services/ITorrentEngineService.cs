@@ -26,6 +26,9 @@ public interface ITorrentEngineService : IAsyncDisposable
     /// </summary>
     void ApplySpeedLimits();
 
+    /// <summary>Updates the streaming policy used by streams opened after this call.</summary>
+    void ApplyStreamingSettings();
+
     Task LoadOptionalDataAsync(CancellationToken cancellationToken);
 
     Task ShutdownAsync(CancellationToken cancellationToken);

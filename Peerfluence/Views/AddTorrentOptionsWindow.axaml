@@ -3,6 +3,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:vm="using:Peerfluence.ViewModels"
+                 xmlns:controls="using:Peerfluence.Controls"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
                  mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="760"
@@ -93,16 +94,16 @@
                                       CanUserSortColumns="True"
                                       Height="240" AutomationProperties.AutomationId="FilesGrid">
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80">
+                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFileSelected}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="vm:AddTorrentFileOptionViewModel" x:DataType="vm:AddTorrentFileOptionViewModel">
                                                 <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="120" IsReadOnly="True"/>
-                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160">
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFilePath}"/>
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="120" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFileSize}"/>
+                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFilePriority}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="vm:AddTorrentFileOptionViewModel" x:DataType="vm:AddTorrentFileOptionViewModel">
                                                 <ComboBox ItemsSource="{Binding PriorityOptions}" SelectedValue="{Binding Priority, Mode=TwoWay}" SelectedValueBinding="{Binding Value}">

@@ -7,6 +7,47 @@ namespace Peerfluence.Tests.Services;
 public class TorrentEngineServiceTests
 {
     [Fact]
+    public async Task StreamingPolicy_IsAppliedAtStartupAndUpdatedForFutureStreams()
+    {
+        var settings = BaseSettings(s =>
+        {
+            s.Streaming.ReadAheadBytes = 80L * 1024 * 1024;
+            s.Streaming.ReadAheadSeconds = 45;
+            s.Streaming.RequestQueueSecondsWhileBuffering = 2;
+            s.Streaming.DataWaitTimeoutSeconds = 0;
+            s.Streaming.MetadataWaitTimeoutSeconds = 120;
+            s.Queue.MaxActiveDownloads = -1;
+            s.Queue.MaxActiveSeeds = -2;
+        });
+        var sut = CreateSut(settings);
+        try
+        {
+            await sut.InitializeAsync(TestContext.Current.CancellationToken);
+            var policy = sut.Engine.Settings.Streaming;
+            Assert.Equal(80L * 1024 * 1024, policy.ReadAheadBytes);
+            Assert.Equal(45, policy.ReadAheadSeconds);
+            Assert.Equal(2, policy.RequestQueueSecondsWhileBuffering);
+            Assert.Equal(0, policy.DataWaitTimeoutSeconds);
+            Assert.Equal(120, policy.MetadataWaitTimeoutSeconds);
+            Assert.Equal(0, sut.Engine.Settings.Queue.MaxActiveDownloads);
+            Assert.Equal(0, sut.Engine.Settings.Queue.MaxActiveSeeds);
+            settings.Streaming.ReadAheadBytes = -1;
+            settings.Streaming.ReadAheadSeconds = 0;
+            settings.Streaming.RequestQueueSecondsWhileBuffering = 0;
+            settings.Streaming.DataWaitTimeoutSeconds = 15;
+            settings.Streaming.MetadataWaitTimeoutSeconds = 0;
+            sut.ApplyStreamingSettings();
+            Assert.Same(policy, sut.Engine.Settings.Streaming);
+            Assert.Equal(1024 * 1024, policy.ReadAheadBytes);
+            Assert.Equal(0, policy.ReadAheadSeconds);
+            Assert.Equal(0, policy.RequestQueueSecondsWhileBuffering);
+            Assert.Equal(15, policy.DataWaitTimeoutSeconds);
+            Assert.Equal(0, policy.MetadataWaitTimeoutSeconds);
+        }
+        finally { await sut.DisposeAsync(); }
+    }
+
+    [Fact]
     public async Task InitializeAsync_WhenAutomaticListeningPortIsEnabled_BindsRealPorts()
     {
         var settingsService = Substitute.For<IAppSettingsService>();

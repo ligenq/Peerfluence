@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -9,11 +8,11 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Interfaces;
-using PeerSharp.Streaming;
 
 namespace Peerfluence.ViewModels;
 
@@ -29,7 +28,7 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
     private readonly IDialogService _dialogService;
 
     private CancellationTokenSource? _streamingCts;
-    private HttpStreamServer? _streamServer;
+    private readonly IMediaStreamingService _mediaStreaming;
 
     private readonly Channel<ITorrent> _refreshChannel;
     private readonly CancellationTokenSource _loopCts = new();
@@ -58,7 +57,8 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
         INotificationService notificationService,
         ITopLevelService topLevelService,
         IAppSettingsService settingsService,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        IMediaStreamingService mediaStreaming)
     {
         _selectionService = selectionService;
         _torrentService = torrentService;
@@ -67,6 +67,7 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
         _topLevelService = topLevelService;
         _settingsService = settingsService;
         _dialogService = dialogService;
+        _mediaStreaming = mediaStreaming;
 
         Files = new ObservableCollection<TorrentFileItemViewModel>();
         Trackers = new ObservableCollection<TrackerStatusItemViewModel>();
@@ -78,7 +79,9 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
         ForceRecheckCommand = new AsyncRelayCommand(ForceRecheckAsync, CanForceRecheck);
         SaveResumeDataCommand = new AsyncRelayCommand(SaveResumeDataAsync, () => _selectionService.SelectedTorrent != null);
         ChangeDownloadPathCommand = new AsyncRelayCommand(ChangeDownloadPathAsync, CanChangeDownloadPath);
-        StreamFileCommand = new AsyncRelayCommand<TorrentFileItemViewModel?>(StreamFileAsync, CanStreamFile);
+        StreamFileCommand = new AsyncRelayCommand<TorrentFileItemViewModel?>((file, ct) => StartStreamingAsync(file, false, ct), CanStreamFile);
+        CopyStreamLinkCommand = new AsyncRelayCommand<TorrentFileItemViewModel?>((file, ct) => StartStreamingAsync(file, true, ct), CanStreamFile);
+        StopStreamingCommand = new RelayCommand(StopStreaming, () => IsStreaming || HasActiveStream);
 
         // Tracker management
         AddTrackerCommand = new RelayCommand(AddTracker, () => _selectionService.SelectedTorrent != null && !string.IsNullOrWhiteSpace(NewTrackerUrl));
@@ -298,8 +301,33 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
     public bool IsStreaming
     {
         get;
-        set => SetProperty(ref field, value);
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                StreamFileCommand.NotifyCanExecuteChanged();
+                CopyStreamLinkCommand.NotifyCanExecuteChanged();
+                StopStreamingCommand.NotifyCanExecuteChanged();
+            }
+        }
     }
+
+    public string ActiveStreamUrl
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(HasActiveStream));
+                StopStreamingCommand.NotifyCanExecuteChanged();
+            }
+        }
+    } = string.Empty;
+
+    public bool HasActiveStream => !string.IsNullOrEmpty(ActiveStreamUrl);
+    public IAsyncRelayCommand<TorrentFileItemViewModel?> CopyStreamLinkCommand { get; }
+    public IRelayCommand StopStreamingCommand { get; }
 
     // Tracker management
     public string NewTrackerUrl
@@ -376,11 +404,9 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
 
     private void OnSelectionChanged(TorrentSelectionChangedMessage msg)
     {
-        _streamingCts?.Cancel();
-        _streamingCts?.Dispose();
-        _streamingCts = null;
-        _streamServer?.Dispose();
-        _streamServer = null;
+        StopStreaming();
+        StreamFileCommand.NotifyCanExecuteChanged();
+        CopyStreamLinkCommand.NotifyCanExecuteChanged();
 
         TriggerRefresh();
         ApplyTorrentSettingsCommand.NotifyCanExecuteChanged();
@@ -754,7 +780,7 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
         torrent.DownloadStrategy = SelectedDownloadStrategy;
 
         // Auto-stop rules
-        if (float.TryParse(RatioLimit, out var ratio) && ratio > 0)
+        if (float.TryParse(RatioLimit, out var ratio) && float.IsFinite(ratio) && ratio > 0)
         {
             torrent.RatioLimit = ratio;
         }
@@ -854,89 +880,61 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
         }
     }
 
-    // Streaming
-    private bool CanStreamFile(TorrentFileItemViewModel? file)
-    {
-        return file is { IsStreamable: true } && _selectionService.SelectedTorrent != null;
-    }
+    // Streaming priorities are owned by PeerSharp's open streams, not DownloadStrategy.
+    private bool CanStreamFile(TorrentFileItemViewModel? file) =>
+        !IsStreaming && file is { IsStreamable: true } && _selectionService.SelectedTorrent != null;
 
-    private async Task StreamFileAsync(TorrentFileItemViewModel? file)
+    private async Task StartStreamingAsync(TorrentFileItemViewModel? file, bool share, CancellationToken cancellationToken)
     {
         var torrent = _selectionService.SelectedTorrent;
-        if (torrent == null || file == null)
-        {
-            return;
-        }
+        if (torrent == null || file is not { IsStreamable: true }) return;
 
+        StopStreaming();
+        var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _loopCts.Token);
+        _streamingCts = cancellation;
+        IsStreaming = true;
         try
         {
-            torrent.DownloadStrategy = DownloadStrategy.Streaming;
-            UIDispatcher(() => SelectedDownloadStrategy = DownloadStrategy.Streaming);
-
-            _streamingCts?.Cancel();
-            _streamingCts?.Dispose();
-            _streamingCts = new CancellationTokenSource();
-
-            _streamServer?.Dispose();
-            var streamServer = new HttpStreamServer(torrent, file.Index);
-            _streamServer = streamServer;
-            streamServer.Start();
-
-            var ct = _streamingCts.Token;
-            IsStreaming = true;
-
-            // Wait for a small amount of data to be available at the start of the file
-            // to ensure the media player can identify the format immediately.
-            _ = Task.Run(async () =>
+            var stream = await _mediaStreaming.StartAsync(torrent, file.Index, share, cancellation.Token);
+            if (cancellation.IsCancellationRequested || !ReferenceEquals(_streamingCts, cancellation)) return;
+            ActiveStreamUrl = stream.Url;
+            if (share)
             {
-                try
-                {
-                    await using var stream = await torrent.OpenStreamAsync(file.Index, ct).ConfigureAwait(false);
-                    var buffer = new byte[256 * 1024];
-                    await stream.ReadAsync(buffer, ct).ConfigureAwait(false);
-
-                    UIDispatcher(() => IsStreaming = false);
-
-                    var mediaPlayerPath = _settingsService.Current.MediaPlayerPath;
-                    if (!string.IsNullOrWhiteSpace(mediaPlayerPath))
-                    {
-                        Process.Start(new ProcessStartInfo(mediaPlayerPath, $"\"{streamServer.Url}\"") { UseShellExecute = false });
-                    }
-                    else
-                    {
-                        Process.Start(new ProcessStartInfo(streamServer.Url) { UseShellExecute = true });
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    UIDispatcher(() => IsStreaming = false);
-                }
-                catch (Exception ex)
-                {
-                    UIDispatcher(() =>
-                    {
-                        IsStreaming = false;
-                        _notificationService.Publish(
-                            new NotificationItem(
-                                Properties.Resources.Details_StreamFailed,
-                                $"{file.Path}: {ex.Message}",
-                                NotificationType.Error,
-                                Material.Icons.MaterialIconKind.AlertCircleOutline.ToString()),
-                            TimeSpan.FromSeconds(8));
-                    });
-                }
-            }, ct);
+                var clipboard = _topLevelService.GetClipboard();
+                await clipboard.SetTextAsync(stream.Url);
+                await clipboard.FlushAsync();
+            }
+            else
+            {
+                _mediaStreaming.Play(stream);
+            }
         }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { }
         catch (Exception ex)
         {
-            _notificationService.Publish(
-                new NotificationItem(
-                    Properties.Resources.Details_StreamFailed,
-                    $"{file.Path}: {ex.Message}",
-                    NotificationType.Error,
-                    Material.Icons.MaterialIconKind.AlertCircleOutline.ToString()),
-                TimeSpan.FromSeconds(8));
+            if (ReferenceEquals(_streamingCts, cancellation) && !cancellation.IsCancellationRequested)
+            {
+                StopStreaming();
+                _notificationService.Publish(new NotificationItem(
+                    Properties.Resources.Details_StreamFailed, $"{file.Path}: {ex.Message}",
+                    NotificationType.Error, Material.Icons.MaterialIconKind.AlertCircleOutline.ToString()), TimeSpan.FromSeconds(8));
+            }
         }
+        finally
+        {
+            if (ReferenceEquals(_streamingCts, cancellation)) IsStreaming = false;
+        }
+    }
+
+    private void StopStreaming()
+    {
+        var cancellation = _streamingCts;
+        _streamingCts = null;
+        cancellation?.Cancel();
+        cancellation?.Dispose();
+        _mediaStreaming.EndSession();
+        IsStreaming = false;
+        ActiveStreamUrl = string.Empty;
     }
 
     // Tracker management
@@ -1315,11 +1313,7 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
         WeakReferenceMessenger.Default.UnregisterAll(this);
         _loopCts.Cancel();
         _refreshChannel.Writer.TryComplete();
-        _streamingCts?.Cancel();
-        _streamingCts?.Dispose();
-        _streamingCts = null;
-        _streamServer?.Dispose();
-        _streamServer = null;
+        StopStreaming();
         _loopCts.Dispose();
     }
 }
