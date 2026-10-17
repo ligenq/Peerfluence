@@ -18,6 +18,51 @@ namespace Peerfluence.HeadlessTests;
 
 public sealed class ThemeRenderingTests
 {
+    [AvaloniaFact]
+    public void OverflowingTextFieldScrollbars_ResolveAndFollowEveryVariant()
+    {
+        var app = Application.Current!;
+        var previous = app.RequestedThemeVariant;
+        var theme = app.Styles.OfType<PeerfluenceTheme>().Single();
+        var field = new TextBox
+        {
+            Text = string.Join(Environment.NewLine, Enumerable.Range(0, 30).Select(index => $"Tracker {index}")),
+            AcceptsReturn = true,
+            Height = 82,
+        };
+        ScrollViewer.SetAllowAutoHide(field, false);
+        var window = new Window { Content = new StackPanel { Children = { field } }, Width = 400, Height = 200 };
+        window.Show();
+        try
+        {
+            foreach (var variant in PeerfluenceTheme.Variants)
+            {
+                app.RequestedThemeVariant = variant;
+                theme.UseVariant(variant);
+                Layout(window);
+                var expected = Assert.IsType<Color>(window.FindResource(variant, "PfTextTertiaryColor"));
+                foreach (string key in new[] { "ScrollBarPanningThumbBackgroundColor", "ScrollBarThumbBackgroundColor" })
+                {
+                    Assert.Equal(expected, Assert.IsType<Color>(window.FindResource(variant, key)));
+                }
+
+                Assert.Equal(expected, Assert.IsAssignableFrom<ISolidColorBrush>(
+                    window.FindResource("ScrollBarPanningThumbBackground")).Color);
+                var bar = field.GetVisualDescendants().OfType<ScrollBar>()
+                    .Single(scroll => scroll.Name == "PART_VerticalScrollBar");
+                Assert.True(bar.IsVisible);
+                var thumb = bar.GetVisualDescendants().OfType<Thumb>().Single();
+                Assert.Equal(expected, Assert.IsAssignableFrom<ISolidColorBrush>(thumb.Background).Color);
+            }
+        }
+        finally
+        {
+            window.Close();
+            theme.UseVariant(previous);
+            app.RequestedThemeVariant = previous;
+        }
+    }
+
     private sealed record TorrentRow(string Name);
 
     [AvaloniaFact]

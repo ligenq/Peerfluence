@@ -53,6 +53,36 @@ public class SettingsViewTests
         Assert.True(combos.Count >= 5, $"Expected at least 5 ComboBoxes, found {combos.Count}");
     }
 
+    [AvaloniaTheory]
+    [InlineData("Light", "MidnightLight")]
+    [InlineData("Dark", "Midnight")]
+    public void StoredThemePreferences_AreSelectedInTheAppearanceControls(string stored, string expected)
+    {
+        var settings = Substitute.For<Peerfluence.Core.Services.IAppSettingsService>();
+        settings.Current.Returns(new AppSettings
+        {
+            Theme = new ThemeSettings { ThemeVariant = stored, ColorTheme = "Sky" }
+        });
+        var model = TestHelpers.CreateSettingsViewModel(settingsService: settings);
+        var view = new SettingsView { DataContext = model };
+        var window = new Window { Content = view, Width = 1200, Height = 800 };
+        window.Show();
+        try
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            var combos = view.GetLogicalDescendants().OfType<ComboBox>().Distinct().ToArray();
+            var variant = combos.Single(combo => AutomationProperties.GetAutomationId(combo) == "ThemeVariantComboBox");
+            var accent = combos.Single(combo => AutomationProperties.GetAutomationId(combo) == "ColorThemeComboBox");
+            Assert.Equal(expected, Assert.IsType<SettingsOption>(variant.SelectedItem).Value);
+            Assert.Equal("Sky", Assert.IsType<SettingsOption>(accent.SelectedItem).Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void TextBoxes_ExistForPaths()
     {

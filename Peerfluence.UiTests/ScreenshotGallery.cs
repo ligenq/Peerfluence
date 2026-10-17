@@ -82,6 +82,32 @@ public sealed class ScreenshotGallery
         await Capture(application, directory, $"{prefix}-expanded", captured);
     }
 
+    /// <summary>One capture per accent, to see whether each still reads on indigo.</summary>
+    [Theory]
+    [InlineData("Cobalt")]
+    [InlineData("Sky")]
+    [InlineData("Cyan")]
+    [InlineData("Teal")]
+    [InlineData("Emerald")]
+    [InlineData("Rose")]
+    [InlineData("Violet")]
+    public async Task CaptureMidnightAccents(string accent)
+    {
+        Assert.SkipUnless(Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOTS") == "1",
+            "Set PEERFLUENCE_SCREENSHOTS=1 to capture the interface.");
+        string directory = Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOT_DIR")
+            ?? Path.Combine(Path.GetTempPath(), "peerfluence-screenshots");
+        Directory.CreateDirectory(directory);
+        string settings = $$"""
+            { "Theme": { "ThemeVariant": "Midnight", "ColorTheme": "{{accent}}" }, "InterfaceMode": "Advanced" }
+            """;
+        using var application = new RunningApplication(settings);
+        Resize(application.Window);
+        RunningApplication.Activate(application.NavigationItems().Single(item => item.Name == "Settings"));
+        Thread.Sleep(1200);
+        await Capture(application, directory, $"accent-{Slug(accent)}", []);
+    }
+
     /// <summary>
     /// The dark variant, on a profile that already asked for it.
     /// </summary>
@@ -90,8 +116,10 @@ public sealed class ScreenshotGallery
     /// because the theme supports both and only one of them is whatever this machine happens to be
     /// set to. A theme reviewed in one variant is a theme half reviewed.
     /// </remarks>
-    [Fact]
-    public async Task CaptureDarkVariant()
+    [Theory]
+    [InlineData("Midnight")]
+    [InlineData("MidnightLight")]
+    public async Task CaptureDarkVariant(string variant)
     {
         Assert.SkipUnless(
             Environment.GetEnvironmentVariable("PEERFLUENCE_SCREENSHOTS") == "1",
@@ -101,8 +129,8 @@ public sealed class ScreenshotGallery
             ?? Path.Combine(Path.GetTempPath(), "peerfluence-screenshots");
         Directory.CreateDirectory(directory);
 
-        const string settings = """
-            { "Theme": { "ThemeVariant": "Dark", "ColorTheme": "Teal" }, "InterfaceMode": "Advanced" }
+        string settings = $$"""
+            { "Theme": { "ThemeVariant": "{{variant}}", "ColorTheme": "Cobalt" }, "InterfaceMode": "Advanced" }
             """;
 
         using var application = new RunningApplication(settings);
@@ -110,7 +138,8 @@ public sealed class ScreenshotGallery
         Thread.Sleep(1800);
 
         var captured = new List<string>();
-        await Capture(application, directory, "dark-00-start", captured);
+        string prefix = Slug(variant);
+        await Capture(application, directory, $"{prefix}-00-start", captured);
 
         var destinations = application.NavigationItems();
         for (var i = 0; i < destinations.Length; i++)
@@ -124,7 +153,7 @@ public sealed class ScreenshotGallery
             string name = items[i].Properties.Name.ValueOrDefault ?? $"destination-{i}";
             RunningApplication.Activate(items[i]);
             Thread.Sleep(900);
-            await Capture(application, directory, $"dark-{i + 1:D2}-{Slug(name)}", captured);
+            await Capture(application, directory, $"{prefix}-{i + 1:D2}-{Slug(name)}", captured);
         }
 
         Assert.NotEmpty(captured);

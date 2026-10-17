@@ -24,6 +24,9 @@
   <Thickness x:Key="PfPadPanel">16</Thickness>
   <Thickness x:Key="PfPadPage">20,18</Thickness>
   <Thickness x:Key="PfPageHeaderMargin">0,0,0,20</Thickness>
+  <Thickness x:Key="PfScrollThumbVerticalInset">4,2</Thickness>
+  <Thickness x:Key="PfScrollThumbHorizontalInset">2,4</Thickness>
+  <Thickness x:Key="PfDialogScrollGutter">0,0,12,0</Thickness>
 
   <!--
     Radii stay modest. Large radii on every surface is the single clearest marker of a generated

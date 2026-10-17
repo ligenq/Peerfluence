@@ -1,7 +1,8 @@
 # Peerfluence.Theme
 
-A compact Avalonia desktop theme with light and dark variants and eight accents. MIT licensed.
-It builds on Fluent control templates and input handling. The application supplies its font.
+A compact Avalonia desktop theme with three variants and eight accents. MIT licensed.
+It builds on Fluent control templates and input handling. Light and dark leave the font to the
+application; midnight brings its own.
 
 ```xml
 <Application.Styles>
@@ -16,6 +17,74 @@ Add `xmlns:theme="using:Peerfluence.Theme"`. Register Inter, for example, with
 `theme.UseAccent("Emerald")`. Unknown accent names return `false` without changing the palette.
 
 Accents: Teal, Indigo, Cobalt, Emerald, Amber, Rose, Violet, Slate.
+
+## Variants
+
+`ThemeVariant.Light`, `ThemeVariant.Dark`, `PeerfluenceTheme.Midnight` and
+`PeerfluenceTheme.MidnightLight`.
+
+The neutral pair is what most applications will want. The Midnight pair is an opinionated identity
+and ships alongside rather than instead: Peerfluence itself offers only those two, but the package
+keeps Light and Dark because a theme that forces one look on its consumers is a narrower thing.
+
+Midnight is an indigo shell whose panels sit **darker** than the canvas behind them, which is the
+reverse of the usual arrangement and is what makes the chrome recede and content read as cut into
+it. It inherits from `Dark`, so every accent stays selectable and any resource it does not define
+resolves against the dark values.
+
+It also carries its own typeface, Open Sans, embedded in this package. A font cannot be applied
+through a per-variant resource, because no resource value means "leave the font alone": a
+`FontFamily` setter whose `DynamicResource` does not resolve assigns an unmatchable family rather
+than skipping the property, and the `$Default` sentinel resolves to a last-resort face instead of
+the host's font. Both render every string in the wrong font at roughly twice the width. The
+typeface is therefore a style the theme adds and removes, so it must be switched explicitly
+alongside the variant:
+
+```csharp
+Application.Current.RequestedThemeVariant = PeerfluenceTheme.Midnight;
+theme.UseVariant(PeerfluenceTheme.Midnight);
+```
+
+Calling `UseVariant` with any other variant removes it again, and repeat calls do not stack.
+
+**Midnight Light** is the same identity by day, not Midnight recoloured. What makes Midnight itself
+is panels sitting *darker* than the canvas, and on a pale page that would be dark cards floating on
+white. So the light variant keeps the part you recognise - the chrome stays deep indigo at all
+times, through the same `UseVariant` styles - and lets the content area behave the ordinary way
+round, with white panels above a tinted canvas. Nothing inside the chrome may take its colour from
+the palette, since the palette's ink is dark under this variant; `Midnight.axaml` states the
+chrome's own foregrounds for that reason.
+
+Both Midnight variants offer the same accents, derived in opposite directions: lifted toward white
+to read on indigo, darkened toward the ink to read on white. Generate them with
+`tools/generate-midnight-accents.py midnight` and `... light`.
+
+Open Sans is licensed under the SIL Open Font License 1.1; `OFL.txt` ships in this package.
+
+Midnight offers a different set of accents, not the same eight. Its canvas is not neutral: at
+chroma 0.108 and hue 279 the background out-colours a muted accent and occupies a stretch of the
+wheel, and three of the eight fail there in ways retuning does not fix.
+
+| dropped | measured reason |
+| --- | --- |
+| Indigo | hue 280, one degree from the canvas, so it reads as the background rather than a selection |
+| Slate | chroma 0.058, half the canvas's own, so it reads as a disabled control |
+| Amber | warm, and a fill dark enough to carry white text turns to ochre |
+
+`Sky` and `Cyan` replace them, both needing no lift at all and clearing AA by the widest margins in
+the set. Ask the theme what a variant offers with `AccentsFor(variant)` and what it falls back to
+with `DefaultAccentFor(variant)`; Midnight defaults to `Cobalt`. `UseAccent` takes any accent the
+theme knows and gives each variant its own default where that variant does not offer it, so one
+stored preference still resolves everywhere.
+
+The accents Midnight does share with Light and Dark are tuned for it rather than inherited from
+`Dark`.
+Dark's tints are mixed toward near-black, which goes muddy on indigo, and its white-on-accent
+pairings fall as low as 2.54:1. Midnight's are mixed toward its own surface and lifted toward
+white only as far as WCAG AA requires against the surfaces each accent actually sits on, which
+four of them did not need at all. Regenerate with `tools/generate-midnight-accents.py`; a test
+re-measures every accent and fails below 4.5:1.
+
 Requires Avalonia 12.1 and .NET 10. The theme library supports trimming and NativeAOT; the gallery
 is a separate development tool and is not shipped with Peerfluence.
 

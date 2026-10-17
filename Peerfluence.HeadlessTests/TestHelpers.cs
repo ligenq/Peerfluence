@@ -110,10 +110,12 @@ internal static class TestHelpers
         return vm;
     }
 
-    public static SettingsViewModel CreateSettingsViewModel(IInterfaceModeService? interfaceModeService = null)
+    public static SettingsViewModel CreateSettingsViewModel(
+        IInterfaceModeService? interfaceModeService = null,
+        IAppSettingsService? settingsService = null)
     {
         var store = Substitute.For<IAppSettingsStore>();
-        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        settingsService ??= new AppSettingsService(new AppPaths(), store, new FileSystem());
         var themeService = Substitute.For<IThemeService>();
         var localizationService = new LocalizationService();
         var topLevelService = Substitute.For<ITopLevelService>();

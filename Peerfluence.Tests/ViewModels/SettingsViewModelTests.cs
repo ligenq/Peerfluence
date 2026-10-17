@@ -1,4 +1,4 @@
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.Globalization;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Config;
@@ -126,17 +126,73 @@ public class SettingsViewModelTests
     [Fact]
     public void ThemeVariants_ContainsExpectedValues()
     {
+        // The neutral Light and Dark still ship in the theme package for other applications, but
+        // this one offers only the pair that carry its identity. A stored "Light" or "Dark" is
+        // migrated rather than listed; see ThemeVariantMigrationTests.
         Assert.Contains("System", _sut.ThemeVariants);
-        Assert.Contains("Light", _sut.ThemeVariants);
-        Assert.Contains("Dark", _sut.ThemeVariants);
+        Assert.Contains("MidnightLight", _sut.ThemeVariants);
+        Assert.Contains("Midnight", _sut.ThemeVariants);
+        Assert.DoesNotContain("Light", _sut.ThemeVariants);
+        Assert.DoesNotContain("Dark", _sut.ThemeVariants);
     }
 
     [Fact]
     public void ColorThemes_ContainsExpectedValues()
     {
-        Assert.Contains("Indigo", _sut.ColorThemes);
+        Assert.DoesNotContain("Indigo", _sut.ColorThemes);
         Assert.Contains("Cobalt", _sut.ColorThemes);
         Assert.Contains("Rose", _sut.ColorThemes);
+        Assert.Contains("Sky", _sut.ColorThemes);
+        Assert.Contains("Cyan", _sut.ColorThemes);
+        Assert.DoesNotContain("Amber", _sut.ColorThemes);
+        Assert.DoesNotContain("Slate", _sut.ColorThemes);
+    }
+
+    [Theory]
+    [InlineData("Sky")]
+    [InlineData("Cyan")]
+    public async Task SwitchingToSystemAndChangingLanguage_PreservesMidnightAccents(string accent)
+    {
+        try
+        {
+            _sut.SelectedThemeVariant = "Midnight";
+            _sut.SelectedColorTheme = accent;
+            _sut.SelectedThemeVariant = "System";
+            _sut.SelectedLanguage = "sv-SE";
+            await _sut.WaitForPendingSaveAsync();
+
+            Assert.Equal(accent, _sut.SelectedColorTheme);
+            Assert.Equal(accent, _settingsService.Current.Theme.ColorTheme);
+            Assert.Equal(Peerfluence.Theme.PeerfluenceTheme.MidnightAccents, _sut.ColorThemes);
+
+            var restored = Create(_settingsService);
+            Assert.Equal("System", restored.SelectedThemeVariant);
+            Assert.Equal(accent, restored.SelectedColorTheme);
+        }
+        finally
+        {
+            await _sut.WaitForPendingSaveAsync();
+            _localizationService.Apply("en-US");
+        }
+    }
+
+    [Theory]
+    [InlineData("Light", "MidnightLight")]
+    [InlineData("Dark", "Midnight")]
+    [InlineData("DARK", "Midnight")]
+    public async Task LoadingAnOldThemePreference_SelectsAndSavesItsReplacement(string stored, string expected)
+    {
+        _settingsService.Current.Theme.ThemeVariant = stored;
+        _settingsService.Current.Theme.ColorTheme = "Sky";
+        var restored = Create(_settingsService);
+
+        Assert.Equal(expected, restored.SelectedThemeVariant);
+        Assert.Contains(restored.ThemeVariantOptions, option => option.Value == expected);
+        Assert.Equal("Sky", restored.SelectedColorTheme);
+
+        restored.EnableDht = !restored.EnableDht;
+        await restored.WaitForPendingSaveAsync();
+        Assert.Equal(expected, _settingsService.Current.Theme.ThemeVariant);
     }
 
     [Fact]
@@ -414,7 +470,7 @@ public class SettingsViewModelTests
 
             await _sut.SaveCommand.ExecuteAsync(null);
 
-            Assert.Equal("Dark", _sut.SelectedThemeVariant);
+            Assert.Equal("Midnight", _sut.SelectedThemeVariant);
             Assert.Equal("Emerald", _sut.SelectedColorTheme);
             Assert.Equal("Require", _sut.SelectedEncryptionMode);
             Assert.Equal("Socks5", _sut.SelectedProxyType);

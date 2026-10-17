@@ -94,13 +94,55 @@ public sealed class DialogService : IDialogService
         // than a name for the field, and is empty for the magnet prompt, so the title is the name.
         textBox.SetValue(AutomationProperties.NameProperty, prompt.Title);
 
+        var validationError = new InfoBar
+        {
+            IsVisible = false,
+            IsClosable = false,
+            Severity = ToastSeverity.Error,
+            MaxWidth = 420,
+        };
+        validationError.SetValue(AutomationProperties.AutomationIdProperty, PromptValidationErrorId);
+        validationError.SetValue(AutomationProperties.LiveSettingProperty, AutomationLiveSetting.Assertive);
+
+        void ShowError(string? message)
+        {
+            validationError.Message = message;
+            validationError.IsVisible = !string.IsNullOrEmpty(message);
+            validationError.SetValue(AutomationProperties.NameProperty, message);
+            textBox.SetValue(AutomationProperties.HelpTextProperty, message);
+        }
+
+        textBox.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == TextBox.TextProperty)
+            {
+                ShowError(null);
+            }
+        };
+
+        bool Validate()
+        {
+            string? error = prompt.Validate?.Invoke(textBox.Text?.Trim() ?? string.Empty);
+            ShowError(error);
+            if (string.IsNullOrEmpty(error))
+            {
+                return true;
+            }
+
+            // Keep the entered text and return focus to the field that needs correcting.
+            textBox.Focus();
+            return false;
+        }
+
+        var content = new StackPanel { Spacing = 8, Children = { textBox, validationError } };
         bool accepted = await ShowAsync(
             prompt.Title,
-            textBox,
+            content,
             PromptSeverity.Information,
             prompt.ConfirmLabel,
             Properties.Resources.Common_Cancel,
-            confirm => EnableOnlyWhenFilledIn(confirm, textBox));
+            confirm => EnableOnlyWhenFilledIn(confirm, textBox),
+            validateConfirm: Validate);
 
         return accepted ? textBox.Text?.Trim() : null;
     }
@@ -178,7 +220,8 @@ public sealed class DialogService : IDialogService
         PromptSeverity severity,
         string confirmLabel,
         string cancelLabel,
-        Action<Button>? configureConfirm = null)
+        Action<Button>? configureConfirm = null,
+        Func<bool>? validateConfirm = null)
     {
         Dispatcher.UIThread.VerifyAccess();
 
@@ -195,7 +238,13 @@ public sealed class DialogService : IDialogService
         var confirm = new Button { Content = confirmLabel, IsDefault = true };
         confirm.Classes.Add("accent");
         confirm.SetValue(AutomationProperties.AutomationIdProperty, PromptConfirmButtonId);
-        confirm.Click += (_, _) => answered.TrySetResult(true);
+        confirm.Click += (_, _) =>
+        {
+            if (validateConfirm is null || validateConfirm())
+            {
+                answered.TrySetResult(true);
+            }
+        };
         configureConfirm?.Invoke(confirm);
 
         var cancel = new Button { Content = cancelLabel, IsCancel = true };
@@ -220,8 +269,8 @@ public sealed class DialogService : IDialogService
                 content,
                 new StackPanel
                 {
+                    Classes = { "dialogActions" },
                     Orientation = Orientation.Horizontal,
-                    Spacing = 8,
                     HorizontalAlignment = HorizontalAlignment.Right,
                     Children = { confirm, cancel },
                 },
@@ -283,6 +332,9 @@ public sealed class DialogService : IDialogService
 
     /// <summary>The automation id of the text box in a prompt that asks for a value.</summary>
     public const string PromptTextBoxId = "PromptTextBox";
+
+    /// <summary>The inline validation message in a text prompt.</summary>
+    public const string PromptValidationErrorId = "PromptValidationError";
 
     /// <summary>The automation id of the accepting button on any prompt built here.</summary>
     public const string PromptConfirmButtonId = "PromptConfirmButton";

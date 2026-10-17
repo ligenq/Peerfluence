@@ -60,7 +60,7 @@
 				</StackPanel>
 			</Grid>
 
-			<TabControl Grid.Row="1">
+			<TabControl Grid.Row="1" Padding="{StaticResource XSmallTopMargin}">
 				<!-- Files Tab -->
 				<TabItem Header="{m:L Details_FilesTab}" AutomationProperties.Name="{m:L Details_FilesTab}" AutomationProperties.AutomationId="FilesTabTab">
 					<Grid RowDefinitions="*,Auto">

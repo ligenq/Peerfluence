@@ -12,9 +12,22 @@
     <Setter Property="Foreground" Value="{DynamicResource PfText}" />
   </Style>
 
+
   <Style Selector="StackPanel.pageHeader">
     <Setter Property="Spacing" Value="{DynamicResource PfSpaceSm}" />
     <Setter Property="Margin" Value="{DynamicResource PfPageHeaderMargin}" />
+  </Style>
+
+  <!-- Shared by window dialogs and prompts assembled by the application. -->
+  <Style Selector="StackPanel.dialogActions">
+    <Setter Property="Spacing" Value="{DynamicResource PfSpaceXl}" />
+  </Style>
+
+  <Style Selector="ScrollViewer.dialogForm">
+    <Setter Property="AllowAutoHide" Value="False" />
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="Padding" Value="{DynamicResource PfDialogScrollGutter}" />
   </Style>
 
   <!--
@@ -217,6 +230,14 @@
 
   <!-- ============================ sidebar navigation ============================ -->
 
+  <!-- The sidebar's own surface, here rather than in the view so a variant can replace it. -->
+  <Style Selector="Border.sidebar">
+    <Setter Property="Background" Value="{DynamicResource PfSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+    <Setter Property="BorderThickness" Value="0,0,1,0" />
+  </Style>
+
+
   <!--
     A list of destinations, not a menu of buttons. Selection is carried by a tinted fill and the
     accent on the label; there is no coloured rail down the side, which is the single most
@@ -313,6 +334,27 @@
   </Style>
 
   <!-- ============================ the rest ============================ -->
+
+  <!-- Inset only the painted thumb. Fluent's full-width Thumb and track still receive input. -->
+  <Style Selector="ScrollBar /template/ Thumb">
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadiusPill}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <!-- The transparent full-size surface keeps the inset pill easy to grab. Fluent's
+             thumb state selectors still paint the Border; the track and drag behavior stay upstream. -->
+        <Grid Background="Transparent">
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ScrollBar:vertical /template/ Thumb /template/ Border">
+    <Setter Property="Margin" Value="{DynamicResource PfScrollThumbVerticalInset}" />
+  </Style>
+  <Style Selector="ScrollBar:horizontal /template/ Thumb /template/ Border">
+    <Setter Property="Margin" Value="{DynamicResource PfScrollThumbHorizontalInset}" />
+  </Style>
 
   <Style Selector="ProgressBar">
     <Setter Property="Foreground" Value="{DynamicResource PfAccent}" />

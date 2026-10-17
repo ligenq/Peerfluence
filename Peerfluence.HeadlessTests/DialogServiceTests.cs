@@ -31,6 +31,111 @@ namespace Peerfluence.HeadlessTests;
 /// </remarks>
 public class DialogServiceTests
 {
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task InvalidTextStaysInThePromptWithAnErrorAndCanBeCorrected(bool clickConfirm)
+    {
+        const string errorMessage = "Enter a valid magnet link.";
+        const string valid = "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        var manager = new DialogManager();
+        var window = new Window { Content = new DialogHost { Manager = manager }, Width = 650, Height = 500 };
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
+        window.Show();
+        try
+        {
+            var answer = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add",
+                InitialText: "not a magnet", Validate: value => value == valid ? null : errorMessage));
+            Layout();
+            var dialog = Assert.IsAssignableFrom<Control>(manager.Content);
+            var box = Box(dialog);
+            Submit();
+            Layout();
+
+            Assert.False(answer.IsCompleted);
+            Assert.Same(dialog, manager.Content);
+            Assert.Equal("not a magnet", box.Text);
+            Assert.True(box.IsFocused);
+            var error = dialog.GetSelfAndLogicalDescendants().OfType<InfoBar>().Single();
+            Assert.True(error.IsVisible);
+            Assert.False(error.IsClosable);
+            Assert.Equal(ToastSeverity.Error, error.Severity);
+            Assert.Equal(errorMessage, error.Message);
+            Assert.Equal(DialogService.PromptValidationErrorId, AutomationProperties.GetAutomationId(error));
+            Assert.Equal(AutomationLiveSetting.Assertive, AutomationProperties.GetLiveSetting(error));
+            Assert.Equal(errorMessage, AutomationProperties.GetHelpText(box));
+            Assert.Single(window.GetVisualDescendants().OfType<TextBlock>(),
+                text => text.IsEffectivelyVisible && text.Text == errorMessage);
+
+            box.Text = $"  {valid}  ";
+            Layout();
+            Assert.False(error.IsVisible);
+            Submit();
+            Layout();
+            Assert.True(answer.IsCompleted);
+            Assert.Equal(valid, await answer);
+            Assert.Null(manager.Content);
+
+            void Submit()
+            {
+                if (clickConfirm)
+                {
+                    var button = Confirm(dialog);
+                    var point = button.TranslatePoint(new Point(button.Bounds.Width / 2, button.Bounds.Height / 2), window)!.Value;
+                    window.MouseMove(point);
+                    window.MouseDown(point, MouseButton.Left);
+                    window.MouseUp(point, MouseButton.Left);
+                }
+                else
+                {
+                    window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+                    window.KeyReleaseQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+                }
+            }
+        }
+        finally
+        {
+            manager.Close();
+            window.Close();
+        }
+
+        void Layout()
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task InvalidTextCanStillBeCancelledWithEscape()
+    {
+        var manager = new DialogManager();
+        var window = new Window { Content = new DialogHost { Manager = manager }, Width = 650, Height = 500 };
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
+        window.Show();
+        try
+        {
+            var answer = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add",
+                InitialText: "invalid", Validate: _ => "Enter a valid magnet link."));
+            Dispatcher.UIThread.RunJobs();
+            window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+            window.KeyReleaseQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(answer.IsCompleted);
+
+            window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(answer.IsCompleted);
+            Assert.Null(await answer);
+            Assert.Null(manager.Content);
+        }
+        finally
+        {
+            manager.Close();
+            window.Close();
+        }
+    }
+
     [AvaloniaFact]
     public async Task ATextPrompt_CapturesTypingCyclesTabAndRestoresFocus()
     {

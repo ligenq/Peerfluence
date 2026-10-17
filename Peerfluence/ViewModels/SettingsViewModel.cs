@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -23,7 +23,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private readonly IUpdateService _updateService;
     private readonly IWindowsAssociationService _windowsAssociationService;
     private IReadOnlyList<SettingsOption> _themeVariantOptions = CreateThemeVariantOptions();
-    private IReadOnlyList<SettingsOption> _colorThemeOptions = CreateColorThemeOptions();
+    private IReadOnlyList<SettingsOption> _colorThemeOptions =
+        CreateColorThemeOptions(Services.ThemeService.Resolve("System"));
     private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
 
@@ -147,14 +148,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// theme and handing it straight to the theme service.
     /// </para>
     /// </summary>
-    private void SetChoice(ref string field, string value, [CallerMemberName] string? propertyName = null)
+    private bool SetChoice(ref string field, string value, [CallerMemberName] string? propertyName = null)
     {
         if (string.IsNullOrEmpty(value))
         {
-            return;
+            return false;
         }
 
-        SetProperty(ref field, value, propertyName);
+        return SetProperty(ref field, value, propertyName);
     }
 
     /// <summary>
@@ -726,7 +727,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     public string SelectedThemeVariant
     {
         get;
-        set => SetChoice(ref field, value);
+        set
+        {
+            if (!string.IsNullOrEmpty(value)
+                && SetChoice(ref field, Services.ThemeService.NormalizeVariant(value)))
+            {
+                RefreshColorThemeOptions();
+            }
+        }
     } = "System";
 
     public string SelectedColorTheme
@@ -734,6 +742,26 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         get;
         set => SetChoice(ref field, value);
     } = Theme.PeerfluenceTheme.DefaultAccent;
+
+    /// <summary>
+    /// Re-offers the accents, because the variants do not offer the same ones.
+    /// </summary>
+    /// <remarks>
+    /// Midnight drops three accents that fail against its indigo canvas and adds two that suit
+    /// it, so switching variants can leave the stored accent naming something the new variant has
+    /// never heard of. Snapping to that variant's default is what stops the box going blank, and
+    /// the guard keeps a choice that both variants happen to share.
+    /// </remarks>
+    private void RefreshColorThemeOptions()
+    {
+        var variant = Services.ThemeService.Resolve(SelectedThemeVariant);
+        ColorThemeOptions = CreateColorThemeOptions(variant);
+        if (!ColorThemeOptions.Any(option => string.Equals(
+                option.Value, SelectedColorTheme, StringComparison.OrdinalIgnoreCase)))
+        {
+            SelectedColorTheme = Theme.PeerfluenceTheme.DefaultAccentFor(variant);
+        }
+    }
 
     public string SelectedLanguage
     {
@@ -1015,7 +1043,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
-    public IReadOnlyList<string> ThemeVariants { get; } = ["System", "Light", "Dark"];
+    public IReadOnlyList<string> ThemeVariants { get; } = ["System", "MidnightLight", "Midnight"];
 
     public IReadOnlyList<SettingsOption> ThemeVariantOptions
     {
@@ -1031,7 +1059,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// longer has and to omit the default. Settings already on disk naming a removed one are
     /// mapped by <see cref="Services.ThemeService"/>.
     /// </remarks>
-    public IReadOnlyList<string> ColorThemes { get; } = Theme.PeerfluenceTheme.Accents;
+    public IReadOnlyList<string> ColorThemes => [.. ColorThemeOptions.Select(option => option.Value)];
 
     public IReadOnlyList<SettingsOption> ColorThemeOptions
     {
@@ -1255,6 +1283,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Theme
         SelectedThemeVariant = settings.Theme.ThemeVariant;
         SelectedColorTheme = settings.Theme.ColorTheme;
+        RefreshColorThemeOptions();
         SelectedLanguage = settings.Language;
 
         // Queue
@@ -1537,6 +1566,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         MaxDiskWriteSpeedBytesPerSecond = defaults.Network.MaxDiskWriteSpeedBytesPerSecond;
         SelectedThemeVariant = defaults.Theme.ThemeVariant;
         SelectedColorTheme = defaults.Theme.ColorTheme;
+        RefreshColorThemeOptions();
         SelectedLanguage = defaults.Language;
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
@@ -1638,7 +1668,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         var selectedProxyType = SelectedProxyType;
 
         ThemeVariantOptions = CreateThemeVariantOptions();
-        ColorThemeOptions = CreateColorThemeOptions();
+        ColorThemeOptions = CreateColorThemeOptions(
+            Services.ThemeService.Resolve(selectedThemeVariant));
         EncryptionModeOptions = CreateEncryptionModeOptions();
         ProxyTypeOptions = CreateProxyTypeOptions();
 
@@ -1659,11 +1690,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private static IReadOnlyList<SettingsOption> CreateThemeVariantOptions()
     {
+        // The neutral Light and Dark still ship in the theme package, which other applications
+        // use, but this one offers only the pair that carry its identity. A stored "Light" or
+        // "Dark" is migrated by ThemeService rather than being listed here.
         return
         [
             new SettingsOption("System", Properties.Resources.Settings_ThemeVariant_System),
-            new SettingsOption("Light", Properties.Resources.Settings_ThemeVariant_Light),
-            new SettingsOption("Dark", Properties.Resources.Settings_ThemeVariant_Dark)
+            new SettingsOption("MidnightLight", Properties.Resources.Settings_ThemeVariant_MidnightLight),
+            new SettingsOption("Midnight", Properties.Resources.Settings_ThemeVariant_Midnight)
         ];
     }
 
@@ -1675,9 +1709,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// moment the theme changed: it offered three accents that no longer existed and omitted the
     /// default, which left the box blank for anyone whose settings named the default.
     /// </remarks>
-    private static IReadOnlyList<SettingsOption> CreateColorThemeOptions()
+    private static IReadOnlyList<SettingsOption> CreateColorThemeOptions(
+        Avalonia.Styling.ThemeVariant variant)
     {
-        return [.. Theme.PeerfluenceTheme.Accents.Select(
+        return [.. Theme.PeerfluenceTheme.AccentsFor(variant).Select(
             accent => new SettingsOption(accent, ColorThemeName(accent)))];
     }
 

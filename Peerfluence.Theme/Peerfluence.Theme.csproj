@@ -28,6 +28,13 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
+    <!--
+      Open Sans, embedded rather than named. A theme that names a font family it does not carry
+      crashes the moment a consumer has not registered it, which is how the Inter dependency was
+      found. The licence travels with it: SIL OFL 1.1 requires the notice to ship alongside.
+    -->
+    <AvaloniaResource Include="Assets/Fonts/*.ttf" />
+    <None Include="Assets/Fonts/OFL.txt" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>

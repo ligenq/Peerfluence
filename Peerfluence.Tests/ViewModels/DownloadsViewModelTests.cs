@@ -243,6 +243,47 @@ public class DownloadsViewModelTests
     }
 
     [Fact]
+    public async Task AddMagnetPrompt_ValidatesInputBeforeAcceptingIt()
+    {
+        var dialogs = Substitute.For<IDialogService>();
+        TextPrompt? prompt = null;
+        dialogs.PromptForTextAsync(Arg.Any<TextPrompt>()).Returns(call =>
+        {
+            prompt = call.Arg<TextPrompt>();
+            return Task.FromResult<string?>(null);
+        });
+        var topLevel = Substitute.For<ITopLevelService>();
+        var clipboard = CreateClipboard(null);
+        topLevel.GetClipboard().Returns(clipboard);
+        var sut = CreateViewModelWithSelectedTorrent(topLevel, out _, dialogs);
+        try
+        {
+            await sut.AddMagnetCommand.ExecuteAsync(null);
+            Assert.NotNull(prompt);
+            Assert.NotNull(prompt.Validate);
+            foreach (string invalid in new[]
+                     {
+                         "not a magnet", "magnet:?xt=urn:btih:abc",
+                         $"magnet:?xs=urn:btpk:{new string('a', 64)}"
+                     })
+            {
+                Assert.False(string.IsNullOrWhiteSpace(prompt.Validate(invalid)),
+                    $"The Add magnet dialog would accept '{invalid}' without an inline error.");
+            }
+
+            Assert.Null(prompt.Validate("  magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA  "));
+            Assert.Null(prompt.Validate($"magnet:?xt=urn:btmh:1220{new string('b', 64)}"));
+            Assert.Equal(string.Empty, sut.StatusMessage);
+            await GetAddTorrentDialogService(sut).DidNotReceive()
+                .ShowMagnetAsync(Arg.Any<string>());
+        }
+        finally
+        {
+            sut.Dispose();
+        }
+    }
+
+    [Fact]
     public async Task CopyHashCommand_PutsTheHashOnTheClipboardAndFlushesIt()
     {
         var clipboard = Substitute.For<IClipboard>();
@@ -387,7 +428,8 @@ public class DownloadsViewModelTests
         return CreateViewModelWithSelectedTorrent(topLevelService, out torrent);
     }
 
-    private DownloadsViewModel CreateViewModelWithSelectedTorrent(ITopLevelService topLevelService, out ITorrent torrent)
+    private DownloadsViewModel CreateViewModelWithSelectedTorrent(
+        ITopLevelService topLevelService, out ITorrent torrent, IDialogService? dialogService = null)
     {
         var selected = Substitute.For<ITorrent>();
         selected.Name.Returns("Selected");
@@ -404,7 +446,7 @@ public class DownloadsViewModelTests
             new TorrentSelectionService(Substitute.For<IAppMessenger>()),
             new LocalizationService(),
             topLevelService,
-            Substitute.For<IDialogService>(),
+            dialogService ?? Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             _settingsService,
             Substitute.For<ITorrentCategoryService>(),

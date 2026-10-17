@@ -38,11 +38,13 @@ public interface IDialogService
 /// <param name="ConfirmLabel">What the accepting button says - "Add", "Rename".</param>
 /// <param name="InitialText">What the box starts with, for editing rather than entering.</param>
 /// <param name="Watermark">Placeholder text shown while the box is empty.</param>
+/// <param name="Validate">Checks trimmed input on confirmation; returns an error message, or null when valid.</param>
 public sealed record TextPrompt(
     string Title,
     string ConfirmLabel,
     string? InitialText = null,
-    string? Watermark = null);
+    string? Watermark = null,
+    Func<string, string?>? Validate = null);
 
 /// <summary>A request to confirm an action.</summary>
 /// <param name="Title">The dialog's heading.</param>

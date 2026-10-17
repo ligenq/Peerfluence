@@ -27,11 +27,11 @@
         <!-- Advanced: a sidebar of destinations beside the current one. -->
         <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding !IsSimpleMode}">
 
+            <!-- Painted by the theme rather than here: a local value outranks a style setter, so
+                 a variant that wants its own sidebar treatment could not override it from here. -->
             <Border Grid.Column="0"
-                    Width="{StaticResource PfSidebarWidth}"
-                    Background="{DynamicResource PfSurface}"
-                    BorderBrush="{DynamicResource PfBorder}"
-                    BorderThickness="0,0,1,0">
+                    Classes="sidebar"
+                    Width="{StaticResource PfSidebarWidth}">
                 <Grid RowDefinitions="Auto,*,Auto">
 
                     <!--

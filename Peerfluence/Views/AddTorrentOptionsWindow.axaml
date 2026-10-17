@@ -16,7 +16,7 @@
 
     <Panel>
         <Grid RowDefinitions="*, Auto" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
-            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="0" Classes="dialogForm">
                 <StackPanel Spacing="{StaticResource SpacingLarge}">
                     <Border Classes="panel">
                         <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
@@ -121,7 +121,8 @@
                         </Grid>
                     </Border>
 
-                    <Expander Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch">
+                    <Expander Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch">
                         <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource SmallTopMargin}">
                             <Border Classes="panel">
                                 <StackPanel Spacing="{StaticResource SpacingStandard}">
@@ -184,12 +185,14 @@
                                         <TextBlock Text="{m:L Details_TrackersTab}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                         <TextBox Text="{Binding ExistingTrackers}"
                                                  IsReadOnly="True"
+                                                 ScrollViewer.AllowAutoHide="False"
                                                  IsVisible="{Binding HasExistingTrackers}"
                                                  Height="82"
                                                  AcceptsReturn="True"
                                                  TextWrapping="Wrap"
                                                  PlaceholderText="{m:L AddTorrent_IncludedTrackersWatermark}" AutomationProperties.Name="{m:L Details_TrackersTab}" AutomationProperties.AutomationId="ExistingTrackersTextBox"/>
                                         <TextBox Text="{Binding AdditionalTrackers, Mode=TwoWay}"
+                                                 ScrollViewer.AllowAutoHide="False"
                                                  Height="100"
                                                  AcceptsReturn="True"
                                                  TextWrapping="Wrap"
@@ -215,9 +218,9 @@
                           IsChecked="{Binding SkipThisStepNextTime}"
                           VerticalAlignment="Center" AutomationProperties.AutomationId="SkipThisStepNextTimeCheckBox"/>
                 <StackPanel Grid.Column="1"
+                            Classes="dialogActions"
                             Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Spacing="{StaticResource SpacingStandard}">
+                            HorizontalAlignment="Right">
                     <Button Content="{m:L AddTorrent_Add}" Classes="accent" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
                     <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
                 </StackPanel>
