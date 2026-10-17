@@ -2810,6 +2810,24 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sky.
+        /// </summary>
+        public static string Settings_ColorTheme_Sky {
+            get {
+                return ResourceManager.GetString("Settings_ColorTheme_Sky", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cyan.
+        /// </summary>
+        public static string Settings_ColorTheme_Cyan {
+            get {
+                return ResourceManager.GetString("Settings_ColorTheme_Cyan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Emerald.
         /// </summary>
         public static string Settings_ColorTheme_Emerald {
@@ -4111,6 +4129,24 @@ namespace Peerfluence.Properties {
         public static string Settings_ThemeVariant_Dark {
             get {
                 return ResourceManager.GetString("Settings_ThemeVariant_Dark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Midnight.
+        /// </summary>
+        public static string Settings_ThemeVariant_Midnight {
+            get {
+                return ResourceManager.GetString("Settings_ThemeVariant_Midnight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Midnight light.
+        /// </summary>
+        public static string Settings_ThemeVariant_MidnightLight {
+            get {
+                return ResourceManager.GetString("Settings_ThemeVariant_MidnightLight", resourceCulture);
             }
         }
         

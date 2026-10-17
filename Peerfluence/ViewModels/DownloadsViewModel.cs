@@ -793,7 +793,10 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             Resources.Downloads_AddMagnet,
             Resources.Downloads_AddMagnet,
             InitialText: MagnetLink,
-            Watermark: Resources.Downloads_MagnetWatermark));
+            Watermark: Resources.Downloads_MagnetWatermark,
+            Validate: value => TryNormalizeMagnetLink(value, out _, out var error)
+                ? null
+                : string.Format(Resources.Status_AddMagnetFailed, error)));
 
         if (typed is null)
         {

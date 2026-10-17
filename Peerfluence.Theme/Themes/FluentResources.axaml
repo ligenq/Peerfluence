@@ -4,6 +4,8 @@
   <!-- Fluent 12.1 resource contract. Control templates and input handling stay upstream.
        Grouped by control; every customized state is mapped explicitly. -->
 
+  <Thickness x:Key="ExpanderChevronMargin">16,0,16,0</Thickness>
+
   <StaticResource x:Key="AccentButtonBackground" ResourceKey="PfAccent" />
   <StaticResource x:Key="AccentButtonBackgroundDisabled" ResourceKey="PfSurfaceAlt" />
   <StaticResource x:Key="AccentButtonBackgroundPointerOver" ResourceKey="PfAccentHover" />
@@ -201,9 +203,31 @@
   <StaticResource x:Key="RepeatButtonBackgroundPressed" ResourceKey="PfSurfaceActive" />
   <StaticResource x:Key="RepeatButtonForegroundDisabled" ResourceKey="PfTextTertiary" />
 
-  <StaticResource x:Key="ScrollBarBackground" ResourceKey="PfCanvas" />
-  <StaticResource x:Key="ScrollBarPanningThumbBackgroundColor" ResourceKey="PfBorderStrongColor" />
-  <StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="PfBorderStrongColor" />
+  <StaticResource x:Key="ScrollBarBackground" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarBackgroundPointerOver" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarBorderBrush" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarTrackFill" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarTrackFillPointerOver" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarTrackStroke" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarTrackStrokePointerOver" ResourceKey="SystemControlTransparentBrush" />
+  <!-- The Color aliases live beside PfTextTertiaryColor in Palette's variant dictionaries.
+       Static lookups here have no variant context; brushes can safely share the dynamic brush. -->
+  <StaticResource x:Key="ScrollBarPanningThumbBackground" ResourceKey="PfTextTertiary" />
+  <StaticResource x:Key="ScrollBarThumbFillPointerOver" ResourceKey="PfTextSecondary" />
+  <StaticResource x:Key="ScrollBarThumbFillPressed" ResourceKey="PfAccent" />
+  <StaticResource x:Key="ScrollBarThumbFillDisabled" ResourceKey="PfBorder" />
+  <StaticResource x:Key="ScrollBarButtonBackground" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBackgroundPointerOver" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBackgroundPressed" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBackgroundDisabled" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBorderBrush" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBorderBrushPointerOver" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBorderBrushPressed" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonBorderBrushDisabled" ResourceKey="SystemControlTransparentBrush" />
+  <StaticResource x:Key="ScrollBarButtonArrowForeground" ResourceKey="PfTextTertiary" />
+  <StaticResource x:Key="ScrollBarButtonArrowForegroundPointerOver" ResourceKey="PfTextSecondary" />
+  <StaticResource x:Key="ScrollBarButtonArrowForegroundPressed" ResourceKey="PfAccent" />
+  <StaticResource x:Key="ScrollBarButtonArrowForegroundDisabled" ResourceKey="PfBorder" />
 
   <StaticResource x:Key="SystemControlDisabledBaseMediumLowBrush" ResourceKey="PfTextTertiary" />
   <StaticResource x:Key="SystemControlFocusVisualPrimaryBrush" ResourceKey="PfAccent" />

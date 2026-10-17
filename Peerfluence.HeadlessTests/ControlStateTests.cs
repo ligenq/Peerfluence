@@ -17,6 +17,130 @@ namespace Peerfluence.HeadlessTests;
 public sealed class ControlStateTests
 {
     [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Scrollbars_KeepTheirRoundedThumbPaletteAndDragArea(bool horizontal)
+    {
+        var app = Application.Current!;
+        var previous = app.RequestedThemeVariant;
+        var theme = app.Styles.OfType<PeerfluenceTheme>().Single();
+        var viewer = new ScrollViewer
+        {
+            Content = new Border { Width = 1400, Height = 1400 },
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            AllowAutoHide = false,
+        };
+        var window = new Window { Content = viewer, Width = 400, Height = 300 };
+        window.Show();
+        try
+        {
+            foreach (var variant in PeerfluenceTheme.Variants)
+            {
+                app.RequestedThemeVariant = variant;
+                theme.UseVariant(variant);
+                viewer.Offset = default;
+                window.MouseMove(new Point(-10, -10));
+                Layout(window);
+                var bar = viewer.GetVisualDescendants().OfType<ScrollBar>()
+                    .Single(scroll => scroll.Name == (horizontal ? "PART_HorizontalScrollBar" : "PART_VerticalScrollBar"));
+                var thumb = bar.GetVisualDescendants().OfType<Thumb>().Single();
+                var painted = thumb.GetVisualDescendants().OfType<Border>().Single();
+                Assert.Equal(8, horizontal ? painted.Bounds.Height : painted.Bounds.Width, precision: 1);
+                Assert.True((horizontal ? thumb.Bounds.Height : thumb.Bounds.Width) >= 16);
+                Assert.True(painted.CornerRadius.TopLeft >= 4);
+                Assert.Equal(Colour(window, "PfTextTertiary"), Fill());
+                var track = bar.GetVisualDescendants().OfType<Rectangle>().Single(part => part.Name == "TrackRect");
+                Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(track.Fill).Color);
+
+                // Drag from the edge of the full-size thumb, outside its narrower painted pill.
+                var point = thumb.TranslatePoint(horizontal
+                    ? new Point(thumb.Bounds.Width / 2, 1)
+                    : new Point(1, thumb.Bounds.Height / 2), window)!.Value;
+                window.MouseMove(point);
+                Layout(window);
+                Assert.Equal(Colour(window, "PfTextSecondary"), Fill());
+                window.MouseDown(point, MouseButton.Left);
+                Layout(window);
+                Assert.Equal(Colour(window, "PfAccent"), Fill());
+                window.MouseMove(point + (horizontal ? new Vector(30, 0) : new Vector(0, 30)));
+                Layout(window);
+                Assert.True((horizontal ? viewer.Offset.X : viewer.Offset.Y) > 0,
+                    $"The {variant} scrollbar could not be dragged from its full interaction area.");
+                window.MouseUp(point, MouseButton.Left);
+                bar.IsEnabled = false;
+                Layout(window);
+                Assert.Equal(Colour(window, "PfBorder"), Fill());
+                bar.IsEnabled = true;
+
+                Color Fill() => Assert.IsAssignableFrom<ISolidColorBrush>(painted.Background).Color;
+            }
+        }
+        finally
+        {
+            window.Close();
+            theme.UseVariant(previous);
+            app.RequestedThemeVariant = previous;
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Midnight", "accent")]
+    [InlineData("MidnightLight", "accent")]
+    [InlineData("Midnight", "chip")]
+    [InlineData("MidnightLight", "chip")]
+    public void MidnightActions_RestoreTheirDisabledAppearanceAndCanBeReenabled(string variant, string kind)
+    {
+        var app = Application.Current!;
+        var previous = app.RequestedThemeVariant;
+        var theme = app.Styles.OfType<PeerfluenceTheme>().Single();
+        var selectedVariant = PeerfluenceTheme.VariantFor(variant);
+        app.RequestedThemeVariant = selectedVariant;
+        theme.UseVariant(selectedVariant);
+        Button button = kind == "chip" ? new RadioButton { IsChecked = true } : new Button();
+        button.Classes.Add(kind);
+        var label = new TextBlock { Text = "Action" };
+        button.Content = label;
+        var window = new Window { Content = button, Width = 400, Height = 200 };
+        window.Show();
+        try
+        {
+            foreach (string accent in PeerfluenceTheme.MidnightAccents)
+            {
+                theme.UseAccent(accent);
+                Layout(window);
+                var point = button.TranslatePoint(new Point(10, 10), window)!.Value;
+                window.MouseMove(point);
+                window.MouseDown(point, MouseButton.Left);
+                button.IsEnabled = false;
+                Layout(window);
+
+                Assert.Equal(Colour(window, "PfSurfaceAlt"), Fill());
+                Assert.Equal(Colour(window, "PfTextTertiary"), Assert.IsAssignableFrom<ISolidColorBrush>(label.Foreground).Color);
+
+                window.MouseUp(point, MouseButton.Left);
+                window.MouseMove(new Point(390, 190));
+                button.IsEnabled = true;
+                Layout(window);
+                Assert.Equal(Colour(window, "PfAccentStrong"), Fill());
+                Assert.Equal(Colors.White, Assert.IsAssignableFrom<ISolidColorBrush>(label.Foreground).Color);
+            }
+        }
+        finally
+        {
+            window.Close();
+            theme.UseVariant(previous);
+            theme.UseAccent(PeerfluenceTheme.DefaultAccent);
+            app.RequestedThemeVariant = previous;
+        }
+
+        Color Fill() => Assert.IsAssignableFrom<ISolidColorBrush>(kind == "chip"
+            ? button.GetVisualDescendants().OfType<Border>().Single(part => part.Name == "PART_Chip").Background
+            : button.GetVisualDescendants().OfType<ContentPresenter>()
+                .Single(part => part.Name == "PART_ContentPresenter").Background).Color;
+    }
+
+    [AvaloniaTheory]
     [InlineData("standard", false)]
     [InlineData("accent", false)]
     [InlineData("ghost", false)]

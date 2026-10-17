@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -430,6 +430,12 @@
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
     <value>Dunkel</value>
   </data>
+  <data name="Settings_ThemeVariant_Midnight" xml:space="preserve">
+    <value>Mitternacht</value>
+  </data>
+  <data name="Settings_ThemeVariant_MidnightLight" xml:space="preserve">
+    <value>Mitternacht hell</value>
+  </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Farbthema</value>
   </data>
@@ -438,6 +444,12 @@
   </data>
   <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
     <value>Kobalt</value>
+  </data>
+  <data name="Settings_ColorTheme_Sky" xml:space="preserve">
+    <value>Himmelblau</value>
+  </data>
+  <data name="Settings_ColorTheme_Cyan" xml:space="preserve">
+    <value>Cyan</value>
   </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>Minze</value>

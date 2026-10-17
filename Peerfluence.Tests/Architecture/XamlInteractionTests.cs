@@ -5,9 +5,8 @@ using System.Xml.Linq;
 namespace Peerfluence.Tests.Architecture;
 
 /// <summary>
-/// Protects interaction and layering conventions that live only in AXAML. These rules deliberately
-/// avoid pixels and theme details: they cover behavior that otherwise fails silently for keyboard,
-/// accessibility and localization users.
+/// Protects interaction, layering and shared-layout conventions declared in AXAML. Pixel measurements
+/// belong to headless layout tests; these rules check how views request the shared styles.
 /// </summary>
 public sealed class XamlInteractionTests
 {
@@ -312,6 +311,159 @@ public sealed class XamlInteractionTests
 
         Assert.True(problems.Count == 0, string.Join(Environment.NewLine, problems));
     }
+
+    [Fact]
+    public void EveryModalWindow_UsesTheSharedActionRowWithoutSpacingOverrides()
+    {
+        var problems = ModalWindows()
+            .SelectMany(file => DialogActionRowProblems(Load(file))
+                .Select(problem => $"  {Relative(file)}: {problem}"))
+            .ToList();
+
+        Assert.True(problems.Count == 0, string.Join(Environment.NewLine, problems));
+    }
+
+    [Fact]
+    public void EveryModalWindow_ScrollsFormsUsingTheSharedPolicy()
+    {
+        var problems = ModalWindows()
+            .SelectMany(file => DialogScrollProblems(Load(file))
+                .Select(problem => $"  {Relative(file)}: {problem}"))
+            .ToList();
+
+        Assert.True(problems.Count == 0, string.Join(Environment.NewLine, problems));
+    }
+
+    [Theory]
+    [InlineData("", "the shared dialogForm class")]
+    [InlineData("Classes=\"dialogForm\" AllowAutoHide=\"True\"", "AllowAutoHide")]
+    [InlineData("Classes=\"dialogForm\" HorizontalScrollBarVisibility=\"Auto\"", "HorizontalScrollBarVisibility")]
+    [InlineData("Classes=\"dialogForm\" VerticalScrollBarVisibility=\"Hidden\"", "VerticalScrollBarVisibility")]
+    [InlineData("Classes=\"dialogForm\" Padding=\"0\"", "Padding")]
+    public void DialogScrollRule_RejectsMissingPolicyAndLocalOverrides(string attributes, string expectedProblem)
+    {
+        var document = XDocument.Parse($"<Window><ScrollViewer {attributes}><StackPanel /></ScrollViewer></Window>");
+        Assert.Contains(DialogScrollProblems(document),
+            problem => problem.Contains(expectedProblem, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void DialogScrollRule_HandlesPropertyElementsAndAllowsTheSharedPolicy()
+    {
+        var document = XDocument.Parse("""
+            <Window>
+                <ScrollViewer Classes="dialogForm">
+                    <ScrollViewer.AllowAutoHide>True</ScrollViewer.AllowAutoHide>
+                    <StackPanel />
+                </ScrollViewer>
+            </Window>
+            """);
+        Assert.Contains(DialogScrollProblems(document), problem => problem.Contains("AllowAutoHide", StringComparison.Ordinal));
+        document.Descendants().Single(element => element.Name.LocalName == "ScrollViewer.AllowAutoHide").Remove();
+        Assert.Empty(DialogScrollProblems(document));
+    }
+
+    private static List<string> DialogScrollProblems(XDocument document)
+    {
+        var problems = new List<string>();
+        foreach (var scroll in document.Descendants().Where(element => element.Name.LocalName == "ScrollViewer"))
+        {
+            if (!(Attribute(scroll, "Classes") ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+                .Contains("dialogForm", StringComparer.Ordinal))
+            {
+                problems.Add($"line {Line(scroll)}: scrollable dialog forms must use the shared dialogForm class");
+            }
+
+            foreach (string property in new[] { "AllowAutoHide", "HorizontalScrollBarVisibility", "VerticalScrollBarVisibility", "Padding" })
+            {
+                if (HasLocalProperty(scroll, property))
+                {
+                    problems.Add($"line {Line(scroll)} overrides {property}; the shared dialogForm style owns scrollbar space and its gutter");
+                }
+            }
+        }
+
+        return problems;
+    }
+
+    [Theory]
+    [InlineData("", "", "", "shared")]
+    [InlineData("Classes=\"dialogActions\" Spacing=\"8\"", "", "", "Spacing")]
+    [InlineData("Classes=\"dialogActions\"", "<StackPanel.Spacing>8</StackPanel.Spacing>", "", "Spacing")]
+    [InlineData("Classes=\"dialogActions\"", "", "Margin=\"0,0,8,0\"", "Margin")]
+    [InlineData("Classes=\"dialogActions\"", "", "<Button.Margin>8</Button.Margin>", "Margin")]
+    public void DialogActionRowRule_RejectsMissingStylesAndLocalOverrides(
+        string rowAttributes, string rowProperties, string buttonOverride, string expectedProblem)
+    {
+        // Exercise both AXAML property syntaxes so the rule cannot be bypassed merely by
+        // writing a property element instead of an attribute.
+        string buttonAttributes = buttonOverride.StartsWith('<') ? "" : buttonOverride;
+        string buttonProperties = buttonOverride.StartsWith('<') ? buttonOverride : "";
+        var document = XDocument.Parse($$"""
+            <Window>
+                <StackPanel {{rowAttributes}}>
+                    {{rowProperties}}
+                    <Button IsDefault="True" {{buttonAttributes}}>{{buttonProperties}}</Button>
+                    <Button IsCancel="True" />
+                </StackPanel>
+            </Window>
+            """);
+
+        Assert.Contains(DialogActionRowProblems(document),
+            problem => problem.Contains(expectedProblem, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void DialogActionRowRule_AllowsTheSharedStyleAlongsideOtherClasses()
+    {
+        var document = XDocument.Parse("""
+            <Window>
+                <StackPanel Classes="footer dialogActions" Margin="0,10,0,0">
+                    <Button IsDefault="True" />
+                    <Button IsCancel="True" />
+                </StackPanel>
+            </Window>
+            """);
+
+        Assert.Empty(DialogActionRowProblems(document));
+    }
+
+    private static List<string> DialogActionRowProblems(XDocument document)
+    {
+        var problems = new List<string>();
+        var actions = document.Descendants().Where(IsButton).ToArray();
+        var primary = actions.FirstOrDefault(button => IsTrue(button, "IsDefault"));
+        var cancel = actions.FirstOrDefault(button => IsTrue(button, "IsCancel"));
+        var row = primary?.Parent;
+        if (primary is null || cancel is null || row is null || row != cancel.Parent
+            || row.Name.LocalName != "StackPanel"
+            || !(Attribute(row, "Classes") ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+                .Contains("dialogActions", StringComparer.Ordinal))
+        {
+            problems.Add("the default and Cancel buttons must share a StackPanel with the shared dialogActions class");
+            return problems;
+        }
+
+        if (HasLocalProperty(row, "Spacing"))
+        {
+            problems.Add($"line {Line(row)} overrides Spacing; let the dialogActions theme style set the gap");
+        }
+
+        foreach (var button in new[] { primary, cancel })
+        {
+            if (HasLocalProperty(button, "Margin"))
+            {
+                problems.Add($"line {Line(button)} {ActionName(button)} sets Margin, which changes the shared gap; "
+                    + "put outer margins on the action row instead");
+            }
+        }
+
+        return problems;
+    }
+
+    private static bool HasLocalProperty(XElement element, string property) =>
+        Attribute(element, property) is not null
+        || element.Elements().Any(child => child.Name.LocalName == $"{element.Name.LocalName}.{property}");
 
     [Fact]
     public void EveryView_DeclaresItsClassAndCompiledBindingContext()

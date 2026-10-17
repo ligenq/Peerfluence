@@ -1,12 +1,120 @@
+using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using Peerfluence.Core.Config;
 using Peerfluence.HeadlessTests.XUnit;
+using Peerfluence.Services;
+using Peerfluence.Theme;
 using Peerfluence.Views;
 
 namespace Peerfluence.HeadlessTests;
 
 public class CreateTorrentWindowTests
 {
+    [AvaloniaTheory]
+    [InlineData("Midnight")]
+    [InlineData("MidnightLight")]
+    public void WindowFitsItsContentAndGrowsWhenAnErrorAppears(string variant)
+    {
+        var app = Application.Current!;
+        var previous = app.RequestedThemeVariant;
+        var theme = app.Styles.OfType<PeerfluenceTheme>().Single();
+        using var service = new ThemeService();
+        service.Apply(new ThemeSettings { ThemeVariant = variant });
+        var model = TestHelpers.CreateCreateTorrentViewModel();
+        var window = new CreateTorrentWindow { DataContext = model };
+        window.Show();
+        try
+        {
+            Layout(window);
+            var scroll = window.FindControl<ScrollViewer>("FormScrollViewer")!;
+            Assert.True(scroll.Extent.Height <= scroll.Viewport.Height + 1);
+            AssertActionsFit(window);
+
+            double initialHeight = window.Bounds.Height;
+
+            model.ErrorMessage = "An error that needs room below the form.";
+            Layout(window);
+            Assert.True(window.Bounds.Height > initialHeight,
+                $"The window stayed at {initialHeight}px instead of making room for the error.");
+            Assert.True(scroll.Extent.Height <= scroll.Viewport.Height + 1);
+            AssertActionsFit(window);
+
+            model.ErrorMessage = string.Empty;
+            Layout(window);
+            Assert.InRange(window.Bounds.Height, initialHeight - 1, initialHeight + 1);
+        }
+        finally
+        {
+            window.Close();
+            theme.UseVariant(previous);
+            theme.UseAccent(PeerfluenceTheme.DefaultAccent);
+            app.RequestedThemeVariant = previous;
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(500)]
+    [InlineData(650)]
+    public void LimitedHeightScrollsTheFormWhileKeepingActionsVisible(int availableHeight)
+    {
+        var model = TestHelpers.CreateCreateTorrentViewModel();
+        var window = new CreateTorrentWindow { DataContext = model, MaxHeight = availableHeight };
+        window.Show();
+        try
+        {
+            Layout(window);
+            Assert.True(window.Bounds.Height <= availableHeight);
+            var scroll = window.FindControl<ScrollViewer>("FormScrollViewer")!;
+            Assert.True(scroll.Extent.Height > scroll.Viewport.Height);
+            Assert.False(scroll.AllowAutoHide);
+            var bar = scroll.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>()
+                .Single(part => part.Name == "PART_VerticalScrollBar" && ReferenceEquals(part.TemplatedParent, scroll));
+            double barLeft = bar.TranslatePoint(default, scroll)!.Value.X;
+            var cards = Assert.IsType<StackPanel>(scroll.Content).Children.OfType<Border>()
+                .Where(card => card.Classes.Contains("panel")).ToArray();
+            Assert.NotEmpty(cards);
+            foreach (var card in cards)
+            {
+                double right = card.TranslatePoint(new Point(card.Bounds.Width, 0), scroll)!.Value.X;
+                Assert.True(barLeft - right >= 8 - 0.5, "The form must leave its cards clear of the scrollbar.");
+            }
+            AssertActionsFit(window);
+
+            scroll.Offset = new Vector(0, scroll.Extent.Height);
+            Layout(window);
+            var comment = window.GetVisualDescendants().OfType<TextBox>()
+                .Single(box => AutomationProperties.GetAutomationId(box) == "CommentTextBox");
+            var commentBottom = comment.TranslatePoint(new Point(0, comment.Bounds.Height), scroll)!.Value.Y;
+            Assert.InRange(commentBottom, 0, scroll.Viewport.Height + 1);
+            AssertActionsFit(window);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static void Layout(Window window)
+    {
+        Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+    }
+
+    private static void AssertActionsFit(Window window)
+    {
+        foreach (var button in window.GetVisualDescendants().OfType<Button>()
+                     .Where(button => button.IsDefault || button.IsCancel))
+        {
+            var bottom = button.TranslatePoint(new Point(0, button.Bounds.Height), window)!.Value.Y;
+            Assert.True(button.Bounds.Height > 0);
+            Assert.InRange(bottom, 0, window.ClientSize.Height);
+        }
+    }
+
     [AvaloniaFact]
     public void View_CanBeCreated()
     {

@@ -1,0 +1,163 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Peerfluence.Theme.MidnightStyles">
+
+  <!--
+    Everything Midnight needs that a per-variant resource cannot express.
+
+    Added and removed by PeerfluenceTheme.UseVariant rather than merged permanently, for two
+    reasons. Typography has no resource value meaning "leave the font alone" - an unresolvable
+    DynamicResource assigns an unmatchable family rather than skipping the property - and metrics
+    like a row height are plain doubles shared by every variant, so overriding them in a theme
+    dictionary would change Light and Dark too. A style collection that is present only while the
+    variant is selected sidesteps both.
+
+    Colours that belong to the palette are NOT repeated here. They live in Palette.axaml's Midnight
+    dictionary, where they can be swapped and inspected like any other variant's.
+  -->
+
+  <!-- ============================ typography ============================ -->
+
+  <!--
+    A literal family rather than a DynamicResource: the value has to be a real one, and this is the
+    only variant that carries a face. Popups are listed separately because they are their own
+    visual trees and inheritance from the window does not reach them.
+  -->
+  <Style Selector="Window">
+    <Setter Property="FontFamily" Value="avares://Peerfluence.Theme/Assets/Fonts#Open Sans" />
+  </Style>
+  <Style Selector="FlyoutPresenter">
+    <Setter Property="FontFamily" Value="avares://Peerfluence.Theme/Assets/Fonts#Open Sans" />
+  </Style>
+  <Style Selector="ContextMenu">
+    <Setter Property="FontFamily" Value="avares://Peerfluence.Theme/Assets/Fonts#Open Sans" />
+  </Style>
+  <Style Selector="ToolTip">
+    <Setter Property="FontFamily" Value="avares://Peerfluence.Theme/Assets/Fonts#Open Sans" />
+  </Style>
+
+  <!-- ============================ the sidebar ============================ -->
+
+  <!--
+    A vertical gradient rather than a flat fill. The chrome darkens towards the bottom, which keeps
+    the destinations at the top sitting forward without needing a separator to say so. The border
+    goes: with a gradient this deep against the indigo canvas, an added line reads as a seam.
+
+    Identical in both variants, which is the point: it is what keeps a light page recognisably the
+    same theme. That also means nothing inside the sidebar may take its colour from the palette.
+    Under Midnight the palette's text happens to be light and would have worked by luck; under
+    Midnight Light it is a deep indigo ink, and every label in here would have gone invisible. The
+    chrome therefore states its own foregrounds, below.
+  -->
+  <Style Selector="Border.sidebar">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="TextElement.Foreground" Value="#E8EAF4" />
+    <Setter Property="Background">
+      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#231F66" Offset="0" />
+        <GradientStop Color="#1F1A5C" Offset="0.45" />
+        <GradientStop Color="#171042" Offset="1" />
+      </LinearGradientBrush>
+    </Setter>
+  </Style>
+
+  <!-- A class style beats an inherited foreground, so the caption needs saying rather than
+       leaving to the cascade above. -->
+  <Style Selector="Border.sidebar TextBlock.caption">
+    <Setter Property="Foreground" Value="#9FA6CF" />
+  </Style>
+
+  <!-- ============================ navigation ============================ -->
+
+  <!--
+    Its own metrics: taller rows, a lighter label, and no inset. Selection is a bar that reaches
+    both edges of the sidebar, which is why the list loses its padding and the items lose their
+    margin and corner radius - any of the three would leave a gap the fill could not cross.
+  -->
+  <Style Selector="ListBox.nav">
+    <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <Style Selector="ListBox.nav ListBoxItem">
+    <Setter Property="MinHeight" Value="52" />
+    <Setter Property="Padding" Value="20,0" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBodyLarge}" />
+    <Setter Property="FontWeight" Value="Light" />
+    <Setter Property="Foreground" Value="#B6BCE4" />
+  </Style>
+
+  <!-- Hover and the resting state are chrome colours, not palette ones: a translucent white works
+       over the gradient in both variants, where PfSurfaceHover would be a pale wash in one of
+       them and invisible against the indigo in the other. -->
+  <Style Selector="ListBox.nav ListBoxItem:not(:disabled):pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1AFFFFFF" />
+    <Setter Property="TextElement.Foreground" Value="#FFFFFF" />
+  </Style>
+
+  <Style Selector="Button.nav:not(:disabled) /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="TextElement.Foreground" Value="#B6BCE4" />
+  </Style>
+  <Style Selector="Button.nav:not(:disabled):pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#1AFFFFFF" />
+    <Setter Property="TextElement.Foreground" Value="#FFFFFF" />
+  </Style>
+  <Style Selector="Button.nav:not(:disabled).selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrong}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
+  </Style>
+
+  <!--
+    The accent, not the reference's fixed blue: the accent is the reader's choice and a nav bar
+    that ignored it would be the one place in the interface that did.
+  -->
+  <Style Selector="ListBox.nav ListBoxItem:not(:disabled):selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrong}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem:not(:disabled):selected:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrongHover}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
+  </Style>
+
+  <!-- ============================ accent fills ============================ -->
+
+  <!--
+    White on every accent fill, as the reference has it, which needs the darker PfAccentStrong
+    underneath. The accent itself stays where it is: it is a text colour in a dozen places and
+    darkening it would make those unreadable, so the two jobs get two colours.
+
+    Scoped to the three places a label sits on an accent fill. Check and radio glyphs still draw
+    in PfTextOnAccent on the plain accent, because a glyph is a shape rather than text and the
+    accent is light enough to carry a dark one.
+  -->
+  <Style Selector="Button.accent:not(:disabled) /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrong}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentStrong}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.accent:not(:disabled):pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrongHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentStrongHover}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.accent:not(:disabled):pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrongPressed}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentStrongPressed}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="RadioButton.chip:checked:not(:disabled)">
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="RadioButton.chip:checked:not(:disabled) /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrong}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentStrong}" />
+  </Style>
+  <Style Selector="RadioButton.chip:checked:not(:disabled):pointerover /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfAccentStrongHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentStrongHover}" />
+  </Style>
+
+</Styles>
