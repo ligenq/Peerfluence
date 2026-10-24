@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core;
+using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;
 using Peerfluence.Properties;
+using PeerSharp.Core;
 
 namespace Peerfluence.ViewModels;
 
@@ -19,18 +20,20 @@ namespace Peerfluence.ViewModels;
 /// Everything here is for a session rather than for all time. The counters live in the engine, and
 /// include restored torrent counters and reset when a new engine is created.
 /// </para>
+/// <para>
+/// Nothing is read while the page is not on screen. It reads the engine once on being shown, so it
+/// never opens on old numbers, and after that takes the reading the downloads screen already makes
+/// every second rather than reading the engine a second time.
+/// </para>
 /// </remarks>
-public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDisposable
+public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IOnScreenAware, IDisposable
 {
     private readonly ITorrentService _torrentService;
-    private readonly CancellationTokenSource _stopping = new();
     private bool _disposed;
 
     public StatisticsViewModel(ITorrentService torrentService)
     {
         _torrentService = torrentService;
-        Refresh();
-        _ = KeepFreshAsync(_stopping.Token);
     }
 
     // IFeatureViewModel
@@ -40,6 +43,34 @@ public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDis
 
     /// <summary>Between finding torrents and the settings: a place to look, not a thing to do.</summary>
     public int Order => 75;
+
+    /// <summary>
+    /// Whether the page is showing. Becoming visible reads the engine straight away and starts taking
+    /// the downloads screen's readings; becoming hidden stops taking them.
+    /// </summary>
+    public bool IsOnScreen
+    {
+        get;
+        set
+        {
+            if (_disposed || !SetProperty(ref field, value))
+            {
+                return;
+            }
+
+            if (value)
+            {
+                Refresh();
+                WeakReferenceMessenger.Default.Register<StatisticsViewModel, EngineStatsReadMessage>(
+                    this,
+                    static (recipient, message) => recipient.Apply(message.Stats));
+            }
+            else
+            {
+                WeakReferenceMessenger.Default.Unregister<EngineStatsReadMessage>(this);
+            }
+        }
+    }
 
     public long DownloadedBytes
     {
@@ -99,8 +130,11 @@ public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDis
     /// <summary>Takes one reading and publishes it.</summary>
     public void Refresh()
     {
-        var snapshot = _torrentService.GetStats();
+        Apply(_torrentService.GetStats());
+    }
 
+    private void Apply(EngineStats snapshot)
+    {
         DownloadedBytes = snapshot.LifetimeDownloaded;
         UploadedBytes = snapshot.LifetimeUploaded;
         Ratio = snapshot.LifetimeDownloaded > 0
@@ -115,38 +149,12 @@ public sealed class StatisticsViewModel : ViewModelBase, IFeatureViewModel, IDis
 
     public void Dispose()
     {
-        // Idempotent, as the contract asks: cancelling a token source that has been disposed throws.
         if (_disposed)
         {
             return;
         }
 
         _disposed = true;
-        _stopping.Cancel();
-        _stopping.Dispose();
-    }
-
-    /// <summary>
-    /// Reads once a second for as long as the application is running.
-    /// </summary>
-    /// <remarks>
-    /// A second, because these are counters rather than an animation, and reading the engine statistics is not
-    /// free. The screen is calm at that rate and still obviously live.
-    /// </remarks>
-    private async Task KeepFreshAsync(CancellationToken cancellationToken)
-    {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-
-        try
-        {
-            while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(true))
-            {
-                Refresh();
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // Closing down.
-        }
+        WeakReferenceMessenger.Default.UnregisterAll(this);
     }
 }

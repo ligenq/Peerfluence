@@ -137,7 +137,14 @@
             <Panel Grid.Row="1"
                    Margin="{StaticResource MediumLeftTopRightBottomMargin}"
                    IsVisible="{Binding !IsSimpleSettingsOpen}">
-                <views:SimpleDownloadsView DataContext="{Binding DownloadsViewModel}"/>
+                <!-- Built on entering simple mode, not on startup: the content is null until then. -->
+                <ContentControl Content="{Binding SimpleDownloadsPage}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate x:DataType="vm:DownloadsViewModel">
+                            <views:SimpleDownloadsView />
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
             </Panel>
             <ContentControl Grid.Row="1"
                             Padding="{StaticResource MediumLeftTopRightBottomMargin}"
