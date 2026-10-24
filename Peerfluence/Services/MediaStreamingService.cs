@@ -6,8 +6,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Peerfluence.Core.Config;
-using Peerfluence.Core.Services;
 using PeerSharp.Interfaces;
 using PeerSharp.Streaming;
 

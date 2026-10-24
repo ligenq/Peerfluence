@@ -11,7 +11,6 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
-using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;

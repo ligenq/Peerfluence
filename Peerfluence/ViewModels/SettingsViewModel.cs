@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Peerfluence.Core.Config;
 using Peerfluence.Core.Messaging;
 
 namespace Peerfluence.ViewModels;
@@ -26,6 +24,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private IReadOnlyList<SettingsOption> _colorThemeOptions =
         CreateColorThemeOptions(Services.ThemeService.Resolve("System"));
     private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
+    private IReadOnlyList<SettingsOption> _directionalEncryptionModeOptions = CreateDirectionalEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
 
     /// <summary>
@@ -183,6 +182,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(ThemeVariantOptions),
         nameof(ColorThemeOptions),
         nameof(EncryptionModeOptions),
+        nameof(DirectionalEncryptionModeOptions),
         nameof(ProxyTypeOptions)
     };
 
@@ -958,7 +958,49 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = true;
 
+    public bool EnableI2p
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string I2pSamHost
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = NetworkSettings.DefaultI2pSamHost;
+
+    public int I2pSamPort
+    {
+        get;
+        set => SetProperty(ref field, NetworkSettings.ClampI2pSamPort(value));
+    } = 7656;
+
+    public bool I2pAllowMixedNetworks
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
     // Encryption
+    public string SelectedIncomingEncryptionMode
+    {
+        get;
+        set => SetChoice(ref field, value);
+    } = NetworkSettings.InheritEncryption;
+
+    public string SelectedOutgoingEncryptionMode
+    {
+        get;
+        set => SetChoice(ref field, value);
+    } = NetworkSettings.InheritEncryption;
+
+    public bool PreferRc4
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = true;
+
     public string SelectedEncryptionMode
     {
         get;
@@ -1092,6 +1134,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     public IReadOnlyList<string> ProxyTypes { get; } = ["None", "Socks5", "Http"];
+
+    public IReadOnlyList<SettingsOption> DirectionalEncryptionModeOptions
+    {
+        get => _directionalEncryptionModeOptions;
+        private set => SetProperty(ref _directionalEncryptionModeOptions, value);
+    }
 
     public IReadOnlyList<SettingsOption> ProxyTypeOptions
     {
@@ -1322,6 +1370,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         StreamingPort = settings.Streaming.Port;
 
         SelectedEncryptionMode = settings.EncryptionMode;
+        SelectedIncomingEncryptionMode = settings.Network.IncomingEncryptionMode;
+        SelectedOutgoingEncryptionMode = settings.Network.OutgoingEncryptionMode;
+        PreferRc4 = settings.Network.PreferRc4;
+        EnableI2p = settings.Network.EnableI2p;
+        I2pSamHost = settings.Network.I2pSamHost;
+        I2pSamPort = settings.Network.I2pSamPort;
+        I2pAllowMixedNetworks = settings.Network.I2pAllowMixedNetworks;
         CompletionActionEnabled = settings.CompletionAction.Enabled;
         CompletionActionProgramPath = settings.CompletionAction.ProgramPath;
         CompletionActionArgumentsTemplate = settings.CompletionAction.ArgumentsTemplate;
@@ -1444,6 +1499,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.Streaming.Port = StreamingPort;
 
             settings.EncryptionMode = SelectedEncryptionMode;
+            settings.Network.IncomingEncryptionMode = SelectedIncomingEncryptionMode;
+            settings.Network.OutgoingEncryptionMode = SelectedOutgoingEncryptionMode;
+            settings.Network.PreferRc4 = PreferRc4;
+            settings.Network.EnableI2p = EnableI2p;
+            settings.Network.I2pSamHost = I2pSamHost;
+            settings.Network.I2pSamPort = I2pSamPort;
+            settings.Network.I2pAllowMixedNetworks = I2pAllowMixedNetworks;
             settings.CompletionAction.Enabled = CompletionActionEnabled;
             settings.CompletionAction.ProgramPath = CompletionActionProgramPath;
             settings.CompletionAction.ArgumentsTemplate = CompletionActionArgumentsTemplate;
@@ -1518,6 +1580,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // nothing, and there is no side effect to avoid repeating.
         _engineService.ApplySpeedLimits();
         _engineService.ApplyStreamingSettings();
+        _engineService.ApplyEncryptionSettings();
     }
 
     /// <summary>
@@ -1601,6 +1664,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         StreamingPort = defaults.Streaming.Port;
 
         SelectedEncryptionMode = defaults.EncryptionMode;
+        SelectedIncomingEncryptionMode = defaults.Network.IncomingEncryptionMode;
+        SelectedOutgoingEncryptionMode = defaults.Network.OutgoingEncryptionMode;
+        PreferRc4 = defaults.Network.PreferRc4;
+        EnableI2p = defaults.Network.EnableI2p;
+        I2pSamHost = defaults.Network.I2pSamHost;
+        I2pSamPort = defaults.Network.I2pSamPort;
+        I2pAllowMixedNetworks = defaults.Network.I2pAllowMixedNetworks;
         CompletionActionEnabled = defaults.CompletionAction.Enabled;
         CompletionActionProgramPath = defaults.CompletionAction.ProgramPath;
         CompletionActionArgumentsTemplate = defaults.CompletionAction.ArgumentsTemplate;
@@ -1665,21 +1735,28 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         var selectedThemeVariant = SelectedThemeVariant;
         var selectedColorTheme = SelectedColorTheme;
         var selectedEncryptionMode = SelectedEncryptionMode;
+        var selectedIncomingEncryptionMode = SelectedIncomingEncryptionMode;
+        var selectedOutgoingEncryptionMode = SelectedOutgoingEncryptionMode;
         var selectedProxyType = SelectedProxyType;
 
         ThemeVariantOptions = CreateThemeVariantOptions();
         ColorThemeOptions = CreateColorThemeOptions(
             Services.ThemeService.Resolve(selectedThemeVariant));
         EncryptionModeOptions = CreateEncryptionModeOptions();
+        DirectionalEncryptionModeOptions = CreateDirectionalEncryptionModeOptions();
         ProxyTypeOptions = CreateProxyTypeOptions();
 
         SelectedThemeVariant = selectedThemeVariant;
         SelectedColorTheme = selectedColorTheme;
         SelectedEncryptionMode = selectedEncryptionMode;
+        SelectedIncomingEncryptionMode = selectedIncomingEncryptionMode;
+        SelectedOutgoingEncryptionMode = selectedOutgoingEncryptionMode;
         SelectedProxyType = selectedProxyType;
         OnPropertyChanged(nameof(SelectedThemeVariant));
         OnPropertyChanged(nameof(SelectedColorTheme));
         OnPropertyChanged(nameof(SelectedEncryptionMode));
+        OnPropertyChanged(nameof(SelectedIncomingEncryptionMode));
+        OnPropertyChanged(nameof(SelectedOutgoingEncryptionMode));
         OnPropertyChanged(nameof(SelectedProxyType));
         OnPropertyChanged(nameof(UpdateManagementMessage));
         foreach (var status in PortMappingStatuses)
@@ -1747,6 +1824,9 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             new SettingsOption("Http", Properties.Resources.Settings_ProxyType_Http)
         ];
     }
+
+    private static IReadOnlyList<SettingsOption> CreateDirectionalEncryptionModeOptions() =>
+        [new SettingsOption(NetworkSettings.InheritEncryption, Properties.Resources.Settings_EncryptionInherit), .. CreateEncryptionModeOptions()];
 
     private async Task BrowseBlocklistAsync()
     {

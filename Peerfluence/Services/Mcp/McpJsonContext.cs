@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Peerfluence.Services.Mcp;
 
+[JsonSerializable(typeof(Peerfluence.Core.Config.AppSettings))]
 [JsonSerializable(typeof(McpConstants.EngineStatsResponse))]
 [JsonSerializable(typeof(McpConstants.WebSeedsResponse))]
 [JsonSerializable(typeof(McpConstants.TrackerScrapeResponse))]

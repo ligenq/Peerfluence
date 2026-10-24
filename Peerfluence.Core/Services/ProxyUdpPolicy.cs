@@ -1,4 +1,3 @@
-using Peerfluence.Core.Config;
 using PeerSharp.Config;
 using ProxySettings = Peerfluence.Core.Config.ProxySettings;
 

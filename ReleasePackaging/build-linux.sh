@@ -54,11 +54,16 @@ mkdir -p "$publish_dir" "$app_dir/usr/lib/peerfluence" "$app_dir/usr/bin" \
     "$app_dir/usr/share/applications" "$app_dir/usr/share/metainfo" \
     "$app_dir/usr/share/icons/hicolor/386x386/apps"
 
+# Not Native AOT: both architectures are built on one x64 runner, and AOT needs a native toolchain
+# for the target. ReadyToRun cross-compiles, and without it every launch JIT-compiles the startup
+# path - measured on Windows, the window took about 920 ms to appear instead of about 415 ms.
+# Precompiling needs the crossgen package, so a --no-restore build must follow a restore that also
+# set PublishReadyToRun.
 dotnet publish "$repo_root/Peerfluence/Peerfluence.csproj" \
     --configuration "$configuration" --runtime "$rid" --self-contained true \
     --output "$publish_dir" ${restore_arg:+$restore_arg} \
-    -p:Version="$version" -p:PublishAot=false -p:PublishSingleFile=true \
-    -p:IncludeNativeLibrariesForSelfExtract=true
+    -p:Version="$version" -p:PublishAot=false -p:PublishReadyToRun=true \
+    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 
 test -x "$publish_dir/Peerfluence"
 find "$publish_dir" -type f -name '*.pdb' -delete

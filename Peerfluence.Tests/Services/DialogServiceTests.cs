@@ -1,5 +1,4 @@
 using Peerfluence.Theme.Controls;
-using Peerfluence.Core.Services;
 using Peerfluence.Services;
 
 namespace Peerfluence.Tests.Services;

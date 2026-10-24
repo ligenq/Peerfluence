@@ -43,7 +43,22 @@
                         </Grid>
                     </Border>
 
-                    <Border Classes="panel">
+                    <Border Classes="panel" IsVisible="{Binding IsSsl}" AutomationProperties.AutomationId="SslCertificateCard">
+                        <StackPanel Spacing="{StaticResource SpacingStandard}">
+                            <TextBlock Text="{m:L AddTorrent_SslCertificate}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{m:L AddTorrent_SslHint}" TextWrapping="Wrap"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
+                                <TextBox Text="{Binding SslCertificatePath, Mode=TwoWay}" AutomationProperties.Name="{m:L AddTorrent_SslCertificate}" AutomationProperties.AutomationId="SslCertificatePathTextBox"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseSslCertificateCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSslCertificateButton">
+                                    <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                </Button>
+                            </Grid>
+                            <TextBlock Text="{m:L AddTorrent_SslPassword}"/>
+                            <TextBox Text="{Binding SslCertificatePassword, Mode=TwoWay}" PasswordChar="&#x25CF;" AutomationProperties.Name="{m:L AddTorrent_SslPassword}" AutomationProperties.AutomationId="SslCertificatePasswordTextBox"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="panel" IsVisible="{Binding IsNewTorrent}">
                         <StackPanel Spacing="{StaticResource SpacingStandard}">
                             <TextBlock Text="{m:L AddTorrent_Destination}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                             <!-- Above the folder, because choosing a category is what fills the folder
@@ -121,7 +136,7 @@
                         </Grid>
                     </Border>
 
-                    <Expander Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch"
+                    <Expander IsVisible="{Binding IsNewTorrent}" Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch"
                               HorizontalContentAlignment="Stretch">
                         <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource SmallTopMargin}">
                             <Border Classes="panel">
@@ -214,14 +229,14 @@
                   ColumnDefinitions="*, Auto"
                   ColumnSpacing="{StaticResource SpacingStandard}"
                   Margin="{StaticResource MediumTopMargin}">
-                <CheckBox Content="{m:L AddTorrent_SkipThisStepNextTime}"
+                <CheckBox IsVisible="{Binding IsNewTorrent}" Content="{m:L AddTorrent_SkipThisStepNextTime}"
                           IsChecked="{Binding SkipThisStepNextTime}"
                           VerticalAlignment="Center" AutomationProperties.AutomationId="SkipThisStepNextTimeCheckBox"/>
                 <StackPanel Grid.Column="1"
                             Classes="dialogActions"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
-                    <Button Content="{m:L AddTorrent_Add}" Classes="accent" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
+                    <Button Content="{Binding SubmitLabel, FallbackValue={m:L AddTorrent_Add}}" Classes="accent" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
                     <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
                 </StackPanel>
             </Grid>

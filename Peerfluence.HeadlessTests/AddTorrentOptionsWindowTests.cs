@@ -26,6 +26,56 @@ namespace Peerfluence.HeadlessTests;
 /// </remarks>
 public class AddTorrentOptionsWindowTests
 {
+    [AvaloniaFact]
+    public async Task SslTorrent_RequiresDialogEvenWhenOptionsAreSkippedAndMasksPassword()
+    {
+        // Only metadata detection is under test here; certificate validation is covered by
+        // the real-engine integration tests with a generated CA and signed credential.
+        var file = Path.GetTempFileName();
+        await File.WriteAllTextAsync(file, "d4:infod6:lengthi0e4:name4:test12:piece lengthi16384e6:pieces0:8:ssl-cert1:xee");
+        try
+        {
+            var settings = Substitute.For<IAppSettingsService>();
+            settings.Current.Returns(new AppSettings
+            {
+                ShowAddTorrentOptions = false,
+                Storage = { DownloadPath = Path.GetTempPath() }
+            });
+            var topLevel = Substitute.For<ITopLevelService>();
+            Window? shown = null;
+            topLevel.ShowDialogAsync(Arg.Any<Window>()).Returns(call =>
+            {
+                shown = call.Arg<Window>();
+                return Task.CompletedTask;
+            });
+            var torrents = Substitute.For<ITorrentService>();
+            var service = new AddTorrentDialogService(torrents, topLevel, settings,
+                Substitute.For<IMagnetMetadataPreviewService>(), Substitute.For<ITorrentCategoryService>());
+            Assert.False(await service.ShowTorrentFileAsync(file));
+            var window = Assert.IsType<AddTorrentOptionsWindow>(shown);
+            var model = Assert.IsType<AddTorrentOptionsViewModel>(window.DataContext);
+            Assert.True(model.IsSsl);
+            window.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+                window.UpdateLayout();
+                var controls = window.GetVisualDescendants().ToArray();
+                var card = controls.OfType<Border>().Single(c => AutomationProperties.GetAutomationId(c) == "SslCertificateCard");
+                Assert.True(card.IsEffectivelyVisible);
+                var password = controls.OfType<TextBox>().Single(c => AutomationProperties.GetAutomationId(c) == "SslCertificatePasswordTextBox");
+                Assert.NotEqual(default, password.PasswordChar);
+                password.Text = "unsaved password";
+                Assert.Equal("unsaved password", model.SslCertificatePassword);
+                model.CancelCommand.Execute(null);
+                Assert.Empty(model.SslCertificatePassword);
+            }
+            finally { window.Close(); }
+            await torrents.DidNotReceive().AddTorrentAsync(Arg.Any<PeerSharp.Core.TorrentFile>(), Arg.Any<PeerSharp.Config.AddTorrentOptions>(), Arg.Any<CancellationToken>());
+        }
+        finally { File.Delete(file); }
+    }
+
     [AvaloniaTheory]
     [InlineData("Midnight", 760)]
     [InlineData("Midnight", 860)]

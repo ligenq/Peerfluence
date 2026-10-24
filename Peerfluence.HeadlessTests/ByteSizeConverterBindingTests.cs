@@ -2,7 +2,6 @@ using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using Avalonia.Headless;
 using Peerfluence.HeadlessTests.XUnit;
 
 namespace Peerfluence.HeadlessTests;

@@ -1612,4 +1612,46 @@ Peerfluence поширюється за MIT License. Установлюючи а
   <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
     <value>Нуль скасовує обмеження часу. Зміни застосовуються до потоків, відкритих після цього.</value>
   </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Вхідні з’єднання</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Вихідні з’єднання</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Використовувати типовий режим шифрування</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Надавати перевагу шифруванню даних MSE (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Застосовується до нових з’єднань. Вимкнення цього параметра дозволяє незашифровані дані MSE, якщо шифрування необов’язкове. Обов’язкове шифрування зберігається.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Увімкнути I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>Адреса маршрутизатора SAM</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>Порт маршрутизатора SAM</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Дозволити піри публічної мережі для I2P-торентів</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Потрібен маршрутизатор I2P з увімкненим SAM. Після змін перезапустіть Peerfluence. Публічні піри можуть розкрити вашу IP-адресу.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>Сертифікат SSL-торента (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Пароль сертифіката</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Виберіть сертифікат із приватним ключем, підписаний центром сертифікації цього торента. Паролі та приватні ключі не зберігаються; після перезапуску виберіть сертифікат знову.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Виберіть сертифікат, що містить приватний ключ.</value>
+  </data>
 </root>

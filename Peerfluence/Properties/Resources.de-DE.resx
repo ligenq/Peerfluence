@@ -1612,4 +1612,46 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
     <value>Null hebt das Zeitlimit auf. Änderungen gelten für danach geöffnete Streams.</value>
   </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Eingehende Verbindungen</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Ausgehende Verbindungen</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Standardverschlüsselung verwenden</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Verschlüsselte MSE-Nutzdaten bevorzugen (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Gilt für neue Verbindungen. Ohne diese Einstellung sind unverschlüsselte MSE-Nutzdaten bei optionaler Verschlüsselung erlaubt. Erforderliche Verschlüsselung bleibt bestehen.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>I2P aktivieren</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>SAM-Router-Host</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>SAM-Router-Port</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Öffentliche Netzwerk-Peers für I2P-Torrents zulassen</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Erfordert einen I2P-Router mit aktiviertem SAM. Starten Sie Peerfluence nach Änderungen neu. Öffentliche Peers können Ihre IP-Adresse offenlegen.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>SSL-Torrent-Zertifikat (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Zertifikatpasswort</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Wählen Sie ein Zertifikat mit privatem Schlüssel, signiert von der Zertifizierungsstelle dieses Torrents. Passwörter und private Schlüssel werden nicht gespeichert; wählen Sie das Zertifikat nach einem Neustart erneut.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Wählen Sie ein Zertifikat mit privatem Schlüssel.</value>
+  </data>
 </root>

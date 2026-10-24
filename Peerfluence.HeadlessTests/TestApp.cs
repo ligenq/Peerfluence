@@ -1,4 +1,3 @@
-using Peerfluence.Theme.Controls;
 using Avalonia;
 using Avalonia.Headless;
 using Material.Icons.Avalonia;

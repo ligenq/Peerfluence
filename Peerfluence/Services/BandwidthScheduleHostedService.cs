@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Peerfluence.Core.Services;
 
 namespace Peerfluence.Services;
 

@@ -1,9 +1,6 @@
 using Peerfluence.Theme.Controls;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Peerfluence.Core;
-using Peerfluence.Core.Messaging;
-using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
 

@@ -94,6 +94,15 @@ public sealed class AppSettingsService : IAppSettingsService
     private bool EnsureDefaultsExist(AppSettings settings)
     {
         var changed = false;
+        if (settings.Network.NormalizeI2p())
+        {
+            changed = true;
+        }
+
+        if (settings.Network.NormalizeEncryption())
+        {
+            changed = true;
+        }
         if (string.IsNullOrWhiteSpace(settings.Storage.DownloadPath))
         {
             settings.Storage.DownloadPath = _paths.DefaultDownloadDirectory;

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Services.Rpc;
 using Peerfluence.Logging;
-using Peerfluence.Services;
 using Peerfluence.Services.Mcp;
 using Peerfluence.ViewModels;
 using Velopack;
@@ -65,8 +64,8 @@ internal sealed class Program
             // 1. Initial Host Setup
             var builder = Host.CreateApplicationBuilder(args);
 
-            // 2. Configure Logging
-            ConfigureLogging(builder, appPaths);
+            // 2. Configure Logging. The file itself is not touched until step 5 says it is ours.
+            var fileLog = ConfigureLogging(builder, appPaths);
 
             // 3. Register Services
             builder.Services.AddPeerfluenceServices(new McpRuntimeOptions
@@ -82,11 +81,12 @@ internal sealed class Program
             using var host = builder.Build();
 
             // 5. Early Check: Single Instance
-            var singleInstance = host.Services.GetRequiredService<ISingleInstanceService>();
-            var runtimeOptions = host.Services.GetRequiredService<IMcpRuntimeOptions>();
-            if (!runtimeOptions.SkipSingleInstanceLock && !singleInstance.TryAcquireSingleInstanceLock())
+            if (!ClaimProfile(
+                    host.Services.GetRequiredService<ISingleInstanceService>(),
+                    host.Services.GetRequiredService<IMcpRuntimeOptions>(),
+                    fileLog,
+                    activationArgs))
             {
-                singleInstance.SignalExistingInstance(activationArgs);
                 return;
             }
 
@@ -178,19 +178,45 @@ internal sealed class Program
         }
     }
 
-    private static void ConfigureLogging(HostApplicationBuilder builder, IAppPaths appPaths)
+    /// <summary>
+    /// Decides whether this process owns the profile, and only then lets it take over the log.
+    /// </summary>
+    /// <remarks>
+    /// Taking over the log archives the previous file and starts an empty one. It used to happen as
+    /// logging was set up, before anything had asked whether another instance was running, so every
+    /// second launch - a magnet link clicked while the application was open - emptied the log of the
+    /// instance that was running and left it writing after a run of NUL bytes.
+    /// </remarks>
+    internal static bool ClaimProfile(
+        ISingleInstanceService singleInstance,
+        IMcpRuntimeOptions runtimeOptions,
+        FileLoggerProvider fileLog,
+        string[] activationArgs)
+    {
+        if (!runtimeOptions.SkipSingleInstanceLock && !singleInstance.TryAcquireSingleInstanceLock())
+        {
+            singleInstance.SignalExistingInstance(activationArgs);
+            return false;
+        }
+
+        fileLog.Open();
+        return true;
+    }
+
+    private static FileLoggerProvider ConfigureLogging(HostApplicationBuilder builder, IAppPaths appPaths)
     {
         Directory.CreateDirectory(appPaths.AppDataDirectory);
-        var logPath = Path.Combine(appPaths.AppDataDirectory, "peerfluence.log");
+        var fileLog = new FileLoggerProvider(Path.Combine(appPaths.AppDataDirectory, "peerfluence.log"));
 
         builder.Logging.ClearProviders();
-        builder.Logging.AddProvider(new FileLoggerProvider(logPath));
+        builder.Logging.AddProvider(fileLog);
 
 #if DEBUG
         builder.Logging.AddFilter(null, LogLevel.Debug);
 #else
         builder.Logging.AddFilter(null, LogLevel.Information);
 #endif
+        return fileLog;
     }
 
     private static async Task RunMcpProxyAsync(string? profilePath)

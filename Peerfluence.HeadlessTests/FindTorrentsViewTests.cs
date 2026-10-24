@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
-using NSubstitute;
 using Peerfluence.Core.Services;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;

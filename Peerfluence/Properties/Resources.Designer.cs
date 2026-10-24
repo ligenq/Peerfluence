@@ -4707,5 +4707,53 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Welcome_Title", resourceCulture);
             }
         }
+        public static string Settings_IncomingEncryption {
+            get {
+                return ResourceManager.GetString("Settings_IncomingEncryption", resourceCulture);
+            }
+        }
+
+        public static string Settings_OutgoingEncryption {
+            get {
+                return ResourceManager.GetString("Settings_OutgoingEncryption", resourceCulture);
+            }
+        }
+
+        public static string Settings_EncryptionInherit {
+            get {
+                return ResourceManager.GetString("Settings_EncryptionInherit", resourceCulture);
+            }
+        }
+
+        public static string Settings_PreferRc4 {
+            get {
+                return ResourceManager.GetString("Settings_PreferRc4", resourceCulture);
+            }
+        }
+
+        public static string Settings_EncryptionPolicyHint {
+            get {
+                return ResourceManager.GetString("Settings_EncryptionPolicyHint", resourceCulture);
+            }
+        }
+
+        public static string Settings_EnableI2p => ResourceManager.GetString("Settings_EnableI2p", resourceCulture);
+
+        public static string Settings_I2pSamHost => ResourceManager.GetString("Settings_I2pSamHost", resourceCulture);
+
+        public static string Settings_I2pSamPort => ResourceManager.GetString("Settings_I2pSamPort", resourceCulture);
+
+        public static string Settings_I2pAllowMixedNetworks => ResourceManager.GetString("Settings_I2pAllowMixedNetworks", resourceCulture);
+
+        public static string Settings_I2pHint => ResourceManager.GetString("Settings_I2pHint", resourceCulture);
+
+        public static string AddTorrent_SslCertificate => ResourceManager.GetString("AddTorrent_SslCertificate", resourceCulture);
+
+        public static string AddTorrent_SslPassword => ResourceManager.GetString("AddTorrent_SslPassword", resourceCulture);
+
+        public static string AddTorrent_SslHint => ResourceManager.GetString("AddTorrent_SslHint", resourceCulture);
+
+        public static string AddTorrent_SslCertificateRequired => ResourceManager.GetString("AddTorrent_SslCertificateRequired", resourceCulture);
+
     }
 }

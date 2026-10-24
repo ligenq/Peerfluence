@@ -1612,4 +1612,46 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
     <value>Zero usuwa limit czasu. Zmiany dotyczą strumieni otwartych później.</value>
   </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Połączenia przychodzące</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Połączenia wychodzące</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Użyj domyślnego trybu szyfrowania</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Preferuj szyfrowane dane MSE (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Dotyczy nowych połączeń. Wyłączenie tej opcji dopuszcza nieszyfrowane dane MSE, gdy szyfrowanie jest opcjonalne. Wymagane szyfrowanie pozostaje aktywne.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Włącz I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>Host routera SAM</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>Port routera SAM</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Zezwalaj na peery z sieci publicznej dla torrentów I2P</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Wymaga routera I2P z włączonym SAM. Po zmianach uruchom Peerfluence ponownie. Publiczne peery mogą ujawnić Twój adres IP.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>Certyfikat torrenta SSL (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Hasło certyfikatu</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Wybierz certyfikat z kluczem prywatnym, podpisany przez urząd tego torrenta. Hasła i klucze prywatne nie są zapisywane; po ponownym uruchomieniu wybierz certyfikat ponownie.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Wybierz certyfikat zawierający klucz prywatny.</value>
+  </data>
 </root>
