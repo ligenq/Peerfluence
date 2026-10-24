@@ -122,9 +122,125 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
             "torrent-stop" => await TorrentStopAsync(arguments, tag, cancellationToken).ConfigureAwait(false),
             "torrent-set" => await TorrentSetAsync(arguments, tag, cancellationToken).ConfigureAwait(false),
             "torrent-set-location" => await TorrentSetLocationAsync(arguments, tag, cancellationToken).ConfigureAwait(false),
-            "session-set" => Success(tag),
+            "session-set" => await SessionSetAsync(arguments, tag, cancellationToken).ConfigureAwait(false),
             _ => Failure($"unsupported method: {method}", tag)
         };
+    }
+
+    /// <summary>
+    /// Changes the global speed limits. Other session fields are ignored, as Transmission ignores
+    /// fields it does not know, but a field it does know with the wrong type is refused before
+    /// anything is changed, so a half-applied call cannot happen. Saving is all it takes: the engine
+    /// picks the new limits up when settings are saved.
+    /// </summary>
+    private async Task<string> SessionSetAsync(JsonElement arguments, int? tag, CancellationToken cancellationToken)
+    {
+        var network = _settingsService.Current.Network;
+        if (!TryReadSpeedLimit(arguments, "speed-limit-down", network.MaxDownloadSpeedBytesPerSecond, out var down, out var error) ||
+            !TryReadSpeedLimit(arguments, "speed-limit-up", network.MaxUploadSpeedBytesPerSecond, out var up, out error))
+        {
+            return Failure(error, tag);
+        }
+
+        if (down is null && up is null)
+        {
+            return Success(tag);
+        }
+
+        if (down is { } downBytes)
+        {
+            network.MaxDownloadSpeedBytesPerSecond = downBytes;
+        }
+
+        if (up is { } upBytes)
+        {
+            network.MaxUploadSpeedBytesPerSecond = upBytes;
+        }
+
+        await _settingsService.SaveAsync(cancellationToken).ConfigureAwait(false);
+        return Success(tag);
+    }
+
+    /// <summary>
+    /// Transmission keeps a limit and whether it is on as two fields; Peerfluence keeps one number,
+    /// with zero meaning unlimited. So off is zero, and a limit sent on its own applies only while a
+    /// limit is already on - Transmission would remember it for later and stay unlimited, which is
+    /// what happens here, less the remembering. Asking for something that one number cannot hold (a
+    /// limit of zero, which Transmission takes as no transfer at all, or switching on a limit with no
+    /// value to switch on) is refused rather than turned into unlimited. A null result is no change.
+    /// </summary>
+    private static bool TryReadSpeedLimit(
+        JsonElement arguments,
+        string name,
+        long currentBytes,
+        out long? bytes,
+        out string error)
+    {
+        bytes = null;
+        error = string.Empty;
+        if (arguments.ValueKind != JsonValueKind.Object)
+        {
+            return true;
+        }
+
+        bool? enabled = null;
+        if (arguments.TryGetProperty($"{name}-enabled", out var flag))
+        {
+            if (flag.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+            {
+                error = $"{name}-enabled must be true or false";
+                return false;
+            }
+
+            enabled = flag.ValueKind == JsonValueKind.True;
+        }
+
+        long? kibibytes = null;
+        if (arguments.TryGetProperty(name, out var limit))
+        {
+            if (limit.ValueKind != JsonValueKind.Number ||
+                !limit.TryGetInt64(out var parsed) ||
+                parsed < 0 ||
+                parsed > long.MaxValue / 1024)
+            {
+                error = $"{name} must be a whole number of KiB/s";
+                return false;
+            }
+
+            kibibytes = parsed;
+        }
+
+        if (enabled == false)
+        {
+            bytes = 0;
+            return true;
+        }
+
+        var limitIsOn = enabled == true || currentBytes > 0;
+        if (kibibytes is null)
+        {
+            if (enabled == true && currentBytes <= 0)
+            {
+                error = $"{name}-enabled needs a {name} to enable";
+                return false;
+            }
+
+            return true;
+        }
+
+        if (!limitIsOn)
+        {
+            return true;
+        }
+
+        if (kibibytes == 0)
+        {
+            error = $"a {name} of 0 is not supported; disable the limit instead";
+            return false;
+        }
+
+        bytes = kibibytes * 1024;
+        return true;
     }
 
     private string SessionGet(int? tag)
