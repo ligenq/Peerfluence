@@ -27,6 +27,14 @@ public interface ITorrentService
     /// </summary>
     Task<ITorrent> AddTorrentFromUrlAsync(string url, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Reattaches a caller-owned SSL credential to a stopped torrent while preserving its
+    /// resume data, files and per-torrent configuration. The returned torrent remains stopped.
+    /// </summary>
+    Task<ITorrent> SetSslCertificateAsync(ITorrent torrent,
+        System.Security.Cryptography.X509Certificates.X509Certificate2 certificate,
+        CancellationToken cancellationToken = default);
+
     Task SaveSessionAsync(CancellationToken cancellationToken = default);
 
     Task RemoveAsync(ITorrent torrent, RemoveOptions options = RemoveOptions.None, CancellationToken cancellationToken = default);

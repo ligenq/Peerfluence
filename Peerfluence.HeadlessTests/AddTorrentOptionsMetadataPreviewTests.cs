@@ -3,7 +3,6 @@ using Peerfluence.Core.Services;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
-using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.HeadlessTests;
@@ -11,6 +10,31 @@ namespace Peerfluence.HeadlessTests;
 public sealed class AddTorrentOptionsMetadataPreviewTests
 {
     private const string MagnetUri = "magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567";
+
+    [AvaloniaTheory]
+    [InlineData(0)]
+    [InlineData(60)]
+    [InlineData(120)]
+    public async Task AddDialog_PreviewUsesConfiguredMetadataWaitIncludingUnlimited(int seconds)
+    {
+        var settings = Substitute.For<IAppSettingsService>();
+        settings.Current.Returns(new AppSettings
+        {
+            Storage = { DownloadPath = Path.GetTempPath() },
+            Streaming = { MetadataWaitTimeoutSeconds = seconds }
+        });
+        var preview = Substitute.For<IMagnetMetadataPreviewService>();
+        preview.FetchAsync(Arg.Any<string>(), Arg.Any<TimeSpan>(), Arg.Any<IProgress<double>?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<MagnetMetadataPreview?>(null));
+        var sut = new AddTorrentDialogService(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            settings, preview, Substitute.For<ITorrentCategoryService>());
+
+        await sut.ShowMagnetAsync(MagnetUri);
+
+        await preview.Received(1).FetchAsync(MagnetUri,
+            seconds == 0 ? Timeout.InfiniteTimeSpan : TimeSpan.FromSeconds(seconds),
+            Arg.Any<IProgress<double>?>(), Arg.Any<CancellationToken>());
+    }
 
     [AvaloniaFact]
     public async Task AddCommand_DoesNotWaitForAnInFlightPreviewToUnwind()

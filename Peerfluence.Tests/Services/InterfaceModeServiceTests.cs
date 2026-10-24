@@ -1,4 +1,3 @@
-using Peerfluence.Core;
 using Peerfluence.Core.Config;
 using Peerfluence.Core.Messaging;
 using Peerfluence.Core.Services;

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Peerfluence.Core;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Interfaces;
 using PeerSharp.Config;
@@ -845,7 +844,56 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     {
         foreach (var item in SelectionOrFocused().Where(item => item.Torrent.State == TorrentState.Stopped))
         {
-            await TorrentService.StartAsync(item.Torrent);
+            await StartOrSelectSslCertificateAsync(item.Torrent);
+        }
+    }
+
+    private async Task StartOrSelectSslCertificateAsync(ITorrent torrent)
+    {
+        try { await TorrentService.StartAsync(torrent); }
+        catch (System.Security.Authentication.AuthenticationException) when (torrent.HasMetadata && torrent.ExportTorrentFile().IsSsl)
+        {
+            torrent.QueueAutoStart = false;
+            await _addTorrentDialogService.ShowSslCertificateAsync(torrent);
+        }
+    }
+
+    /// <summary>
+    /// Asks for a certificate when a magnet's metadata turns out to describe an SSL torrent.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The add dialog can only offer the certificate field once it knows the torrent is SSL, which
+    /// for a magnet means once its preview has resolved. A magnet added before then - or from a
+    /// browser, the watch folder, MCP or RPC, none of which pass a certificate - learns it only now,
+    /// and without a certificate it cannot authenticate to a single peer. Left alone it stays
+    /// started and never makes progress, with nothing to say why.
+    /// </para>
+    /// <para>
+    /// Every torrent raising this alert lacks a certificate: the alert comes only from a magnet's
+    /// metadata download, and a certificate can only be attached while adding a torrent whose
+    /// metadata is already known. So there is no case in which this stops a torrent that could
+    /// have run.
+    /// </para>
+    /// </remarks>
+    internal async Task RequestCertificateIfSslAsync(ITorrent torrent)
+    {
+        try
+        {
+            if (!torrent.HasMetadata || !torrent.ExportTorrentFile().IsSsl)
+            {
+                return;
+            }
+
+            torrent.QueueAutoStart = false;
+            await TorrentService.StopAsync(torrent);
+            await _addTorrentDialogService.ShowSslCertificateAsync(torrent);
+        }
+        catch (Exception ex)
+        {
+            // Started from a dispatcher callback that does not await it, so nothing else would
+            // ever see this.
+            SetStatusMessage(string.Format(Resources.Status_AddMagnetFailed, ex.Message));
         }
     }
 
@@ -986,7 +1034,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
         return item.Torrent.Started
             ? TorrentService.StopAsync(item.Torrent)
-            : TorrentService.StartAsync(item.Torrent);
+            : StartOrSelectSslCertificateAsync(item.Torrent);
     }
 
     private Task CopyHashAsync()
@@ -1083,6 +1131,13 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         {
             Dispatcher.UIThread.Post(() => HandleTorrentAlert(e));
             return;
+        }
+
+        // Kept out of the debouncing channel for the same reason: it happens once, and a progress
+        // alert in the same window would otherwise replace it.
+        if (e.Alert.Id is AlertId.MetadataInitialized)
+        {
+            Dispatcher.UIThread.Post(() => _ = RequestCertificateIfSslAsync(e.Torrent));
         }
 
         _alertChannel.Writer.TryWrite(e);

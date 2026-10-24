@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Peerfluence.Core;
-using Peerfluence.Core.Services;
 using Peerfluence.Properties;
 
 namespace Peerfluence.ViewModels;

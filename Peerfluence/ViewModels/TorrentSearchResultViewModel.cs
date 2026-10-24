@@ -1,5 +1,4 @@
 using System;
-using Peerfluence.Core.Services;
 using Peerfluence.Properties;
 
 namespace Peerfluence.ViewModels;

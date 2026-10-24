@@ -31,6 +31,7 @@ public partial class AddTorrentOptionsWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _currentViewModel?.OnRequestClose -= Close;
+        _currentViewModel?.CancelCommand.Execute(null);
         base.OnClosed(e);
     }
 }

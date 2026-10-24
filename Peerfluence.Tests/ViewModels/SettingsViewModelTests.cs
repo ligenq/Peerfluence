@@ -18,6 +18,55 @@ namespace Peerfluence.Tests.ViewModels;
 public class SettingsViewModelTests
 {
     [Fact]
+    public async Task I2pOptions_AreSavedLoadedAndReset()
+    {
+        _sut.EnableI2p = true;
+        _sut.I2pSamHost = "sam.local";
+        _sut.I2pSamPort = 7666;
+        _sut.I2pAllowMixedNetworks = true;
+        await _sut.SaveCommand.ExecuteAsync(null);
+        var restored = Create(_settingsService);
+        Assert.True(restored.EnableI2p);
+        Assert.Equal("sam.local", restored.I2pSamHost);
+        Assert.Equal(7666, restored.I2pSamPort);
+        Assert.True(restored.I2pAllowMixedNetworks);
+        _sut.ResetDefaultsCommand.Execute(null);
+        Assert.False(_sut.EnableI2p);
+        Assert.Equal("127.0.0.1", _sut.I2pSamHost);
+        Assert.Equal(7656, _sut.I2pSamPort);
+        Assert.False(_sut.I2pAllowMixedNetworks);
+        await _sut.WaitForPendingSaveAsync();
+    }
+
+    [Fact]
+    public async Task EncryptionOverrides_AreSavedPreservedAcrossLanguageChangesAndReset()
+    {
+        _sut.SelectedEncryptionMode = "Require";
+        _sut.SelectedIncomingEncryptionMode = "Allow";
+        _sut.SelectedOutgoingEncryptionMode = "Refuse";
+        _sut.PreferRc4 = false;
+        _sut.SelectedLanguage = "sv-SE";
+        try
+        {
+            await _sut.SaveCommand.ExecuteAsync(null);
+            var restored = Create(_settingsService);
+            Assert.Equal("Allow", restored.SelectedIncomingEncryptionMode);
+            Assert.Equal("Refuse", restored.SelectedOutgoingEncryptionMode);
+            Assert.False(restored.PreferRc4);
+            Assert.Contains(restored.DirectionalEncryptionModeOptions, choice => choice.Value == "Inherit");
+            _sut.ResetDefaultsCommand.Execute(null);
+            Assert.Equal("Inherit", _sut.SelectedIncomingEncryptionMode);
+            Assert.Equal("Inherit", _sut.SelectedOutgoingEncryptionMode);
+            Assert.True(_sut.PreferRc4);
+        }
+        finally
+        {
+            _sut.SelectedLanguage = "en-US";
+            await _sut.WaitForPendingSaveAsync();
+        }
+    }
+
+    [Fact]
     public async Task StreamingPreferences_AreSavedAppliedAndRestored()
     {
         _sut.StreamingReadAheadMiB = 80;

@@ -1,5 +1,4 @@
 ﻿using PeerSharp.Core;
-using PeerSharp.Interfaces;
 using Peerfluence.Core.Services;
 using Peerfluence.ViewModels;
 

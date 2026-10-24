@@ -1,4 +1,3 @@
-using Peerfluence.Theme.Controls;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;

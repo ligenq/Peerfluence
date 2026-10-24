@@ -1612,4 +1612,46 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
     <value>Noll tar bort tidsgränsen. Ändringar gäller strömmar som öppnas därefter.</value>
   </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Inkommande anslutningar</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Utgående anslutningar</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Använd standardläget för kryptering</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Föredra krypterad MSE-data (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Gäller nya anslutningar. Om detta stängs av tillåts okrypterad MSE-data när kryptering är valfri. Obligatorisk kryptering förblir krypterad.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Aktivera I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>SAM-routerns värd</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>SAM-routerns port</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Tillåt publika nätverksparter för I2P-torrenter</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Kräver en I2P-router med SAM aktiverat. Starta om Peerfluence efter ändringar. Publika nätverksparter kan exponera din IP-adress.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>SSL-certifikat för torrent (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Certifikatlösenord</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Välj ett certifikat med privat nyckel, signerat av torrentens certifikatutfärdare. Lösenord och privata nycklar sparas inte; välj certifikatet igen efter omstart.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Välj ett certifikat som innehåller dess privata nyckel.</value>
+  </data>
 </root>

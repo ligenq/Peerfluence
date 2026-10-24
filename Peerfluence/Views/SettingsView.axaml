@@ -537,6 +537,32 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
+                        <TextBlock Text="{m:L Settings_IncomingEncryption}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <ComboBox ItemsSource="{Binding DirectionalEncryptionModeOptions}" SelectedValue="{Binding SelectedIncomingEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_IncomingEncryption}" AutomationProperties.AutomationId="IncomingEncryptionComboBox">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption"><TextBlock Text="{Binding DisplayName}"/></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Text="{m:L Settings_OutgoingEncryption}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <ComboBox ItemsSource="{Binding DirectionalEncryptionModeOptions}" SelectedValue="{Binding SelectedOutgoingEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_OutgoingEncryption}" AutomationProperties.AutomationId="OutgoingEncryptionComboBox">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption"><TextBlock Text="{Binding DisplayName}"/></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <ToggleSwitch IsChecked="{Binding PreferRc4, Mode=TwoWay}" Content="{m:L Settings_PreferRc4}" AutomationProperties.AutomationId="PreferRc4Switch"/>
+                        <TextBlock Text="{m:L Settings_EncryptionPolicyHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
+                        <ToggleSwitch IsChecked="{Binding EnableI2p, Mode=TwoWay}" Content="{m:L Settings_EnableI2p}" AutomationProperties.AutomationId="EnableI2pSwitch"/>
+                        <StackPanel IsEnabled="{Binding EnableI2p}" Spacing="{StaticResource SpacingNormal}">
+                            <TextBlock Text="{m:L Settings_I2pSamHost}"/>
+                            <TextBox Text="{Binding I2pSamHost, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_I2pSamHost}" AutomationProperties.AutomationId="I2pSamHostTextBox"/>
+                            <TextBlock Text="{m:L Settings_I2pSamPort}"/>
+                            <NumericUpDown Value="{Binding I2pSamPort, Mode=TwoWay}" Minimum="1" Maximum="65535" FormatString="0" AutomationProperties.Name="{m:L Settings_I2pSamPort}" AutomationProperties.AutomationId="I2pSamPortNumericUpDown"/>
+                            <ToggleSwitch IsChecked="{Binding I2pAllowMixedNetworks, Mode=TwoWay}" Content="{m:L Settings_I2pAllowMixedNetworks}" AutomationProperties.AutomationId="I2pAllowMixedNetworksSwitch"/>
+                        </StackPanel>
+                        <TextBlock Text="{m:L Settings_I2pHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
                             <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.Name="{m:L Settings_BlocklistFile}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>

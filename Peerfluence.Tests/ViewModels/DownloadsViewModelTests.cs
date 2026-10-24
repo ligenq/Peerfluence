@@ -16,6 +16,73 @@ namespace Peerfluence.Tests.ViewModels;
 [Collection("Messenger")]
 public class DownloadsViewModelTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StartingSslTorrentWithoutCredential_OpensCertificateDialogAndDisablesAutoStart(bool rowAction)
+    {
+        using var data = new SslTorrentTestData();
+        var sut = CreateViewModelWithTorrents(("ssl", Complete: false, Running: false));
+        try
+        {
+            var row = Assert.Single(sut.Torrents);
+            row.Torrent.HasMetadata.Returns(true);
+            row.Torrent.ExportTorrentFile().Returns(data.Metadata);
+            row.Torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Certificate required")));
+            sut.SetSelectedTorrents([row]);
+            if (rowAction) await sut.ToggleTorrentCommand.ExecuteAsync(row);
+            else await sut.StartSelectedCommand.ExecuteAsync(null);
+            await GetAddTorrentDialogService(sut).Received(1).ShowSslCertificateAsync(row.Torrent);
+            Assert.False(row.Torrent.QueueAutoStart);
+        }
+        finally { StopLoops(sut); }
+    }
+
+    /// <summary>
+    /// A magnet added before its preview resolved, or from anywhere that cannot offer a certificate,
+    /// finds out it is SSL only when its metadata arrives - and cannot reach a peer without one.
+    /// </summary>
+    [Fact]
+    public async Task SslMagnetMetadataArriving_StopsTheTorrentAndAsksForACertificate()
+    {
+        using var data = new SslTorrentTestData();
+        var sut = CreateViewModelWithTorrents(("ssl-magnet", Complete: false, Running: true));
+        try
+        {
+            var torrent = Assert.Single(sut.Torrents).Torrent;
+            torrent.HasMetadata.Returns(true);
+            torrent.ExportTorrentFile().Returns(data.Metadata);
+            torrent.QueueAutoStart = true;
+
+            await sut.RequestCertificateIfSslAsync(torrent);
+
+            Assert.False(torrent.QueueAutoStart);
+            await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+            await GetAddTorrentDialogService(sut).Received(1).ShowSslCertificateAsync(torrent);
+        }
+        finally { StopLoops(sut); }
+    }
+
+    [Fact]
+    public async Task OrdinaryMagnetMetadataArriving_LeavesTheTorrentRunning()
+    {
+        var sut = CreateViewModelWithTorrents(("plain-magnet", Complete: false, Running: true));
+        try
+        {
+            var torrent = Assert.Single(sut.Torrents).Torrent;
+            torrent.HasMetadata.Returns(true);
+            torrent.ExportTorrentFile().Returns(PlainTorrentTestData.Metadata());
+            torrent.QueueAutoStart = true;
+
+            await sut.RequestCertificateIfSslAsync(torrent);
+
+            Assert.True(torrent.QueueAutoStart);
+            await torrent.DidNotReceive().StopAsync(Arg.Any<CancellationToken>());
+            await GetAddTorrentDialogService(sut).DidNotReceiveWithAnyArgs().ShowSslCertificateAsync(default!);
+        }
+        finally { StopLoops(sut); }
+    }
+
     private readonly ITorrentService _torrentService;
     private readonly TorrentSelectionService _selectionService = new(Substitute.For<IAppMessenger>());
     private readonly LocalizationService _localizationService = new();

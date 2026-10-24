@@ -95,12 +95,12 @@ internal sealed class HeapReport
         }
         // Frozen objects are never collected, even when no ordinary root points at them.
         foreach (var segment in _heap.Segments.Where(s => s.Kind == GCSegmentKind.Frozen))
-        foreach (var obj in segment.EnumerateObjects(carefully: true))
-        {
-            if (obj.IsFree || !_parents.TryAdd(obj.Address, 0)) continue;
-            _roots[obj.Address] = "Frozen segment";
-            pending.Enqueue(obj.Address);
-        }
+            foreach (var obj in segment.EnumerateObjects(carefully: true))
+            {
+                if (obj.IsFree || !_parents.TryAdd(obj.Address, 0)) continue;
+                _roots[obj.Address] = "Frozen segment";
+                pending.Enqueue(obj.Address);
+            }
         while (pending.TryDequeue(out var address))
         {
             var obj = _heap.GetObject(address);

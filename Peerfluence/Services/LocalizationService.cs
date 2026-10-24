@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Globalization;
-using Avalonia;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core.Messaging;
 

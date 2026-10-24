@@ -2,6 +2,58 @@
 
 public sealed class NetworkSettings
 {
+    /// <summary>The per-direction value meaning "use AppSettings.EncryptionMode".</summary>
+    public const string InheritEncryption = "Inherit";
+
+    public const string DefaultI2pSamHost = "127.0.0.1";
+
+    /// <summary>
+    /// The modes an encryption policy can name. The one list everything checks against: the
+    /// stored overrides, what an MCP client may set, and what the engine is handed.
+    /// </summary>
+    public static bool IsEncryptionMode(string? mode) => mode is "Allow" or "Require" or "Refuse";
+
+    public static string NormalizeI2pSamHost(string? host) =>
+        string.IsNullOrWhiteSpace(host) ? DefaultI2pSamHost : host.Trim();
+
+    public static int ClampI2pSamPort(int port) => Math.Clamp(port, 1, 65535);
+
+    /// <summary>Per-direction overrides, or Inherit to use AppSettings.EncryptionMode.</summary>
+    public string IncomingEncryptionMode { get; set; } = InheritEncryption;
+
+    public string OutgoingEncryptionMode { get; set; } = InheritEncryption;
+
+    /// <summary>Keep MSE payloads encrypted by default; false permits negotiated plaintext under Allow.</summary>
+    public bool PreferRc4 { get; set; } = true;
+
+    /// <summary>Repairs unknown stored overrides without weakening the shared encryption policy.</summary>
+    public bool NormalizeEncryption()
+    {
+        var before = (IncomingEncryptionMode, OutgoingEncryptionMode);
+        IncomingEncryptionMode = NormalizeMode(IncomingEncryptionMode);
+        OutgoingEncryptionMode = NormalizeMode(OutgoingEncryptionMode);
+        return before != (IncomingEncryptionMode, OutgoingEncryptionMode);
+    }
+
+    private static string NormalizeMode(string mode) => IsEncryptionMode(mode) ? mode : InheritEncryption;
+
+    public bool EnableI2p { get; set; }
+
+    public string I2pSamHost { get; set; } = DefaultI2pSamHost;
+
+    public int I2pSamPort { get; set; } = 7656;
+
+    /// <summary>Opt in to public IP peers for I2P torrents. Disabled to preserve network isolation.</summary>
+    public bool I2pAllowMixedNetworks { get; set; }
+
+    public bool NormalizeI2p()
+    {
+        var before = (I2pSamHost, I2pSamPort);
+        I2pSamHost = NormalizeI2pSamHost(I2pSamHost);
+        I2pSamPort = ClampI2pSamPort(I2pSamPort);
+        return before != (I2pSamHost, I2pSamPort);
+    }
+
     public bool EnableDht { get; set; } = true;
 
     /// <summary>

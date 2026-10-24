@@ -10,8 +10,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Protocol;
-using Peerfluence.Core;
-using Peerfluence.Core.Services;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Services.Mcp;
@@ -247,6 +245,16 @@ public class McpToolHandler : IMcpToolHandler
             var current = _appSettingsService.Current;
             using var doc = JsonDocument.Parse(settingsJson);
 
+            // Validate the entire payload against a detached copy first. Applying directly can
+            // leave an earlier encryption change in memory when a later field is invalid.
+            var candidate = JsonSerializer.Deserialize(
+                JsonSerializer.SerializeToUtf8Bytes(current, McpJsonContext.Default.AppSettings),
+                McpJsonContext.Default.AppSettings)!;
+            foreach (var prop in doc.RootElement.EnumerateObject())
+            {
+                ApplySetting(candidate, prop.Name, prop.Value);
+            }
+
             foreach (var prop in doc.RootElement.EnumerateObject())
             {
                 ApplySetting(current, prop.Name, prop.Value);
@@ -335,7 +343,20 @@ public class McpToolHandler : IMcpToolHandler
             case "language": current.Language = value.GetString() ?? current.Language; break;
             case "showremovetorrentoptions": current.ShowRemoveTorrentOptions = value.GetBoolean(); break;
             case "defaultremovetorrentaction": current.DefaultRemoveTorrentAction = value.GetString() ?? current.DefaultRemoveTorrentAction; break;
-            case "encryptionmode": current.EncryptionMode = value.GetString() ?? current.EncryptionMode; break;
+            case "encryptionmode": current.EncryptionMode = ReadEncryptionMode(value, allowInherit: false); break;
+            case "incomingencryptionmode": current.Network.IncomingEncryptionMode = ReadEncryptionMode(value, allowInherit: true); break;
+            case "outgoingencryptionmode": current.Network.OutgoingEncryptionMode = ReadEncryptionMode(value, allowInherit: true); break;
+            case "enablei2p": current.Network.EnableI2p = value.GetBoolean(); break;
+            case "i2psamhost": current.Network.I2pSamHost = NetworkSettings.NormalizeI2pSamHost(value.GetString()); break;
+            case "i2psamport":
+                // Refused rather than clamped: a client that asked for a port it cannot have should
+                // hear so, not be given a different one.
+                var samPort = value.GetInt32();
+                if (samPort != NetworkSettings.ClampI2pSamPort(samPort)) throw new ArgumentOutOfRangeException(nameof(value), "I2P SAM port must be between 1 and 65535.");
+                current.Network.I2pSamPort = samPort;
+                break;
+            case "i2pallowmixednetworks": current.Network.I2pAllowMixedNetworks = value.GetBoolean(); break;
+            case "preferrc4": current.Network.PreferRc4 = value.GetBoolean(); break;
             case "enableblocklist": current.EnableBlocklist = value.GetBoolean(); break;
             case "blocklistpath": current.BlocklistPath = value.GetString() ?? current.BlocklistPath; break;
             case "enablegeoip": current.EnableGeoIp = value.GetBoolean(); break;
@@ -360,6 +381,15 @@ public class McpToolHandler : IMcpToolHandler
     }
 
     private static void ApplyStorageSettings(AppSettings current, JsonElement value) => ApplyNested(current, value);
+
+    private static string ReadEncryptionMode(JsonElement value, bool allowInherit)
+    {
+        var mode = value.GetString();
+        if (NetworkSettings.IsEncryptionMode(mode) || (allowInherit && mode == NetworkSettings.InheritEncryption)) return mode!;
+        throw new ArgumentException(allowInherit
+            ? "Encryption mode must be Inherit, Allow, Require, or Refuse."
+            : "Encryption mode must be Allow, Require, or Refuse.", nameof(value));
+    }
 
     private static void ApplyNetworkSettings(AppSettings current, JsonElement value) => ApplyNested(current, value);
 

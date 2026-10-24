@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,29 +9,70 @@ using System.Threading;
 
 namespace Peerfluence.Logging;
 
+/// <summary>
+/// Writes the profile's log, once told the profile is this process's to write.
+///
+/// <para>
+/// Taking over the file archives the previous log and starts a fresh one, which is only right for
+/// the instance that owns the profile. Nothing can know that until the single-instance lock has been
+/// tried, and that comes after logging is set up - so the file is left alone until
+/// <see cref="Open"/>, and anything logged before then is held and written when it is called. A
+/// process that turns out to be a second launch is disposed without ever opening it, which is what
+/// keeps it from emptying the log of the instance already running.
+/// </para>
+/// </summary>
 internal sealed class FileLoggerProvider : ILoggerProvider
 {
     private const int RetainedArchiveCount = 5;
 
+    // Only a few lines are logged before the lock is decided. The bound is for a caller that never
+    // opens the file, which must not turn into memory held for the life of the process.
+    private const int MaxPendingLines = 1000;
+
     private readonly Lock _lock = new();
-    private readonly StreamWriter _writer;
+    private readonly string _path;
+    private readonly List<string> _pending = [];
+    private StreamWriter? _writer;
     private bool _disposed;
 
     public FileLoggerProvider(string path)
     {
-        var directory = Path.GetDirectoryName(path);
-        if (!string.IsNullOrWhiteSpace(directory))
+        _path = path;
+    }
+
+    /// <summary>
+    /// Archives the previous log, starts a fresh one, and writes everything logged so far.
+    /// </summary>
+    public void Open()
+    {
+        lock (_lock)
         {
-            Directory.CreateDirectory(directory);
+            if (_disposed || _writer != null)
+            {
+                return;
+            }
+
+            var directory = Path.GetDirectoryName(_path);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            ArchiveExistingLog(_path);
+
+            var stream = new FileStream(_path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            _writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false))
+            {
+                AutoFlush = true
+            };
+
+            foreach (var line in _pending)
+            {
+                _writer.WriteLine(line);
+            }
+
+            _pending.Clear();
         }
-
-        ArchiveExistingLog(path);
-
-        var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
-        _writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false))
-        {
-            AutoFlush = true
-        };
     }
 
     private static void ArchiveExistingLog(string path)
@@ -106,7 +148,8 @@ internal sealed class FileLoggerProvider : ILoggerProvider
                 return;
             }
             _disposed = true;
-            _writer.Dispose();
+            _writer?.Dispose();
+            _pending.Clear();
         }
     }
 
@@ -118,6 +161,17 @@ internal sealed class FileLoggerProvider : ILoggerProvider
             {
                 return;
             }
+
+            if (_writer is null)
+            {
+                if (_pending.Count < MaxPendingLines)
+                {
+                    _pending.Add(message);
+                }
+
+                return;
+            }
+
             _writer.WriteLine(message);
         }
     }
