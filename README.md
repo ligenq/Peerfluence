@@ -65,6 +65,8 @@ lifecycle, and PeerSharp for BitTorrent engine behavior.
 - Configure a completion action program/script that runs when a torrent finishes.
 - Customize theme variant, accent color, and language.
 - Self-update through Velopack for direct-download builds.
+- Let Sonarr, Radarr and other tools drive Peerfluence over a Transmission-compatible RPC
+  endpoint, off by default and bound to this machine unless opened up with a password.
 - Expose a local MCP server for AI-assisted control and diagnostics.
 - Run a UI-agent mode for natural-language, AI-executable UI test cases.
 - Handle crashes with native platform dialogs and crash logs.
@@ -145,6 +147,8 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 - Search: Torznab endpoint URL and API key used by the Find Torrents page.
 - Media player: external media player path.
 - Completion action: program/script, arguments, working directory, timeout, run hidden.
+- Remote control: Transmission RPC on/off, port, whether other machines may connect, and
+  the username and password they must give.
 - Updates: Velopack update URL and restart/apply controls for direct builds.
 - Appearance: interface mode (simple or advanced), Midnight or Midnight Light theme,
   automatic switching with the system preference, accent color, and language.
@@ -191,6 +195,18 @@ On Linux, the configured XDG Downloads directory is honored. Typical Windows loc
 Use `--profile <path>` to run with an isolated profile. This is especially useful for
 testing.
 
+## Remote Control
+
+Peerfluence can answer the Transmission RPC protocol at `/transmission/rpc`, so Sonarr, Radarr
+and other tools written for Transmission can add, start, stop, move and remove torrents and read
+their progress. Turn it on under Settings → Remote control; changes take effect the next time
+Peerfluence starts. The default port is Transmission's own, 9091.
+
+It listens only on this machine unless **Reachable from other machines** is on, and then only
+with a username and password set; without them it does not start. `session-set` applies the
+global download and upload limits (`speed-limit-down`, `speed-limit-up` and their `-enabled`
+flags, in KiB/s) and ignores session fields it does not support.
+
 ## MCP Integration
 
 Peerfluence includes a local MCP server. It is disabled by default for normal use. Enable
@@ -210,7 +226,8 @@ mode is a stdio JSON-RPC proxy that connects to the already-running app.
 - `manage_torrent`: pause, resume, or remove by info hash.
 - `take_screenshot`: capture the current application window.
 - `shutdown_application`: gracefully shut down Peerfluence.
-- `update_settings`: update application settings from JSON.
+- `update_settings`: update application settings from JSON, including the global speed limits
+  (`Network.MaxDownloadSpeedBytesPerSecond`, `Network.MaxUploadSpeedBytesPerSecond`).
 - `invoke_ui_action`: invoke UI actions such as `pause_all` or `resume_all`.
 - `get_torrent_diagnostics`: inspect trackers, peers, missing pieces, and errors.
 - `set_file_priority`: set the priority for a torrent file.
@@ -357,13 +374,13 @@ The Debian package registers the application launcher, `.torrent` MIME handler, 
 architecture with `clang` and `zlib1g-dev` installed:
 
 ```shell
-./ReleasePackaging/build-linux.sh --version 2.1.0 --rid linux-x64
+./ReleasePackaging/build-linux.sh --version 2.2.0 --rid linux-x64
 ```
 
 Build a Velopack release:
 
 ```powershell
-.\ReleasePackaging\build-velopack.ps1 -Version 2.1.0
+.\ReleasePackaging\build-velopack.ps1 -Version 2.2.0
 ```
 
 The script publishes the app, creates the Velopack release, and writes artifacts to
