@@ -647,6 +647,10 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ActiveTorrents = stats.ActiveTorrents;
         TotalPeers = stats.TotalPeers;
         IsSessionPaused = _torrentService.IsSessionPaused;
+
+        // Passed on so the statistics page, while it is open, shows this reading instead of taking
+        // its own: the engine is read once a second, not once per screen that shows the numbers.
+        WeakReferenceMessenger.Default.Send(new EngineStatsReadMessage(stats));
     }
 
 
