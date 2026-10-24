@@ -1,8 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Theme.Controls;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Peerfluence.Core;
-using Peerfluence.Core.Messaging;
-using Peerfluence.Core.Services;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
 
@@ -16,7 +14,7 @@ public sealed class NotificationServiceTests
     [Fact]
     public void PublishingNothing_IsRejectedRatherThanStored()
     {
-        var sut = new NotificationService(Substitute.For<SukiUI.Toasts.ISukiToastManager>());
+        var sut = new NotificationService(Substitute.For<IToastManager>());
 
         Assert.Throws<ArgumentNullException>(() => sut.Publish(null!));
     }

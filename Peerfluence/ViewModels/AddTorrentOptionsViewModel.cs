@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,49 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     private readonly bool _isMagnet;
     private CancellationTokenSource? _metadataPreviewCts;
     private TorrentFile? _previewTorrentFile;
+    private ITorrent? _existingSslTorrent;
+
+    [ObservableProperty]
+    private bool _isSsl;
+
+    [ObservableProperty]
+    private string _sslCertificatePath = string.Empty;
+
+    [ObservableProperty]
+    private string _sslCertificatePassword = string.Empty;
+
+    public bool IsNewTorrent => _existingSslTorrent == null;
+
+    public string SubmitLabel => IsNewTorrent ? Resources.AddTorrent_Add : Resources.Downloads_Start;
+
+    [RelayCommand]
+    private async Task BrowseSslCertificateAsync()
+    {
+        var files = await _topLevelService.GetStorageProvider().OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Resources.AddTorrent_SslCertificate,
+            AllowMultiple = false,
+            FileTypeFilter = [new FilePickerFileType("PKCS#12") { Patterns = ["*.pfx", "*.p12"] }]
+        });
+        if (files.Count > 0) SslCertificatePath = files[0].Path.LocalPath;
+    }
+
+    public static AddTorrentOptionsViewModel CreateForSslCertificate(ITorrent torrent,
+        ITorrentService torrentService, ITopLevelService topLevelService, IAppSettingsService settingsService)
+    {
+        var file = torrent.ExportTorrentFile();
+        if (!file.IsSsl) throw new ArgumentException("This torrent does not require an SSL certificate.", nameof(torrent));
+        return new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, string.Empty, false)
+        {
+            _existingSslTorrent = torrent,
+            _previewTorrentFile = file,
+            IsSsl = true,
+            Name = torrent.Name,
+            DownloadPath = torrent.Files.DownloadPath,
+            FileCount = file.FileCount,
+            TotalSizeBytes = file.TotalSize
+        };
+    }
 
     private AddTorrentOptionsViewModel(
         ITorrentService torrentService,
@@ -222,6 +266,13 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         ITorrentCategoryService categoryService)
     {
         var torrentFile = await TorrentFile.LoadAsync(torrentPath);
+        return CreateForTorrentFile(torrentFile, torrentPath, torrentService, topLevelService, settingsService, categoryService);
+    }
+
+    public static AddTorrentOptionsViewModel CreateForTorrentFile(TorrentFile torrentFile, string torrentPath,
+        ITorrentService torrentService, ITopLevelService topLevelService, IAppSettingsService settingsService,
+        ITorrentCategoryService categoryService)
+    {
         var model = new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, torrentPath, isMagnet: false)
         {
             // Kept so the add reuses the file we already parsed rather than reading it a second time.
@@ -235,6 +286,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             PieceCount = torrentFile.PieceCount,
             PieceSizeBytes = torrentFile.PieceSize,
             IsPrivate = torrentFile.IsPrivate,
+            IsSsl = torrentFile.IsSsl,
             ExistingTrackers = string.Join(Environment.NewLine, torrentFile.Trackers),
             DownloadPath = Path.Combine(GetDefaultDownloadPath(settingsService), torrentFile.Name)
         };
@@ -287,6 +339,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     internal void ApplyMetadataPreview(MagnetMetadataPreview preview)
     {
         _previewTorrentFile = preview.TorrentFile;
+        IsSsl = preview.TorrentFile?.IsSsl == true;
         Name = preview.Name;
         Hash = preview.Hash;
         VersionLabel = preview.VersionLabel;
@@ -355,9 +408,18 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             // the add no longer has to wait out an unwind that is already under way.
             CancelMetadataPreview();
 
+            using var certificate = IsSsl ? LoadSslCertificate() : null;
             var options = BuildOptions();
+            options.SslCertificate = certificate;
             ITorrent added;
-            if (_previewTorrentFile != null)
+            if (_existingSslTorrent != null)
+            {
+                _existingSslTorrent = await _torrentService.SetSslCertificateAsync(_existingSslTorrent, certificate!);
+                added = _existingSslTorrent;
+                try { await added.StartAsync(); }
+                catch { added.QueueAutoStart = false; throw; }
+            }
+            else if (_previewTorrentFile != null)
             {
                 // Both a .torrent file and a magnet whose preview resolved end up here; adding the
                 // parsed file spares the magnet a second metadata download.
@@ -386,12 +448,28 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            if (_existingSslTorrent != null)
+                _existingSslTorrent = _torrentService.GetTorrents().FirstOrDefault(t => TorrentIdentity.SameTorrent(t, _existingSslTorrent)) ?? _existingSslTorrent;
             ErrorMessage = ex.Message;
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    private X509Certificate2 LoadSslCertificate()
+    {
+        if (string.IsNullOrWhiteSpace(SslCertificatePath))
+            throw new InvalidOperationException(Resources.AddTorrent_SslCertificateRequired);
+        var certificate = X509CertificateLoader.LoadPkcs12FromFile(
+            SslCertificatePath.Trim(), SslCertificatePassword, X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+        if (!certificate.HasPrivateKey)
+        {
+            certificate.Dispose();
+            throw new InvalidOperationException(Resources.AddTorrent_SslCertificateRequired);
+        }
+        return certificate;
     }
 
     internal AddTorrentOptions BuildOptions()
@@ -427,6 +505,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     private void RequestClose()
     {
         CancelMetadataPreview();
+        SslCertificatePassword = string.Empty;
         OnRequestClose?.Invoke();
     }
 

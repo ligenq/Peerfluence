@@ -23,10 +23,70 @@ public class FileLoggerProviderTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    private FileLoggerProvider OpenProvider()
+    {
+        var provider = new FileLoggerProvider(_logPath);
+        provider.Open();
+        return provider;
+    }
+
+    /// <summary>
+    /// A second launch logs before it knows it is one, and must not take the file over to do it.
+    /// </summary>
+    [Fact]
+    public void Logger_LeavesAnExistingLogAloneUntilOpened()
+    {
+        File.WriteAllText(_logPath, "the running instance's log\n");
+
+        using (var provider = new FileLoggerProvider(_logPath))
+        {
+            provider.CreateLogger("SecondLaunch").LogInformation("never opened");
+        }
+
+        Assert.Equal("the running instance's log\n", File.ReadAllText(_logPath));
+        Assert.Empty(Directory.EnumerateFiles(
+            Path.GetDirectoryName(_logPath)!,
+            $"{Path.GetFileNameWithoutExtension(_logPath)}.*.log"));
+    }
+
+    [Fact]
+    public void Open_WritesWhatWasLoggedBeforeIt_ThenCarriesOn()
+    {
+        using (var provider = new FileLoggerProvider(_logPath))
+        {
+            var logger = provider.CreateLogger("Test");
+            logger.LogInformation("before open");
+            provider.Open();
+            logger.LogInformation("after open");
+        }
+
+        var content = File.ReadAllText(_logPath);
+        Assert.Contains("before open", content);
+        Assert.Contains("after open", content);
+        Assert.True(
+            content.IndexOf("before open", StringComparison.Ordinal) < content.IndexOf("after open", StringComparison.Ordinal),
+            "Lines held before the file was opened must come first.");
+    }
+
+    [Fact]
+    public void Open_IsIdempotent_AndDoesNotArchiveTheLogItJustStarted()
+    {
+        using (var provider = OpenProvider())
+        {
+            provider.CreateLogger("Test").LogInformation("only session");
+            provider.Open();
+        }
+
+        Assert.Contains("only session", File.ReadAllText(_logPath));
+        Assert.Empty(Directory.EnumerateFiles(
+            Path.GetDirectoryName(_logPath)!,
+            $"{Path.GetFileNameWithoutExtension(_logPath)}.*.log"));
+    }
+
     [Fact]
     public void CreateLogger_ReturnsLoggerInstance()
     {
-        using var provider = new FileLoggerProvider(_logPath);
+        using var provider = OpenProvider();
         var logger = provider.CreateLogger("TestCategory");
 
         Assert.NotNull(logger);
@@ -35,7 +95,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Logger_WritesToFile()
     {
-        using (var provider = new FileLoggerProvider(_logPath))
+        using (var provider = OpenProvider())
         {
             var logger = provider.CreateLogger("TestCategory");
             logger.LogInformation("Hello from test");
@@ -48,7 +108,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Logger_IncludesTimestamp()
     {
-        using (var provider = new FileLoggerProvider(_logPath))
+        using (var provider = OpenProvider())
         {
             var logger = provider.CreateLogger("Test");
             logger.LogWarning("timestamp check");
@@ -62,7 +122,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Logger_IncludesExceptionDetails()
     {
-        using (var provider = new FileLoggerProvider(_logPath))
+        using (var provider = OpenProvider())
         {
             var logger = provider.CreateLogger("Test");
             logger.LogError(new InvalidOperationException("boom"), "Something failed");
@@ -78,14 +138,14 @@ public class FileLoggerProviderTests : IDisposable
     public void Logger_ArchivesPreviousLogOnNewSession()
     {
         // First session
-        using (var provider = new FileLoggerProvider(_logPath))
+        using (var provider = OpenProvider())
         {
             var logger = provider.CreateLogger("Session1");
             logger.LogInformation("first session message");
         }
 
         // Second session archives the previous active log and starts a fresh one.
-        using (var provider = new FileLoggerProvider(_logPath))
+        using (var provider = OpenProvider())
         {
             var logger = provider.CreateLogger("Session2");
             logger.LogInformation("second session message");
@@ -107,7 +167,7 @@ public class FileLoggerProviderTests : IDisposable
     {
         for (var i = 0; i < 7; i++)
         {
-            using var provider = new FileLoggerProvider(_logPath);
+            using var provider = OpenProvider();
             var logger = provider.CreateLogger($"Session{i}");
             logger.LogInformation("session {Index}", i);
             Thread.Sleep(5);
@@ -123,7 +183,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Logger_IgnoresLogLevelNone()
     {
-        using var provider = new FileLoggerProvider(_logPath);
+        using var provider = OpenProvider();
         var logger = provider.CreateLogger("Test");
 
         Assert.False(logger.IsEnabled(LogLevel.None));
@@ -132,7 +192,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Logger_IsEnabledForAllLevelsExceptNone()
     {
-        using var provider = new FileLoggerProvider(_logPath);
+        using var provider = OpenProvider();
         var logger = provider.CreateLogger("Test");
 
         Assert.True(logger.IsEnabled(LogLevel.Trace));
@@ -146,7 +206,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Dispose_IsIdempotent()
     {
-        var provider = new FileLoggerProvider(_logPath);
+        var provider = OpenProvider();
         provider.Dispose();
         provider.Dispose(); // Should not throw
     }
@@ -154,7 +214,7 @@ public class FileLoggerProviderTests : IDisposable
     [Fact]
     public void Logger_DoesNotWriteAfterDispose()
     {
-        var provider = new FileLoggerProvider(_logPath);
+        var provider = OpenProvider();
         var logger = provider.CreateLogger("Test");
         logger.LogInformation("before dispose");
         provider.Dispose();

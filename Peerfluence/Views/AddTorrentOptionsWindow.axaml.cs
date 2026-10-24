@@ -1,11 +1,11 @@
+using Avalonia.Controls;
 using System;
 using Avalonia.Markup.Xaml;
 using Peerfluence.ViewModels;
-using SukiUI.Controls;
 
 namespace Peerfluence.Views;
 
-public partial class AddTorrentOptionsWindow : SukiWindow
+public partial class AddTorrentOptionsWindow : Window
 {
     private AddTorrentOptionsViewModel? _currentViewModel;
 
@@ -31,6 +31,7 @@ public partial class AddTorrentOptionsWindow : SukiWindow
     protected override void OnClosed(EventArgs e)
     {
         _currentViewModel?.OnRequestClose -= Close;
+        _currentViewModel?.CancelCommand.Execute(null);
         base.OnClosed(e);
     }
 }

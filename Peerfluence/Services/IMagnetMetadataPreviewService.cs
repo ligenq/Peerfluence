@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using PeerSharp.Core;
 
 namespace Peerfluence.Services;
 
@@ -12,7 +11,7 @@ public interface IMagnetMetadataPreviewService
     /// Fetches a magnet's metadata without adding it to the engine.
     /// </summary>
     /// <param name="magnetUri">The magnet to resolve.</param>
-    /// <param name="timeout">How long to wait before giving up.</param>
+    /// <param name="timeout">How long to wait, or Timeout.InfiniteTimeSpan to wait until cancelled.</param>
     /// <param name="progress">
     /// Receives how much of the metadata has arrived, from 0 to 1. Optional: the fetch used to be
     /// unobservable, so a caller that only wants the result passes nothing and gets what it always

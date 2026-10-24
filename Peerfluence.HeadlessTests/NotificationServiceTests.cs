@@ -1,8 +1,8 @@
+using Peerfluence.Theme.Controls;
 using Avalonia.Threading;
 using Peerfluence.Core;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;
-using SukiUI.Toasts;
 
 namespace Peerfluence.HeadlessTests;
 
@@ -25,32 +25,32 @@ public class NotificationServiceTests
         // action failing are both reported from a hosted service, on whatever thread the engine's
         // alert arrived on. Those callers have no reason to know that saying so touches the
         // interface, which is why the service marshals rather than asking them to.
-        var manager = Substitute.For<ISukiToastManager>();
+        var manager = new ToastManager();
         var sut = new NotificationService(manager);
 
         Task.Run(() => sut.Publish(Item())).GetAwaiter().GetResult();
         Dispatcher.UIThread.RunJobs();
 
-        manager.Received(1).CreateToast();
+        Assert.Single(manager.Toasts);
     }
 
     [AvaloniaFact]
     public void ANotificationFromTheUiThread_ArrivesJustTheSame()
     {
-        var manager = Substitute.For<ISukiToastManager>();
+        var manager = new ToastManager();
         var sut = new NotificationService(manager);
 
         sut.Publish(Item());
         Dispatcher.UIThread.RunJobs();
 
-        manager.Received(1).CreateToast();
+        Assert.Single(manager.Toasts);
     }
 
     [AvaloniaFact]
     public void PublishingNothing_IsRefusedWhereTheCallerCanSeeIt()
     {
         // On the calling thread rather than inside the posted work, where nobody would catch it.
-        var sut = new NotificationService(Substitute.For<ISukiToastManager>());
+        var sut = new NotificationService(Substitute.For<IToastManager>());
 
         Assert.Throws<ArgumentNullException>(() => sut.Publish(null!));
     }

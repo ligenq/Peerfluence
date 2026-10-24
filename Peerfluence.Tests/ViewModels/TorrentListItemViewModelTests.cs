@@ -136,6 +136,7 @@ public class TorrentListItemViewModelTests
 
         Assert.NotEqual("\u221E", _sut.Eta);
         Assert.NotEqual(string.Empty, _sut.Eta);
+        Assert.Equal(10, _sut.EstimatedSecondsRemaining);
     }
 
     [Fact]
@@ -155,6 +156,7 @@ public class TorrentListItemViewModelTests
         _sut.UpdateTransferStats(stats);
 
         Assert.Equal("\u221E", _sut.Eta);
+        Assert.Equal(double.PositiveInfinity, _sut.EstimatedSecondsRemaining);
     }
 
     [Fact]
@@ -174,6 +176,7 @@ public class TorrentListItemViewModelTests
         _sut.UpdateTransferStats(stats);
 
         Assert.Equal(string.Empty, _sut.Eta);
+        Assert.Equal(0, _sut.EstimatedSecondsRemaining);
     }
 
     [Fact]

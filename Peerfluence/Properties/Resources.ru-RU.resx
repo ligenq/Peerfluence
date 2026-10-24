@@ -64,6 +64,12 @@
   <data name="App_Tagline" xml:space="preserve">
     <value>Рабочая станция BitTorrent</value>
   </data>
+  <data name="Nav_Navigation" xml:space="preserve">
+    <value>Навигация</value>
+  </data>
+  <data name="Find_Hint" xml:space="preserve">
+    <value>Ищите в подключённых индексаторах и добавляйте результаты в загрузки.</value>
+  </data>
   <data name="Nav_Downloads" xml:space="preserve">
     <value>Загрузки</value>
   </data>
@@ -424,6 +430,12 @@
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
     <value>Тёмная</value>
   </data>
+  <data name="Settings_ThemeVariant_Midnight" xml:space="preserve">
+    <value>Полночь</value>
+  </data>
+  <data name="Settings_ThemeVariant_MidnightLight" xml:space="preserve">
+    <value>Полночь светлая</value>
+  </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Цветовая тема</value>
   </data>
@@ -433,8 +445,20 @@
   <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
     <value>Кобальт</value>
   </data>
+  <data name="Settings_ColorTheme_Sky" xml:space="preserve">
+    <value>Небесный</value>
+  </data>
+  <data name="Settings_ColorTheme_Cyan" xml:space="preserve">
+    <value>Голубой</value>
+  </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>Мятный</value>
+  </data>
+  <data name="Settings_ColorTheme_Teal" xml:space="preserve">
+    <value>Сине-зелёный</value>
+  </data>
+  <data name="Settings_ColorTheme_Violet" xml:space="preserve">
+    <value>Фиолетовый</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Изумрудный</value>
@@ -1545,5 +1569,89 @@ Peerfluence распространяется по MIT License. Устанавл�
   </data>
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Категория для добавленного</value>
+  </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Укажите конкретный локальный IP-адрес для общих потоков; адреса с подстановочными знаками не поддерживаются.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Выбранный файл не содержит данных для воспроизведения.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Копировать ссылку на поток</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Остановить трансляцию</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Адрес для общего доступа к потокам</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Оставьте пустым для доступа только с этого компьютера. Для телевизора или другого устройства укажите IP-адрес этого компьютера в общей сети. Любой обладатель ссылки может воспроизводить файл до остановки трансляции.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Порт общего потока (0: автоматически)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Буфер и время ожидания</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Минимальное упреждающее чтение (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Упреждающее чтение при скорости воспроизведения (секунды)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Очередь запросов пира при буферизации (секунды)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Ожидание данных воспроизведения (секунды)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Ожидание метаданных торрента (секунды)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Ноль отменяет ограничение времени. Изменения применяются к потокам, открытым после этого.</value>
+  </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Входящие соединения</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Исходящие соединения</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Использовать режим шифрования по умолчанию</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Предпочитать шифрование данных MSE (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Применяется к новым соединениям. Отключение этой настройки разрешает незашифрованные данные MSE, если шифрование необязательно. Обязательное шифрование сохраняется.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Включить I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>Адрес маршрутизатора SAM</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>Порт маршрутизатора SAM</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Разрешить пиры публичной сети для I2P-торрентов</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Требуется маршрутизатор I2P с включённым SAM. После изменений перезапустите Peerfluence. Публичные пиры могут раскрыть ваш IP-адрес.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>Сертификат SSL-торрента (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Пароль сертификата</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Выберите сертификат с закрытым ключом, подписанный центром сертификации этого торрента. Пароли и закрытые ключи не сохраняются; после перезапуска выберите сертификат снова.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Выберите сертификат, содержащий закрытый ключ.</value>
   </data>
 </root>

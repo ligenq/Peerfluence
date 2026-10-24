@@ -1,0 +1,33 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Peerfluence.Theme.PeerfluenceTheme">
+
+  <!--
+    The entry point. Add it to Application.Styles after FluentTheme, which supplies the control
+    templates this restyles rather than replacing:
+
+      <FluentTheme />
+      <theme:PeerfluenceTheme />
+
+    Accents.axaml declares every accent at compile time; UseAccent changes the colours behind
+    the shared brushes. Nothing is loaded at run time.
+  -->
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Peerfluence.Theme/Themes/Metrics.axaml" />
+        <ResourceInclude Source="avares://Peerfluence.Theme/Themes/Palette.axaml" />
+        <ResourceInclude Source="avares://Peerfluence.Theme/Themes/Accents.axaml" />
+        <ResourceInclude Source="avares://Peerfluence.Theme/Themes/FluentResources.axaml" />
+        <ResourceInclude Source="avares://Peerfluence.Theme/Themes/Overlays.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+      <StaticResource x:Key="SystemAccentColorBrush" ResourceKey="PfAccent" />
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+  <StyleInclude Source="avares://Peerfluence.Theme/Themes/Controls.axaml" />
+  <StyleInclude Source="avares://Peerfluence.Theme/Themes/Variants.axaml" />
+
+</Styles>

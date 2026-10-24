@@ -1,4 +1,4 @@
-﻿using Peerfluence.Core.Services;
+using Peerfluence.Theme.Controls;
 using Peerfluence.Services;
 
 namespace Peerfluence.Tests.Services;
@@ -23,7 +23,7 @@ public sealed class DialogServiceTests
         // created it, so there was a window during startup where it existed and could not prompt.
         // It is a constructor argument now, and there is no such window.
         var sut = new DialogService(
-            Substitute.For<ITopLevelService>(), [], Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<ITopLevelService>(), [], Substitute.For<IDialogManager>());
 
         Assert.True(sut.CanPrompt);
     }
@@ -31,7 +31,7 @@ public sealed class DialogServiceTests
     [Fact]
     public async Task AskingForADialogNobodyRegistered_SaysWhichOneWasMissing()
     {
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), [], Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+        var sut = new DialogService(Substitute.For<ITopLevelService>(), [], Substitute.For<IDialogManager>());
 
         var error = await Assert.ThrowsAsync<InvalidOperationException>(sut.ShowAsync<UnregisteredViewModel>);
 
@@ -48,7 +48,7 @@ public sealed class DialogServiceTests
             () => throw new InvalidOperationException("no window should be built"),
             () => "not a view model");
 
-        var sut = new DialogService(Substitute.For<ITopLevelService>(), [registration], Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+        var sut = new DialogService(Substitute.For<ITopLevelService>(), [registration], Substitute.For<IDialogManager>());
 
         await Assert.ThrowsAsync<InvalidOperationException>(sut.ShowAsync<UnregisteredViewModel>);
     }

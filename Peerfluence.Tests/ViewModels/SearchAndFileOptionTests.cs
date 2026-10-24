@@ -1,5 +1,4 @@
 ﻿using PeerSharp.Core;
-using PeerSharp.Interfaces;
 using Peerfluence.Core.Services;
 using Peerfluence.ViewModels;
 
@@ -96,6 +95,17 @@ public sealed class AddTorrentFileOptionViewModelTests
 /// </summary>
 public sealed class TorrentSearchResultViewModelTests
 {
+    [Fact]
+    public void PublishedAt_PreservesTheTimestampUsedToSortAgeAndMissingValues()
+    {
+        var published = DateTimeOffset.UtcNow.AddHours(-3);
+        var result = new TorrentSearchResultViewModel(
+            new TorrentSearchResult("Title", 2048, 1, 1, "Indexer", published, "magnet:?a"));
+
+        Assert.Equal(published, result.PublishedAt);
+        Assert.Null(Result(1, 1).PublishedAt);
+    }
+
     private static TorrentSearchResultViewModel Result(int seeders, int peers) =>
         new(new TorrentSearchResult("Title", 2048, seeders, peers, "Indexer", null, "magnet:?xt=urn:btih:abc"));
 

@@ -30,6 +30,88 @@ public sealed class TorrentService : ITorrentService
         return _engineService.Engine.GetTorrents();
     }
 
+    public async Task<ITorrent> SetSslCertificateAsync(ITorrent torrent,
+        System.Security.Cryptography.X509Certificates.X509Certificate2 certificate,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(torrent);
+        ArgumentNullException.ThrowIfNull(certificate);
+        if (!certificate.HasPrivateKey) throw new ArgumentException("The SSL certificate must include its private key.", nameof(certificate));
+        if (torrent.State != TorrentState.Stopped) throw new InvalidOperationException("Stop the torrent before changing its SSL certificate.");
+        var metadata = torrent.ExportTorrentFile();
+        if (!metadata.IsSsl) throw new InvalidOperationException("This torrent does not require an SSL certificate.");
+        // Not redundant with the guard above. Stopped is what the caller has to ask for; this closes
+        // the gap after it, where a queue that still saw auto-start set could have started the
+        // torrent again before its resume data is read below.
+        torrent.QueueAutoStart = false;
+        await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
+        var options = new AddTorrentOptions
+        {
+            StartImmediately = false,
+            SslCertificate = certificate,
+            DownloadPath = torrent.Files.DownloadPath,
+            ResumeData = torrent.GetResumeData(),
+            FileSelections = torrent.GetAllFileSelections(),
+            AdditionalTrackers = torrent.Trackers.GetTrackers().Select(tracker => tracker.Url).ToArray(),
+            AdditionalWebSeeds = torrent.WebSeeds.GetAll(),
+            DownloadStrategy = torrent.DownloadStrategy,
+            DownloadLimitBytesPerSecond = torrent.DownloadLimitBytesPerSecond,
+            UploadLimitBytesPerSecond = torrent.UploadLimitBytesPerSecond,
+            QueuePriority = torrent.QueuePriority,
+            RatioLimit = torrent.RatioLimit,
+            SeedTimeLimit = torrent.SeedTimeLimit,
+            SuperSeeding = torrent.SuperSeeding,
+            Events = torrent.Events
+        };
+        var readLimit = torrent.DiskReadLimitBytesPerSecond;
+        var writeLimit = torrent.DiskWriteLimitBytesPerSecond;
+        var maxConnections = torrent.MaxConnections;
+        var maxUploadSlots = torrent.MaxUploadSlots;
+        var engine = _engineService.Engine;
+        // The released API accepts certificates only at add time. After removal, finish the
+        // replacement even if the caller cancels; leave a stopped entry on any start failure.
+        await engine.RemoveTorrentAsync(torrent, RemoveOptions.None, cancellationToken).ConfigureAwait(false);
+        ITorrent replacement;
+        try
+        {
+            replacement = await engine.AddTorrentAsync(metadata, options, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception replacementFailure)
+        {
+            options.SslCertificate = null;
+            ITorrent recovered;
+            try
+            {
+                recovered = await engine.AddTorrentAsync(metadata, options, CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception recoveryFailure)
+            {
+                // Both adds failed, so the cause was not the certificate, and the torrent is already
+                // out of the session with nothing left to put it back. Say so, and keep the first
+                // failure: it is the reason, and letting the second replace it hid both.
+                throw new AggregateException(
+                    $"Torrent '{metadata.Name}' could not be re-added after its certificate change and is no longer in the list. Add its .torrent file again to resume it.",
+                    replacementFailure,
+                    recoveryFailure);
+            }
+
+            RestoreLimits(recovered);
+            await engine.SaveSessionAsync(CancellationToken.None).ConfigureAwait(false);
+            throw;
+        }
+        RestoreLimits(replacement);
+        await engine.SaveSessionAsync(CancellationToken.None).ConfigureAwait(false);
+        return replacement;
+
+        void RestoreLimits(ITorrent target)
+        {
+            target.DiskReadLimitBytesPerSecond = readLimit;
+            target.DiskWriteLimitBytesPerSecond = writeLimit;
+            target.MaxConnections = maxConnections;
+            target.MaxUploadSlots = maxUploadSlots;
+        }
+    }
+
     public EngineStats GetStats()
     {
         try
@@ -130,12 +212,12 @@ public sealed class TorrentService : ITorrentService
     {
         var seeding = _settings.Current.Seeding;
 
-        if (seeding.LimitRatio)
+        if (seeding.LimitRatio && float.IsFinite(seeding.RatioLimit) && seeding.RatioLimit >= 0)
         {
             options.RatioLimit ??= seeding.RatioLimit;
         }
 
-        if (seeding.LimitSeedTime)
+        if (seeding.LimitSeedTime && seeding.SeedTimeLimitMinutes >= 0)
         {
             options.SeedTimeLimit ??= TimeSpan.FromMinutes(seeding.SeedTimeLimitMinutes);
         }

@@ -1,0 +1,421 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:pf="using:Peerfluence.Theme.Controls">
+
+  <!-- Layout and intentional visual differences. Fluent resource mappings live in FluentResources.axaml. -->
+
+  <!-- ============================ structure and density ============================ -->
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource PfCanvas}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource PfText}" />
+  </Style>
+
+
+  <Style Selector="StackPanel.pageHeader">
+    <Setter Property="Spacing" Value="{DynamicResource PfSpaceSm}" />
+    <Setter Property="Margin" Value="{DynamicResource PfPageHeaderMargin}" />
+  </Style>
+
+  <!-- Shared by window dialogs and prompts assembled by the application. -->
+  <Style Selector="StackPanel.dialogActions">
+    <Setter Property="Spacing" Value="{DynamicResource PfSpaceXl}" />
+  </Style>
+
+  <Style Selector="ScrollViewer.dialogForm">
+    <Setter Property="AllowAutoHide" Value="False" />
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="Padding" Value="{DynamicResource PfDialogScrollGutter}" />
+  </Style>
+
+  <!--
+    Named roles rather than sizes at call sites, so a screen asks for a caption and gets whatever a
+    caption currently is.
+  -->
+  <Style Selector="TextBlock.display">
+    <Setter Property="FontSize" Value="{DynamicResource PfFontDisplay}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="-0.4" />
+  </Style>
+  <Style Selector="TextBlock.title">
+    <Setter Property="FontSize" Value="{DynamicResource PfFontTitle}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="-0.2" />
+  </Style>
+  <Style Selector="TextBlock.subtitle">
+    <Setter Property="FontSize" Value="{DynamicResource PfFontSubtitle}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="TextBlock.secondary">
+    <Setter Property="Foreground" Value="{DynamicResource PfTextSecondary}" />
+  </Style>
+  <Style Selector="TextBlock.tertiary">
+    <Setter Property="Foreground" Value="{DynamicResource PfTextTertiary}" />
+  </Style>
+  <Style Selector="TextBlock.caption">
+    <Setter Property="FontSize" Value="{DynamicResource PfFontCaption}" />
+    <Setter Property="Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="LetterSpacing" Value="0.5" />
+  </Style>
+  <!-- Anything that is a measurement. Columns of digits that do not line up look broken. -->
+  <Style Selector="TextBlock.numeric">
+    <Setter Property="FontFeatures" Value="tnum=1" />
+  </Style>
+
+  <!-- ============================ buttons ============================ -->
+
+  <Style Selector="Button">
+    <Setter Property="MinHeight" Value="{DynamicResource PfControlHeight}" />
+    <Setter Property="Padding" Value="{DynamicResource PfPadControlWide}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadius}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource PfBorderThin}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Base properties for class variants. Their presenter states live in Variants.axaml. -->
+  <Style Selector="Button.ghost">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.danger">
+    <Setter Property="Foreground" Value="{DynamicResource PfDanger}" />
+  </Style>
+
+  <Style Selector="Button.icon">
+    <Setter Property="Padding" Value="7" />
+    <Setter Property="MinWidth" Value="{DynamicResource PfControlHeight}" />
+  </Style>
+
+  <Style Selector="Button.ghost.icon">
+    <Setter Property="Foreground" Value="{DynamicResource PfTextSecondary}" />
+  </Style>
+
+  <!-- Toolbar toggles use the same footprint as icon buttons, with a persistent selected state. -->
+  <Style Selector="ToggleButton.toolbar">
+    <Setter Property="MinHeight" Value="{DynamicResource PfControlHeight}" />
+    <Setter Property="MinWidth" Value="{DynamicResource PfControlHeight}" />
+    <Setter Property="Padding" Value="7" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadius}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource PfBorderThin}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+  </Style>
+  <!-- ============================ fields ============================ -->
+
+  <Style Selector="TextBox, ComboBox, NumericUpDown">
+    <Setter Property="MinHeight" Value="{DynamicResource PfControlHeight}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadius}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+  </Style>
+
+  <Style Selector="TextBox">
+    <Setter Property="Padding" Value="{DynamicResource PfPadControl}" />
+  </Style>
+
+  <Style Selector="Button.nav">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource PfTextSecondary}" />
+  </Style>
+
+  <!-- ============================ segmented choice ============================ -->
+
+  <!--
+    A radio group that reads as one segmented control rather than as a column of dots: used where
+    the options are few, exclusive and worth showing at once, such as the two interface modes.
+    Retemplated rather than restyled, because the thing being removed is the radio glyph itself.
+  -->
+  <Style Selector="RadioButton.chip">
+    <Setter Property="MinHeight" Value="{DynamicResource PfControlHeight}" />
+    <Setter Property="Padding" Value="{DynamicResource PfPadControlWide}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource PfTextSecondary}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Chip"
+                Background="{DynamicResource PfSurface}"
+                BorderBrush="{DynamicResource PfBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource PfRadius}"
+                Padding="{TemplateBinding Padding}">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.chip:pointerover /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorderStrong}" />
+  </Style>
+  <Style Selector="RadioButton.chip:checked">
+    <Setter Property="Foreground" Value="{DynamicResource PfTextOnAccent}" />
+  </Style>
+  <Style Selector="RadioButton.chip:not(:checked):pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource PfText}" />
+  </Style>
+  <Style Selector="RadioButton.chip:checked /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccent}" />
+  </Style>
+  <Style Selector="RadioButton.chip:pressed /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceActive}" />
+  </Style>
+  <Style Selector="RadioButton.chip:checked:pointerover /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfAccentHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentHover}" />
+  </Style>
+  <Style Selector="RadioButton.chip:checked:pressed /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfAccentPressed}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccentPressed}" />
+  </Style>
+  <Style Selector="RadioButton.chip:disabled">
+    <Setter Property="Foreground" Value="{DynamicResource PfTextTertiary}" />
+  </Style>
+  <Style Selector="RadioButton.chip:disabled /template/ Border#PART_Chip">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceAlt}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+  </Style>
+
+  <!-- ============================ tabs ============================ -->
+
+  <!--
+    An underline rather than Fluent's pill. Settings has eight of these across one row, and eight
+    pills read as eight buttons rather than as one control.
+  -->
+  <Style Selector="TabControl">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <Style Selector="TabItem">
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource PfTextSecondary}" />
+    <Setter Property="Padding" Value="0,0,0,8" />
+    <Setter Property="Margin" Value="0,0,20,0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0,0,0,2" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+  <Style Selector="TabItem:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource PfText}" />
+  </Style>
+  <Style Selector="TabItem:selected">
+    <Setter Property="Foreground" Value="{DynamicResource PfText}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfAccent}" />
+  </Style>
+
+  <!--
+    Fluent marks the selected tab with its own indicator as well, which left two lines: the pipe is
+    positioned for Fluent's padding, and the tighter padding set above drops it onto the text like a
+    strikethrough. The underline here is the item's own bottom border, so the pipe is turned off
+    rather than repositioned - one indicator, and it stays put whatever the padding becomes.
+  -->
+  <Style Selector="TabItem /template/ Border#PART_SelectedPipe">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <!-- ============================ sidebar navigation ============================ -->
+
+  <!-- The sidebar's own surface, here rather than in the view so a variant can replace it. -->
+  <Style Selector="Border.sidebar">
+    <Setter Property="Background" Value="{DynamicResource PfSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+    <Setter Property="BorderThickness" Value="0,0,1,0" />
+  </Style>
+
+
+  <!--
+    A list of destinations, not a menu of buttons. Selection is carried by a tinted fill and the
+    accent on the label; there is no coloured rail down the side, which is the single most
+    recognisable tic of a generated interface.
+  -->
+  <Style Selector="ListBox.nav">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="8,0" />
+  </Style>
+
+  <Style Selector="ListBox.nav ListBoxItem">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadius}" />
+    <Setter Property="Foreground" Value="{DynamicResource PfTextSecondary}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceHover}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfText}" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfAccent}" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PfTextTertiary}" />
+  </Style>
+
+  <!-- ============================ the torrent list ============================ -->
+
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="RowHeight" Value="{DynamicResource PfRowHeight}" />
+    <Setter Property="GridLinesVisibility" Value="Horizontal" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource PfBorder}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource PfTextTertiary}" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontCaption}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="MinHeight" Value="30" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+  </Style>
+
+  <Style Selector="DataGridRow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource PfText}" />
+  </Style>
+  <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="{DynamicResource PfSurfaceHover}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="{DynamicResource PfAccentSubtle}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="DataGridCell">
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontSize" Value="{DynamicResource PfFontBody}" />
+  </Style>
+
+  <!-- Generated text-column content and explicitly marked template text share the same
+       overflow behavior. Do not style labels inside cell buttons or editors.
+       The tooltip is the trimmed text only: see OverflowTooltip for why a plain Tip setter is
+       wrong here - it would repeat text the cell is already showing in full. -->
+  <Style Selector="DataGridCell TextBlock#CellTextBlock, DataGridCell TextBlock.gridCellText">
+    <Setter Property="TextWrapping" Value="NoWrap" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="pf:OverflowTooltip.IsEnabled" Value="True" />
+  </Style>
+
+  <!-- Selection belongs to the row. Keep cell focus for keyboard navigation and embedded
+       controls, but remove Fluent's outlines around the focused/current cell. -->
+  <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="DataGridCell:current /template/ Rectangle#CurrencyVisual">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <!-- ============================ the rest ============================ -->
+
+  <!-- Inset only the painted thumb. Fluent's full-width Thumb and track still receive input. -->
+  <Style Selector="ScrollBar /template/ Thumb">
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadiusPill}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <!-- The transparent full-size surface keeps the inset pill easy to grab. Fluent's
+             thumb state selectors still paint the Border; the track and drag behavior stay upstream. -->
+        <Grid Background="Transparent">
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ScrollBar:vertical /template/ Thumb /template/ Border">
+    <Setter Property="Margin" Value="{DynamicResource PfScrollThumbVerticalInset}" />
+  </Style>
+  <Style Selector="ScrollBar:horizontal /template/ Thumb /template/ Border">
+    <Setter Property="Margin" Value="{DynamicResource PfScrollThumbHorizontalInset}" />
+  </Style>
+
+  <Style Selector="ProgressBar">
+    <Setter Property="Foreground" Value="{DynamicResource PfAccent}" />
+    <Setter Property="Background" Value="{DynamicResource PfSurfaceSunken}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadiusPill}" />
+    <Setter Property="MinHeight" Value="6" />
+    <Setter Property="Height" Value="6" />
+  </Style>
+
+  <Style Selector="Separator">
+    <Setter Property="Background" Value="{DynamicResource PfBorder}" />
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Margin" Value="0" />
+  </Style>
+
+  <Style Selector="Border.panel">
+    <Setter Property="Padding" Value="{DynamicResource PfPadPanel}" />
+    <Setter Property="Background" Value="{DynamicResource PfSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource PfBorderThin}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadiusLg}" />
+  </Style>
+
+  <Style Selector="Border.divider">
+    <Setter Property="Background" Value="{DynamicResource PfBorder}" />
+    <Setter Property="Height" Value="1" />
+  </Style>
+
+  <Style Selector="Expander">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PfBorder}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadius}" />
+  </Style>
+
+  <Style Selector="Expander.disclosure">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Background" Value="{DynamicResource PfSurface}" />
+    <Setter Property="Padding" Value="{DynamicResource PfPadPanel}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadiusLg}" />
+  </Style>
+  <Style Selector="Expander.disclosure /template/ ToggleButton#ExpanderHeader">
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- Toast titles. Information keeps the ordinary text colour; only the rest are coloured. -->
+  <Style Selector="TextBlock.toastSuccess">
+    <Setter Property="Foreground" Value="{DynamicResource PfSuccess}" />
+  </Style>
+  <Style Selector="TextBlock.toastWarning">
+    <Setter Property="Foreground" Value="{DynamicResource PfWarning}" />
+  </Style>
+  <Style Selector="TextBlock.toastError">
+    <Setter Property="Foreground" Value="{DynamicResource PfDanger}" />
+  </Style>
+
+  <Style Selector="ToolTip">
+    <Setter Property="FontSize" Value="{DynamicResource PfFontSmall}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource PfRadiusSm}" />
+    <Setter Property="Padding" Value="8,5" />
+  </Style>
+
+</Styles>

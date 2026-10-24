@@ -5,8 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Peerfluence.Core.Config;
-using Peerfluence.Core.Services;
 using Peerfluence.Core.Services.Rpc;
 
 namespace Peerfluence.Services;

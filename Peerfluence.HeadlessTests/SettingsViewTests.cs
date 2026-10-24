@@ -1,4 +1,5 @@
-﻿using Avalonia.Automation;
+using Peerfluence.Theme.Controls;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using CommunityToolkit.Mvvm.Messaging;
@@ -7,12 +8,86 @@ using Peerfluence.Core.Messaging;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
-using SukiUI.Controls;
 
 namespace Peerfluence.HeadlessTests;
 
 public class SettingsViewTests
 {
+    [AvaloniaFact]
+    public async Task I2pControls_WriteEndpointAndExplicitMixedNetworkOptIn()
+    {
+        var settings = Substitute.For<Peerfluence.Core.Services.IAppSettingsService>();
+        settings.Current.Returns(new AppSettings());
+        var vm = TestHelpers.CreateSettingsViewModel(settingsService: settings);
+        var view = new SettingsView { DataContext = vm };
+        var window = new Window { Content = view, Width = 1200, Height = 800 };
+        window.Show();
+        try
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var controls = view.GetLogicalDescendants().ToArray();
+            var enabled = controls.OfType<ToggleSwitch>().Single(c => AutomationProperties.GetAutomationId(c) == "EnableI2pSwitch");
+            var mixed = controls.OfType<ToggleSwitch>().Single(c => AutomationProperties.GetAutomationId(c) == "I2pAllowMixedNetworksSwitch");
+            var host = controls.OfType<TextBox>().Single(c => AutomationProperties.GetAutomationId(c) == "I2pSamHostTextBox");
+            var port = controls.OfType<NumericUpDown>().Single(c => AutomationProperties.GetAutomationId(c) == "I2pSamPortNumericUpDown");
+            Assert.False(enabled.IsChecked);
+            Assert.False(mixed.IsChecked);
+            Assert.Equal("127.0.0.1", host.Text);
+            Assert.Equal(7656, port.Value);
+            enabled.IsChecked = true;
+            host.Text = "sam.local";
+            port.Value = 7666;
+            mixed.IsChecked = true;
+            await vm.SaveCommand.ExecuteAsync(null);
+            Assert.True(settings.Current.Network.EnableI2p);
+            Assert.Equal("sam.local", settings.Current.Network.I2pSamHost);
+            Assert.Equal(7666, settings.Current.Network.I2pSamPort);
+            Assert.True(settings.Current.Network.I2pAllowMixedNetworks);
+        }
+        finally
+        {
+            window.Close();
+            await vm.WaitForPendingSaveAsync();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task EncryptionControls_RetainStoredChoicesAndWriteUserChanges()
+    {
+        var settings = Substitute.For<Peerfluence.Core.Services.IAppSettingsService>();
+        settings.Current.Returns(new AppSettings
+        {
+            Network = { IncomingEncryptionMode = "Allow", OutgoingEncryptionMode = "Refuse" }
+        });
+        var vm = TestHelpers.CreateSettingsViewModel(settingsService: settings);
+        var view = new SettingsView { DataContext = vm };
+        var window = new Window { Content = view, Width = 1200, Height = 800 };
+        window.Show();
+        try
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var controls = view.GetLogicalDescendants().ToArray();
+            var incoming = controls.OfType<ComboBox>().Single(control => AutomationProperties.GetAutomationId(control) == "IncomingEncryptionComboBox");
+            var outgoing = controls.OfType<ComboBox>().Single(control => AutomationProperties.GetAutomationId(control) == "OutgoingEncryptionComboBox");
+            var rc4 = controls.OfType<ToggleSwitch>().Single(control => AutomationProperties.GetAutomationId(control) == "PreferRc4Switch");
+            Assert.Equal("Allow", incoming.SelectedValue);
+            Assert.Equal("Refuse", outgoing.SelectedValue);
+            Assert.True(rc4.IsChecked);
+            incoming.SelectedValue = "Require";
+            outgoing.SelectedValue = "Inherit";
+            rc4.IsChecked = false;
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.Equal("Require", settings.Current.Network.IncomingEncryptionMode);
+            Assert.Equal("Inherit", settings.Current.Network.OutgoingEncryptionMode);
+            Assert.False(settings.Current.Network.PreferRc4);
+        }
+        finally
+        {
+            window.Close();
+            await vm.WaitForPendingSaveAsync();
+        }
+    }
+
     private static (SettingsView View, SettingsViewModel Vm) CreateView()
     {
         var vm = TestHelpers.CreateSettingsViewModel();
@@ -49,8 +124,38 @@ public class SettingsViewTests
         var (view, _) = CreateView();
 
         var combos = view.GetLogicalDescendants().OfType<ComboBox>().ToList();
-        // ThemeVariant, ColorTheme, BackgroundStyle, Language, EncryptionMode, ProxyType
-        Assert.True(combos.Count >= 6, $"Expected at least 6 ComboBoxes, found {combos.Count}");
+        // ThemeVariant, ColorTheme, Language, EncryptionMode, ProxyType
+        Assert.True(combos.Count >= 5, $"Expected at least 5 ComboBoxes, found {combos.Count}");
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Light", "MidnightLight")]
+    [InlineData("Dark", "Midnight")]
+    public void StoredThemePreferences_AreSelectedInTheAppearanceControls(string stored, string expected)
+    {
+        var settings = Substitute.For<Peerfluence.Core.Services.IAppSettingsService>();
+        settings.Current.Returns(new AppSettings
+        {
+            Theme = new ThemeSettings { ThemeVariant = stored, ColorTheme = "Sky" }
+        });
+        var model = TestHelpers.CreateSettingsViewModel(settingsService: settings);
+        var view = new SettingsView { DataContext = model };
+        var window = new Window { Content = view, Width = 1200, Height = 800 };
+        window.Show();
+        try
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            var combos = view.GetLogicalDescendants().OfType<ComboBox>().Distinct().ToArray();
+            var variant = combos.Single(combo => AutomationProperties.GetAutomationId(combo) == "ThemeVariantComboBox");
+            var accent = combos.Single(combo => AutomationProperties.GetAutomationId(combo) == "ColorThemeComboBox");
+            Assert.Equal(expected, Assert.IsType<SettingsOption>(variant.SelectedItem).Value);
+            Assert.Equal("Sky", Assert.IsType<SettingsOption>(accent.SelectedItem).Value);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]

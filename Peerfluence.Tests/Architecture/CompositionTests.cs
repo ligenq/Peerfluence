@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 using Peerfluence.Core;
@@ -37,12 +37,12 @@ public sealed class CompositionTests
     /// </remarks>
     private static readonly string[] UiThreadOnly =
     [
-        // Namespaces rather than the interfaces, because the fluent API is extension methods: a
-        // toast is queued through SukiUI.Toasts.FluentSukiToastBuilder, and naming
-        // ISukiToastManager matched nothing at all. Found by asking the graph what the code really
-        // calls rather than what it looks like it calls.
-        "SukiUI.Toasts.",
-        "SukiUI.Dialogs.",
+        // The types themselves now that the overlay managers are the application's own: their
+        // methods are ordinary instance methods, so naming the type matches what the graph sees.
+        // Under SukiUI this had to name whole namespaces, because its fluent API was extension
+        // methods and naming the interface matched nothing at all.
+        "Peerfluence.Theme.Controls.ToastManager::",
+        "Peerfluence.Theme.Controls.DialogManager::",
         "Avalonia.Controls.TopLevel::",
     ];
 
@@ -162,7 +162,7 @@ public sealed class CompositionTests
     [Fact]
     public void EverythingThatTouchesTheInterface_SaysItNeedsTheUiThread()
     {
-        // Nothing about ISukiToastManager says it is thread affine - it is an interface like any
+        // Nothing about ToastManager says it is thread affine - it is an interface like any
         // other - so the requirement lives in whoever remembers it. This is the written form of
         // remembering: a method that reaches one of these either marshals onto the UI thread, or
         // declares that it is already there with VerifyAccess, and the runtime check makes the
@@ -635,7 +635,7 @@ public sealed class CompositionTests
             .Where(reference =>
                 reference.Name is not null
                 && (reference.Name.StartsWith("Avalonia", StringComparison.Ordinal)
-                    || reference.Name.StartsWith("SukiUI", StringComparison.Ordinal)
+                    || reference.Name.StartsWith("Peerfluence.Theme", StringComparison.Ordinal)
                     || reference.Name.StartsWith("Material.Icons", StringComparison.Ordinal)))
             .Select(reference => $"  Peerfluence.Core references {reference.Name}")
             .ToList();

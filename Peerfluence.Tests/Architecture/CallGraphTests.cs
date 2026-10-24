@@ -1,5 +1,5 @@
+using Peerfluence.Theme.Controls;
 using Avalonia.Threading;
-using SukiUI.Toasts;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -21,14 +21,14 @@ public sealed class CallGraphTests
 
     private static class UiThreadFixtures
     {
-        public static void Posted(ISukiToastManager manager)
+        public static void Posted(ToastManager manager)
         {
-            Dispatcher.UIThread.Post(() => manager.CreateToast());
+            Dispatcher.UIThread.Post(() => manager.Show(new Toast { Title = "fixture" }));
         }
 
-        public static void Unposted(ISukiToastManager manager)
+        public static void Unposted(ToastManager manager)
         {
-            Task.Run(() => manager.CreateToast());
+            Task.Run(() => manager.Show(new Toast { Title = "fixture" }));
         }
     }
 }

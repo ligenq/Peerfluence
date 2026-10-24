@@ -9,10 +9,10 @@
 	-->
 
 	<!--A label beside a value, a column heading, a caption. The great majority of dimmed text.-->
-	<sys:Double x:Key="OpacitySecondary">0.7</sys:Double>
+	<sys:Double x:Key="OpacitySecondary">0.8</sys:Double>
 
 	<!--Explanatory text under a control, saying what the setting above it does.-->
-	<sys:Double x:Key="OpacityHint">0.55</sys:Double>
+	<sys:Double x:Key="OpacityHint">0.75</sys:Double>
 
 	<!--Something switched off, or standing in for content that is not there yet.-->
 	<sys:Double x:Key="OpacityDisabled">0.5</sys:Double>

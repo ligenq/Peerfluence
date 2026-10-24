@@ -26,6 +26,12 @@ public interface ITorrentEngineService : IAsyncDisposable
     /// </summary>
     void ApplySpeedLimits();
 
+    /// <summary>Updates the streaming policy used by streams opened after this call.</summary>
+    void ApplyStreamingSettings();
+
+    /// <summary>Applies encryption preferences to future peer handshakes.</summary>
+    void ApplyEncryptionSettings();
+
     Task LoadOptionalDataAsync(CancellationToken cancellationToken);
 
     Task ShutdownAsync(CancellationToken cancellationToken);

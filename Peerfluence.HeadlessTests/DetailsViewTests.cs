@@ -1,5 +1,9 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
@@ -26,6 +30,53 @@ public class DetailsViewTests
         var (view, _) = CreateView();
         Assert.NotNull(view);
     }
+
+    /// <summary>
+    /// The two buttons under the file grid stay apart at a width that cannot hold both.
+    /// </summary>
+    /// <remarks>
+    /// They used to share one grid cell, held apart only by opposing HorizontalAlignment, which
+    /// overlaps rather than running out of room: squeeze the pane, or use a language whose labels
+    /// are longer, and "Stop streaming" is drawn over "Apply file selection". A column each means
+    /// the labels trim instead.
+    /// </remarks>
+    [AvaloniaTheory]
+    [InlineData(1200)]
+    [InlineData(420)]
+    [InlineData(240)]
+    public void FileActionButtons_NeverOverlapHoweverNarrowThePaneIs(int width)
+    {
+        var vm = TestHelpers.CreateDetailsViewModel();
+        var view = new DetailsView { DataContext = vm };
+        var window = new Window { Content = view, Width = width, Height = 800 };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            var stop = Find(view, "StopStreamingButton");
+            var apply = Find(view, "ApplyFileSelectionButton");
+            Assert.NotSame(stop, apply);
+
+            // Both are laid out even while Stop is collapsed, so compare the slots they occupy.
+            var stopRight = stop.TranslatePoint(new Point(stop.Bounds.Width, 0), view);
+            var applyLeft = apply.TranslatePoint(default, view);
+            Assert.NotNull(stopRight);
+            Assert.NotNull(applyLeft);
+            Assert.True(stopRight.Value.X <= applyLeft.Value.X + 0.5,
+                $"at {width}px the buttons overlap: stop ends at {stopRight.Value.X}, apply starts at {applyLeft.Value.X}");
+        }
+        finally
+        {
+            window.Close();
+            ((IDisposable)vm).Dispose();
+        }
+    }
+
+    private static Control Find(DetailsView view, string automationId) =>
+        view.GetVisualDescendants().OfType<Control>()
+            .Single(control => AutomationProperties.GetAutomationId(control) == automationId);
 
     [AvaloniaFact]
     public void TabControl_HasExpectedTabs()

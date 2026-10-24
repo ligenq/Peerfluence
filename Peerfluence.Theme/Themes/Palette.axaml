@@ -1,0 +1,227 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:pf="using:Peerfluence.Theme">
+
+  <!--
+    Surfaces, text and semantic state, for both variants.
+
+    Neutrals carry a slight blue bias rather than being pure grey: a true neutral next to a coloured
+    accent reads as unconsidered, and this application puts an accent on nearly every screen.
+
+    Accent colours are deliberately absent. They live in Accents/*.axaml so one can be swapped at
+    run time, and the brushes here bind to them dynamically. Anything merging this dictionary must
+    also merge an accent, or the accent brushes resolve to nothing.
+  -->
+
+  <ResourceDictionary.ThemeDictionaries>
+
+    <ResourceDictionary x:Key="Light">
+      <!-- Surfaces, from furthest back to nearest front. -->
+      <Color x:Key="PfCanvasColor">#F6F7F9</Color>
+      <Color x:Key="PfSurfaceColor">#FFFFFF</Color>
+      <Color x:Key="PfSurfaceAltColor">#FAFBFC</Color>
+      <Color x:Key="PfSurfaceHoverColor">#F0F2F5</Color>
+      <Color x:Key="PfSurfaceActiveColor">#E6E9EE</Color>
+      <Color x:Key="PfSurfaceSunkenColor">#EDEFF2</Color>
+
+      <Color x:Key="PfBorderColor">#E2E5EA</Color>
+      <Color x:Key="PfBorderStrongColor">#C8CDD6</Color>
+
+      <Color x:Key="PfTextColor">#15181D</Color>
+      <Color x:Key="PfTextSecondaryColor">#58606C</Color>
+      <Color x:Key="PfTextTertiaryColor">#6B7380</Color>
+      <StaticResource x:Key="ScrollBarPanningThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+      <StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+
+      <!-- State. Tuned for contrast on a light surface rather than taken from a stock ramp. -->
+      <Color x:Key="PfSuccessColor">#17803D</Color>
+      <Color x:Key="PfWarningColor">#B45309</Color>
+      <Color x:Key="PfDangerColor">#C62828</Color>
+      <Color x:Key="PfInfoColor">#1D63C4</Color>
+      <Color x:Key="PfMutedColor">#7A828E</Color>
+
+      <!-- Faint tints of the same hues, for row backgrounds and badges. -->
+      <Color x:Key="PfSuccessSubtleColor">#E8F5EC</Color>
+      <Color x:Key="PfWarningSubtleColor">#FBF0E3</Color>
+      <Color x:Key="PfDangerSubtleColor">#FBEAEA</Color>
+
+      <Color x:Key="PfShadowColor">#1A202A</Color>
+      <Color x:Key="PfScrimColor">#5E000000</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <!--
+        Not an inversion of the light values. The dark canvas sits a little above true black so the
+        surfaces above it have somewhere to go, and the text stops short of pure white, which glares
+        against a dark field at the sizes this interface uses.
+      -->
+      <Color x:Key="PfCanvasColor">#0F1115</Color>
+      <Color x:Key="PfSurfaceColor">#161920</Color>
+      <Color x:Key="PfSurfaceAltColor">#1A1E26</Color>
+      <Color x:Key="PfSurfaceHoverColor">#20242D</Color>
+      <Color x:Key="PfSurfaceActiveColor">#272C36</Color>
+      <Color x:Key="PfSurfaceSunkenColor">#0B0D11</Color>
+
+      <Color x:Key="PfBorderColor">#242933</Color>
+      <Color x:Key="PfBorderStrongColor">#39404D</Color>
+
+      <Color x:Key="PfTextColor">#E7EAEF</Color>
+      <Color x:Key="PfTextSecondaryColor">#99A1AE</Color>
+      <Color x:Key="PfTextTertiaryColor">#929BAA</Color>
+      <StaticResource x:Key="ScrollBarPanningThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+      <StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+
+      <Color x:Key="PfSuccessColor">#4ADE80</Color>
+      <Color x:Key="PfWarningColor">#FBBF24</Color>
+      <Color x:Key="PfDangerColor">#FB7185</Color>
+      <Color x:Key="PfInfoColor">#60A5FA</Color>
+      <Color x:Key="PfMutedColor">#7D8694</Color>
+
+      <Color x:Key="PfSuccessSubtleColor">#122C1E</Color>
+      <Color x:Key="PfWarningSubtleColor">#2E2311</Color>
+      <Color x:Key="PfDangerSubtleColor">#301A1E</Color>
+
+      <Color x:Key="PfShadowColor">#000000</Color>
+      <Color x:Key="PfScrimColor">#99000000</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="{x:Static pf:PeerfluenceTheme.Midnight}">
+      <!--
+        An indigo shell with panels that sit DARKER than the canvas behind them. That inversion is
+        the whole character of this variant: every other variant here, and most dark themes
+        generally, lift a surface above its background to bring it forward. Reversing it makes the
+        chrome recede and the content read as cut into it rather than laid on top.
+
+        Only the surfaces, text and state live here. Accents are not repeated: the variant inherits
+        from Dark, so all eight stay selectable and keep working.
+      -->
+      <Color x:Key="PfCanvasColor">#1C1856</Color>
+      <Color x:Key="PfSurfaceColor">#151243</Color>
+      <Color x:Key="PfSurfaceAltColor">#1A1750</Color>
+      <Color x:Key="PfSurfaceHoverColor">#232065</Color>
+      <Color x:Key="PfSurfaceActiveColor">#2A2676</Color>
+      <Color x:Key="PfSurfaceSunkenColor">#110E36</Color>
+
+      <Color x:Key="PfBorderColor">#2C2A62</Color>
+      <!-- The violet edge the reference puts on its cards, which is what stops the panels from
+           dissolving into the indigo once they are darker than it. -->
+      <Color x:Key="PfBorderStrongColor">#4B3075</Color>
+
+      <Color x:Key="PfTextColor">#E8EAF4</Color>
+      <Color x:Key="PfTextSecondaryColor">#A5A8CC</Color>
+      <Color x:Key="PfTextTertiaryColor">#8185AE</Color>
+      <StaticResource x:Key="ScrollBarPanningThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+      <StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+
+      <!-- Brighter and more saturated than the Dark set, because indigo is a far livelier
+           background than near-black and a muted state colour disappears into it. -->
+      <Color x:Key="PfSuccessColor">#8BE028</Color>
+      <Color x:Key="PfWarningColor">#F5A623</Color>
+      <Color x:Key="PfDangerColor">#F2295B</Color>
+      <Color x:Key="PfInfoColor">#2D7FF9</Color>
+      <Color x:Key="PfMutedColor">#7E82A8</Color>
+
+      <Color x:Key="PfSuccessSubtleColor">#1E3320</Color>
+      <Color x:Key="PfWarningSubtleColor">#352A1C</Color>
+      <Color x:Key="PfDangerSubtleColor">#3A1A33</Color>
+
+      <Color x:Key="PfShadowColor">#000000</Color>
+      <Color x:Key="PfScrimColor">#A80C0A28</Color>
+
+    </ResourceDictionary>
+
+
+    <ResourceDictionary x:Key="{x:Static pf:PeerfluenceTheme.MidnightLight}">
+      <!--
+        The same identity by day. The chrome stays deep indigo - that lives in Midnight.axaml and
+        applies to both variants - while the content area behaves the ordinary way round: white
+        panels above a tinted canvas, because a panel darker than a pale page is a dark card
+        floating on white, which reads as a mistake rather than as a light theme.
+
+        The canvas, panel, border and ink are sampled from the reference interface's own light
+        surface rather than invented. Its ink is a deep indigo rather than a near-black, which is
+        what keeps a light page recognisably part of the same family.
+      -->
+      <Color x:Key="PfCanvasColor">#F8FAFF</Color>
+      <Color x:Key="PfSurfaceColor">#FFFFFF</Color>
+      <Color x:Key="PfSurfaceAltColor">#F4F6FD</Color>
+      <Color x:Key="PfSurfaceHoverColor">#EDF1FB</Color>
+      <Color x:Key="PfSurfaceActiveColor">#E2E8F8</Color>
+      <Color x:Key="PfSurfaceSunkenColor">#EFF2FB</Color>
+
+      <Color x:Key="PfBorderColor">#EAEAEE</Color>
+      <Color x:Key="PfBorderStrongColor">#C7CDE4</Color>
+
+      <Color x:Key="PfTextColor">#0B1A65</Color>
+      <Color x:Key="PfTextSecondaryColor">#4A5680</Color>
+      <Color x:Key="PfTextTertiaryColor">#6A7497</Color>
+      <StaticResource x:Key="ScrollBarPanningThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+      <StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="PfTextTertiaryColor" />
+
+      <!-- Darker than the Light set, because they sit on white rather than on a grey-white, and
+           because a pale indigo page is less forgiving of a washed-out state colour. -->
+      <Color x:Key="PfSuccessColor">#0D7882</Color>
+      <Color x:Key="PfWarningColor">#9A5B00</Color>
+      <Color x:Key="PfDangerColor">#CB265D</Color>
+      <Color x:Key="PfInfoColor">#0160F5</Color>
+      <Color x:Key="PfMutedColor">#6A7497</Color>
+
+      <Color x:Key="PfSuccessSubtleColor">#E6F3F4</Color>
+      <Color x:Key="PfWarningSubtleColor">#FBF1E3</Color>
+      <Color x:Key="PfDangerSubtleColor">#FBE9EF</Color>
+
+      <Color x:Key="PfShadowColor">#0B1A65</Color>
+      <Color x:Key="PfScrimColor">#5E0B1A65</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <!--
+    Brushes, defined once outside the variant dictionaries. Each takes its colour dynamically, so a
+    variant switch or an accent swap repaints without rebuilding anything.
+  -->
+  <SolidColorBrush x:Key="PfCanvas" Color="{DynamicResource PfCanvasColor}" />
+  <SolidColorBrush x:Key="PfSurface" Color="{DynamicResource PfSurfaceColor}" />
+  <SolidColorBrush x:Key="PfSurfaceAlt" Color="{DynamicResource PfSurfaceAltColor}" />
+  <SolidColorBrush x:Key="PfSurfaceHover" Color="{DynamicResource PfSurfaceHoverColor}" />
+  <SolidColorBrush x:Key="PfSurfaceActive" Color="{DynamicResource PfSurfaceActiveColor}" />
+  <SolidColorBrush x:Key="PfSurfaceSunken" Color="{DynamicResource PfSurfaceSunkenColor}" />
+  <SolidColorBrush x:Key="PfScrim" Color="{DynamicResource PfScrimColor}" />
+
+  <SolidColorBrush x:Key="PfBorder" Color="{DynamicResource PfBorderColor}" />
+  <SolidColorBrush x:Key="PfBorderStrong" Color="{DynamicResource PfBorderStrongColor}" />
+
+  <SolidColorBrush x:Key="PfText" Color="{DynamicResource PfTextColor}" />
+  <SolidColorBrush x:Key="PfTextSecondary" Color="{DynamicResource PfTextSecondaryColor}" />
+  <SolidColorBrush x:Key="PfTextTertiary" Color="{DynamicResource PfTextTertiaryColor}" />
+
+  <SolidColorBrush x:Key="PfSuccess" Color="{DynamicResource PfSuccessColor}" />
+  <SolidColorBrush x:Key="PfWarning" Color="{DynamicResource PfWarningColor}" />
+  <SolidColorBrush x:Key="PfDanger" Color="{DynamicResource PfDangerColor}" />
+  <SolidColorBrush x:Key="PfInfo" Color="{DynamicResource PfInfoColor}" />
+  <SolidColorBrush x:Key="PfMuted" Color="{DynamicResource PfMutedColor}" />
+
+  <SolidColorBrush x:Key="PfSuccessSubtle" Color="{DynamicResource PfSuccessSubtleColor}" />
+  <SolidColorBrush x:Key="PfWarningSubtle" Color="{DynamicResource PfWarningSubtleColor}" />
+  <SolidColorBrush x:Key="PfDangerSubtle" Color="{DynamicResource PfDangerSubtleColor}" />
+
+  <!--
+    Shared accent brushes keep their identity so Fluent's StaticResource aliases follow changes.
+    UseAccent updates their colours in the light and dark resource dictionaries.
+  -->
+  <SolidColorBrush x:Key="PfAccent" Color="{DynamicResource PfAccentColor}" />
+  <SolidColorBrush x:Key="PfAccentHover" Color="{DynamicResource PfAccentHoverColor}" />
+  <SolidColorBrush x:Key="PfAccentPressed" Color="{DynamicResource PfAccentPressedColor}" />
+  <SolidColorBrush x:Key="PfAccentSubtle" Color="{DynamicResource PfAccentSubtleColor}" />
+  <SolidColorBrush x:Key="PfAccentMuted" Color="{DynamicResource PfAccentMutedColor}" />
+  <SolidColorBrush x:Key="PfTextOnAccent" Color="{DynamicResource PfTextOnAccentColor}" />
+
+  <!--
+    A fill dark enough to carry white text, which the accent itself cannot be: an accent light
+    enough to read as text on its own tint is too light to sit under white. Only Midnight
+    defines these, so only styles that come and go with Midnight may use them.
+  -->
+  <SolidColorBrush x:Key="PfAccentStrong" Color="{DynamicResource PfAccentStrongColor}" />
+  <SolidColorBrush x:Key="PfAccentStrongHover" Color="{DynamicResource PfAccentStrongHoverColor}" />
+  <SolidColorBrush x:Key="PfAccentStrongPressed" Color="{DynamicResource PfAccentStrongPressedColor}" />
+
+</ResourceDictionary>

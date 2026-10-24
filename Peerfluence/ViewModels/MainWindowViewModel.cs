@@ -1,18 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Material.Icons;
-using Peerfluence.Core.Config;
 using Peerfluence.Core.Messaging;
 using Peerfluence.Properties;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
+using Peerfluence.Theme.Controls;
 
 namespace Peerfluence.ViewModels;
 
@@ -25,6 +21,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly AboutViewModel _aboutViewModel;
     private readonly IInterfaceModeService _interfaceModeService;
     private readonly IDialogService _dialogService;
+    private IOnScreenAware? _onScreenPage;
     private bool _startupUpdateCheckStarted;
     private bool _disposed;
 
@@ -38,8 +35,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
         IDialogService dialogService,
         DownloadsViewModel downloadsViewModel,
         SettingsViewModel settingsViewModel,
-        ISukiToastManager toastManager,
-        ISukiDialogManager dialogManager)
+        IToastManager toastManager,
+        IDialogManager dialogManager)
     {
         _settingsService = settingsService;
         _updateService = updateService;
@@ -102,8 +99,24 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public bool IsSimpleMode
     {
         get;
-        private set => SetProperty(ref field, value);
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(SimpleDownloadsPage));
+                UpdateOnScreenPage();
+            }
+        }
     }
+
+    /// <summary>
+    /// The downloads, for the simple screen to show, and nothing outside simple mode.
+    /// </summary>
+    /// <remarks>
+    /// Null rather than hidden, so the simple screen's view is not built at all for someone who
+    /// never uses it: a control declared in markup is constructed whether or not it is visible.
+    /// </remarks>
+    public DownloadsViewModel? SimpleDownloadsPage => IsSimpleMode ? DownloadsViewModel : null;
 
     /// <summary>
     /// Whether the first-run welcome is up. Shown until the question has been answered once, and
@@ -163,9 +176,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
 
     public ObservableCollection<NavigationItem> NavigationItems { get; }
 
-    public ISukiToastManager ToastManager { get; }
+    public IToastManager ToastManager { get; }
 
-    public ISukiDialogManager DialogManager { get; }
+    public IDialogManager DialogManager { get; }
 
     public IRelayCommand ShowAboutCommand { get; }
 
@@ -189,7 +202,45 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public ViewModelBase? CurrentPage
     {
         get;
-        set => SetProperty(ref field, value);
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(IsAboutSelected));
+                UpdateOnScreenPage();
+            }
+        }
+    }
+
+    public bool IsAboutSelected => ReferenceEquals(CurrentPage, _aboutViewModel);
+
+    /// <summary>
+    /// Tells the page that has just come into view, and the one that has just left it.
+    /// </summary>
+    /// <remarks>
+    /// The current page is only on screen in advanced mode. Simple mode shows its own downloads
+    /// screen and leaves <see cref="CurrentPage"/> as it was, so a page left open before switching
+    /// would otherwise go on working behind it.
+    /// </remarks>
+    private void UpdateOnScreenPage()
+    {
+        var shown = IsSimpleMode ? null : CurrentPage as IOnScreenAware;
+        if (ReferenceEquals(shown, _onScreenPage))
+        {
+            return;
+        }
+
+        if (_onScreenPage != null)
+        {
+            _onScreenPage.IsOnScreen = false;
+        }
+
+        _onScreenPage = shown;
+
+        if (shown != null)
+        {
+            shown.IsOnScreen = true;
+        }
     }
 
     /// <summary>

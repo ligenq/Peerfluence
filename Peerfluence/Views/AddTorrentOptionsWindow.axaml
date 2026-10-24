@@ -1,9 +1,9 @@
-﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                  xmlns:vm="using:Peerfluence.ViewModels"
+                 xmlns:controls="using:Peerfluence.Controls"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
                  mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="760"
@@ -14,11 +14,11 @@
                  MinWidth="760" MinHeight="640"
                  WindowStartupLocation="CenterOwner">
 
-    <suki:BusyArea IsBusy="{Binding IsBusy}">
+    <Panel>
         <Grid RowDefinitions="*, Auto" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
-            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="0" Classes="dialogForm">
                 <StackPanel Spacing="{StaticResource SpacingLarge}">
-                    <suki:GlassCard>
+                    <Border Classes="panel">
                         <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
                             <materialIcons:MaterialIcon Grid.RowSpan="2"
                                                         Kind="DownloadBoxOutline"
@@ -41,9 +41,24 @@
                                 </StackPanel>
                             </UniformGrid>
                         </Grid>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <suki:GlassCard>
+                    <Border Classes="panel" IsVisible="{Binding IsSsl}" AutomationProperties.AutomationId="SslCertificateCard">
+                        <StackPanel Spacing="{StaticResource SpacingStandard}">
+                            <TextBlock Text="{m:L AddTorrent_SslCertificate}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{m:L AddTorrent_SslHint}" TextWrapping="Wrap"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}">
+                                <TextBox Text="{Binding SslCertificatePath, Mode=TwoWay}" AutomationProperties.Name="{m:L AddTorrent_SslCertificate}" AutomationProperties.AutomationId="SslCertificatePathTextBox"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseSslCertificateCommand}" ToolTip.Tip="{m:L Settings_Browse}" AutomationProperties.Name="{m:L Settings_Browse}" AutomationProperties.AutomationId="BrowseSslCertificateButton">
+                                    <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                </Button>
+                            </Grid>
+                            <TextBlock Text="{m:L AddTorrent_SslPassword}"/>
+                            <TextBox Text="{Binding SslCertificatePassword, Mode=TwoWay}" PasswordChar="&#x25CF;" AutomationProperties.Name="{m:L AddTorrent_SslPassword}" AutomationProperties.AutomationId="SslCertificatePasswordTextBox"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="panel" IsVisible="{Binding IsNewTorrent}">
                         <StackPanel Spacing="{StaticResource SpacingStandard}">
                             <TextBlock Text="{m:L AddTorrent_Destination}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                             <!-- Above the folder, because choosing a category is what fills the folder
@@ -63,9 +78,9 @@
                             </Grid>
                             <CheckBox Content="{m:L AddTorrent_StartImmediately}" IsChecked="{Binding StartImmediately}" AutomationProperties.AutomationId="StartImmediatelyCheckBox"/>
                         </StackPanel>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <suki:GlassCard IsVisible="{Binding IsMetadataPending}">
+                    <Border Classes="panel" IsVisible="{Binding IsMetadataPending}">
                         <StackPanel Spacing="{StaticResource SpacingNormal}">
                             <TextBlock Text="{m:L AddTorrent_MetadataPendingTitle}" FontWeight="SemiBold"/>
                             <TextBlock Text="{m:L AddTorrent_MetadataPendingBody}"
@@ -81,9 +96,9 @@
                                          IsVisible="{Binding IsFetchingMetadata}"
                                          Height="{StaticResource ProgressBarHeightSlim}"/>
                         </StackPanel>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <suki:GlassCard IsVisible="{Binding HasFiles}">
+                    <Border Classes="panel" IsVisible="{Binding HasFiles}">
                         <Grid RowDefinitions="Auto, *" RowSpacing="{StaticResource SpacingStandard}">
                             <TextBlock Text="{m:L Details_FilesTab}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                             <DataGrid Grid.Row="1"
@@ -94,16 +109,16 @@
                                       CanUserSortColumns="True"
                                       Height="240" AutomationProperties.AutomationId="FilesGrid">
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80">
+                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Selected}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFileSelected}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="vm:AddTorrentFileOptionViewModel" x:DataType="vm:AddTorrentFileOptionViewModel">
                                                 <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="120" IsReadOnly="True"/>
-                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160">
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Path}" Binding="{Binding Path}" Width="*" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFilePath}"/>
+                                    <DataGridTextColumn Header="{m:L Details_Grid_Size}" Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" Width="120" IsReadOnly="True" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFileSize}"/>
+                                    <DataGridTemplateColumn Header="{m:L Details_Grid_Priority}" Width="160" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.AddFilePriority}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="vm:AddTorrentFileOptionViewModel" x:DataType="vm:AddTorrentFileOptionViewModel">
                                                 <ComboBox ItemsSource="{Binding PriorityOptions}" SelectedValue="{Binding Priority, Mode=TwoWay}" SelectedValueBinding="{Binding Value}">
@@ -119,11 +134,12 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
-                    </suki:GlassCard>
+                    </Border>
 
-                    <Expander Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch">
+                    <Expander IsVisible="{Binding IsNewTorrent}" Header="{m:L AddTorrent_Advanced}" HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch">
                         <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource SmallTopMargin}">
-                            <suki:GlassCard>
+                            <Border Classes="panel">
                                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                                     <TextBlock Text="{m:L AddTorrent_Metadata}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                     <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
@@ -150,9 +166,9 @@
                                                   IsEnabled="False" AutomationProperties.AutomationId="PrivateCheckBox"/>
                                     </Grid>
                                 </StackPanel>
-                            </suki:GlassCard>
+                            </Border>
 
-                            <suki:GlassCard>
+                            <Border Classes="panel">
                                 <Grid ColumnDefinitions="*, *" ColumnSpacing="{StaticResource SpacingLarge}">
                                     <StackPanel Spacing="{StaticResource SpacingStandard}">
                                         <TextBlock Text="{m:L AddTorrent_Limits}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
@@ -184,19 +200,21 @@
                                         <TextBlock Text="{m:L Details_TrackersTab}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
                                         <TextBox Text="{Binding ExistingTrackers}"
                                                  IsReadOnly="True"
+                                                 ScrollViewer.AllowAutoHide="False"
                                                  IsVisible="{Binding HasExistingTrackers}"
                                                  Height="82"
                                                  AcceptsReturn="True"
                                                  TextWrapping="Wrap"
                                                  PlaceholderText="{m:L AddTorrent_IncludedTrackersWatermark}" AutomationProperties.Name="{m:L Details_TrackersTab}" AutomationProperties.AutomationId="ExistingTrackersTextBox"/>
                                         <TextBox Text="{Binding AdditionalTrackers, Mode=TwoWay}"
+                                                 ScrollViewer.AllowAutoHide="False"
                                                  Height="100"
                                                  AcceptsReturn="True"
                                                  TextWrapping="Wrap"
                                                  PlaceholderText="{m:L AddTorrent_AdditionalTrackersWatermark}" AutomationProperties.Name="{m:L AddTorrent_AdditionalTrackersWatermark}" AutomationProperties.AutomationId="AdditionalTrackersTextBox"/>
                                     </StackPanel>
                                 </Grid>
-                            </suki:GlassCard>
+                            </Border>
                         </StackPanel>
                     </Expander>
 
@@ -211,17 +229,24 @@
                   ColumnDefinitions="*, Auto"
                   ColumnSpacing="{StaticResource SpacingStandard}"
                   Margin="{StaticResource MediumTopMargin}">
-                <CheckBox Content="{m:L AddTorrent_SkipThisStepNextTime}"
+                <CheckBox IsVisible="{Binding IsNewTorrent}" Content="{m:L AddTorrent_SkipThisStepNextTime}"
                           IsChecked="{Binding SkipThisStepNextTime}"
                           VerticalAlignment="Center" AutomationProperties.AutomationId="SkipThisStepNextTimeCheckBox"/>
                 <StackPanel Grid.Column="1"
+                            Classes="dialogActions"
                             Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Spacing="{StaticResource SpacingStandard}">
-                    <Button Content="{m:L AddTorrent_Add}" Classes="Flat" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
+                            HorizontalAlignment="Right">
+                    <Button Content="{Binding SubmitLabel, FallbackValue={m:L AddTorrent_Add}}" Classes="accent" Command="{Binding AddCommand}" IsDefault="True" MinWidth="130" AutomationProperties.AutomationId="AddButton"/>
                     <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="110" AutomationProperties.AutomationId="CancelButton"/>
                 </StackPanel>
             </Grid>
         </Grid>
-    </suki:BusyArea>
-</suki:SukiWindow>
+    <!-- Covers the form while work is in flight, so nothing can be edited mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsBusy}">
+            <ProgressBar IsIndeterminate="True"
+                         Width="180"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+        </Border>
+    </Panel>
+</Window>

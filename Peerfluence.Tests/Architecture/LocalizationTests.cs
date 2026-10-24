@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Resources;
 using Peerfluence.Properties;
 
 namespace Peerfluence.Tests.Architecture;

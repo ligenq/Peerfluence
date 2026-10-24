@@ -1,12 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Automation;
 using Avalonia.Controls;
-using Avalonia.Threading;
+using Avalonia.Layout;
 using Avalonia.Media;
-using SukiUI.Dialogs;
+using Avalonia.Threading;
+using Peerfluence.Theme.Controls;
 
 namespace Peerfluence.Services;
 
@@ -29,19 +31,17 @@ public sealed class DialogService : IDialogService
 {
     private readonly ITopLevelService _topLevelService;
     private readonly IReadOnlyDictionary<Type, DialogRegistration> _registrations;
+    private readonly IDialogManager _dialogManager;
 
     public DialogService(
         ITopLevelService topLevelService,
         IEnumerable<DialogRegistration> registrations,
-        ISukiDialogManager dialogManager)
+        IDialogManager dialogManager)
     {
         _topLevelService = topLevelService;
         _registrations = registrations.ToDictionary(r => r.ViewModelType);
-        DialogManager = dialogManager;
+        _dialogManager = dialogManager;
     }
-
-    /// <summary>Where the dialogs appear.</summary>
-    private ISukiDialogManager DialogManager { get; }
 
     /// <summary>
     /// Whether a prompt would be seen by anybody.
@@ -78,10 +78,9 @@ public sealed class DialogService : IDialogService
 
         var textBox = new TextBox
         {
-            Width = 420,
             MinWidth = 320,
             Text = prompt.InitialText ?? string.Empty,
-            PlaceholderText = prompt.Watermark
+            PlaceholderText = prompt.Watermark,
         };
 
         // The markup carries an automation id on everything a person can act on, checked by an
@@ -94,15 +93,55 @@ public sealed class DialogService : IDialogService
         // than a name for the field, and is empty for the magnet prompt, so the title is the name.
         textBox.SetValue(AutomationProperties.NameProperty, prompt.Title);
 
-        var accepted = await ShowAsync(
-            builder =>
+        var validationError = new InfoBar
+        {
+            IsVisible = false,
+            IsClosable = false,
+            Severity = ToastSeverity.Error,
+            MaxWidth = 420,
+        };
+        validationError.SetValue(AutomationProperties.AutomationIdProperty, PromptValidationErrorId);
+        validationError.SetValue(AutomationProperties.LiveSettingProperty, AutomationLiveSetting.Assertive);
+
+        void ShowError(string? message)
+        {
+            validationError.Message = message;
+            validationError.IsVisible = !string.IsNullOrEmpty(message);
+            validationError.SetValue(AutomationProperties.NameProperty, message);
+            textBox.SetValue(AutomationProperties.HelpTextProperty, message);
+        }
+
+        textBox.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == TextBox.TextProperty)
             {
-                Dispatcher.UIThread.VerifyAccess();
-                return builder.WithTitle(prompt.Title).WithContent(textBox);
-            },
+                ShowError(null);
+            }
+        };
+
+        bool Validate()
+        {
+            string? error = prompt.Validate?.Invoke(textBox.Text?.Trim() ?? string.Empty);
+            ShowError(error);
+            if (string.IsNullOrEmpty(error))
+            {
+                return true;
+            }
+
+            // Keep the entered text and return focus to the field that needs correcting.
+            textBox.Focus();
+            return false;
+        }
+
+        var content = new StackPanel { Spacing = 8, Children = { textBox, validationError } };
+        bool accepted = await ShowAsync(
+            prompt.Title,
+            content,
+            PromptSeverity.Information,
             prompt.ConfirmLabel,
             Properties.Resources.Common_Cancel,
-            confirm => EnableOnlyWhenFilledIn(confirm, textBox));
+            confirm => EnableOnlyWhenFilledIn(confirm, textBox),
+            validateConfirm: Validate);
 
         return accepted ? textBox.Text?.Trim() : null;
     }
@@ -110,20 +149,12 @@ public sealed class DialogService : IDialogService
     public Task<bool> ConfirmAsync(ConfirmPrompt prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);
-
-        // Builds controls and shows them. Declared rather than assumed: every caller is a
-        // command handler today, and the day one is not, this says so immediately.
         Dispatcher.UIThread.VerifyAccess();
 
         return ShowAsync(
-            builder =>
-            {
-                Dispatcher.UIThread.VerifyAccess();
-                return builder
-                    .OfType(ToNotificationType(prompt.Severity))
-                    .WithTitle(prompt.Title)
-                    .WithContent(Wrapped(prompt.Message));
-            },
+            prompt.Title,
+            Wrapped(prompt.Message),
+            prompt.Severity,
             prompt.ConfirmLabel,
             prompt.CancelLabel);
     }
@@ -131,12 +162,9 @@ public sealed class DialogService : IDialogService
     public async Task<RemoveTorrentChoice?> PromptForRemoveOptionsAsync(RemoveTorrentPrompt prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);
-
-        // Builds controls and shows them. Declared rather than assumed: every caller is a
-        // command handler today, and the day one is not, this says so immediately.
         Dispatcher.UIThread.VerifyAccess();
 
-        var options = new StackPanel();
+        var options = new StackPanel { Spacing = 4 };
         var buttons = new Dictionary<RemoveTorrentAction, RadioButton>();
 
         foreach (var (action, label) in prompt.OptionLabels)
@@ -145,38 +173,25 @@ public sealed class DialogService : IDialogService
             {
                 Content = label,
                 GroupName = "RemoveTorrentAction",
-                IsChecked = action == prompt.DefaultAction
+                IsChecked = action == prompt.DefaultAction,
             };
 
             buttons[action] = button;
             options.Children.Add(button);
         }
 
-        var rememberChoice = new CheckBox
-        {
-            Content = prompt.RememberChoiceLabel,
-            Margin = new Avalonia.Thickness(0, 10, 0, 0)
-        };
+        var rememberChoice = new CheckBox { Content = prompt.RememberChoiceLabel };
 
         var content = new StackPanel
         {
-            Children =
-            {
-                Wrapped(prompt.Message),
-                new StackPanel { Margin = new Avalonia.Thickness(0, 10, 0, 0), Children = { options } },
-                rememberChoice
-            }
+            Spacing = 12,
+            Children = { Wrapped(prompt.Message), options, rememberChoice },
         };
 
-        var accepted = await ShowAsync(
-            builder =>
-            {
-                Dispatcher.UIThread.VerifyAccess();
-                return builder
-                    .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
-                    .WithTitle(prompt.Title)
-                    .WithContent(content);
-            },
+        bool accepted = await ShowAsync(
+            prompt.Title,
+            content,
+            PromptSeverity.Warning,
             prompt.ConfirmLabel,
             prompt.CancelLabel);
 
@@ -193,70 +208,100 @@ public sealed class DialogService : IDialogService
     /// Shows a dialog with a confirming and a declining button, and answers which was pressed.
     /// </summary>
     /// <remarks>
-    /// Dismissing by clicking the background counts as declining, which is why the completion source
-    /// is set from <c>OnDismissed</c> as well as from the buttons.
+    /// Dismissing without answering - Escape, or a click on the background - counts as declining.
+    /// That arrives as the manager's content being replaced or cleared by something other than this
+    /// method, which is what the subscription below watches for. Without it, a dismissed dialog
+    /// would leave its caller awaiting an answer that can never come.
     /// </remarks>
     private async Task<bool> ShowAsync(
-        Func<SukiDialogBuilder, SukiDialogBuilder> describe,
+        string title,
+        Control content,
+        PromptSeverity severity,
         string confirmLabel,
         string cancelLabel,
-        Action<Button>? configureConfirm = null)
+        Action<Button>? configureConfirm = null,
+        Func<bool>? validateConfirm = null)
     {
         Dispatcher.UIThread.VerifyAccess();
 
         var answered = new TaskCompletionSource<bool>();
 
-        var builder = describe(DialogManager.CreateDialog())
-            .Dismiss().ByClickingBackground()
-            .OnDismissed(_ => answered.TrySetResult(false))
-            // The affirmative action first, so it sits on the left. Same order as the two dialogs
-            // written in markup, and the same reason: Windows puts the "do it" button leftmost and
-            // the safe one rightmost. Every prompt in the application is built here, so this is the
-            // only place that decides it.
-            .WithActionButton(confirmLabel, _ => answered.TrySetResult(true), true, "Flat")
-            .WithActionButton(cancelLabel, _ => answered.TrySetResult(false), true);
-
-        var buttons = builder.Dialog.ActionButtons.OfType<Button>().ToList();
-        GiveTheKeyboardItsTwoAnswers(buttons);
-        NameTheButtonsForAutomation(buttons);
-
-        if (buttons.Count > 0)
+        // The affirmative action first, so it sits on the left. Same order as the two dialogs
+        // written in markup, and the same reason: Windows puts the "do it" button leftmost and the
+        // safe one rightmost. Every prompt in the application is built here, so this is the only
+        // place that decides it.
+        //
+        // IsDefault and IsCancel are what make Enter and Escape work. These prompts are an overlay
+        // inside the main window rather than a window of their own, so their buttons share that
+        // window's key handling, which is why they need not become windows to behave like dialogs.
+        var confirm = new Button { Content = confirmLabel, IsDefault = true };
+        confirm.Classes.Add("accent");
+        confirm.SetValue(AutomationProperties.AutomationIdProperty, PromptConfirmButtonId);
+        confirm.Click += (_, _) =>
         {
-            configureConfirm?.Invoke(buttons[0]);
+            if (validateConfirm is null || validateConfirm())
+            {
+                answered.TrySetResult(true);
+            }
+        };
+        configureConfirm?.Invoke(confirm);
+
+        var cancel = new Button { Content = cancelLabel, IsCancel = true };
+        cancel.SetValue(AutomationProperties.AutomationIdProperty, PromptCancelButtonId);
+        cancel.Click += (_, _) => answered.TrySetResult(false);
+
+        // Severity shows in the heading's colour and nowhere else. A warning dialog is already
+        // the whole screen's attention; an icon and a tinted panel on top of that is decoration.
+        var heading = new TextBlock { Text = title };
+        heading.Classes.Add("subtitle");
+        if (severity == PromptSeverity.Warning)
+        {
+            heading.Classes.Add("toastWarning");
         }
 
-        await builder.TryShowAsync();
-
-        return answered.Task.IsCompletedSuccessfully && answered.Task.Result;
-    }
-
-    /// <summary>
-    /// Makes Enter accept the dialog and Escape dismiss it.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// These are the two keys every dialog is expected to answer, and until this was added the
-    /// prompts built here answered neither - they could only be dismissed with the mouse. The
-    /// dialogs written in markup get it from <c>IsDefault</c> and <c>IsCancel</c> in the markup;
-    /// this is the same two properties, set on the buttons Suki built.
-    /// </para>
-    /// <para>
-    /// It works because a Suki dialog is an overlay inside the main window rather than a window of
-    /// its own, so its buttons are in that window's top level and are reached by the same key
-    /// handling. That is worth stating because it is not obvious, and because it is the reason
-    /// these prompts do not need to become windows to behave like dialogs.
-    /// </para>
-    /// </remarks>
-    private static void GiveTheKeyboardItsTwoAnswers(List<Button> buttons)
-    {
-        if (buttons.Count != 2)
+        var dialog = new StackPanel
         {
-            return;
+            Spacing = 14,
+            Children =
+            {
+                heading,
+                content,
+                new StackPanel
+                {
+                    Classes = { "dialogActions" },
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Children = { confirm, cancel },
+                },
+            },
+        };
+
+        void OnManagerChanged(object? sender, PropertyChangedEventArgs change)
+        {
+            if (!ReferenceEquals(_dialogManager.Content, dialog))
+            {
+                answered.TrySetResult(false);
+            }
         }
 
-        // Confirm is added first so that it renders leftmost, which makes it the default.
-        buttons[0].IsDefault = true;
-        buttons[1].IsCancel = true;
+        _dialogManager.PropertyChanged += OnManagerChanged;
+        _dialogManager.Show(dialog);
+
+        try
+        {
+            return await answered.Task;
+        }
+        finally
+        {
+            _dialogManager.PropertyChanged -= OnManagerChanged;
+
+            // Only if this dialog is still the one showing: a dismissal has already replaced it,
+            // and closing again would shut whatever opened next.
+            if (ReferenceEquals(_dialogManager.Content, dialog))
+            {
+                _dialogManager.Close();
+            }
+        }
     }
 
     /// <summary>
@@ -287,37 +332,15 @@ public sealed class DialogService : IDialogService
     /// <summary>The automation id of the text box in a prompt that asks for a value.</summary>
     public const string PromptTextBoxId = "PromptTextBox";
 
+    /// <summary>The inline validation message in a text prompt.</summary>
+    public const string PromptValidationErrorId = "PromptValidationError";
+
     /// <summary>The automation id of the accepting button on any prompt built here.</summary>
     public const string PromptConfirmButtonId = "PromptConfirmButton";
 
     /// <summary>The automation id of the dismissing button on any prompt built here.</summary>
     public const string PromptCancelButtonId = "PromptCancelButton";
 
-    /// <summary>
-    /// Gives the two action buttons ids a test or a screen reader can find them by.
-    /// </summary>
-    /// <remarks>
-    /// By position rather than by label, because the label is translated into ten languages and the
-    /// position is not: the affirmative button is added first everywhere, which is the same fact the
-    /// button order and the keyboard defaults rest on.
-    /// </remarks>
-    private static void NameTheButtonsForAutomation(List<Button> buttons)
-    {
-        if (buttons.Count != 2)
-        {
-            return;
-        }
-
-        buttons[0].SetValue(AutomationProperties.AutomationIdProperty, PromptConfirmButtonId);
-        buttons[1].SetValue(AutomationProperties.AutomationIdProperty, PromptCancelButtonId);
-    }
-
     private static TextBlock Wrapped(string text) =>
         new() { Text = text, TextWrapping = TextWrapping.Wrap, MaxWidth = 420 };
-
-    private static Avalonia.Controls.Notifications.NotificationType ToNotificationType(PromptSeverity severity) => severity switch
-    {
-        PromptSeverity.Information => Avalonia.Controls.Notifications.NotificationType.Information,
-        _ => Avalonia.Controls.Notifications.NotificationType.Warning
-    };
 }

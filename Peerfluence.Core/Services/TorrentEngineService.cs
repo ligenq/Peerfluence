@@ -12,6 +12,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<TorrentEngineService> _logger;
     private readonly TimeProvider _timeProvider;
+    private readonly Func<TorrentClientOptions, IClientEngine> _createEngine;
     private IClientEngine? _engine;
     private Task? _shutdownTask;
 
@@ -19,11 +20,25 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         IAppSettingsService settingsService,
         ILoggerFactory loggerFactory,
         TimeProvider timeProvider)
+        : this(settingsService, loggerFactory, timeProvider, ClientEngineFactory.Create)
+    {
+    }
+
+    /// <summary>
+    /// For tests that need to see what is asked of the engine, and in what order.
+    /// </summary>
+    internal TorrentEngineService(
+        IAppSettingsService settingsService,
+        ILoggerFactory loggerFactory,
+        TimeProvider timeProvider,
+        Func<TorrentClientOptions, IClientEngine> createEngine)
     {
         _settingsService = settingsService;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<TorrentEngineService>();
         _timeProvider = timeProvider;
+        _createEngine = createEngine;
+        _settingsService.SettingsSaved += OnSettingsSavedAsync;
     }
 
     public IClientEngine Engine => _engine ?? throw new InvalidOperationException("Torrent engine is not initialized.");
@@ -38,9 +53,34 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         _engine ??= CreateEngine();
-        await _engine.InitializeAsync(cancellationToken).ConfigureAwait(false);
-        var engineElapsedMs = stopwatch.ElapsedMilliseconds;
-        await LoadBlocklistAsync(cancellationToken).ConfigureAwait(false);
+        // PeerSharp does not persist SSL private keys. Defer restored starts so a missing
+        // certificate cannot make the add fail and discard the restored torrent entirely.
+        var queueEnabled = _engine.Settings.Queue.Enabled;
+        _engine.Settings.Queue.Enabled = false;
+        long blocklistElapsedMs;
+        try
+        {
+            await _engine.PauseAsync(cancellationToken).ConfigureAwait(false);
+            await _engine.InitializeAsync(cancellationToken).ConfigureAwait(false);
+
+            // While the session is still paused: the blocklist has nowhere to go before the engine
+            // is initialized, and after resuming is too late. It is consulted only as a peer is
+            // added or connects, so restored torrents that resumed first could reach peers it
+            // would have refused, and nothing drops those connections once it arrives.
+            var blocklistStartedMs = stopwatch.ElapsedMilliseconds;
+            await LoadBlocklistAsync(cancellationToken).ConfigureAwait(false);
+            blocklistElapsedMs = stopwatch.ElapsedMilliseconds - blocklistStartedMs;
+
+            await _engine.ResumeAsync(cancellationToken).ConfigureAwait(false);
+            KeepSslTorrentsWithoutCertificatesFromAutoStarting(_engine);
+        }
+        finally
+        {
+            // Only this, so a failure above is the exception that leaves here. The SSL pass used to
+            // run here too, and a throw from it while initialization was already failing replaced
+            // the reason startup failed with a secondary one.
+            _engine.Settings.Queue.Enabled = queueEnabled;
+        }
         if (_logger.IsEnabled(LogLevel.Information))
         {
             var torrentCount = _engine.GetTorrents().Count;
@@ -48,7 +88,29 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
                 _logger,
                 stopwatch.ElapsedMilliseconds,
                 torrentCount,
-                stopwatch.ElapsedMilliseconds - engineElapsedMs);
+                blocklistElapsedMs);
+        }
+    }
+
+    /// <summary>
+    /// Stops the queue retrying restored SSL torrents, which cannot start until a certificate is
+    /// supplied again.
+    /// </summary>
+    /// <remarks>
+    /// Only torrents still set to auto-start are examined. A failed resume leaves its torrent set,
+    /// and clearing the flag on any other torrent changes nothing - which matters, because the
+    /// only way to ask whether a torrent is SSL is <see cref="ITorrent.ExportTorrentFile"/>, which
+    /// serializes and re-parses its whole metadata. Asked of every stopped torrent, that was a
+    /// startup cost growing with the size of a seeding library, for an answer that was not needed.
+    /// </remarks>
+    private static void KeepSslTorrentsWithoutCertificatesFromAutoStarting(IClientEngine engine)
+    {
+        foreach (var torrent in engine.GetTorrents())
+        {
+            if (!torrent.Started && torrent.QueueAutoStart && torrent.HasMetadata && torrent.ExportTorrentFile().IsSsl)
+            {
+                torrent.QueueAutoStart = false;
+            }
         }
     }
 
@@ -61,6 +123,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
 
     public ValueTask DisposeAsync()
     {
+        _settingsService.SettingsSaved -= OnSettingsSavedAsync;
         if (_shutdownTask != null)
         {
             // ShutdownAsync already initiated disposal. In particular, do not
@@ -74,6 +137,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
 
     public async Task ShutdownAsync(CancellationToken cancellationToken)
     {
+        _settingsService.SettingsSaved -= OnSettingsSavedAsync;
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         var engine = Interlocked.Exchange(ref _engine, null);
         if (engine != null)
@@ -143,6 +207,11 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             },
             Connection =
             {
+                I2pSamHost = settings.Network.EnableI2p
+                    ? NetworkSettings.NormalizeI2pSamHost(settings.Network.I2pSamHost)
+                    : null,
+                I2pSamPort = NetworkSettings.ClampI2pSamPort(settings.Network.I2pSamPort),
+                I2pAllowMixedNetworks = settings.Network.EnableI2p && settings.Network.I2pAllowMixedNetworks,
                 TcpPort = GetListeningPort(settings.Network),
                 UdpPort = GetListeningPort(settings.Network),
                 // Port mapping discovers the interface independently and opens its own sockets, so
@@ -164,8 +233,8 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             Queue =
             {
                 Enabled = settings.Queue.EnableQueueManagement,
-                MaxActiveDownloads = settings.Queue.MaxActiveDownloads,
-                MaxActiveSeeds = settings.Queue.MaxActiveSeeds,
+                MaxActiveDownloads = Math.Max(0, settings.Queue.MaxActiveDownloads),
+                MaxActiveSeeds = Math.Max(0, settings.Queue.MaxActiveSeeds),
                 EnforceAutoStop = true
             },
             Transfer =
@@ -174,6 +243,8 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
                 MaxUploadSpeed = ToSpeed(uploadLimit)
             }
         };
+        ApplyStreamingSettings(settings.Streaming, clientSettings.Streaming);
+        ApplyEncryptionSettings(settings, clientSettings.Connection);
         ProxyUdpPolicy.ApplySettings(settings.Proxy, clientSettings.Proxy);
 
         var options = new TorrentClientOptions
@@ -182,7 +253,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             Settings = clientSettings
         };
 
-        return ClientEngineFactory.Create(options);
+        return _createEngine(options);
     }
 
     public void ApplySpeedLimits()
@@ -201,6 +272,64 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         var (download, upload) = BandwidthSchedule.LimitsFor(_settingsService.Current, _timeProvider.GetLocalNow());
         engine.Settings.Transfer.MaxDownloadSpeed = ToSpeed(download);
         engine.Settings.Transfer.MaxUploadSpeed = ToSpeed(upload);
+    }
+
+    public void ApplyStreamingSettings()
+    {
+        if (_engine is { } engine)
+        {
+            ApplyStreamingSettings(_settingsService.Current.Streaming, engine.Settings.Streaming);
+        }
+    }
+
+    public void ApplyEncryptionSettings()
+    {
+        if (_engine is { } engine)
+        {
+            ApplyEncryptionSettings(_settingsService.Current, engine.Settings.Connection);
+        }
+    }
+
+    /// <summary>
+    /// Puts every setting the running engine can take into force, whoever saved them.
+    /// </summary>
+    /// <remarks>
+    /// The settings screen also applies these the moment a field changes, ahead of its delayed
+    /// write; this is for the saves that have no screen behind them. Doing only encryption here
+    /// meant a speed limit or streaming policy changed over MCP was stored but ignored until the
+    /// next restart.
+    /// </remarks>
+    private Task OnSettingsSavedAsync(CancellationToken cancellationToken)
+    {
+        ApplySpeedLimits();
+        ApplyStreamingSettings();
+        ApplyEncryptionSettings();
+        return Task.CompletedTask;
+    }
+
+    private static void ApplyEncryptionSettings(AppSettings source, ConnectionSettings target)
+    {
+        target.Encryption = ParseEncryption(source.EncryptionMode);
+        target.IncomingEncryption = ParseEncryptionOverride(source.Network.IncomingEncryptionMode);
+        target.OutgoingEncryption = ParseEncryptionOverride(source.Network.OutgoingEncryptionMode);
+        target.PreferRc4 = source.Network.PreferRc4;
+    }
+
+    private static Encryption? ParseEncryptionOverride(string mode) =>
+        NetworkSettings.IsEncryptionMode(mode) ? ParseEncryption(mode) : null;
+
+    private static void ApplyStreamingSettings(Peerfluence.Core.Config.StreamingSettings source, PeerSharp.Config.StreamingSettings target)
+    {
+        // Clamped again on the way in, rather than trusted: the engine rejects an out-of-range
+        // value, and this runs against whatever is in Current, not only against a freshly loaded
+        // file. The bounds are the stored ones, so the two cannot disagree.
+        target.ReadAheadBytes = Math.Clamp(source.ReadAheadBytes,
+            Config.StreamingSettings.MinReadAheadBytes, Config.StreamingSettings.MaxReadAheadBytes);
+        target.ReadAheadSeconds = Math.Clamp(source.ReadAheadSeconds, 0, Config.StreamingSettings.MaxReadAheadSeconds);
+        target.RequestQueueSecondsWhileBuffering = Math.Clamp(
+            source.RequestQueueSecondsWhileBuffering, 0, Config.StreamingSettings.MaxRequestQueueSeconds);
+        target.DataWaitTimeoutSeconds = Math.Clamp(source.DataWaitTimeoutSeconds, 0, Config.StreamingSettings.MaxWaitTimeoutSeconds);
+        target.MetadataWaitTimeoutSeconds = Math.Clamp(source.MetadataWaitTimeoutSeconds, 0, Config.StreamingSettings.MaxWaitTimeoutSeconds);
     }
 
     /// <summary>

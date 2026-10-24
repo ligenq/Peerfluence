@@ -44,6 +44,18 @@ jobs:
       - name: Headless UI tests
         run: dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj --no-build --configuration Release
 
+      - name: Render every accent and interaction state
+        run: >
+          dotnet run --project Peerfluence.Theme.Gallery --no-build --configuration Release --
+          --capture TestResults/theme-gallery --all-accents
+
+      - name: Upload the complete control gallery
+        uses: actions/upload-artifact@v4
+        with:
+          name: complete-theme-gallery
+          path: TestResults/theme-gallery/
+          if-no-files-found: error
+
       - name: Install Stryker
         run: dotnet tool install --global dotnet-stryker --version 4.16.0
 

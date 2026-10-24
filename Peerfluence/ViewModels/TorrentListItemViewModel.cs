@@ -73,13 +73,25 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     public long DataLeftBytes
     {
         get;
-        set => SetProperty(ref field, value);
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(EstimatedSecondsRemaining));
+            }
+        }
     }
 
     public long DownloadSpeedBytesPerSecond
     {
         get;
-        set => SetProperty(ref field, value);
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(EstimatedSecondsRemaining));
+            }
+        }
     }
 
     public long UploadSpeedBytesPerSecond
@@ -99,6 +111,11 @@ public sealed class TorrentListItemViewModel : ViewModelBase
         get;
         set => SetProperty(ref field, value);
     } = "\u221E";
+
+    /// <summary>Completed rows sort first and unknown estimates last, independent of display units.</summary>
+    public double EstimatedSecondsRemaining => DataLeftBytes <= 0
+        ? 0
+        : DownloadSpeedBytesPerSecond > 0 ? (double)DataLeftBytes / DownloadSpeedBytesPerSecond : double.PositiveInfinity;
 
     public string StatusDetail
     {

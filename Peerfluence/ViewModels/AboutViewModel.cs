@@ -23,7 +23,7 @@ public sealed class AboutViewModel : ViewModelBase
             "Material.Icons.Avalonia (MIT)",
             "Microsoft.Extensions.Hosting (MIT)",
             "ModelContextProtocol (MIT)",
-            "SukiUI (MIT)"
+            "Peerfluence.Theme (MIT)"
         };
     }
 
