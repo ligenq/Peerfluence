@@ -21,6 +21,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly AboutViewModel _aboutViewModel;
     private readonly IInterfaceModeService _interfaceModeService;
     private readonly IDialogService _dialogService;
+    private IOnScreenAware? _onScreenPage;
     private bool _startupUpdateCheckStarted;
     private bool _disposed;
 
@@ -98,8 +99,24 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
     public bool IsSimpleMode
     {
         get;
-        private set => SetProperty(ref field, value);
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(SimpleDownloadsPage));
+                UpdateOnScreenPage();
+            }
+        }
     }
+
+    /// <summary>
+    /// The downloads, for the simple screen to show, and nothing outside simple mode.
+    /// </summary>
+    /// <remarks>
+    /// Null rather than hidden, so the simple screen's view is not built at all for someone who
+    /// never uses it: a control declared in markup is constructed whether or not it is visible.
+    /// </remarks>
+    public DownloadsViewModel? SimpleDownloadsPage => IsSimpleMode ? DownloadsViewModel : null;
 
     /// <summary>
     /// Whether the first-run welcome is up. Shown until the question has been answered once, and
@@ -190,11 +207,41 @@ public sealed class MainWindowViewModel : ViewModelBase, IDisposable
             if (SetProperty(ref field, value))
             {
                 OnPropertyChanged(nameof(IsAboutSelected));
+                UpdateOnScreenPage();
             }
         }
     }
 
     public bool IsAboutSelected => ReferenceEquals(CurrentPage, _aboutViewModel);
+
+    /// <summary>
+    /// Tells the page that has just come into view, and the one that has just left it.
+    /// </summary>
+    /// <remarks>
+    /// The current page is only on screen in advanced mode. Simple mode shows its own downloads
+    /// screen and leaves <see cref="CurrentPage"/> as it was, so a page left open before switching
+    /// would otherwise go on working behind it.
+    /// </remarks>
+    private void UpdateOnScreenPage()
+    {
+        var shown = IsSimpleMode ? null : CurrentPage as IOnScreenAware;
+        if (ReferenceEquals(shown, _onScreenPage))
+        {
+            return;
+        }
+
+        if (_onScreenPage != null)
+        {
+            _onScreenPage.IsOnScreen = false;
+        }
+
+        _onScreenPage = shown;
+
+        if (shown != null)
+        {
+            shown.IsOnScreen = true;
+        }
+    }
 
     /// <summary>
     /// The navigation, in the order the features asked to appear in.
