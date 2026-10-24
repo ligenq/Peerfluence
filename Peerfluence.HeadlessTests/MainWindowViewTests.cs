@@ -116,4 +116,35 @@ public sealed class MainWindowViewTests
             view.Close();
         }
     }
+
+    [AvaloniaFact]
+    public async Task SimpleDownloadsView_IsBuiltOnlyInSimpleMode()
+    {
+        // A control declared in markup is constructed whether or not it is visible, so the simple
+        // screen used to be built at startup in advanced mode, where nobody sees it.
+        var mainVm = TestHelpers.CreateMainWindowViewModel();
+        await mainVm.ChooseAdvancedModeCommand.ExecuteAsync(null);
+        var view = new MainWindowView(mainVm);
+        view.Show();
+
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.Empty(view.GetVisualDescendants().OfType<SimpleDownloadsView>());
+
+            await mainVm.ChooseSimpleModeCommand.ExecuteAsync(null);
+            Dispatcher.UIThread.RunJobs();
+            view.UpdateLayout();
+
+            var simple = Assert.Single(view.GetVisualDescendants().OfType<SimpleDownloadsView>());
+            Assert.Same(mainVm.DownloadsViewModel, simple.DataContext);
+            Assert.Contains(
+                simple.GetVisualDescendants().OfType<Button>(),
+                button => AutomationProperties.GetAutomationId(button) == "SimpleDownloadsAddMagnetButton");
+        }
+        finally
+        {
+            view.Close();
+        }
+    }
 }
