@@ -1,5 +1,4 @@
 ﻿using System;
-using Peerfluence.Core;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Messaging;
-using Peerfluence.Core.Services;
 
 namespace Peerfluence.Services.Mcp;
 

@@ -1,24 +1,19 @@
 # Peerfluence
 
-Peerfluence is a cross-platform Avalonia desktop client for BitTorrent, with its current
-installer and desktop-association integration focused on Windows. It is built on top of
+Peerfluence is a cross-platform Avalonia desktop client for BitTorrent, with Windows
+installers, portable Linux builds, and Debian packages. It is built on top of
 [PeerSharp](https://github.com/ligenq/PeerSharp). It focuses on giving a local user full
 control over torrent downloads while also exposing a local MCP interface that can be used
 by AI agents for diagnostics, automation, and repeatable UI testing.
 
-The application is written in C#/.NET, uses Avalonia and SukiUI for the desktop UI,
+The application is written in C#/.NET, uses Avalonia Fluent with the Peerfluence theme for the desktop UI,
 Material.Icons.Avalonia for icons, Microsoft.Extensions.Hosting for application
 lifecycle, and PeerSharp for BitTorrent engine behavior.
-
-## Status
-
-Peerfluence is actively being prepared for normal desktop distribution. The core app,
-settings system, torrent controls, MCP integration, natural-language UI test harness, and
-Velopack update path are in place.
 
 ## Main Capabilities
 
 - Add torrents from `.torrent` files, magnet links, or the clipboard.
+- Create `.torrent` files from a file or folder.
 - Find torrents through a configured Torznab endpoint, such as Jackett or Prowlarr, and
   add a result without leaving the application. Nothing is shipped preconfigured.
 - Optionally associate `.torrent` files and `magnet:` links with Peerfluence on Windows.
@@ -52,10 +47,15 @@ Velopack update path are in place.
 - Set per-torrent connection and upload-slot limits, and turn on BEP 16 super-seeding for
   an initial seed introducing content to an empty swarm.
 - Stream eligible files through the configured external media player.
+- Share token-protected streaming links with another device on a configured local address.
+- Tune streaming read-ahead, buffering queues and timeouts without changing the torrent's
+  configured download strategy.
 - Show notifications for finished downloads, metadata readiness, torrent errors, and
   completion actions.
 - Persist session data and settings across restarts.
 - Use DHT, NAT-PMP, UPnP, proxy settings, encryption mode, blocklist, and GeoIP settings.
+- Download I2P torrents through a configured SAM router, and SSL torrents using a certificate
+  issued by the torrent's embedded certificate authority.
 - Use fixed or automatic OS-assigned listening ports for TCP/uTP.
 - Bind every socket to a single local address, so traffic stops rather than leaving by
   another route when a VPN goes away.
@@ -63,13 +63,35 @@ Velopack update path are in place.
 - Configure disk read/write limits separately from network settings.
 - Configure queue management with maximum active downloads/seeds.
 - Configure a completion action program/script that runs when a torrent finishes.
-- Customize theme variant, color palette, background style, and language.
+- Customize theme variant, accent color, and language.
 - Self-update through Velopack for direct-download builds.
 - Expose a local MCP server for AI-assisted control and diagnostics.
 - Run a UI-agent mode for natural-language, AI-executable UI test cases.
 - Handle crashes with native platform dialogs and crash logs.
 
 ## User-Facing Workflows
+
+### Streaming while downloading
+
+Open the details pane and use Play beside a supported audio or video file. PeerSharp
+prioritizes the pieces that open streams need and restores ordinary selection when the last
+stream closes; playing a file does not overwrite the configured download strategy. Cancel
+stops preparation, and Stop streaming closes the listener and its connections.
+
+To play on another device, set this computer's address under Settings → Storage & session →
+Media player, then use Copy streaming link beside the file. Sharing produces a link with a
+generated access token. While the address is blank nothing is shared and Copy streaming link
+reports what to set, rather than copying a loopback link no other device could reach. The link
+remains available until streaming stops, another file starts streaming, the selected torrent
+changes, or Peerfluence exits. Anyone with the link can access the stream while it is active. A
+shared port of zero selects a free port automatically. Local Play always stays on loopback,
+regardless of the sharing address.
+
+The streaming options expand to show minimum read-ahead in MiB, adaptive read-ahead in seconds,
+the peer queue while buffering, and data/metadata timeouts. Zero disables a timeout. Policy
+changes apply to streams opened afterward. The MCP settings tool accepts the same policy as a
+`Streaming` object with `ReadAheadBytes`, `ReadAheadSeconds`, `RequestQueueSecondsWhileBuffering`,
+`DataWaitTimeoutSeconds`, `MetadataWaitTimeoutSeconds`, `BindAddress`, and `Port`.
 
 ### Adding Torrents
 
@@ -117,14 +139,42 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
   status.
 - Performance: disk read/write limits.
 - Queue management: enable queueing, max active downloads, max active seeds.
-- Security and privacy: encryption mode, blocklist, GeoIP, proxy type/host/port,
+- Security and privacy: default encryption mode, independent incoming/outgoing overrides,
+  encrypted MSE payload preference, blocklist, GeoIP, proxy type/host/port,
   credentials, proxy peers, and proxy trackers.
 - Search: Torznab endpoint URL and API key used by the Find Torrents page.
 - Media player: external media player path.
 - Completion action: program/script, arguments, working directory, timeout, run hidden.
 - Updates: Velopack update URL and restart/apply controls for direct builds.
-- Appearance: interface mode (simple or advanced), system/light/dark theme, color theme,
-  background style, language.
+- Appearance: interface mode (simple or advanced), Midnight or Midnight Light theme,
+  automatic switching with the system preference, accent color, and language.
+
+Encryption changes apply to new peer connections. Incoming and outgoing policies inherit the
+default mode unless explicitly overridden. Encrypted MSE payloads remain preferred by default;
+turning off that preference permits negotiated plaintext only when encryption is optional.
+The MCP settings tool accepts `Network.IncomingEncryptionMode`, `Network.OutgoingEncryptionMode`
+(`Inherit`, `Allow`, `Require`, or `Refuse`) and `Network.PreferRc4` too, and applies them to new
+connections after saving. The metadata wait timeout also controls magnet previews; zero waits
+until the dialog is cancelled or the magnet is added.
+
+PeerSharp 5.2.0's reduced resume/autosave allocations, pooled streaming read-ahead, larger magnet
+metadata budget, HTTP seed support, and protocol/lifecycle fixes apply through the existing engine
+integration. Session persistence uses PeerSharp's implementation directly.
+
+For I2P, enable **I2P** in Security and privacy and enter the SAM router host and port
+(default `127.0.0.1:7656`). A running I2P router with SAM enabled is required. Restart Peerfluence
+after changing I2P settings. I2P torrents stay isolated from public-network peers unless you
+explicitly enable mixed networks, which can expose your public IP address. These options are also
+available through MCP under `Network.EnableI2p`, `Network.I2pSamHost`, `Network.I2pSamPort`, and
+`Network.I2pAllowMixedNetworks`.
+
+For SSL torrents, open the `.torrent` file and select a `.pfx` or `.p12` certificate containing
+its private key, signed by the torrent's authority and authorized for its name. The certificate
+dialog appears even when ordinary add options are skipped. Passwords and private keys are not
+stored in settings or session files. After restarting, SSL torrents remain stopped and visible;
+press **Start** to select their certificate again. Attaching a certificate preserves downloaded
+files, resume progress, file selections, and per-torrent limits. Certificate errors remain in the
+dialog so they can be corrected.
 
 Settings apply and persist as they are changed; there is no Save button. Reset restores
 the defaults. In simple mode the screen shows only the download folder and appearance —
@@ -195,13 +245,13 @@ isolated profile.
 Start the application:
 
 ```powershell
-dotnet run --project C:\repos\Peerfluence\Peerfluence\Peerfluence.csproj -- --ui-agent --profile C:\temp\peerfluence-ai-test
+dotnet run --project Peerfluence/Peerfluence.csproj -- --ui-agent --profile C:\temp\peerfluence-ai-test
 ```
 
 Start the proxy in a second process:
 
 ```powershell
-dotnet run --project C:\repos\Peerfluence\Peerfluence\Peerfluence.csproj -- --mcp --profile C:\temp\peerfluence-ai-test
+dotnet run --project Peerfluence/Peerfluence.csproj -- --mcp --profile C:\temp\peerfluence-ai-test
 ```
 
 The proxy uses newline-delimited JSON-RPC. Do not send `Content-Length` framing.
@@ -220,7 +270,7 @@ UI-agent tools include:
 - `ui_agent_cleanup`
 
 Natural-language test cases and runner guidance live in
-`Testing\AI_UI_Test_Cases.md`. The `Testing` folder also contains fixture torrent data
+[Testing/AI_UI_Test_Cases.md](Testing/AI_UI_Test_Cases.md). The `Testing` folder also contains fixture torrent data
 and a magnet link used by the test cases.
 
 ## Development Quality Gates
@@ -233,15 +283,6 @@ Linux and Windows, executes an isolated smoke test, and publishes Cobertura cove
 Security and depth checks are separate workflows: CodeQL and dependency review run for pull
 requests, while scheduled deep validation runs mutation analysis with Stryker and the interactive
 Windows UI suite.
-
-A ruleset protects `main`: force pushes and deletion are refused, changes arrive by pull request
-with conversations resolved, the branch must be current, and `CI`, `Analyze C#` and
-`Review dependencies` must pass. `CI` is an aggregate job that fails unless every lane and every
-matrix entry of the CI workflow succeeded, so adding an operating system or renaming a lane does
-not also mean editing the ruleset. CodeQL and dependency review are separate workflows that no job
-there can wait on, which is why they are required in their own right. No bypasses are granted, and
-approvals are set to zero rather than one: every path in `CODEOWNERS` belongs to the sole
-maintainer, who cannot approve their own pull request, so requiring one would lock `main`.
 
 Before opening a pull request, the shortest local gate is:
 
@@ -260,13 +301,24 @@ on a running indexer. Set `PEERFLUENCE_RUN_LIVE_TESTS=1` when intentionally runn
 
 Requirements:
 
-- Windows, Linux, or macOS with .NET SDK 10.
+- Windows, Linux, or macOS with the .NET SDK selected by `global.json` (10.0.400 or a
+  compatible patch).
 
 Run the app:
 
 ```shell
 dotnet run --project Peerfluence/Peerfluence.csproj
 ```
+
+Builds use the published **PeerSharp 5.2.0** NuGet package, including when a sibling engine
+checkout exists. No local package feed is needed. For engine development, explicitly opt into
+the sibling checkout (including the headless tests):
+
+```shell
+dotnet run --project Peerfluence/Peerfluence.csproj -p:UseLocalPeerSharp=true
+```
+
+Set `-p:PeerSharpProjectPath=/path/to/PeerSharp.csproj` as well to use another checkout.
 
 Run with an isolated profile:
 
@@ -277,8 +329,8 @@ dotnet run --project Peerfluence/Peerfluence.csproj -- --profile /path/to/peerfl
 Run tests:
 
 ```shell
-dotnet test Peerfluence.Tests/Peerfluence.Tests.csproj
-dotnet test Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
+dotnet test --project Peerfluence.Tests/Peerfluence.Tests.csproj
+dotnet test --project Peerfluence.HeadlessTests/Peerfluence.HeadlessTests.csproj
 ```
 
 Create a self-contained portable build by selecting a runtime identifier:
@@ -289,11 +341,9 @@ dotnet publish Peerfluence/Peerfluence.csproj -c Release -r linux-x64 --self-con
 
 Supported publish targets include `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`,
 `osx-x64`, and `osx-arm64`. Native AOT publishing must be performed on the target OS (or
-in a matching CI runner with the required native toolchain). Linux and macOS output is
-currently a portable application directory rather than a registered desktop installer.
-
-If a Windows build fails with file-lock errors in `bin` or `obj`, rerun the command
-serially. Parallel build/test commands can occasionally collide on generated files.
+in a matching CI runner with the required native toolchain). A direct publish for Linux or macOS
+produces a portable application directory; use the packaging scripts below for Linux
+archives and Debian desktop integration.
 
 ## Distribution
 
@@ -303,7 +353,8 @@ is installed through Velopack.
 
 Linux releases provide portable AppDir archives and Debian packages for x64 and ARM64.
 The Debian package registers the application launcher, `.torrent` MIME handler, and
-`magnet:` URL handler. Build one locally with:
+`magnet:` URL handler. Both are Native AOT builds, so build on a host of the target
+architecture with `clang` and `zlib1g-dev` installed:
 
 ```shell
 ./ReleasePackaging/build-linux.sh --version 2.1.0 --rid linux-x64
@@ -321,7 +372,7 @@ GitHub release on [ligenq/Peerfluence](https://github.com/ligenq/Peerfluence). U
 download `Peerfluence.Desktop-win-Setup.exe`; the remaining files are used by the
 auto-update feed. The default update URL is `https://github.com/ligenq/Peerfluence`.
 
-See `ReleasePackaging/README.md` for Linux formats, AppImage generation, MSI generation,
+See [ReleasePackaging/README.md](ReleasePackaging/README.md) for Linux formats, AppImage generation, MSI generation,
 release notes, update hosting, and optional signing details. GitHub Actions workflows run
 the unit/headless test suite on Windows and Linux and can create a combined GitHub release.
 
@@ -330,16 +381,15 @@ the unit/headless test suite on Windows and Linux and can create a combined GitH
 - `Peerfluence`: Avalonia UI, app startup, services, MCP server, notifications, dialogs.
 - `Peerfluence.Core`: UI-independent settings, service contracts, messages, engine
   services.
+- `Peerfluence.Theme`: shared Avalonia theme, palettes, and control styles.
+- `Peerfluence.Theme.Gallery`: control gallery and visual capture tool.
 - `Peerfluence.Tests`: unit tests.
 - `Peerfluence.HeadlessTests`: Avalonia/headless UI tests.
 - `Peerfluence.UiTests`: Windows UI Automation tests that drive the built application.
 - `Testing`: AI-executable UI test cases and fixtures.
-- `ReleasePackaging`: Velopack release packaging script and instructions.
+- `ReleasePackaging`: Windows and Linux packaging scripts and instructions.
 - `DebuggerApp`: local helper/debug harness.
-
-[PeerSharp](https://github.com/ligenq/PeerSharp) is consumed as a NuGet package by the
-app. The separate PeerSharp source repo is useful when engine behavior needs deeper
-analysis.
+- `tools/DumpAnalyzer`: managed memory dump analysis helper.
 
 ## Notes
 

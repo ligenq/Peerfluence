@@ -4,9 +4,9 @@ set -euo pipefail
 # Produces a CycloneDX bill of materials for one runtime identifier.
 #
 # Generated from the restore graph rather than from the published files, and deliberately. Both
-# release builds produce a single opaque executable - Windows compiles ahead of time, Linux bundles
-# every assembly into one file - so a scanner pointed at the published output finds one binary and
-# learns nothing. The dependency graph is where the answer actually is.
+# release builds are Native AOT, which compiles every assembly into one opaque executable, so a
+# scanner pointed at the published output finds one binary and learns nothing. The dependency graph
+# is where the answer actually is.
 
 usage() {
     echo "Usage: $0 --version VERSION --rid RID [--configuration Release] [--output DIR]"

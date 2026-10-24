@@ -1,4 +1,4 @@
-﻿using Peerfluence.Core.Config;
+using Peerfluence.Core.Config;
 using System.IO.Abstractions;
 
 namespace Peerfluence.Core.Services;
@@ -82,8 +82,7 @@ public sealed class AppSettingsService : IAppSettingsService
             Theme =
             {
                 ThemeVariant = "System",
-                ColorTheme = "Indigo",
-                BackgroundStyle = "GradientSoft"
+                ColorTheme = "Teal"
             },
             ShowRemoveTorrentOptions = true,
             ShowDetailsPane = false,
@@ -95,6 +94,15 @@ public sealed class AppSettingsService : IAppSettingsService
     private bool EnsureDefaultsExist(AppSettings settings)
     {
         var changed = false;
+        if (settings.Network.NormalizeI2p())
+        {
+            changed = true;
+        }
+
+        if (settings.Network.NormalizeEncryption())
+        {
+            changed = true;
+        }
         if (string.IsNullOrWhiteSpace(settings.Storage.DownloadPath))
         {
             settings.Storage.DownloadPath = _paths.DefaultDownloadDirectory;
@@ -125,13 +133,7 @@ public sealed class AppSettingsService : IAppSettingsService
 
         if (string.IsNullOrWhiteSpace(settings.Theme.ColorTheme))
         {
-            settings.Theme.ColorTheme = "Indigo";
-            changed = true;
-        }
-
-        if (string.IsNullOrWhiteSpace(settings.Theme.BackgroundStyle))
-        {
-            settings.Theme.BackgroundStyle = "GradientSoft";
+            settings.Theme.ColorTheme = "Teal";
             changed = true;
         }
 
@@ -156,6 +158,38 @@ public sealed class AppSettingsService : IAppSettingsService
         if (settings.Mcp == null)
         {
             settings.Mcp = new McpSettings();
+            changed = true;
+        }
+        if (settings.Streaming == null)
+        {
+            settings.Streaming = new StreamingSettings();
+            changed = true;
+        }
+        if (settings.Streaming.Normalize())
+        {
+            changed = true;
+        }
+
+        if (settings.Queue.MaxActiveDownloads < 0)
+        {
+            settings.Queue.MaxActiveDownloads = 0;
+            changed = true;
+        }
+        if (settings.Queue.MaxActiveSeeds < 0)
+        {
+            settings.Queue.MaxActiveSeeds = 0;
+            changed = true;
+        }
+        if (!float.IsFinite(settings.Seeding.RatioLimit) || settings.Seeding.RatioLimit < 0)
+        {
+            settings.Seeding.RatioLimit = 2;
+            settings.Seeding.LimitRatio = false;
+            changed = true;
+        }
+        if (settings.Seeding.SeedTimeLimitMinutes < 0)
+        {
+            settings.Seeding.SeedTimeLimitMinutes = 1440;
+            settings.Seeding.LimitSeedTime = false;
             changed = true;
         }
         if (settings.CompletionAction.TimeoutSeconds <= 0)

@@ -64,6 +64,12 @@
   <data name="App_Tagline" xml:space="preserve">
     <value>BitTorrent-arbetsstation</value>
   </data>
+  <data name="Nav_Navigation" xml:space="preserve">
+    <value>Navigering</value>
+  </data>
+  <data name="Find_Hint" xml:space="preserve">
+    <value>Sök i anslutna indexerare och lägg till resultat bland dina nedladdningar.</value>
+  </data>
   <data name="Nav_Downloads" xml:space="preserve">
     <value>Nedladdningar</value>
   </data>
@@ -424,6 +430,12 @@
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
     <value>Mörkt</value>
   </data>
+  <data name="Settings_ThemeVariant_Midnight" xml:space="preserve">
+    <value>Midnatt</value>
+  </data>
+  <data name="Settings_ThemeVariant_MidnightLight" xml:space="preserve">
+    <value>Midnatt ljus</value>
+  </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Färgtema</value>
   </data>
@@ -433,8 +445,20 @@
   <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
     <value>Kobolt</value>
   </data>
+  <data name="Settings_ColorTheme_Sky" xml:space="preserve">
+    <value>Himmelsblå</value>
+  </data>
+  <data name="Settings_ColorTheme_Cyan" xml:space="preserve">
+    <value>Cyan</value>
+  </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>Mint</value>
+  </data>
+  <data name="Settings_ColorTheme_Teal" xml:space="preserve">
+    <value>Blågrön</value>
+  </data>
+  <data name="Settings_ColorTheme_Violet" xml:space="preserve">
+    <value>Violett</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Smaragd</value>
@@ -1427,7 +1451,7 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>Namnbytet misslyckades: {0}</value>
   </data>
   <data name="Details_SuperSeeding" xml:space="preserve">
-    <value>Supersådd (BEP 16)</value>
+    <value>Superseed (BEP 16)</value>
   </data>
   <data name="Details_SuperSeedingHint" xml:space="preserve">
     <value>För en ensam seed som introducerar nytt innehåll i en tom svärm. Stäng av den efteråt: i en etablerad svärm bromsar den peers som kunde ha laddat ner fritt.</value>
@@ -1545,5 +1569,89 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   </data>
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Kategori för det som läggs till</value>
+  </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Ange en specifik lokal IP-adress för delade strömmar; jokeradresser stöds inte.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Den valda filen innehåller inga spelbara data.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Kopiera strömningslänk</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Stoppa strömning</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Adress för delad strömning</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Lämna tomt för endast den här datorn. Ange datorns IP-adress på det gemensamma nätverket för att dela en länk med en TV eller annan enhet. Alla med länken kan spela filen tills du stoppar strömningen.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Port för delad strömning (0: automatiskt)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Strömningsbuffert och tidsgränser</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Minsta förläsning (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Förläsning vid uppspelningshastighet (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Kötid per klient vid buffring (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Väntetid för uppspelningsdata (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Väntetid för torrentmetadata (sekunder)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Noll tar bort tidsgränsen. Ändringar gäller strömmar som öppnas därefter.</value>
+  </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Inkommande anslutningar</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Utgående anslutningar</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Använd standardläget för kryptering</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Föredra krypterad MSE-data (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Gäller nya anslutningar. Om detta stängs av tillåts okrypterad MSE-data när kryptering är valfri. Obligatorisk kryptering förblir krypterad.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Aktivera I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>SAM-routerns värd</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>SAM-routerns port</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Tillåt publika nätverksparter för I2P-torrenter</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Kräver en I2P-router med SAM aktiverat. Starta om Peerfluence efter ändringar. Publika nätverksparter kan exponera din IP-adress.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>SSL-certifikat för torrent (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Certifikatlösenord</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Välj ett certifikat med privat nyckel, signerat av torrentens certifikatutfärdare. Lösenord och privata nycklar sparas inte; välj certifikatet igen efter omstart.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Välj ett certifikat som innehåller dess privata nyckel.</value>
   </data>
 </root>

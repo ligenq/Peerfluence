@@ -1,44 +1,51 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:m="using:Peerfluence.Markup"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Peerfluence.Views.AboutView"
              x:DataType="vm:AboutViewModel">
-    <StackPanel Spacing="{StaticResource SpacingStandard}" MaxWidth="600">
-        <TextBlock Text="{m:L About_Title}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"/>
-        <TextBlock Text="{m:L App_Tagline}" Opacity="{StaticResource OpacitySecondary}"/>
-        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
-            <TextBlock Text="{m:L AddTorrent_Version}" Opacity="{StaticResource OpacitySecondary}"/>
-            <TextBlock Text="{Binding ApplicationVersion}" Opacity="{StaticResource OpacitySecondary}"/>
+    <ScrollViewer>
+        <StackPanel Spacing="{StaticResource SpacingStandard}"
+                    Width="{Binding $parent[ScrollViewer].Viewport.Width}"
+                    MaxWidth="600"
+                    HorizontalAlignment="Left">
+            <TextBlock Text="{m:L About_Title}" Classes="title"/>
+            <TextBlock Text="{m:L App_Tagline}" Opacity="{StaticResource OpacitySecondary}"/>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingXSmall}">
+                <TextBlock Text="{m:L AddTorrent_Version}" Opacity="{StaticResource OpacitySecondary}"/>
+                <TextBlock Text="{Binding ApplicationVersion}" Opacity="{StaticResource OpacitySecondary}"/>
+            </StackPanel>
+
+            <Separator Background="{DynamicResource PfBorder}"/>
+
+            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                <TextBlock Text="{m:L About_GitHub}" FontWeight="SemiBold"/>
+                <Button Command="{Binding OpenGitHubCommand}" Classes="ghost" Padding="{StaticResource ZeroThickness}" AutomationProperties.Name="{m:L About_GitHub}" AutomationProperties.AutomationId="OpenGitHubButton">
+                    <TextBlock Text="{Binding GitHubUrl}" Foreground="{DynamicResource PfAccent}" Cursor="Hand"/>
+                </Button>
+            </StackPanel>
+
+            <Expander Classes="disclosure"
+                      Header="{m:L About_LegalNotice}"
+                      AutomationProperties.Name="{m:L About_LegalNotice}"
+                      AutomationProperties.AutomationId="LegalNoticeExpander">
+                <TextBlock Text="{m:L About_LegalNoticeText}"
+                           TextWrapping="Wrap"
+                           Classes="secondary"
+                           LineHeight="{DynamicResource PfLineHeightBody}"/>
+            </Expander>
+
+            <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                <TextBlock Text="{m:L About_Packages}" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Packages}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding}" Margin="{StaticResource XXSmallBottomMargin}" Opacity="{StaticResource OpacitySecondary}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </StackPanel>
-
-        <Separator Background="{DynamicResource SukiBorderBrush}"/>
-
-        <StackPanel Spacing="{StaticResource SpacingXSmall}">
-            <TextBlock Text="{m:L About_GitHub}" FontWeight="SemiBold"/>
-            <Button Command="{Binding OpenGitHubCommand}" Classes="Basic" Padding="{StaticResource ZeroThickness}" AutomationProperties.Name="{m:L About_GitHub}" AutomationProperties.AutomationId="OpenGitHubButton">
-                <TextBlock Text="{Binding GitHubUrl}" Foreground="{DynamicResource SukiPrimaryColor}" Cursor="Hand"/>
-            </Button>
-        </StackPanel>
-
-        <Expander Header="{m:L About_LegalNotice}">
-            <TextBlock Text="{m:L About_LegalNoticeText}"
-                       TextWrapping="Wrap"
-                       Opacity="{StaticResource OpacitySecondary}"
-                       Margin="{StaticResource SmallTopMargin}"/>
-        </Expander>
-
-        <StackPanel Spacing="{StaticResource SpacingXSmall}">
-            <TextBlock Text="{m:L About_Packages}" FontWeight="SemiBold"/>
-            <ItemsControl ItemsSource="{Binding Packages}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="x:String">
-                        <TextBlock Text="{Binding}" Margin="{StaticResource XXSmallBottomMargin}" Opacity="{StaticResource OpacitySecondary}"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

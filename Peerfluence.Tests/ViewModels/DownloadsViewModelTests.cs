@@ -16,6 +16,73 @@ namespace Peerfluence.Tests.ViewModels;
 [Collection("Messenger")]
 public class DownloadsViewModelTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StartingSslTorrentWithoutCredential_OpensCertificateDialogAndDisablesAutoStart(bool rowAction)
+    {
+        using var data = new SslTorrentTestData();
+        var sut = CreateViewModelWithTorrents(("ssl", Complete: false, Running: false));
+        try
+        {
+            var row = Assert.Single(sut.Torrents);
+            row.Torrent.HasMetadata.Returns(true);
+            row.Torrent.ExportTorrentFile().Returns(data.Metadata);
+            row.Torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Certificate required")));
+            sut.SetSelectedTorrents([row]);
+            if (rowAction) await sut.ToggleTorrentCommand.ExecuteAsync(row);
+            else await sut.StartSelectedCommand.ExecuteAsync(null);
+            await GetAddTorrentDialogService(sut).Received(1).ShowSslCertificateAsync(row.Torrent);
+            Assert.False(row.Torrent.QueueAutoStart);
+        }
+        finally { StopLoops(sut); }
+    }
+
+    /// <summary>
+    /// A magnet added before its preview resolved, or from anywhere that cannot offer a certificate,
+    /// finds out it is SSL only when its metadata arrives - and cannot reach a peer without one.
+    /// </summary>
+    [Fact]
+    public async Task SslMagnetMetadataArriving_StopsTheTorrentAndAsksForACertificate()
+    {
+        using var data = new SslTorrentTestData();
+        var sut = CreateViewModelWithTorrents(("ssl-magnet", Complete: false, Running: true));
+        try
+        {
+            var torrent = Assert.Single(sut.Torrents).Torrent;
+            torrent.HasMetadata.Returns(true);
+            torrent.ExportTorrentFile().Returns(data.Metadata);
+            torrent.QueueAutoStart = true;
+
+            await sut.RequestCertificateIfSslAsync(torrent);
+
+            Assert.False(torrent.QueueAutoStart);
+            await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+            await GetAddTorrentDialogService(sut).Received(1).ShowSslCertificateAsync(torrent);
+        }
+        finally { StopLoops(sut); }
+    }
+
+    [Fact]
+    public async Task OrdinaryMagnetMetadataArriving_LeavesTheTorrentRunning()
+    {
+        var sut = CreateViewModelWithTorrents(("plain-magnet", Complete: false, Running: true));
+        try
+        {
+            var torrent = Assert.Single(sut.Torrents).Torrent;
+            torrent.HasMetadata.Returns(true);
+            torrent.ExportTorrentFile().Returns(PlainTorrentTestData.Metadata());
+            torrent.QueueAutoStart = true;
+
+            await sut.RequestCertificateIfSslAsync(torrent);
+
+            Assert.True(torrent.QueueAutoStart);
+            await torrent.DidNotReceive().StopAsync(Arg.Any<CancellationToken>());
+            await GetAddTorrentDialogService(sut).DidNotReceiveWithAnyArgs().ShowSslCertificateAsync(default!);
+        }
+        finally { StopLoops(sut); }
+    }
+
     private readonly ITorrentService _torrentService;
     private readonly TorrentSelectionService _selectionService = new(Substitute.For<IAppMessenger>());
     private readonly LocalizationService _localizationService = new();
@@ -45,7 +112,7 @@ public class DownloadsViewModelTests
             _localizationService,
             notificationService,
             _topLevelService,
-            settingsService, Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>(), Substitute.For<IMediaStreamingService>());
 
         // Workaround for Dispatcher dependencies in constructor
 #pragma warning disable SYSLIB0050
@@ -243,6 +310,47 @@ public class DownloadsViewModelTests
     }
 
     [Fact]
+    public async Task AddMagnetPrompt_ValidatesInputBeforeAcceptingIt()
+    {
+        var dialogs = Substitute.For<IDialogService>();
+        TextPrompt? prompt = null;
+        dialogs.PromptForTextAsync(Arg.Any<TextPrompt>()).Returns(call =>
+        {
+            prompt = call.Arg<TextPrompt>();
+            return Task.FromResult<string?>(null);
+        });
+        var topLevel = Substitute.For<ITopLevelService>();
+        var clipboard = CreateClipboard(null);
+        topLevel.GetClipboard().Returns(clipboard);
+        var sut = CreateViewModelWithSelectedTorrent(topLevel, out _, dialogs);
+        try
+        {
+            await sut.AddMagnetCommand.ExecuteAsync(null);
+            Assert.NotNull(prompt);
+            Assert.NotNull(prompt.Validate);
+            foreach (string invalid in new[]
+                     {
+                         "not a magnet", "magnet:?xt=urn:btih:abc",
+                         $"magnet:?xs=urn:btpk:{new string('a', 64)}"
+                     })
+            {
+                Assert.False(string.IsNullOrWhiteSpace(prompt.Validate(invalid)),
+                    $"The Add magnet dialog would accept '{invalid}' without an inline error.");
+            }
+
+            Assert.Null(prompt.Validate("  magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA  "));
+            Assert.Null(prompt.Validate($"magnet:?xt=urn:btmh:1220{new string('b', 64)}"));
+            Assert.Equal(string.Empty, sut.StatusMessage);
+            await GetAddTorrentDialogService(sut).DidNotReceive()
+                .ShowMagnetAsync(Arg.Any<string>());
+        }
+        finally
+        {
+            sut.Dispose();
+        }
+    }
+
+    [Fact]
     public async Task CopyHashCommand_PutsTheHashOnTheClipboardAndFlushesIt()
     {
         var clipboard = Substitute.For<IClipboard>();
@@ -387,7 +495,8 @@ public class DownloadsViewModelTests
         return CreateViewModelWithSelectedTorrent(topLevelService, out torrent);
     }
 
-    private DownloadsViewModel CreateViewModelWithSelectedTorrent(ITopLevelService topLevelService, out ITorrent torrent)
+    private DownloadsViewModel CreateViewModelWithSelectedTorrent(
+        ITopLevelService topLevelService, out ITorrent torrent, IDialogService? dialogService = null)
     {
         var selected = Substitute.For<ITorrent>();
         selected.Name.Returns("Selected");
@@ -404,7 +513,7 @@ public class DownloadsViewModelTests
             new TorrentSelectionService(Substitute.For<IAppMessenger>()),
             new LocalizationService(),
             topLevelService,
-            Substitute.For<IDialogService>(),
+            dialogService ?? Substitute.For<IDialogService>(),
             Substitute.For<IAddTorrentDialogService>(),
             _settingsService,
             Substitute.For<ITorrentCategoryService>(),

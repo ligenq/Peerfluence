@@ -14,6 +14,153 @@ namespace Peerfluence.Tests.Services.Mcp;
 public class McpToolHandlerTests
 {
     [Fact]
+    public async Task I2pUpdates_PreserveIsolationAndRejectInvalidPortsAtomically()
+    {
+        var settings = new AppSettings { Mcp = { AllowDestructiveTools = true } };
+        var service = Substitute.For<IAppSettingsService>();
+        service.Current.Returns(settings);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            service, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+        var valid = await handler.UpdateSettingsAsync("""{"Network":{"EnableI2p":true,"I2pSamHost":"sam.local","I2pSamPort":7666}}""", TestContext.Current.CancellationToken);
+        Assert.False(valid.IsError);
+        Assert.True(settings.Network.EnableI2p);
+        Assert.Equal("sam.local", settings.Network.I2pSamHost);
+        Assert.Equal(7666, settings.Network.I2pSamPort);
+        Assert.False(settings.Network.I2pAllowMixedNetworks);
+        var invalid = await handler.UpdateSettingsAsync("""{"Network":{"I2pAllowMixedNetworks":true,"I2pSamPort":65536}}""", TestContext.Current.CancellationToken);
+        Assert.True(invalid.IsError);
+        Assert.False(settings.Network.I2pAllowMixedNetworks);
+        Assert.Equal(7666, settings.Network.I2pSamPort);
+        await service.Received(1).SaveAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EncryptionUpdates_ApplyToRunningEngineAndRejectUnknownModes()
+    {
+        var paths = Substitute.For<IAppPaths>();
+        paths.DefaultDownloadDirectory.Returns(Path.GetTempPath());
+        paths.SessionDirectory.Returns(Path.GetTempPath());
+        var store = Substitute.For<IAppSettingsStore>();
+        var settings = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
+        settings.Current.Mcp.AllowDestructiveTools = true;
+        settings.Current.Storage.EnableSessionPersistence = false;
+        settings.Current.Network.UseAutomaticListeningPort = true;
+        settings.Current.Network.EnableDht = false;
+        settings.Current.Network.EnableNatPmp = false;
+        settings.Current.Network.EnableUpnp = false;
+        await using var engine = new TorrentEngineService(settings, Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance, TimeProvider.System);
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            settings, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+
+        var result = await handler.UpdateSettingsAsync("""
+            { "EncryptionMode": "Require", "Network": {
+                "IncomingEncryptionMode": "Inherit", "OutgoingEncryptionMode": "Allow", "PreferRc4": false } }
+            """, TestContext.Current.CancellationToken);
+        Assert.False(result.IsError);
+        var connection = engine.Engine.Settings.Connection;
+        Assert.Equal(PeerSharp.Config.Encryption.Require, connection.Encryption);
+        Assert.Null(connection.IncomingEncryption);
+        Assert.Equal(PeerSharp.Config.Encryption.Allow, connection.OutgoingEncryption);
+        Assert.False(connection.PreferRc4);
+
+        var invalid = await handler.UpdateSettingsAsync("""{"EncryptionMode":"unknown"}""", TestContext.Current.CancellationToken);
+        Assert.True(invalid.IsError);
+        Assert.Equal("Require", settings.Current.EncryptionMode);
+        Assert.Equal(PeerSharp.Config.Encryption.Require, connection.Encryption);
+        foreach (var rejectedPayload in new[]
+        {
+            """{"Network":{"PreferRc4":true,"OutgoingEncryptionMode":"unknown"}}""",
+            """{"Network":{"PreferRc4":true,"ListeningPort":"invalid"}}"""
+        })
+        {
+            var rejected = await handler.UpdateSettingsAsync(rejectedPayload, TestContext.Current.CancellationToken);
+            Assert.True(rejected.IsError);
+            Assert.False(settings.Current.Network.PreferRc4);
+            Assert.False(connection.PreferRc4);
+            Assert.Equal("Allow", settings.Current.Network.OutgoingEncryptionMode);
+        }
+        await store.Received(1).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SpeedLimitUpdates_ReachTheRunningEngine_AndNegativesAreRefusedAtomically()
+    {
+        var paths = Substitute.For<IAppPaths>();
+        paths.DefaultDownloadDirectory.Returns(Path.GetTempPath());
+        paths.SessionDirectory.Returns(Path.GetTempPath());
+        var store = Substitute.For<IAppSettingsStore>();
+        var settings = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
+        settings.Current.Mcp.AllowDestructiveTools = true;
+        settings.Current.Storage.EnableSessionPersistence = false;
+        settings.Current.Network.UseAutomaticListeningPort = true;
+        settings.Current.Network.EnableDht = false;
+        settings.Current.Network.EnableNatPmp = false;
+        settings.Current.Network.EnableUpnp = false;
+        await using var engine = new TorrentEngineService(settings, Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance, TimeProvider.System);
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            settings, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+
+        var result = await handler.UpdateSettingsAsync(
+            """{"Network":{"MaxDownloadSpeedBytesPerSecond":512000,"MaxUploadSpeedBytesPerSecond":65536}}""",
+            TestContext.Current.CancellationToken);
+        Assert.False(result.IsError);
+        Assert.Equal(512000, settings.Current.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(65536, settings.Current.Network.MaxUploadSpeedBytesPerSecond);
+        var transfer = engine.Engine.Settings.Transfer;
+        Assert.Equal(512000, transfer.MaxDownloadSpeed);
+        Assert.Equal(65536, transfer.MaxUploadSpeed);
+
+        var rejected = await handler.UpdateSettingsAsync(
+            """{"Network":{"MaxDownloadSpeedBytesPerSecond":0,"MaxUploadSpeedBytesPerSecond":-1}}""",
+            TestContext.Current.CancellationToken);
+        Assert.True(rejected.IsError);
+        Assert.Equal(512000, settings.Current.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(65536, settings.Current.Network.MaxUploadSpeedBytesPerSecond);
+        Assert.Equal(512000, transfer.MaxDownloadSpeed);
+
+        var unlimited = await handler.UpdateSettingsAsync(
+            """{"Network":{"MaxDownloadSpeedBytesPerSecond":0}}""", TestContext.Current.CancellationToken);
+        Assert.False(unlimited.IsError);
+        Assert.Equal(0, transfer.MaxDownloadSpeed);
+        await store.Received(2).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("192.168.1.23", false)]
+    [InlineData("0.0.0.0", true)]
+    public async Task UpdatingStreamingPolicy_ValidatesSharingAndPreservesUnlimitedTimeouts(string address, bool invalid)
+    {
+        var settings = new AppSettings { Mcp = { AllowDestructiveTools = true } };
+        var service = Substitute.For<IAppSettingsService>();
+        service.Current.Returns(settings);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            service, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+        var result = await handler.UpdateSettingsAsync($$"""
+            { "Streaming": { "BindAddress": "{{address}}", "Port": 8087, "ReadAheadBytes": 83886080,
+              "ReadAheadSeconds": 45, "RequestQueueSecondsWhileBuffering": 0,
+              "DataWaitTimeoutSeconds": 0, "MetadataWaitTimeoutSeconds": 120 } }
+            """, TestContext.Current.CancellationToken);
+        Assert.Equal(invalid, result.IsError);
+        if (invalid)
+        {
+            Assert.Equal(string.Empty, settings.Streaming.BindAddress);
+            await service.DidNotReceive().SaveAsync(Arg.Any<CancellationToken>());
+            return;
+        }
+
+        Assert.Equal(address, settings.Streaming.BindAddress);
+        Assert.Equal(8087, settings.Streaming.Port);
+        Assert.Equal(83886080, settings.Streaming.ReadAheadBytes);
+        Assert.Equal(45, settings.Streaming.ReadAheadSeconds);
+        Assert.Equal(0, settings.Streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(0, settings.Streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(120, settings.Streaming.MetadataWaitTimeoutSeconds);
+        await service.Received(1).SaveAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task AddTorrentAsync_ReturnsError_WhenMagnetLinkIsEmpty()
     {
         // Arrange

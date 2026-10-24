@@ -1,6 +1,5 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:m="using:Peerfluence.Markup"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -15,56 +14,58 @@
         by the same converters the lists use, so a size means the same thing here as it does there.
     -->
     <ScrollViewer AutomationProperties.AutomationId="StatisticsPage">
-        <StackPanel Spacing="{StaticResource SpacingStandard}" MaxWidth="{StaticResource ContentMaxWidth}">
-            <TextBlock Text="{m:L Nav_Statistics}" FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"/>
-            <TextBlock Text="{m:L Stats_Hint}" Opacity="{StaticResource OpacitySecondary}" TextWrapping="Wrap"/>
+        <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="720" HorizontalAlignment="Left">
+            <StackPanel Classes="pageHeader" Margin="{StaticResource ZeroThickness}">
+                <TextBlock Text="{m:L Nav_Statistics}" Classes="title"/>
+                <TextBlock Text="{m:L Stats_Hint}" Classes="secondary" TextWrapping="Wrap"/>
+            </StackPanel>
 
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpacingLarge}" RowSpacing="{StaticResource SpacingStandard}">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Stats_Downloaded}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsDownloadedValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Stats_Downloaded}" Classes="secondary"/>
+                        <TextBlock Text="{Binding DownloadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsDownloadedValue" Classes="display numeric"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Stats_Uploaded}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding UploadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsUploadedValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Stats_Uploaded}" Classes="secondary"/>
+                        <TextBlock Text="{Binding UploadedBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsUploadedValue" Classes="display numeric"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Stats_Ratio}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding Ratio, StringFormat={}{0:0.00}}" AutomationProperties.AutomationId="StatsRatioValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Stats_Ratio}" Classes="secondary"/>
+                        <TextBlock Text="{Binding Ratio, StringFormat={}{0:0.00}}" AutomationProperties.AutomationId="StatsRatioValue" Classes="display numeric"/>
                     </StackPanel>
                 </Grid>
-            </suki:GlassCard>
+            </Border>
 
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Downloads_Grid_Down}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsDownloadSpeedValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Downloads_Grid_Down}" Classes="secondary"/>
+                        <TextBlock Text="{Binding DownloadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsDownloadSpeedValue" Classes="subtitle numeric"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Downloads_Grid_Up}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsUploadSpeedValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Downloads_Grid_Up}" Classes="secondary"/>
+                        <TextBlock Text="{Binding UploadSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}, Mode=OneWay}" AutomationProperties.AutomationId="StatsUploadSpeedValue" Classes="subtitle numeric"/>
                     </StackPanel>
                 </Grid>
-            </suki:GlassCard>
+            </Border>
 
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpacingLarge}">
                     <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Stats_Torrents}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding Torrents}" AutomationProperties.AutomationId="StatsTorrentsValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Stats_Torrents}" Classes="secondary"/>
+                        <TextBlock Text="{Binding Torrents}" AutomationProperties.AutomationId="StatsTorrentsValue" Classes="subtitle numeric"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Downloads_Active}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding ActiveTorrents}" AutomationProperties.AutomationId="StatsActiveTorrentsValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Downloads_Active}" Classes="secondary"/>
+                        <TextBlock Text="{Binding ActiveTorrents}" AutomationProperties.AutomationId="StatsActiveTorrentsValue" Classes="subtitle numeric"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Downloads_Peers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBlock Text="{Binding ConnectedPeers}" AutomationProperties.AutomationId="StatsConnectedPeersValue" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{m:L Downloads_Peers}" Classes="secondary"/>
+                        <TextBlock Text="{Binding ConnectedPeers}" AutomationProperties.AutomationId="StatsConnectedPeersValue" Classes="subtitle numeric"/>
                     </StackPanel>
                 </Grid>
-            </suki:GlassCard>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

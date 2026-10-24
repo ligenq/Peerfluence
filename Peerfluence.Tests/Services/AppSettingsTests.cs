@@ -1,4 +1,4 @@
-﻿using Peerfluence.Core.Config;
+using Peerfluence.Core.Config;
 
 namespace Peerfluence.Tests.Services;
 
@@ -20,8 +20,7 @@ public class AppSettingsTests
         Assert.Equal(0, settings.Network.MaxDiskReadSpeedBytesPerSecond);
         Assert.Equal(0, settings.Network.MaxDiskWriteSpeedBytesPerSecond);
         Assert.Equal("System", settings.Theme.ThemeVariant);
-        Assert.Equal("Indigo", settings.Theme.ColorTheme);
-        Assert.Equal("GradientSoft", settings.Theme.BackgroundStyle);
+        Assert.Equal("Teal", settings.Theme.ColorTheme);
         Assert.Equal("en-US", settings.Language);
         Assert.True(settings.ShowRemoveTorrentOptions);
         Assert.Equal("RemoveOnly", settings.DefaultRemoveTorrentAction);
@@ -114,7 +113,6 @@ public class AppSettingsTests
         settings.Network.MaxDiskWriteSpeedBytesPerSecond = 2000;
         settings.Theme.ThemeVariant = "Dark";
         settings.Theme.ColorTheme = "Rose";
-        settings.Theme.BackgroundStyle = "Flat";
         settings.Language = "de-DE";
         settings.Queue.EnableQueueManagement = true;
         settings.Queue.MaxActiveDownloads = 5;

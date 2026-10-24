@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Peerfluence.Core.Services;
 using Peerfluence.Properties;
-using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Services;

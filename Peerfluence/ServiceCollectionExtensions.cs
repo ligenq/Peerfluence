@@ -1,5 +1,4 @@
-﻿using SukiUI.Toasts;
-using SukiUI.Dialogs;
+using Peerfluence.Theme.Controls;
 using System;
 using System.IO.Abstractions;
 using System.Net.Http;
@@ -47,18 +46,19 @@ public static class ServiceCollectionExtensions
     {
         // One instance behind two interfaces: the window sets the host, everything else asks for
         // a prompt.
-        // The two SukiUI managers. Singletons rather than something a view model creates and
+        // The two overlay managers. Singletons rather than something a view model creates and
         // hands round: the window binds its hosts to them, the notification service raises toasts
         // through one and the dialog service shows prompts through the other, and every one of those
         // is a constructor argument now instead of a property somebody has to remember to set.
-        services.AddSingleton<ISukiToastManager>(_ => new SukiToastManager());
-        services.AddSingleton<ISukiDialogManager>(_ => new SukiDialogManager());
+        services.AddSingleton<IToastManager, ToastManager>();
+        services.AddSingleton<IDialogManager, DialogManager>();
 
         services.AddSingleton<DialogService>();
         services.AddSingleton<IDialogService>(sp => sp.GetRequiredService<DialogService>());
         services.AddSingleton<IAddTorrentDialogService, AddTorrentDialogService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IMagnetMetadataPreviewService, MagnetMetadataPreviewService>();
+        services.AddSingleton<IMediaStreamingService, MediaStreamingService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<ISingleInstanceService, SingleInstanceService>();
         services.AddSingleton<IThemeService, ThemeService>();

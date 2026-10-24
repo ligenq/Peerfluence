@@ -1,23 +1,23 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pf="using:Peerfluence.Theme.Controls"
              xmlns:vm="using:Peerfluence.ViewModels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:m="using:Peerfluence.Markup"
              xmlns:config="using:Peerfluence.Core.Config"
              x:Class="Peerfluence.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
-    <Grid RowDefinitions="Auto,*" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
-        <suki:GlassCard Padding="{StaticResource NormalLeftTopRightBottomMargin}" Margin="{StaticResource StandardBottomMargin}">
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Classes="pageHeader">
             <StackPanel Spacing="{StaticResource SpacingStandard}">
                 <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                        <TextBlock Text="{m:L Settings_Title}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold"/>
+                    <StackPanel Spacing="{StaticResource SpacingSmallPlus}">
+                        <TextBlock Text="{m:L Settings_Title}" Classes="title"/>
                         <!-- No Save button: changes apply as they are made, so say that instead. -->
-                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <TextBlock Text="{m:L Settings_SavedAutomatically}" Classes="secondary"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Right">
-                        <Button Command="{Binding ResetDefaultsCommand}" Classes="Accent" AutomationProperties.Name="{m:L Settings_Reset}" AutomationProperties.AutomationId="ResetDefaultsButton">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpacingStandard}" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Classes="ghost" Command="{Binding ResetDefaultsCommand}" AutomationProperties.Name="{m:L Settings_Reset}" AutomationProperties.AutomationId="ResetDefaultsButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="Restore" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_Reset}"/>
@@ -25,45 +25,47 @@
                         </Button>
                     </StackPanel>
                 </Grid>
-                <suki:InfoBar x:Name="SettingsStatusInfoBar"
+                <pf:InfoBar x:Name="SettingsStatusInfoBar"
                               IsVisible="{Binding HasStatusMessage}"
                               IsClosable="False"
                               Message="{Binding StatusMessage}" />
             </StackPanel>
-        </suki:GlassCard>
+        </StackPanel>
 
         <TabControl x:Name="SettingsTabs" Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
             <TabItem Header="{m:L Settings_Appearance}" AutomationProperties.Name="{m:L Settings_Appearance}" AutomationProperties.AutomationId="AppearanceTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
 
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="TuneVariant" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="TuneVariant" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_InterfaceMode}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- The only way back to simple mode once advanced has been chosen. -->
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
-                        <RadioButton Classes="Chips" GroupName="InterfaceMode"
-                                     IsChecked="{Binding SimpleModeSelected, Mode=TwoWay}"
-                                     Content="{m:L Settings_InterfaceMode_Simple}" AutomationProperties.AutomationId="InterfaceModeSimpleRadioButton"/>
-                        <RadioButton Classes="Chips" GroupName="InterfaceMode"
-                                     IsChecked="{Binding AdvancedModeSelected, Mode=TwoWay}"
-                                     Content="{m:L Settings_InterfaceMode_Advanced}" AutomationProperties.AutomationId="InterfaceModeAdvancedRadioButton"/>
+                    <StackPanel Spacing="{StaticResource SpacingSmall}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmallPlus}">
+                            <RadioButton Classes="chip" GroupName="InterfaceMode"
+                                         IsChecked="{Binding SimpleModeSelected, Mode=TwoWay}"
+                                         Content="{m:L Settings_InterfaceMode_Simple}" AutomationProperties.AutomationId="InterfaceModeSimpleRadioButton"/>
+                            <RadioButton Classes="chip" GroupName="InterfaceMode"
+                                         IsChecked="{Binding AdvancedModeSelected, Mode=TwoWay}"
+                                         Content="{m:L Settings_InterfaceMode_Advanced}" AutomationProperties.AutomationId="InterfaceModeAdvancedRadioButton"/>
+                        </StackPanel>
+                        <TextBlock Text="{m:L Settings_InterfaceModeHint}"
+                                   Opacity="{StaticResource OpacityHint}"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
                     </StackPanel>
-                    <TextBlock Text="{m:L Settings_InterfaceModeHint}"
-                               Opacity="{StaticResource OpacityHint}"
-                               FontSize="{StaticResource FontSizeSmall}"
-                               TextWrapping="Wrap"/>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
 
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="PaletteOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="PaletteOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Appearance}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -89,16 +91,6 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Spacing="{StaticResource SpacingXSmall}">
-                            <TextBlock Text="{m:L Settings_BackgroundStyle}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding BackgroundStyleOptions}" SelectedValue="{Binding SelectedBackgroundStyle}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_BackgroundStyle}" AutomationProperties.AutomationId="BackgroundStyleComboBox">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:SettingsOption">
-                                        <TextBlock Text="{Binding DisplayName}"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
                             <TextBlock Text="{m:L Settings_Language}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
                             <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedValue="{Binding SelectedLanguage}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_Language}" AutomationProperties.AutomationId="LanguageComboBox">
                                 <ComboBox.ItemTemplate>
@@ -110,18 +102,18 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_StorageAndSession}" AutomationProperties.Name="{m:L Settings_StorageAndSession}" AutomationProperties.AutomationId="StorageAndSessionTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
-            <suki:GlassCard>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="FolderNetworkOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="FolderNetworkOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_StorageAndSession}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -164,26 +156,28 @@
                     <ToggleSwitch IsChecked="{Binding ShowAddTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowAddTorrentOptions}" AutomationProperties.AutomationId="ShowAddTorrentOptionsSwitch"/>
                     <ToggleSwitch IsChecked="{Binding ShowRemoveTorrentOptions, Mode=TwoWay}" Content="{m:L Settings_ShowRemoveTorrentOptions}" AutomationProperties.AutomationId="ShowRemoveTorrentOptionsSwitch"/>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard IsVisible="{Binding CanManageWindowsAssociations}">
+            </Border>
+            <Border Classes="panel" IsVisible="{Binding CanManageWindowsAssociations}">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="LinkVariant" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="LinkVariant" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_WindowsAssociations}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <ToggleSwitch IsChecked="{Binding AssociateTorrentFiles, Mode=TwoWay}" Content="{m:L Settings_AssociateTorrentFiles}" AutomationProperties.AutomationId="AssociateTorrentFilesSwitch"/>
-                    <ToggleSwitch IsChecked="{Binding AssociateMagnetLinks, Mode=TwoWay}" Content="{m:L Settings_AssociateMagnetLinks}" AutomationProperties.AutomationId="AssociateMagnetLinksSwitch"/>
-                    <TextBlock Text="{m:L Settings_WindowsAssociationsHint}"
-                               Opacity="{StaticResource OpacityHint}"
-                               FontSize="{StaticResource FontSizeSmall}"
-                               TextWrapping="Wrap"/>
+                    <StackPanel Spacing="{StaticResource SpacingSmall}">
+                        <ToggleSwitch IsChecked="{Binding AssociateTorrentFiles, Mode=TwoWay}" Content="{m:L Settings_AssociateTorrentFiles}" AutomationProperties.AutomationId="AssociateTorrentFilesSwitch"/>
+                        <ToggleSwitch IsChecked="{Binding AssociateMagnetLinks, Mode=TwoWay}" Content="{m:L Settings_AssociateMagnetLinks}" AutomationProperties.AutomationId="AssociateMagnetLinksSwitch"/>
+                        <TextBlock Text="{m:L Settings_WindowsAssociationsHint}"
+                                   Opacity="{StaticResource OpacityHint}"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard>
+            </Border>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="PlayCircleOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="PlayCircleOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_MediaPlayer}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -196,12 +190,43 @@
                             </Button>
                         </Grid>
                     </StackPanel>
+                      <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                          <TextBlock Text="{m:L Settings_StreamingAddress}" Classes="secondary" />
+                          <TextBox Text="{Binding StreamingBindAddress, Mode=TwoWay}"
+                                   AutomationProperties.Name="{m:L Settings_StreamingAddress}" AutomationProperties.AutomationId="StreamingBindAddressTextBox" />
+                          <TextBlock Text="{m:L Settings_StreamingAddressHint}" Classes="secondary" TextWrapping="Wrap" />
+                          <TextBlock Text="{m:L Settings_StreamingAddressInvalid}" IsVisible="{Binding HasInvalidStreamingAddress}"
+                                     Foreground="{DynamicResource PfDanger}" TextWrapping="Wrap" />
+                          <TextBlock Text="{m:L Settings_StreamingPort}" Classes="secondary" />
+                          <NumericUpDown Value="{Binding StreamingPort}" Minimum="0" Maximum="65535"
+                                         AutomationProperties.Name="{m:L Settings_StreamingPort}" AutomationProperties.AutomationId="StreamingPortInput" />
+                      </StackPanel>
+                      <Expander Header="{m:L Settings_StreamingBuffer}" Classes="disclosure" AutomationProperties.AutomationId="StreamingOptionsExpander">
+                          <StackPanel Spacing="{StaticResource SpacingSmall}">
+                              <TextBlock Text="{m:L Settings_StreamingReadAheadMiB}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingReadAheadMiB}" Minimum="1" Maximum="512"
+                                             AutomationProperties.Name="{m:L Settings_StreamingReadAheadMiB}" AutomationProperties.AutomationId="StreamingReadAheadMiBInput" />
+                              <TextBlock Text="{m:L Settings_StreamingReadAheadSeconds}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingReadAheadSeconds}" Minimum="0" Maximum="3600"
+                                             AutomationProperties.Name="{m:L Settings_StreamingReadAheadSeconds}" AutomationProperties.AutomationId="StreamingReadAheadSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingQueueSeconds}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingQueueSeconds}" Minimum="0" Maximum="60"
+                                             AutomationProperties.Name="{m:L Settings_StreamingQueueSeconds}" AutomationProperties.AutomationId="StreamingQueueSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingDataTimeout}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingDataTimeoutSeconds}" Minimum="0" Maximum="86400"
+                                             AutomationProperties.Name="{m:L Settings_StreamingDataTimeout}" AutomationProperties.AutomationId="StreamingDataTimeoutSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingMetadataTimeout}" Classes="secondary" />
+                              <NumericUpDown Value="{Binding StreamingMetadataTimeoutSeconds}" Minimum="0" Maximum="86400"
+                                             AutomationProperties.Name="{m:L Settings_StreamingMetadataTimeout}" AutomationProperties.AutomationId="StreamingMetadataTimeoutSecondsInput" />
+                              <TextBlock Text="{m:L Settings_StreamingTimeoutHint}" Classes="secondary" TextWrapping="Wrap" />
+                          </StackPanel>
+                      </Expander>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard>
+            </Border>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="ConsoleLine" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="ConsoleLine" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_CompletionAction}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -240,18 +265,18 @@
                                    TextWrapping="Wrap"/>
                     </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_NetworkAndConnectivity}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_NetworkAndConnectivity}" AutomationProperties.AutomationId="NetworkAndConnectivityTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
-            <suki:GlassCard>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="TransitConnectionVariant" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="TransitConnectionVariant" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_NetworkAndConnectivity}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -347,11 +372,11 @@
                                    TextWrapping="Wrap"/>
                     </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard>
+            </Border>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="Speedometer" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="Speedometer" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Performance}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -383,11 +408,11 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard>
+            </Border>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="TrayFull" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="TrayFull" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_QueueManagement}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -404,15 +429,15 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
             <!--
                 Scheduled limits. One window rather than a table of them: what people want is to
                 leave the connection alone while they are using it.
             -->
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="ClockOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="ClockOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Schedule}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -459,16 +484,16 @@
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
             <!--
                 Seeding goals. The engine has always enforced these per torrent and the add dialog
                 has always been able to set them; what was missing was an answer for the torrents
                 nobody says anything about, which is nearly all of them.
             -->
-            <suki:GlassCard>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="SeedOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="SeedOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Seeding}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -485,18 +510,18 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_SecurityAndPrivacy}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_SecurityAndPrivacy}" AutomationProperties.AutomationId="SecurityAndPrivacyTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
-            <suki:GlassCard>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="ShieldLockOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="ShieldLockOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_SecurityAndPrivacy}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -512,6 +537,32 @@
                     </StackPanel>
 
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
+                        <TextBlock Text="{m:L Settings_IncomingEncryption}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <ComboBox ItemsSource="{Binding DirectionalEncryptionModeOptions}" SelectedValue="{Binding SelectedIncomingEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_IncomingEncryption}" AutomationProperties.AutomationId="IncomingEncryptionComboBox">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption"><TextBlock Text="{Binding DisplayName}"/></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Text="{m:L Settings_OutgoingEncryption}" Opacity="{StaticResource OpacitySecondary}"/>
+                        <ComboBox ItemsSource="{Binding DirectionalEncryptionModeOptions}" SelectedValue="{Binding SelectedOutgoingEncryptionMode}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_OutgoingEncryption}" AutomationProperties.AutomationId="OutgoingEncryptionComboBox">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption"><TextBlock Text="{Binding DisplayName}"/></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <ToggleSwitch IsChecked="{Binding PreferRc4, Mode=TwoWay}" Content="{m:L Settings_PreferRc4}" AutomationProperties.AutomationId="PreferRc4Switch"/>
+                        <TextBlock Text="{m:L Settings_EncryptionPolicyHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
+                        <ToggleSwitch IsChecked="{Binding EnableI2p, Mode=TwoWay}" Content="{m:L Settings_EnableI2p}" AutomationProperties.AutomationId="EnableI2pSwitch"/>
+                        <StackPanel IsEnabled="{Binding EnableI2p}" Spacing="{StaticResource SpacingNormal}">
+                            <TextBlock Text="{m:L Settings_I2pSamHost}"/>
+                            <TextBox Text="{Binding I2pSamHost, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_I2pSamHost}" AutomationProperties.AutomationId="I2pSamHostTextBox"/>
+                            <TextBlock Text="{m:L Settings_I2pSamPort}"/>
+                            <NumericUpDown Value="{Binding I2pSamPort, Mode=TwoWay}" Minimum="1" Maximum="65535" FormatString="0" AutomationProperties.Name="{m:L Settings_I2pSamPort}" AutomationProperties.AutomationId="I2pSamPortNumericUpDown"/>
+                            <ToggleSwitch IsChecked="{Binding I2pAllowMixedNetworks, Mode=TwoWay}" Content="{m:L Settings_I2pAllowMixedNetworks}" AutomationProperties.AutomationId="I2pAllowMixedNetworksSwitch"/>
+                        </StackPanel>
+                        <TextBlock Text="{m:L Settings_I2pHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
                             <TextBox Text="{Binding BlocklistPath, Mode=TwoWay}" PlaceholderText="{m:L Settings_BlocklistWatermark}" AutomationProperties.Name="{m:L Settings_BlocklistFile}" AutomationProperties.AutomationId="BlocklistPathTextBox"/>
@@ -521,11 +572,11 @@
                         </Grid>
                     </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard>
+            </Border>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="Earth" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="Earth" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_GeoIp}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -541,11 +592,11 @@
                         </Grid>
                     </StackPanel>
                 </StackPanel>
-            </suki:GlassCard>
-            <suki:GlassCard>
+            </Border>
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="Vpn" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="Vpn" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Proxy}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -587,18 +638,18 @@
                         <ToggleSwitch IsChecked="{Binding ProxyTrackers, Mode=TwoWay}" Content="{m:L Settings_ProxyTrackers}" AutomationProperties.AutomationId="ProxyTrackersSwitch"/>
                     </WrapPanel>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_Remote}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Remote}" AutomationProperties.AutomationId="RemoteTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
-                        <suki:GlassCard>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
+                        <Border Classes="panel">
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                                    <materialIcons:MaterialIcon Kind="RemoteDesktop" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <materialIcons:MaterialIcon Kind="RemoteDesktop" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                                     <TextBlock Text="{m:L Settings_Remote}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
 
@@ -633,7 +684,7 @@
 
                                     <!-- Said here rather than left to a log nobody reads: this
                                          combination is refused at startup. -->
-                                    <suki:InfoBar x:Name="RemoteCredentialsWarning"
+                                    <pf:InfoBar x:Name="RemoteCredentialsWarning"
                                                   IsVisible="{Binding RemoteNeedsCredentials}"
                                                   IsClosable="False"
                                                   Severity="Warning"
@@ -645,18 +696,18 @@
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
                             </StackPanel>
-                        </suki:GlassCard>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_Categories}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Categories}" AutomationProperties.AutomationId="CategoriesTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
-                        <suki:GlassCard>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
+                        <Border Classes="panel">
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                                    <materialIcons:MaterialIcon Kind="FolderMultipleOutline" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <materialIcons:MaterialIcon Kind="FolderMultipleOutline" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                                     <TextBlock Text="{m:L Settings_Categories}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
 
@@ -672,7 +723,7 @@
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" MinWidth="120"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding SavePath}" Opacity="{StaticResource OpacitySecondary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                                 <Button Grid.Column="2"
-                                                        Classes="Basic"
+                                                        Classes="ghost"
                                                         Command="{Binding $parent[ItemsControl].((vm:SettingsViewModel)DataContext).RemoveCategoryCommand}"
                                                         ToolTip.Tip="{m:L Downloads_Remove}"
                                                         CommandParameter="{Binding Name}">
@@ -690,22 +741,22 @@
                                     <Button Grid.Column="3" Command="{Binding AddCategoryCommand}" Content="{m:L Settings_Categories_Add}" AutomationProperties.AutomationId="AddCategoryButton"/>
                                 </Grid>
                             </StackPanel>
-                        </suki:GlassCard>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_Search}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Search}" AutomationProperties.AutomationId="SearchTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
                         <!--
                             A saved query that runs on its own. Anyone with Sonarr or Radarr already
                             has this through the Transmission endpoint; this is for everyone else.
                         -->
-                        <suki:GlassCard>
+                        <Border Classes="panel">
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                                    <materialIcons:MaterialIcon Kind="AutoFix" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <materialIcons:MaterialIcon Kind="AutoFix" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                                     <TextBlock Text="{m:L Settings_AutoSearch}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
 
@@ -730,12 +781,12 @@
                                     </Grid>
                                 </StackPanel>
                             </StackPanel>
-                        </suki:GlassCard>
+                        </Border>
 
-                        <suki:GlassCard>
+                        <Border Classes="panel">
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                                    <materialIcons:MaterialIcon Kind="Magnify" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <materialIcons:MaterialIcon Kind="Magnify" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                                     <TextBlock Text="{m:L Settings_Search}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
 
@@ -757,7 +808,7 @@
                                     <Button Command="{Binding UseIndexerPresetCommand}"
                                             CommandParameter="{x:Static config:SearchSettings.JackettTemplate}"
                                             Content="{m:L Settings_Search_UseJackett}" AutomationProperties.AutomationId="SettingsUseIndexerPresetButton"/>
-                                    <Button Command="{Binding DetectIndexerCommand}" Classes="Flat" AutomationProperties.Name="{m:L Settings_Search_Detect}" AutomationProperties.AutomationId="DetectIndexerButton">
+                                    <Button Command="{Binding DetectIndexerCommand}" AutomationProperties.Name="{m:L Settings_Search_Detect}" AutomationProperties.AutomationId="DetectIndexerButton">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                             <materialIcons:MaterialIcon Kind="Radar" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                             <TextBlock Text="{m:L Settings_Search_Detect}"/>
@@ -781,22 +832,22 @@
                                             VerticalAlignment="Bottom" AutomationProperties.AutomationId="TestIndexerButton"/>
                                 </Grid>
 
-                                <suki:InfoBar IsVisible="{Binding HasSearchStatusMessage}"
+                                <pf:InfoBar IsVisible="{Binding HasSearchStatusMessage}"
                                               IsClosable="False"
                                               Message="{Binding SearchStatusMessage}"/>
                             </StackPanel>
-                        </suki:GlassCard>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="{m:L Settings_Updates}" IsVisible="{Binding IsAdvancedMode}" AutomationProperties.Name="{m:L Settings_Updates}" AutomationProperties.AutomationId="UpdatesTab">
                 <ScrollViewer>
-                    <StackPanel Spacing="{StaticResource SpacingLarge}" MaxWidth="{StaticResource ContentMaxWidth}" Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
-            <suki:GlassCard>
+                    <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
+            <Border Classes="panel">
                 <StackPanel Spacing="{StaticResource SpacingStandard}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                        <materialIcons:MaterialIcon Kind="Update" Foreground="{DynamicResource SukiPrimaryColor}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                        <materialIcons:MaterialIcon Kind="Update" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
                         <TextBlock Text="{m:L Settings_Updates}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </StackPanel>
 
@@ -819,7 +870,7 @@
                                 <TextBlock Text="{m:L Settings_CheckForUpdates}"/>
                             </StackPanel>
                         </Button>
-                        <Button Command="{Binding ApplyUpdateAndRestartCommand}" IsVisible="{Binding IsUpdateAvailable}" Classes="Accent" AutomationProperties.Name="{m:L Settings_ApplyUpdateAndRestart}" AutomationProperties.AutomationId="ApplyUpdateAndRestartButton">
+                        <Button Command="{Binding ApplyUpdateAndRestartCommand}" IsVisible="{Binding IsUpdateAvailable}" Classes="accent" AutomationProperties.Name="{m:L Settings_ApplyUpdateAndRestart}" AutomationProperties.AutomationId="ApplyUpdateAndRestartButton">
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
                                 <materialIcons:MaterialIcon Kind="RestartAlert" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
                                 <TextBlock Text="{m:L Settings_ApplyUpdateAndRestart}"/>
@@ -829,7 +880,7 @@
 
                     <TextBlock Text="{m:L Settings_UpdateNotInstalled}" Opacity="{StaticResource OpacityDisabled}" FontSize="{StaticResource FontSizeSmall}" IsVisible="{Binding ShouldShowUpdateNotInstalled}"/>
                 </StackPanel>
-            </suki:GlassCard>
+            </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

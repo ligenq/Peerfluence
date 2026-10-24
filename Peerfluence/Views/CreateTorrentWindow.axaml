@@ -1,8 +1,7 @@
-﻿<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                  xmlns:vm="using:Peerfluence.ViewModels"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
@@ -10,68 +9,80 @@
                  x:Class="Peerfluence.Views.CreateTorrentWindow"
                  x:DataType="vm:CreateTorrentViewModel"
                  Title="{m:L CreateTorrent_Title}"
-                 Width="650" Height="750"
+                 Width="650" SizeToContent="Height"
                  WindowStartupLocation="CenterOwner"
                  CanResize="False">
 
-    <suki:BusyArea IsBusy="{Binding IsCreating}">
-        <StackPanel Spacing="{StaticResource SpacingLarge}" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
-            <suki:GlassCard>
-                <StackPanel Spacing="{StaticResource SpacingStandard}">
-                    <!-- Source -->
-                    <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
-                            <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Source}" AutomationProperties.AutomationId="SourcePathTextBox"/>
-                            <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}" AutomationProperties.Name="{m:L CreateTorrent_BrowseFile}" AutomationProperties.AutomationId="BrowseSourceFileButton">
-                                <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                            </Button>
-                            <Button Grid.Column="2" Command="{Binding BrowseSourceCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.Name="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.AutomationId="BrowseSourceButton">
-                                <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
-                            </Button>
-                        </Grid>
-                    </StackPanel>
+    <Panel>
+        <Grid RowDefinitions="*,Auto" RowSpacing="{StaticResource SpacingLarge}"
+              Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
+            <ScrollViewer x:Name="FormScrollViewer" Classes="dialogForm">
+                <StackPanel Spacing="{StaticResource SpacingLarge}">
+                    <Border Classes="panel">
+                        <StackPanel Spacing="{StaticResource SpacingStandard}">
+                            <!-- Source -->
+                            <StackPanel Spacing="{StaticResource SpacingNormal}">
+                                <TextBlock Text="{m:L CreateTorrent_Source}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="{StaticResource SpacingNormal}">
+                                    <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{m:L CreateTorrent_SourceWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Source}" AutomationProperties.AutomationId="SourcePathTextBox"/>
+                                    <Button Grid.Column="1" Command="{Binding BrowseSourceFileCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFile}" AutomationProperties.Name="{m:L CreateTorrent_BrowseFile}" AutomationProperties.AutomationId="BrowseSourceFileButton">
+                                        <materialIcons:MaterialIcon Kind="FileOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                    </Button>
+                                    <Button Grid.Column="2" Command="{Binding BrowseSourceCommand}" ToolTip.Tip="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.Name="{m:L CreateTorrent_BrowseFolder}" AutomationProperties.AutomationId="BrowseSourceButton">
+                                        <materialIcons:MaterialIcon Kind="FolderOutline" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
 
-                    <!-- Piece Size & Private -->
-                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingLarge}">
-                        <StackPanel Spacing="{StaticResource SpacingNormal}">
-                            <TextBlock Text="{m:L CreateTorrent_PieceSize}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                            <ComboBox ItemsSource="{Binding PieceSizes}" SelectedIndex="{Binding SelectedPieceSizeIndex}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L CreateTorrent_PieceSize}" AutomationProperties.AutomationId="PieceSizesComboBox"/>
+                            <!-- Piece Size & Private -->
+                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="{StaticResource SpacingLarge}">
+                                <StackPanel Spacing="{StaticResource SpacingNormal}">
+                                    <TextBlock Text="{m:L CreateTorrent_PieceSize}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                    <ComboBox ItemsSource="{Binding PieceSizes}" SelectedIndex="{Binding SelectedPieceSizeIndex}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L CreateTorrent_PieceSize}" AutomationProperties.AutomationId="PieceSizesComboBox"/>
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Content="{m:L CreateTorrent_Private}" IsChecked="{Binding IsPrivate}" VerticalAlignment="Bottom" Margin="{StaticResource XXSmallBottomMargin}" AutomationProperties.AutomationId="CreateTorrentPrivateCheckBox"/>
+                            </Grid>
                         </StackPanel>
-                        <CheckBox Grid.Column="1" Content="{m:L CreateTorrent_Private}" IsChecked="{Binding IsPrivate}" VerticalAlignment="Bottom" Margin="{StaticResource XXSmallBottomMargin}" AutomationProperties.AutomationId="CreateTorrentPrivateCheckBox"/>
-                    </Grid>
+                    </Border>
+
+                    <Border Classes="panel">
+                        <StackPanel Spacing="{StaticResource SpacingStandard}">
+                            <!-- Trackers -->
+                            <StackPanel Spacing="{StaticResource SpacingNormal}">
+                                <TextBlock Text="{m:L CreateTorrent_Trackers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding Trackers}" Height="120" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_TrackersWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Trackers}" AutomationProperties.AutomationId="TrackersTextBox"/>
+                            </StackPanel>
+
+                            <!-- Web Seeds -->
+                            <StackPanel Spacing="{StaticResource SpacingNormal}">
+                                <TextBlock Text="{m:L CreateTorrent_WebSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding WebSeeds}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_WebSeedsHint}" AutomationProperties.Name="{m:L CreateTorrent_WebSeeds}" AutomationProperties.AutomationId="WebSeedsTextBox"/>
+                            </StackPanel>
+
+                            <!-- Comment -->
+                            <StackPanel Spacing="{StaticResource SpacingNormal}">
+                                <TextBlock Text="{m:L CreateTorrent_Comment}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                <TextBox Text="{Binding Comment, Mode=TwoWay}" AutomationProperties.Name="{m:L CreateTorrent_Comment}" AutomationProperties.AutomationId="CommentTextBox"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="{StaticResource ErrorColor}" TextWrapping="Wrap" FontSize="{StaticResource FontSizeNormal}"/>
                 </StackPanel>
-            </suki:GlassCard>
-
-            <suki:GlassCard>
-                <StackPanel Spacing="{StaticResource SpacingStandard}">
-                    <!-- Trackers -->
-                    <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_Trackers}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding Trackers}" Height="120" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_TrackersWatermark}" AutomationProperties.Name="{m:L CreateTorrent_Trackers}" AutomationProperties.AutomationId="TrackersTextBox"/>
-                    </StackPanel>
-
-                    <!-- Web Seeds -->
-                    <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_WebSeeds}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding WebSeeds}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="{m:L CreateTorrent_WebSeedsHint}" AutomationProperties.Name="{m:L CreateTorrent_WebSeeds}" AutomationProperties.AutomationId="WebSeedsTextBox"/>
-                    </StackPanel>
-
-                    <!-- Comment -->
-                    <StackPanel Spacing="{StaticResource SpacingNormal}">
-                        <TextBlock Text="{m:L CreateTorrent_Comment}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                        <TextBox Text="{Binding Comment, Mode=TwoWay}" AutomationProperties.Name="{m:L CreateTorrent_Comment}" AutomationProperties.AutomationId="CommentTextBox"/>
-                    </StackPanel>
-                </StackPanel>
-            </suki:GlassCard>
-
-            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="{StaticResource ErrorColor}" TextWrapping="Wrap" FontSize="{StaticResource FontSizeNormal}"/>
+            </ScrollViewer>
 
             <!-- Actions -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource SpacingStandard}" Margin="{StaticResource NormalTopMargin}">
-                <Button Content="{m:L CreateTorrent_Create}" Classes="Flat" Command="{Binding CreateCommand}" IsDefault="True" Width="120" AutomationProperties.AutomationId="CreateButton"/>
+            <StackPanel Grid.Row="1" Classes="dialogActions" Orientation="Horizontal" HorizontalAlignment="Right" Margin="{StaticResource NormalTopMargin}">
+                <Button Content="{m:L CreateTorrent_Create}" Classes="accent" Command="{Binding CreateCommand}" IsDefault="True" Width="120" AutomationProperties.AutomationId="CreateButton"/>
                 <Button Content="{m:L Common_Cancel}" Command="{Binding CancelCommand}" IsCancel="True" Width="120" AutomationProperties.AutomationId="CreateTorrentCancelButton"/>
             </StackPanel>
-        </StackPanel>
-    </suki:BusyArea>
-</suki:SukiWindow>
+        </Grid>
+        <!-- Covers the form while work is in flight, so nothing can be edited mid-flight. -->
+        <Border Background="{DynamicResource PfScrim}" IsVisible="{Binding IsCreating}">
+            <ProgressBar IsIndeterminate="True"
+                         Width="180"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+        </Border>
+    </Panel>
+</Window>

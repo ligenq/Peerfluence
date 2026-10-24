@@ -1,7 +1,11 @@
 <Project>
   <PropertyGroup>
     <!-- Kept in one place so the projects do not drift to different package versions. -->
-    <PeerSharpPackageVersion>5.0.0</PeerSharpPackageVersion>
+    <PeerSharpPackageVersion>5.2.0</PeerSharpPackageVersion>
+    <!-- Production builds use the published package. Opt into a sibling engine checkout with
+         -p:UseLocalPeerSharp=true, optionally overriding PeerSharpProjectPath. -->
+    <PeerSharpProjectPath Condition="'$(PeerSharpProjectPath)' == ''">$(MSBuildThisFileDirectory)..\PeerSharp\src\PeerSharp\PeerSharp.csproj</PeerSharpProjectPath>
+    <UseLocalPeerSharp Condition="'$(UseLocalPeerSharp)' == ''">false</UseLocalPeerSharp>
   </PropertyGroup>
 
   <PropertyGroup>

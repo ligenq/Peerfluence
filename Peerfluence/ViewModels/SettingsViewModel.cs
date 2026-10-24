@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Peerfluence.Core.Config;
 using Peerfluence.Core.Messaging;
 
 namespace Peerfluence.ViewModels;
@@ -23,9 +21,10 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private readonly IUpdateService _updateService;
     private readonly IWindowsAssociationService _windowsAssociationService;
     private IReadOnlyList<SettingsOption> _themeVariantOptions = CreateThemeVariantOptions();
-    private IReadOnlyList<SettingsOption> _colorThemeOptions = CreateColorThemeOptions();
-    private IReadOnlyList<SettingsOption> _backgroundStyleOptions = CreateBackgroundStyleOptions();
+    private IReadOnlyList<SettingsOption> _colorThemeOptions =
+        CreateColorThemeOptions(Services.ThemeService.Resolve("System"));
     private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
+    private IReadOnlyList<SettingsOption> _directionalEncryptionModeOptions = CreateDirectionalEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
 
     /// <summary>
@@ -148,14 +147,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     /// theme and handing it straight to the theme service.
     /// </para>
     /// </summary>
-    private void SetChoice(ref string field, string value, [CallerMemberName] string? propertyName = null)
+    private bool SetChoice(ref string field, string value, [CallerMemberName] string? propertyName = null)
     {
         if (string.IsNullOrEmpty(value))
         {
-            return;
+            return false;
         }
 
-        SetProperty(ref field, value, propertyName);
+        return SetProperty(ref field, value, propertyName);
     }
 
     /// <summary>
@@ -182,8 +181,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(NewCategoryPath),
         nameof(ThemeVariantOptions),
         nameof(ColorThemeOptions),
-        nameof(BackgroundStyleOptions),
         nameof(EncryptionModeOptions),
+        nameof(DirectionalEncryptionModeOptions),
         nameof(ProxyTypeOptions)
     };
 
@@ -728,20 +727,41 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     public string SelectedThemeVariant
     {
         get;
-        set => SetChoice(ref field, value);
+        set
+        {
+            if (!string.IsNullOrEmpty(value)
+                && SetChoice(ref field, Services.ThemeService.NormalizeVariant(value)))
+            {
+                RefreshColorThemeOptions();
+            }
+        }
     } = "System";
 
     public string SelectedColorTheme
     {
         get;
         set => SetChoice(ref field, value);
-    } = "Indigo";
+    } = Theme.PeerfluenceTheme.DefaultAccent;
 
-    public string SelectedBackgroundStyle
+    /// <summary>
+    /// Re-offers the accents, because the variants do not offer the same ones.
+    /// </summary>
+    /// <remarks>
+    /// Midnight drops three accents that fail against its indigo canvas and adds two that suit
+    /// it, so switching variants can leave the stored accent naming something the new variant has
+    /// never heard of. Snapping to that variant's default is what stops the box going blank, and
+    /// the guard keeps a choice that both variants happen to share.
+    /// </remarks>
+    private void RefreshColorThemeOptions()
     {
-        get;
-        set => SetChoice(ref field, value);
-    } = "GradientSoft";
+        var variant = Services.ThemeService.Resolve(SelectedThemeVariant);
+        ColorThemeOptions = CreateColorThemeOptions(variant);
+        if (!ColorThemeOptions.Any(option => string.Equals(
+                option.Value, SelectedColorTheme, StringComparison.OrdinalIgnoreCase)))
+        {
+            SelectedColorTheme = Theme.PeerfluenceTheme.DefaultAccentFor(variant);
+        }
+    }
 
     public string SelectedLanguage
     {
@@ -826,6 +846,63 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = string.Empty;
 
+    public int StreamingReadAheadMiB
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, MinReadAheadMiB, MaxReadAheadMiB));
+    } = 20;
+
+    public int StreamingReadAheadSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxReadAheadSeconds));
+    } = 30;
+
+    public int StreamingQueueSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxRequestQueueSeconds));
+    } = 1;
+
+    public int StreamingDataTimeoutSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxWaitTimeoutSeconds));
+    } = 60;
+
+    public int StreamingMetadataTimeoutSeconds
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxWaitTimeoutSeconds));
+    } = 60;
+
+    public string StreamingBindAddress
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value)) OnPropertyChanged(nameof(HasInvalidStreamingAddress));
+        }
+    } = string.Empty;
+
+    public int StreamingPort
+    {
+        get;
+        set => SetProperty(ref field, Math.Clamp(value, 0, StreamingSettings.MaxPort));
+    }
+
+    /// <summary>Set to something, but not to an address a shared link could name.</summary>
+    /// <remarks>
+    /// Blank is not invalid - it means nothing is shared - so this stays false for it. Asking for a
+    /// shared link while it is blank is refused where the link would be handed out.
+    /// </remarks>
+    public bool HasInvalidStreamingAddress => !string.IsNullOrWhiteSpace(StreamingBindAddress)
+        && !StreamingSettings.IsShareableAddress(StreamingBindAddress);
+
+    // The stored value is bytes; the screen asks for whole MiB.
+    private const int MinReadAheadMiB = (int)(StreamingSettings.MinReadAheadBytes / (1024 * 1024));
+    private const int MaxReadAheadMiB = (int)(StreamingSettings.MaxReadAheadBytes / (1024 * 1024));
+
     // Completion action
     public bool CompletionActionEnabled
     {
@@ -881,7 +958,49 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetProperty(ref field, value);
     } = true;
 
+    public bool EnableI2p
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
+    public string I2pSamHost
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = NetworkSettings.DefaultI2pSamHost;
+
+    public int I2pSamPort
+    {
+        get;
+        set => SetProperty(ref field, NetworkSettings.ClampI2pSamPort(value));
+    } = 7656;
+
+    public bool I2pAllowMixedNetworks
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
     // Encryption
+    public string SelectedIncomingEncryptionMode
+    {
+        get;
+        set => SetChoice(ref field, value);
+    } = NetworkSettings.InheritEncryption;
+
+    public string SelectedOutgoingEncryptionMode
+    {
+        get;
+        set => SetChoice(ref field, value);
+    } = NetworkSettings.InheritEncryption;
+
+    public bool PreferRc4
+    {
+        get;
+        set => SetProperty(ref field, value);
+    } = true;
+
     public string SelectedEncryptionMode
     {
         get;
@@ -966,7 +1085,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
-    public IReadOnlyList<string> ThemeVariants { get; } = ["System", "Light", "Dark"];
+    public IReadOnlyList<string> ThemeVariants { get; } = ["System", "MidnightLight", "Midnight"];
 
     public IReadOnlyList<SettingsOption> ThemeVariantOptions
     {
@@ -974,20 +1093,20 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         private set => SetProperty(ref _themeVariantOptions, value);
     }
 
-    public IReadOnlyList<string> ColorThemes { get; } = ["Indigo", "Cobalt", "Mint", "Emerald", "Rose", "Vibrant", "Amber", "Slate", "Solar"];
+    /// <summary>
+    /// The accents on offer, taken from the theme rather than restated here.
+    /// </summary>
+    /// <remarks>
+    /// This used to be its own list, which is how it came to offer three accents the theme no
+    /// longer has and to omit the default. Settings already on disk naming a removed one are
+    /// mapped by <see cref="Services.ThemeService"/>.
+    /// </remarks>
+    public IReadOnlyList<string> ColorThemes => [.. ColorThemeOptions.Select(option => option.Value)];
 
     public IReadOnlyList<SettingsOption> ColorThemeOptions
     {
         get => _colorThemeOptions;
         private set => SetProperty(ref _colorThemeOptions, value);
-    }
-
-    public IReadOnlyList<string> BackgroundStyles { get; } = ["GradientSoft", "Gradient", "GradientDarker", "Flat", "Bubble"];
-
-    public IReadOnlyList<SettingsOption> BackgroundStyleOptions
-    {
-        get => _backgroundStyleOptions;
-        private set => SetProperty(ref _backgroundStyleOptions, value);
     }
 
     public IReadOnlyList<SettingsOption> LanguageOptions { get; } =
@@ -1015,6 +1134,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     }
 
     public IReadOnlyList<string> ProxyTypes { get; } = ["None", "Socks5", "Http"];
+
+    public IReadOnlyList<SettingsOption> DirectionalEncryptionModeOptions
+    {
+        get => _directionalEncryptionModeOptions;
+        private set => SetProperty(ref _directionalEncryptionModeOptions, value);
+    }
 
     public IReadOnlyList<SettingsOption> ProxyTypeOptions
     {
@@ -1164,7 +1289,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private string CurrentThemeKey()
     {
-        return $"{SelectedThemeVariant}|{SelectedColorTheme}|{SelectedBackgroundStyle}";
+        return $"{SelectedThemeVariant}|{SelectedColorTheme}";
     }
 
     private void LoadFromSettingsCore()
@@ -1206,7 +1331,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Theme
         SelectedThemeVariant = settings.Theme.ThemeVariant;
         SelectedColorTheme = settings.Theme.ColorTheme;
-        SelectedBackgroundStyle = settings.Theme.BackgroundStyle;
+        RefreshColorThemeOptions();
         SelectedLanguage = settings.Language;
 
         // Queue
@@ -1236,7 +1361,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableGeoIp = settings.EnableGeoIp;
         GeoIpPath = settings.GeoIpPath;
         MediaPlayerPath = settings.MediaPlayerPath;
+        StreamingReadAheadMiB = (int)Math.Clamp(settings.Streaming.ReadAheadBytes / (1024 * 1024), MinReadAheadMiB, MaxReadAheadMiB);
+        StreamingReadAheadSeconds = settings.Streaming.ReadAheadSeconds;
+        StreamingQueueSeconds = settings.Streaming.RequestQueueSecondsWhileBuffering;
+        StreamingDataTimeoutSeconds = settings.Streaming.DataWaitTimeoutSeconds;
+        StreamingMetadataTimeoutSeconds = settings.Streaming.MetadataWaitTimeoutSeconds;
+        StreamingBindAddress = settings.Streaming.BindAddress;
+        StreamingPort = settings.Streaming.Port;
+
         SelectedEncryptionMode = settings.EncryptionMode;
+        SelectedIncomingEncryptionMode = settings.Network.IncomingEncryptionMode;
+        SelectedOutgoingEncryptionMode = settings.Network.OutgoingEncryptionMode;
+        PreferRc4 = settings.Network.PreferRc4;
+        EnableI2p = settings.Network.EnableI2p;
+        I2pSamHost = settings.Network.I2pSamHost;
+        I2pSamPort = settings.Network.I2pSamPort;
+        I2pAllowMixedNetworks = settings.Network.I2pAllowMixedNetworks;
         CompletionActionEnabled = settings.CompletionAction.Enabled;
         CompletionActionProgramPath = settings.CompletionAction.ProgramPath;
         CompletionActionArgumentsTemplate = settings.CompletionAction.ArgumentsTemplate;
@@ -1321,7 +1461,6 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             // Theme
             settings.Theme.ThemeVariant = SelectedThemeVariant;
             settings.Theme.ColorTheme = SelectedColorTheme;
-            settings.Theme.BackgroundStyle = SelectedBackgroundStyle;
             settings.Language = SelectedLanguage;
 
             // Queue
@@ -1351,7 +1490,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.EnableGeoIp = EnableGeoIp;
             settings.GeoIpPath = GeoIpPath;
             settings.MediaPlayerPath = MediaPlayerPath;
+            settings.Streaming.ReadAheadBytes = (long)StreamingReadAheadMiB * 1024 * 1024;
+            settings.Streaming.ReadAheadSeconds = StreamingReadAheadSeconds;
+            settings.Streaming.RequestQueueSecondsWhileBuffering = StreamingQueueSeconds;
+            settings.Streaming.DataWaitTimeoutSeconds = StreamingDataTimeoutSeconds;
+            settings.Streaming.MetadataWaitTimeoutSeconds = StreamingMetadataTimeoutSeconds;
+            settings.Streaming.BindAddress = StreamingBindAddress.Trim();
+            settings.Streaming.Port = StreamingPort;
+
             settings.EncryptionMode = SelectedEncryptionMode;
+            settings.Network.IncomingEncryptionMode = SelectedIncomingEncryptionMode;
+            settings.Network.OutgoingEncryptionMode = SelectedOutgoingEncryptionMode;
+            settings.Network.PreferRc4 = PreferRc4;
+            settings.Network.EnableI2p = EnableI2p;
+            settings.Network.I2pSamHost = I2pSamHost;
+            settings.Network.I2pSamPort = I2pSamPort;
+            settings.Network.I2pAllowMixedNetworks = I2pAllowMixedNetworks;
             settings.CompletionAction.Enabled = CompletionActionEnabled;
             settings.CompletionAction.ProgramPath = CompletionActionProgramPath;
             settings.CompletionAction.ArgumentsTemplate = CompletionActionArgumentsTemplate;
@@ -1425,6 +1579,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         // Unconditional, unlike the three above: pushing two numbers at a running engine costs
         // nothing, and there is no side effect to avoid repeating.
         _engineService.ApplySpeedLimits();
+        _engineService.ApplyStreamingSettings();
+        _engineService.ApplyEncryptionSettings();
     }
 
     /// <summary>
@@ -1473,7 +1629,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         MaxDiskWriteSpeedBytesPerSecond = defaults.Network.MaxDiskWriteSpeedBytesPerSecond;
         SelectedThemeVariant = defaults.Theme.ThemeVariant;
         SelectedColorTheme = defaults.Theme.ColorTheme;
-        SelectedBackgroundStyle = defaults.Theme.BackgroundStyle;
+        RefreshColorThemeOptions();
         SelectedLanguage = defaults.Language;
         EnableQueueManagement = defaults.Queue.EnableQueueManagement;
         MaxActiveDownloads = defaults.Queue.MaxActiveDownloads;
@@ -1499,7 +1655,22 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         EnableGeoIp = defaults.EnableGeoIp;
         GeoIpPath = defaults.GeoIpPath;
         MediaPlayerPath = defaults.MediaPlayerPath;
+        StreamingReadAheadMiB = (int)(defaults.Streaming.ReadAheadBytes / (1024 * 1024));
+        StreamingReadAheadSeconds = defaults.Streaming.ReadAheadSeconds;
+        StreamingQueueSeconds = defaults.Streaming.RequestQueueSecondsWhileBuffering;
+        StreamingDataTimeoutSeconds = defaults.Streaming.DataWaitTimeoutSeconds;
+        StreamingMetadataTimeoutSeconds = defaults.Streaming.MetadataWaitTimeoutSeconds;
+        StreamingBindAddress = defaults.Streaming.BindAddress;
+        StreamingPort = defaults.Streaming.Port;
+
         SelectedEncryptionMode = defaults.EncryptionMode;
+        SelectedIncomingEncryptionMode = defaults.Network.IncomingEncryptionMode;
+        SelectedOutgoingEncryptionMode = defaults.Network.OutgoingEncryptionMode;
+        PreferRc4 = defaults.Network.PreferRc4;
+        EnableI2p = defaults.Network.EnableI2p;
+        I2pSamHost = defaults.Network.I2pSamHost;
+        I2pSamPort = defaults.Network.I2pSamPort;
+        I2pAllowMixedNetworks = defaults.Network.I2pAllowMixedNetworks;
         CompletionActionEnabled = defaults.CompletionAction.Enabled;
         CompletionActionProgramPath = defaults.CompletionAction.ProgramPath;
         CompletionActionArgumentsTemplate = defaults.CompletionAction.ArgumentsTemplate;
@@ -1563,25 +1734,29 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         var selectedThemeVariant = SelectedThemeVariant;
         var selectedColorTheme = SelectedColorTheme;
-        var selectedBackgroundStyle = SelectedBackgroundStyle;
         var selectedEncryptionMode = SelectedEncryptionMode;
+        var selectedIncomingEncryptionMode = SelectedIncomingEncryptionMode;
+        var selectedOutgoingEncryptionMode = SelectedOutgoingEncryptionMode;
         var selectedProxyType = SelectedProxyType;
 
         ThemeVariantOptions = CreateThemeVariantOptions();
-        ColorThemeOptions = CreateColorThemeOptions();
-        BackgroundStyleOptions = CreateBackgroundStyleOptions();
+        ColorThemeOptions = CreateColorThemeOptions(
+            Services.ThemeService.Resolve(selectedThemeVariant));
         EncryptionModeOptions = CreateEncryptionModeOptions();
+        DirectionalEncryptionModeOptions = CreateDirectionalEncryptionModeOptions();
         ProxyTypeOptions = CreateProxyTypeOptions();
 
         SelectedThemeVariant = selectedThemeVariant;
         SelectedColorTheme = selectedColorTheme;
-        SelectedBackgroundStyle = selectedBackgroundStyle;
         SelectedEncryptionMode = selectedEncryptionMode;
+        SelectedIncomingEncryptionMode = selectedIncomingEncryptionMode;
+        SelectedOutgoingEncryptionMode = selectedOutgoingEncryptionMode;
         SelectedProxyType = selectedProxyType;
         OnPropertyChanged(nameof(SelectedThemeVariant));
         OnPropertyChanged(nameof(SelectedColorTheme));
-        OnPropertyChanged(nameof(SelectedBackgroundStyle));
         OnPropertyChanged(nameof(SelectedEncryptionMode));
+        OnPropertyChanged(nameof(SelectedIncomingEncryptionMode));
+        OnPropertyChanged(nameof(SelectedOutgoingEncryptionMode));
         OnPropertyChanged(nameof(SelectedProxyType));
         OnPropertyChanged(nameof(UpdateManagementMessage));
         foreach (var status in PortMappingStatuses)
@@ -1592,41 +1767,43 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private static IReadOnlyList<SettingsOption> CreateThemeVariantOptions()
     {
+        // The neutral Light and Dark still ship in the theme package, which other applications
+        // use, but this one offers only the pair that carry its identity. A stored "Light" or
+        // "Dark" is migrated by ThemeService rather than being listed here.
         return
         [
             new SettingsOption("System", Properties.Resources.Settings_ThemeVariant_System),
-            new SettingsOption("Light", Properties.Resources.Settings_ThemeVariant_Light),
-            new SettingsOption("Dark", Properties.Resources.Settings_ThemeVariant_Dark)
+            new SettingsOption("MidnightLight", Properties.Resources.Settings_ThemeVariant_MidnightLight),
+            new SettingsOption("Midnight", Properties.Resources.Settings_ThemeVariant_Midnight)
         ];
     }
 
-    private static IReadOnlyList<SettingsOption> CreateColorThemeOptions()
+    /// <summary>
+    /// The accents the theme offers, each with its name in the reader's language.
+    /// </summary>
+    /// <remarks>
+    /// Driven by the theme's own list rather than restated. The restated version drifted the
+    /// moment the theme changed: it offered three accents that no longer existed and omitted the
+    /// default, which left the box blank for anyone whose settings named the default.
+    /// </remarks>
+    private static IReadOnlyList<SettingsOption> CreateColorThemeOptions(
+        Avalonia.Styling.ThemeVariant variant)
     {
-        return
-        [
-            new SettingsOption("Indigo", Properties.Resources.Settings_ColorTheme_Indigo),
-            new SettingsOption("Cobalt", Properties.Resources.Settings_ColorTheme_Cobalt),
-            new SettingsOption("Mint", Properties.Resources.Settings_ColorTheme_Mint),
-            new SettingsOption("Emerald", Properties.Resources.Settings_ColorTheme_Emerald),
-            new SettingsOption("Rose", Properties.Resources.Settings_ColorTheme_Rose),
-            new SettingsOption("Vibrant", Properties.Resources.Settings_ColorTheme_Vibrant),
-            new SettingsOption("Amber", Properties.Resources.Settings_ColorTheme_Amber),
-            new SettingsOption("Slate", Properties.Resources.Settings_ColorTheme_Slate),
-            new SettingsOption("Solar", Properties.Resources.Settings_ColorTheme_Solar)
-        ];
+        return [.. Theme.PeerfluenceTheme.AccentsFor(variant).Select(
+            accent => new SettingsOption(accent, ColorThemeName(accent)))];
     }
 
-    private static IReadOnlyList<SettingsOption> CreateBackgroundStyleOptions()
-    {
-        return
-        [
-            new SettingsOption("GradientSoft", Properties.Resources.Settings_BackgroundStyle_GradientSoft),
-            new SettingsOption("Gradient", Properties.Resources.Settings_BackgroundStyle_Gradient),
-            new SettingsOption("GradientDarker", Properties.Resources.Settings_BackgroundStyle_GradientDarker),
-            new SettingsOption("Flat", Properties.Resources.Settings_BackgroundStyle_Flat),
-            new SettingsOption("Bubble", Properties.Resources.Settings_BackgroundStyle_Bubble)
-        ];
-    }
+    /// <summary>
+    /// An accent's translated name, or the accent itself if this version has no string for it.
+    /// </summary>
+    /// <remarks>
+    /// By lookup rather than a switch, so adding an accent to the theme does not require editing
+    /// here as well. An accent with no string shows its English name, which is wrong but legible;
+    /// the localization test is what stops one shipping that way.
+    /// </remarks>
+    private static string ColorThemeName(string accent) =>
+        Properties.Resources.ResourceManager.GetString(
+            $"Settings_ColorTheme_{accent}", Properties.Resources.Culture) ?? accent;
 
     private static IReadOnlyList<SettingsOption> CreateEncryptionModeOptions()
     {
@@ -1647,6 +1824,9 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             new SettingsOption("Http", Properties.Resources.Settings_ProxyType_Http)
         ];
     }
+
+    private static IReadOnlyList<SettingsOption> CreateDirectionalEncryptionModeOptions() =>
+        [new SettingsOption(NetworkSettings.InheritEncryption, Properties.Resources.Settings_EncryptionInherit), .. CreateEncryptionModeOptions()];
 
     private async Task BrowseBlocklistAsync()
     {

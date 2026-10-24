@@ -61,7 +61,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GitHub Repository.
+        ///   Looks up a localized string similar to GitHub repository.
         /// </summary>
         public static string About_GitHub {
             get {
@@ -70,7 +70,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Legal Notice.
+        ///   Looks up a localized string similar to Legal notice.
         /// </summary>
         public static string About_LegalNotice {
             get {
@@ -83,7 +83,7 @@ namespace Peerfluence.Properties {
         ///
         ///Peerfluence is provided &quot;as is&quot;, without warranty of any kind. To the fullest extent permitted by law, the author(s), contributors, and copyright holders are not liable for any damages, data loss, network issues, legal claims, downloaded content, shared content, or other consequences arising from the installation or use of the application.
         ///
-        ///You are solely responsible for how you use Peerfluence, including ensuring that any content you download, upload, seed, share, or distribute complies with appli [rest of string was truncated]&quot;;.
+        ///You are solely responsible for how you use Peerfluence, including ensuring that any content you download, upload, seed, sh [rest of string was truncated]&quot;;.
         /// </summary>
         public static string About_LegalNoticeText {
             get {
@@ -136,7 +136,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to Category.
         /// </summary>
@@ -145,6 +144,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("AddTorrent_Category", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Destination.
         /// </summary>
@@ -443,7 +443,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Peerfluence - Fatal Error.
+        ///   Looks up a localized string similar to Peerfluence - fatal error.
         /// </summary>
         public static string Crash_Title {
             get {
@@ -488,7 +488,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create.
+        ///   Looks up a localized string similar to Create....
         /// </summary>
         public static string CreateTorrent_Create {
             get {
@@ -533,7 +533,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Piece Size.
+        ///   Looks up a localized string similar to Piece size.
         /// </summary>
         public static string CreateTorrent_PieceSize {
             get {
@@ -542,7 +542,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Private Torrent.
+        ///   Looks up a localized string similar to Private torrent.
         /// </summary>
         public static string CreateTorrent_Private {
             get {
@@ -551,7 +551,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save Torrent File.
+        ///   Looks up a localized string similar to Save torrent file.
         /// </summary>
         public static string CreateTorrent_SaveTorrentFile {
             get {
@@ -560,7 +560,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Source File.
+        ///   Looks up a localized string similar to Select source file.
         /// </summary>
         public static string CreateTorrent_SelectSourceFile {
             get {
@@ -569,7 +569,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Source Folder.
+        ///   Looks up a localized string similar to Select source folder.
         /// </summary>
         public static string CreateTorrent_SelectSourceFolder {
             get {
@@ -578,7 +578,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source Path.
+        ///   Looks up a localized string similar to Source path.
         /// </summary>
         public static string CreateTorrent_Source {
             get {
@@ -596,7 +596,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create Torrent.
+        ///   Looks up a localized string similar to Create torrent.
         /// </summary>
         public static string CreateTorrent_Title {
             get {
@@ -605,7 +605,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Torrent File.
+        ///   Looks up a localized string similar to Torrent file.
         /// </summary>
         public static string CreateTorrent_TorrentFileType {
             get {
@@ -632,7 +632,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Web Seeds (one URL per line).
+        ///   Looks up a localized string similar to Web seeds (one URL per line).
         /// </summary>
         public static string CreateTorrent_WebSeeds {
             get {
@@ -659,7 +659,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Apply File Selection.
+        ///   Looks up a localized string similar to Apply file selection.
         /// </summary>
         public static string Details_ApplyFileSelection {
             get {
@@ -668,7 +668,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Change Path.
+        ///   Looks up a localized string similar to Change path.
         /// </summary>
         public static string Details_ChangeDownloadPath {
             get {
@@ -695,11 +695,20 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select New Download Path.
+        ///   Looks up a localized string similar to Select new download path.
         /// </summary>
         public static string Details_ChangeDownloadPath_Title {
             get {
                 return ResourceManager.GetString("Details_ChangeDownloadPath_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy streaming link.
+        /// </summary>
+        public static string Details_CopyStreamLink {
+            get {
+                return ResourceManager.GetString("Details_CopyStreamLink", resourceCulture);
             }
         }
         
@@ -740,11 +749,20 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to End Game.
+        ///   Looks up a localized string similar to End game.
         /// </summary>
         public static string Details_EndGameMode {
             get {
                 return ResourceManager.GetString("Details_EndGameMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        public static string Details_Files_Rename {
+            get {
+                return ResourceManager.GetString("Details_Files_Rename", resourceCulture);
             }
         }
         
@@ -757,15 +775,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Rename.
-        /// </summary>
-        public static string Details_Files_Rename {
-            get {
-                return ResourceManager.GetString("Details_Files_Rename", resourceCulture);
-            }
-        }
-
         /// <summary>
         ///   Looks up a localized string similar to Downloaded.
         /// </summary>
@@ -837,7 +846,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_MaxConnections", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Max upload slots.
         /// </summary>
@@ -846,7 +855,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_MaxUploadSlots", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Download path changed and the data moved.
         /// </summary>
@@ -855,7 +864,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_MoveStorage_Success", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Path.
         /// </summary>
@@ -898,6 +907,15 @@ namespace Peerfluence.Properties {
         public static string Details_Peers_AddTitle {
             get {
                 return ResourceManager.GetString("Details_Peers_AddTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peer address, e.g. 192.168.1.10:51413.
+        /// </summary>
+        public static string Details_Peers_AddWatermark {
+            get {
+                return ResourceManager.GetString("Details_Peers_AddWatermark", resourceCulture);
             }
         }
         
@@ -1098,9 +1116,9 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_Rename_Failed", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Save Resume Data.
+        ///   Looks up a localized string similar to Save resume data.
         /// </summary>
         public static string Details_SaveResumeData {
             get {
@@ -1118,7 +1136,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resume Data.
+        ///   Looks up a localized string similar to Resume data.
         /// </summary>
         public static string Details_SaveResumeData_FileType {
             get {
@@ -1136,7 +1154,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save Resume Data.
+        ///   Looks up a localized string similar to Save resume data.
         /// </summary>
         public static string Details_SaveResumeData_Title {
             get {
@@ -1152,7 +1170,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_Scrape_Failed", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Seed time (min).
         /// </summary>
@@ -1208,6 +1226,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stop streaming.
+        /// </summary>
+        public static string Details_StopStreaming {
+            get {
+                return ResourceManager.GetString("Details_StopStreaming", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Strategy.
         /// </summary>
         public static string Details_Strategy {
@@ -1235,6 +1262,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The selected file contains no playable data..
+        /// </summary>
+        public static string Details_StreamNoData {
+            get {
+                return ResourceManager.GetString("Details_StreamNoData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Super-seed (BEP 16).
         /// </summary>
         public static string Details_SuperSeeding {
@@ -1242,7 +1278,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_SuperSeeding", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to For one seed introducing new content to an empty swarm. Turn it off afterwards: against an established swarm it holds back peers that could download freely..
         /// </summary>
@@ -1251,7 +1287,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_SuperSeedingHint", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Details.
         /// </summary>
@@ -1289,7 +1325,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Last Error.
+        ///   Looks up a localized string similar to Last error.
         /// </summary>
         public static string Details_Trackers_LastError {
             get {
@@ -1314,7 +1350,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_Trackers_Scrape", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Seeds.
         /// </summary>
@@ -1361,11 +1397,56 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Verify Files.
+        ///   Looks up a localized string similar to Verify files.
         /// </summary>
         public static string Details_VerifyFiles {
             get {
                 return ResourceManager.GetString("Details_VerifyFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add web seed.
+        /// </summary>
+        public static string Details_WebSeeds_Add {
+            get {
+                return ResourceManager.GetString("Details_WebSeeds_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This torrent has no web seeds..
+        /// </summary>
+        public static string Details_WebSeeds_Empty {
+            get {
+                return ResourceManager.GetString("Details_WebSeeds_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to That is not a usable web seed address, or the torrent already has it..
+        /// </summary>
+        public static string Details_WebSeeds_Rejected {
+            get {
+                return ResourceManager.GetString("Details_WebSeeds_Rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL.
+        /// </summary>
+        public static string Details_WebSeeds_Url {
+            get {
+                return ResourceManager.GetString("Details_WebSeeds_Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://example.com/files/.
+        /// </summary>
+        public static string Details_WebSeeds_Watermark {
+            get {
+                return ResourceManager.GetString("Details_WebSeeds_Watermark", resourceCulture);
             }
         }
         
@@ -1377,52 +1458,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_WebSeedsTab", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Add web seed.
-        /// </summary>
-        public static string Details_WebSeeds_Add {
-            get {
-                return ResourceManager.GetString("Details_WebSeeds_Add", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to This torrent has no web seeds..
-        /// </summary>
-        public static string Details_WebSeeds_Empty {
-            get {
-                return ResourceManager.GetString("Details_WebSeeds_Empty", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to That is not a usable web seed address, or the torrent already has it..
-        /// </summary>
-        public static string Details_WebSeeds_Rejected {
-            get {
-                return ResourceManager.GetString("Details_WebSeeds_Rejected", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to URL.
-        /// </summary>
-        public static string Details_WebSeeds_Url {
-            get {
-                return ResourceManager.GetString("Details_WebSeeds_Url", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to https://example.com/files/.
-        /// </summary>
-        public static string Details_WebSeeds_Watermark {
-            get {
-                return ResourceManager.GetString("Details_WebSeeds_Watermark", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to 0 uses the global setting.
         /// </summary>
@@ -1431,9 +1467,9 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Details_ZeroMeansEngineDefault", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Active Torrents.
+        ///   Looks up a localized string similar to Active torrents.
         /// </summary>
         public static string Downloads_Active {
             get {
@@ -1442,7 +1478,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add Magnet.
+        ///   Looks up a localized string similar to Add magnet.
         /// </summary>
         public static string Downloads_AddMagnet {
             get {
@@ -1451,14 +1487,13 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add Torrent.
+        ///   Looks up a localized string similar to Add torrent.
         /// </summary>
         public static string Downloads_AddTorrent {
             get {
                 return ResourceManager.GetString("Downloads_AddTorrent", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Category.
@@ -1486,6 +1521,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Downloads_Category_None", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to The clipboard is not available right now..
         /// </summary>
@@ -1505,7 +1541,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy Hash.
+        ///   Looks up a localized string similar to Copy hash.
         /// </summary>
         public static string Downloads_CopyHash {
             get {
@@ -1514,7 +1550,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy Magnet Link.
+        ///   Looks up a localized string similar to Copy magnet link.
         /// </summary>
         public static string Downloads_CopyMagnet {
             get {
@@ -1559,7 +1595,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Torrent.
+        ///   Looks up a localized string similar to Open torrent.
         /// </summary>
         public static string Downloads_FilePicker_Title {
             get {
@@ -1568,14 +1604,49 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Force Recheck.
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string Downloads_Filter_All {
+            get {
+                return ResourceManager.GetString("Downloads_Filter_All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed.
+        /// </summary>
+        public static string Downloads_Filter_Completed {
+            get {
+                return ResourceManager.GetString("Downloads_Filter_Completed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading.
+        /// </summary>
+        public static string Downloads_Filter_Downloading {
+            get {
+                return ResourceManager.GetString("Downloads_Filter_Downloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seeding.
+        /// </summary>
+        public static string Downloads_Filter_Seeding {
+            get {
+                return ResourceManager.GetString("Downloads_Filter_Seeding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force recheck.
         /// </summary>
         public static string Downloads_ForceRecheck {
             get {
                 return ResourceManager.GetString("Downloads_ForceRecheck", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Category.
@@ -1585,6 +1656,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Downloads_Grid_Category", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Down.
         /// </summary>
@@ -1631,6 +1703,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        public static string Downloads_Grid_Size {
+            get {
+                return ResourceManager.GetString("Downloads_Grid_Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to State.
         /// </summary>
         public static string Downloads_Grid_State {
@@ -1658,7 +1739,16 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Folder.
+        ///   Looks up a localized string similar to No downloads match your search..
+        /// </summary>
+        public static string Downloads_NoMatches {
+            get {
+                return ResourceManager.GetString("Downloads_NoMatches", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open folder.
         /// </summary>
         public static string Downloads_OpenFolder {
             get {
@@ -1667,7 +1757,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Paste Magnet.
+        ///   Looks up a localized string similar to Paste magnet.
         /// </summary>
         public static string Downloads_PasteMagnet {
             get {
@@ -1683,7 +1773,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Downloads_PauseAll", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Peers.
         /// </summary>
@@ -1703,15 +1793,6 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove &quot;{0}&quot; from the download list?.
-        /// </summary>
-        public static string Downloads_Remove_Confirm_Message {
-            get {
-                return ResourceManager.GetString("Downloads_Remove_Confirm_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Remove {0} downloads from the list?.
         /// </summary>
         public static string Downloads_Remove_Confirm_Many {
@@ -1721,7 +1802,16 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove Torrent.
+        ///   Looks up a localized string similar to Remove &quot;{0}&quot; from the download list?.
+        /// </summary>
+        public static string Downloads_Remove_Confirm_Message {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_Confirm_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove torrent.
         /// </summary>
         public static string Downloads_Remove_Confirm_Title {
             get {
@@ -1791,9 +1881,9 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Downloads_ResumeAll", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Search downloads.
+        ///   Looks up a localized string similar to Filter downloads.
         /// </summary>
         public static string Downloads_Search {
             get {
@@ -1829,7 +1919,16 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Total Down.
+        ///   Looks up a localized string similar to Show or hide the details pane.
+        /// </summary>
+        public static string Downloads_ToggleDetails {
+            get {
+                return ResourceManager.GetString("Downloads_ToggleDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total down.
         /// </summary>
         public static string Downloads_TotalDown {
             get {
@@ -1838,11 +1937,38 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Total Up.
+        ///   Looks up a localized string similar to Total up.
         /// </summary>
         public static string Downloads_TotalUp {
             get {
                 return ResourceManager.GetString("Downloads_TotalUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rarest first.
+        /// </summary>
+        public static string DownloadStrategy_RarestFirst {
+            get {
+                return ResourceManager.GetString("DownloadStrategy_RarestFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sequential.
+        /// </summary>
+        public static string DownloadStrategy_Sequential {
+            get {
+                return ResourceManager.GetString("DownloadStrategy_Sequential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Streaming.
+        /// </summary>
+        public static string DownloadStrategy_Streaming {
+            get {
+                return ResourceManager.GetString("DownloadStrategy_Streaming", resourceCulture);
             }
         }
         
@@ -1881,7 +2007,6 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Eta_Seconds", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Add.
@@ -1973,7 +2098,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to No indexer has been set up yet..
         /// </summary>
@@ -1992,7 +2116,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to {0} asked to be given a moment. Try again shortly..
         /// </summary>
@@ -2001,6 +2124,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Find_Failure_RateLimited", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to The indexer refused the request. Check the API key..
         /// </summary>
@@ -2018,6 +2142,16 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Find_Failure_Unreachable", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search connected indexers and add results to your downloads..
+        /// </summary>
+        public static string Find_Hint {
+            get {
+                return ResourceManager.GetString("Find_Hint", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Nothing matched that search..
         /// </summary>
@@ -2028,7 +2162,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Peerfluence searches the indexers you connect to it. Connect one under Settings, Search..
+        ///   Looks up a localized string similar to Peerfluence has no index of its own. It searches through Prowlarr or Jackett - separate applications you install and run yourself..
         /// </summary>
         public static string Find_NotConfiguredBody {
             get {
@@ -2045,7 +2179,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to Open search settings.
         /// </summary>
@@ -2054,6 +2187,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Find_OpenSearchSettings", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to {0} of {1} indexers answered. Some results may be missing..
         /// </summary>
@@ -2081,15 +2215,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Set up an indexer.
-        /// </summary>
-        public static string Find_SetUpIndexer {
-            get {
-                return ResourceManager.GetString("Find_SetUpIndexer", resourceCulture);
-            }
-        }
         /// <summary>
         ///   Looks up a localized string similar to Search failed: {0}.
         /// </summary>
@@ -2098,6 +2223,16 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Find_SearchFailed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open search settings.
+        /// </summary>
+        public static string Find_SetUpIndexer {
+            get {
+                return ResourceManager.GetString("Find_SetUpIndexer", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to About.
         /// </summary>
@@ -2125,7 +2260,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to Find torrents.
         /// </summary>
@@ -2134,12 +2268,31 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Nav_FindTorrents", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigation.
+        /// </summary>
+        public static string Nav_Navigation {
+            get {
+                return ResourceManager.GetString("Nav_Navigation", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string Nav_Settings {
             get {
                 return ResourceManager.GetString("Nav_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Statistics.
+        /// </summary>
+        public static string Nav_Statistics {
+            get {
+                return ResourceManager.GetString("Nav_Statistics", resourceCulture);
             }
         }
         
@@ -2178,7 +2331,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Notification_ListenPortChanged", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Port {0} could not be bound, so {1} is in use instead. Update your router’s port forwarding to match..
         /// </summary>
@@ -2187,7 +2340,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Notification_ListenPortChangedBody", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Metadata ready.
         /// </summary>
@@ -2205,7 +2358,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Notification_MetadataStalled", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Proxy cannot carry UDP.
         /// </summary>
@@ -2214,7 +2367,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Notification_ProxyRestricted", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to An HTTP proxy is configured, so DHT and uTP are off for this session. Use a SOCKS5 proxy to keep them..
         /// </summary>
@@ -2223,7 +2376,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Notification_ProxyRestrictedBody", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Torrent error.
         /// </summary>
@@ -2243,6 +2396,114 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed.
+        /// </summary>
+        public static string PortMappingResult_Failed {
+            get {
+                return ResourceManager.GetString("PortMappingResult_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not attempted.
+        /// </summary>
+        public static string PortMappingResult_NotAttempted {
+            get {
+                return ResourceManager.GetString("PortMappingResult_NotAttempted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pending.
+        /// </summary>
+        public static string PortMappingResult_Pending {
+            get {
+                return ResourceManager.GetString("PortMappingResult_Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string PortMappingResult_Success {
+            get {
+                return ResourceManager.GetString("PortMappingResult_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do not download.
+        /// </summary>
+        public static string Priority_DoNotDownload {
+            get {
+                return ResourceManager.GetString("Priority_DoNotDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        public static string Priority_High {
+            get {
+                return ResourceManager.GetString("Priority_High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        public static string Priority_Low {
+            get {
+                return ResourceManager.GetString("Priority_Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Normal.
+        /// </summary>
+        public static string Priority_Normal {
+            get {
+                return ResourceManager.GetString("Priority_Normal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow several connections per IP address.
+        /// </summary>
+        public static string Settings_AllowMultipleConnectionsPerIp {
+            get {
+                return ResourceManager.GetString("Settings_AllowMultipleConnectionsPerIp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keeps peers that share one address, as mobile and campus networks do when many subscribers sit behind the same one. Turning it off admits a single connection per address, and refuses a peer that reconnects from a new port instead of recognising it..
+        /// </summary>
+        public static string Settings_AllowMultipleConnectionsPerIpHint {
+            get {
+                return ResourceManager.GetString("Settings_AllowMultipleConnectionsPerIpHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Answer torrent sampling requests.
+        /// </summary>
+        public static string Settings_AnswerInfoHashSampling {
+            get {
+                return ResourceManager.GetString("Settings_AnswerInfoHashSampling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lets other DHT nodes ask which torrents you have peers for, which search indexes use to discover torrents. The same information is already available by asking who has a specific torrent, so turning this off hides little. Requires DHT..
+        /// </summary>
+        public static string Settings_AnswerInfoHashSamplingHint {
+            get {
+                return ResourceManager.GetString("Settings_AnswerInfoHashSamplingHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Appearance.
         /// </summary>
         public static string Settings_Appearance {
@@ -2257,6 +2518,69 @@ namespace Peerfluence.Properties {
         public static string Settings_ApplyUpdateAndRestart {
             get {
                 return ResourceManager.GetString("Settings_ApplyUpdateAndRestart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open magnet links with Peerfluence.
+        /// </summary>
+        public static string Settings_AssociateMagnetLinks {
+            get {
+                return ResourceManager.GetString("Settings_AssociateMagnetLinks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open .torrent files with Peerfluence.
+        /// </summary>
+        public static string Settings_AssociateTorrentFiles {
+            get {
+                return ResourceManager.GetString("Settings_AssociateTorrentFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic search.
+        /// </summary>
+        public static string Settings_AutoSearch {
+            get {
+                return ResourceManager.GetString("Settings_AutoSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Category for what it adds.
+        /// </summary>
+        public static string Settings_AutoSearchCategory {
+            get {
+                return ResourceManager.GetString("Settings_AutoSearchCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The query runs on the indexer above and adds anything it has not added before. Fifteen minutes is the shortest interval it will use..
+        /// </summary>
+        public static string Settings_AutoSearchHint {
+            get {
+                return ResourceManager.GetString("Settings_AutoSearchHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Every (minutes).
+        /// </summary>
+        public static string Settings_AutoSearchInterval {
+            get {
+                return ResourceManager.GetString("Settings_AutoSearchInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Query.
+        /// </summary>
+        public static string Settings_AutoSearchQuery {
+            get {
+                return ResourceManager.GetString("Settings_AutoSearchQuery", resourceCulture);
             }
         }
         
@@ -2322,7 +2646,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_BindAddress", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Send everything from one local address, such as your VPN’s. Traffic stops rather than leaving by another route if that address goes away, which is what makes it a kill switch. Leave blank to use every interface. Port mapping is turned off while this is set..
         /// </summary>
@@ -2331,7 +2655,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_BindAddressHint", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Not an address this can bind to. Use one of your machine’s own addresses, not 0.0.0.0..
         /// </summary>
@@ -2340,7 +2664,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_BindAddressInvalid", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Blocklist file.
         /// </summary>
@@ -2369,7 +2693,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Blocklist File.
+        ///   Looks up a localized string similar to Select blocklist file.
         /// </summary>
         public static string Settings_BlocklistPicker_Title {
             get {
@@ -2387,14 +2711,13 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Browse.
+        ///   Looks up a localized string similar to Browse....
         /// </summary>
         public static string Settings_Browse {
             get {
                 return ResourceManager.GetString("Settings_Browse", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Categories.
@@ -2440,6 +2763,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_CategoriesHint", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Check now.
         /// </summary>
@@ -2482,6 +2806,24 @@ namespace Peerfluence.Properties {
         public static string Settings_ColorTheme_Cobalt {
             get {
                 return ResourceManager.GetString("Settings_ColorTheme_Cobalt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sky.
+        /// </summary>
+        public static string Settings_ColorTheme_Sky {
+            get {
+                return ResourceManager.GetString("Settings_ColorTheme_Sky", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cyan.
+        /// </summary>
+        public static string Settings_ColorTheme_Cyan {
+            get {
+                return ResourceManager.GetString("Settings_ColorTheme_Cyan", resourceCulture);
             }
         }
         
@@ -2540,6 +2882,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Teal.
+        /// </summary>
+        public static string Settings_ColorTheme_Teal {
+            get {
+                return ResourceManager.GetString("Settings_ColorTheme_Teal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Vibrant.
         /// </summary>
         public static string Settings_ColorTheme_Vibrant {
@@ -2549,7 +2900,16 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Completion Action.
+        ///   Looks up a localized string similar to Violet.
+        /// </summary>
+        public static string Settings_ColorTheme_Violet {
+            get {
+                return ResourceManager.GetString("Settings_ColorTheme_Violet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completion action.
         /// </summary>
         public static string Settings_CompletionAction {
             get {
@@ -2657,24 +3017,6 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Working directory.
-        /// </summary>
-        public static string Settings_CompletionActionWorkingDirectory {
-            get {
-                return ResourceManager.GetString("Settings_CompletionActionWorkingDirectory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {downloadPath}.
-        /// </summary>
-        public static string Settings_CompletionActionWorkingDirectoryWatermark {
-            get {
-                return ResourceManager.GetString("Settings_CompletionActionWorkingDirectoryWatermark", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Disk read limit (bytes/sec, 0 = unlimited).
         /// </summary>
         public static string Settings_DiskReadLimit {
@@ -2702,14 +3044,13 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Download Folder.
+        ///   Looks up a localized string similar to Select download folder.
         /// </summary>
         public static string Settings_DownloadFolderPicker_Title {
             get {
                 return ResourceManager.GetString("Settings_DownloadFolderPicker_Title", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Download limit (KiB/s).
@@ -2719,6 +3060,16 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_DownloadLimit", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run a saved search on its own.
+        /// </summary>
+        public static string Settings_EnableAutoSearch {
+            get {
+                return ResourceManager.GetString("Settings_EnableAutoSearch", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Enable IP blocklist.
         /// </summary>
@@ -2765,6 +3116,15 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use different limits at certain times.
+        /// </summary>
+        public static string Settings_EnableSchedule {
+            get {
+                return ResourceManager.GetString("Settings_EnableSchedule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable session persistence.
         /// </summary>
         public static string Settings_EnableSessionPersistence {
@@ -2779,6 +3139,15 @@ namespace Peerfluence.Properties {
         public static string Settings_EnableUpnp {
             get {
                 return ResourceManager.GetString("Settings_EnableUpnp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add torrent files from a folder.
+        /// </summary>
+        public static string Settings_EnableWatchFolder {
+            get {
+                return ResourceManager.GetString("Settings_EnableWatchFolder", resourceCulture);
             }
         }
         
@@ -2828,7 +3197,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GeoIP Database.
+        ///   Looks up a localized string similar to GeoIP database.
         /// </summary>
         public static string Settings_GeoIp {
             get {
@@ -2855,7 +3224,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select GeoIP Database.
+        ///   Looks up a localized string similar to Select GeoIP database.
         /// </summary>
         public static string Settings_GeoIpPicker_Title {
             get {
@@ -2873,7 +3242,43 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IP Blocklist.
+        ///   Looks up a localized string similar to Interface.
+        /// </summary>
+        public static string Settings_InterfaceMode {
+            get {
+                return ResourceManager.GetString("Settings_InterfaceMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        public static string Settings_InterfaceMode_Advanced {
+            get {
+                return ResourceManager.GetString("Settings_InterfaceMode_Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simple.
+        /// </summary>
+        public static string Settings_InterfaceMode_Simple {
+            get {
+                return ResourceManager.GetString("Settings_InterfaceMode_Simple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simple shows only the download list. Advanced adds the dashboard, the details pane and all settings..
+        /// </summary>
+        public static string Settings_InterfaceModeHint {
+            get {
+                return ResourceManager.GetString("Settings_InterfaceModeHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IP blocklist.
         /// </summary>
         public static string Settings_IpBlocklist {
             get {
@@ -2887,6 +3292,24 @@ namespace Peerfluence.Properties {
         public static string Settings_Language {
             get {
                 return ResourceManager.GetString("Settings_Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop at ratio.
+        /// </summary>
+        public static string Settings_LimitSeedingRatio {
+            get {
+                return ResourceManager.GetString("Settings_LimitSeedingRatio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop after minutes.
+        /// </summary>
+        public static string Settings_LimitSeedingTime {
+            get {
+                return ResourceManager.GetString("Settings_LimitSeedingTime", resourceCulture);
             }
         }
         
@@ -2934,7 +3357,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_MaxConnectionsPerIp", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to How many connections one address may hold on a single torrent. 0 is unlimited. A single peer briefly holds more than one while a dial tries both transports, so set this from what your network looks like rather than low on principle..
         /// </summary>
@@ -2943,9 +3366,9 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_MaxConnectionsPerIpHint", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Media Player.
+        ///   Looks up a localized string similar to Media player.
         /// </summary>
         public static string Settings_MediaPlayer {
             get {
@@ -2972,7 +3395,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Media Player.
+        ///   Looks up a localized string similar to Select media player.
         /// </summary>
         public static string Settings_MediaPlayerPicker_Title {
             get {
@@ -2990,7 +3413,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Network &amp; Connectivity.
+        ///   Looks up a localized string similar to Network &amp; connectivity.
         /// </summary>
         public static string Settings_NetworkAndConnectivity {
             get {
@@ -3008,7 +3431,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Port Mapping Status.
+        ///   Looks up a localized string similar to Port mapping status.
         /// </summary>
         public static string Settings_PortMapping {
             get {
@@ -3170,14 +3593,13 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Queue Management.
+        ///   Looks up a localized string similar to Queue management.
         /// </summary>
         public static string Settings_QueueManagement {
             get {
                 return ResourceManager.GetString("Settings_QueueManagement", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Remote control.
@@ -3259,6 +3681,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_RemoteHint", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Reset.
         /// </summary>
@@ -3277,6 +3700,59 @@ namespace Peerfluence.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Changes are saved as you make them..
+        /// </summary>
+        public static string Settings_SavedAutomatically {
+            get {
+                return ResourceManager.GetString("Settings_SavedAutomatically", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scheduled limits.
+        /// </summary>
+        public static string Settings_Schedule {
+            get {
+                return ResourceManager.GetString("Settings_Schedule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Days.
+        /// </summary>
+        public static string Settings_ScheduleDays {
+            get {
+                return ResourceManager.GetString("Settings_ScheduleDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to From.
+        /// </summary>
+        public static string Settings_ScheduleFrom {
+            get {
+                return ResourceManager.GetString("Settings_ScheduleFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to While the window is open these limits replace the ones above. A closing time earlier than the opening time runs through midnight..
+        /// </summary>
+        public static string Settings_ScheduleHint {
+            get {
+                return ResourceManager.GetString("Settings_ScheduleHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To.
+        /// </summary>
+        public static string Settings_ScheduleTo {
+            get {
+                return ResourceManager.GetString("Settings_ScheduleTo", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Search.
@@ -3306,7 +3782,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Found one. Add the API key from that app's own settings..
+        ///   Looks up a localized string similar to Found one. Add the API key from that app&apos;s own settings..
         /// </summary>
         public static string Settings_Search_Detected {
             get {
@@ -3333,7 +3809,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Address filled in. Add the API key from that app's own settings..
+        ///   Looks up a localized string similar to Address filled in. Checking whether it answers....
         /// </summary>
         public static string Settings_Search_PresetApplied {
             get {
@@ -3341,15 +3817,15 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
-        ///   Looks up a localized string similar to Address filled in, but replace the 1 with your indexer's id - Prowlarr gives each indexer its own address and has no combined one. The id is in the address bar when you open an indexer in Prowlarr..
+        ///   Looks up a localized string similar to Address filled in, but replace the 1 with your indexer&apos;s id - Prowlarr gives each indexer its own address and has no combined one. The id is in the address bar when you open an indexer in Prowlarr..
         /// </summary>
         public static string Settings_Search_ProwlarrNeedsIndexerId {
             get {
                 return ResourceManager.GetString("Settings_Search_ProwlarrNeedsIndexerId", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Test.
         /// </summary>
@@ -3377,7 +3853,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to Fill in an address first..
         /// </summary>
@@ -3395,6 +3870,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_Search_TestNotTorznab", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to The endpoint answered..
         /// </summary>
@@ -3404,9 +3880,8 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
-        ///   Looks up a localized string similar to The indexer answered but refused the key. Copy it again from that app's settings..
+        ///   Looks up a localized string similar to The indexer answered but refused the key. Copy it again from that app&apos;s settings..
         /// </summary>
         public static string Settings_Search_TestRejected {
             get {
@@ -3422,6 +3897,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_Search_TestUnreachable", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Torznab endpoint.
         /// </summary>
@@ -3430,7 +3906,6 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_Search_Url", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Use Jackett.
@@ -3451,19 +3926,38 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Peerfluence does not host an index. It queries a Torznab endpoint you run yourself, such as Prowlarr or Jackett, and shows what comes back..
+        ///   Looks up a localized string similar to Peerfluence has no index of its own. It searches through a Torznab endpoint you run yourself, such as Prowlarr or Jackett..
         /// </summary>
         public static string Settings_SearchHint {
             get {
                 return ResourceManager.GetString("Settings_SearchHint", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Security &amp; Privacy.
+        ///   Looks up a localized string similar to Security &amp; privacy.
         /// </summary>
         public static string Settings_SecurityAndPrivacy {
             get {
                 return ResourceManager.GetString("Settings_SecurityAndPrivacy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seeding.
+        /// </summary>
+        public static string Settings_Seeding {
+            get {
+                return ResourceManager.GetString("Settings_Seeding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Applies to torrents added from now on. Each torrent can still be given goals of its own..
+        /// </summary>
+        public static string Settings_SeedingHint {
+            get {
+                return ResourceManager.GetString("Settings_SeedingHint", resourceCulture);
             }
         }
         
@@ -3477,7 +3971,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Session Data Folder.
+        ///   Looks up a localized string similar to Select session data folder.
         /// </summary>
         public static string Settings_SessionFolderPicker_Title {
             get {
@@ -3503,7 +3997,6 @@ namespace Peerfluence.Properties {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to Zero means no limit. Takes effect immediately, without restarting anything..
         /// </summary>
@@ -3512,12 +4005,112 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_SpeedLimitHint", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Storage &amp; Session.
+        ///   Looks up a localized string similar to Storage &amp; session.
         /// </summary>
         public static string Settings_StorageAndSession {
             get {
                 return ResourceManager.GetString("Settings_StorageAndSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shared streaming address.
+        /// </summary>
+        public static string Settings_StreamingAddress {
+            get {
+                return ResourceManager.GetString("Settings_StreamingAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Leave blank for this computer only. To share a link with a TV or another device, enter this computer&apos;s IP address on the shared network. Anyone with the link can play the file until you stop streaming..
+        /// </summary>
+        public static string Settings_StreamingAddressHint {
+            get {
+                return ResourceManager.GetString("Settings_StreamingAddressHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a specific local IP address for shared streams; wildcard addresses are not supported..
+        /// </summary>
+        public static string Settings_StreamingAddressInvalid {
+            get {
+                return ResourceManager.GetString("Settings_StreamingAddressInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Streaming buffer and timeouts.
+        /// </summary>
+        public static string Settings_StreamingBuffer {
+            get {
+                return ResourceManager.GetString("Settings_StreamingBuffer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wait for playback data (seconds).
+        /// </summary>
+        public static string Settings_StreamingDataTimeout {
+            get {
+                return ResourceManager.GetString("Settings_StreamingDataTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wait for torrent metadata (seconds).
+        /// </summary>
+        public static string Settings_StreamingMetadataTimeout {
+            get {
+                return ResourceManager.GetString("Settings_StreamingMetadataTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shared streaming port (0: automatic).
+        /// </summary>
+        public static string Settings_StreamingPort {
+            get {
+                return ResourceManager.GetString("Settings_StreamingPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peer queue while buffering (seconds).
+        /// </summary>
+        public static string Settings_StreamingQueueSeconds {
+            get {
+                return ResourceManager.GetString("Settings_StreamingQueueSeconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum read-ahead (MiB).
+        /// </summary>
+        public static string Settings_StreamingReadAheadMiB {
+            get {
+                return ResourceManager.GetString("Settings_StreamingReadAheadMiB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Read-ahead at playback rate (seconds).
+        /// </summary>
+        public static string Settings_StreamingReadAheadSeconds {
+            get {
+                return ResourceManager.GetString("Settings_StreamingReadAheadSeconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zero removes the timeout. Changes apply to streams opened afterward..
+        /// </summary>
+        public static string Settings_StreamingTimeoutHint {
+            get {
+                return ResourceManager.GetString("Settings_StreamingTimeoutHint", resourceCulture);
             }
         }
         
@@ -3536,6 +4129,24 @@ namespace Peerfluence.Properties {
         public static string Settings_ThemeVariant_Dark {
             get {
                 return ResourceManager.GetString("Settings_ThemeVariant_Dark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Midnight.
+        /// </summary>
+        public static string Settings_ThemeVariant_Midnight {
+            get {
+                return ResourceManager.GetString("Settings_ThemeVariant_Midnight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Midnight light.
+        /// </summary>
+        public static string Settings_ThemeVariant_MidnightLight {
+            get {
+                return ResourceManager.GetString("Settings_ThemeVariant_MidnightLight", resourceCulture);
             }
         }
         
@@ -3594,14 +4205,13 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://example.com/releases.
+        ///   Looks up a localized string similar to https://github.com/ligenq/Peerfluence.
         /// </summary>
         public static string Settings_UpdateUrlWatermark {
             get {
                 return ResourceManager.GetString("Settings_UpdateUrlWatermark", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Upload limit (KiB/s).
@@ -3611,12 +4221,130 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Settings_UploadLimit", resourceCulture);
             }
         }
+        
         /// <summary>
         ///   Looks up a localized string similar to Use automatic listening port.
         /// </summary>
         public static string Settings_UseAutomaticListeningPort {
             get {
                 return ResourceManager.GetString("Settings_UseAutomaticListeningPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Watched folder.
+        /// </summary>
+        public static string Settings_WatchFolder {
+            get {
+                return ResourceManager.GetString("Settings_WatchFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Torrent files dropped here are added automatically. Each one is renamed rather than deleted once it has been taken..
+        /// </summary>
+        public static string Settings_WatchFolderHint {
+            get {
+                return ResourceManager.GetString("Settings_WatchFolderHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a folder to watch.
+        /// </summary>
+        public static string Settings_WatchFolderPicker_Title {
+            get {
+                return ResourceManager.GetString("Settings_WatchFolderPicker_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows associations.
+        /// </summary>
+        public static string Settings_WindowsAssociations {
+            get {
+                return ResourceManager.GetString("Settings_WindowsAssociations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Associations are registered for the current Windows user. If Windows keeps another default app, choose Peerfluence from Windows Default Apps..
+        /// </summary>
+        public static string Settings_WindowsAssociationsHint {
+            get {
+                return ResourceManager.GetString("Settings_WindowsAssociationsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a .torrent file or paste a magnet link to start downloading..
+        /// </summary>
+        public static string Simple_EmptyBody {
+            get {
+                return ResourceManager.GetString("Simple_EmptyBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause or resume.
+        /// </summary>
+        public static string Simple_PauseResume {
+            get {
+                return ResourceManager.GetString("Simple_PauseResume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switch to advanced.
+        /// </summary>
+        public static string Simple_SwitchToAdvanced {
+            get {
+                return ResourceManager.GetString("Simple_SwitchToAdvanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloaded this session.
+        /// </summary>
+        public static string Stats_Downloaded {
+            get {
+                return ResourceManager.GetString("Stats_Downloaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Counted since Peerfluence started, and reported by the engine itself..
+        /// </summary>
+        public static string Stats_Hint {
+            get {
+                return ResourceManager.GetString("Stats_Hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Share ratio.
+        /// </summary>
+        public static string Stats_Ratio {
+            get {
+                return ResourceManager.GetString("Stats_Ratio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Torrents.
+        /// </summary>
+        public static string Stats_Torrents {
+            get {
+                return ResourceManager.GetString("Stats_Torrents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uploaded this session.
+        /// </summary>
+        public static string Stats_Uploaded {
+            get {
+                return ResourceManager.GetString("Stats_Uploaded", resourceCulture);
             }
         }
         
@@ -3709,7 +4437,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Status_SessionPaused", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Torrents resumed.
         /// </summary>
@@ -3718,7 +4446,7 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("Status_SessionResumed", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Settings reset to last saved values..
         /// </summary>
@@ -3792,42 +4520,6 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Install update.
-        /// </summary>
-        public static string UpdatePrompt_Install {
-            get {
-                return ResourceManager.GetString("UpdatePrompt_Install", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A new version is available. Install it now and restart Peerfluence?.
-        /// </summary>
-        public static string UpdatePrompt_Message {
-            get {
-                return ResourceManager.GetString("UpdatePrompt_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Peerfluence {0} is available.
-        /// </summary>
-        public static string UpdatePrompt_Title {
-            get {
-                return ResourceManager.GetString("UpdatePrompt_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A Peerfluence update is available.
-        /// </summary>
-        public static string UpdatePrompt_Title_Generic {
-            get {
-                return ResourceManager.GetString("UpdatePrompt_Title_Generic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Active.
         /// </summary>
         public static string TorrentState_Active {
@@ -3873,6 +4565,87 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Circuit open.
+        /// </summary>
+        public static string TrackerStatus_CircuitOpen {
+            get {
+                return ResourceManager.GetString("TrackerStatus_CircuitOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disabled by tracker.
+        /// </summary>
+        public static string TrackerStatus_Disabled {
+            get {
+                return ResourceManager.GetString("TrackerStatus_Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not working.
+        /// </summary>
+        public static string TrackerStatus_NotWorking {
+            get {
+                return ResourceManager.GetString("TrackerStatus_NotWorking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string TrackerStatus_Unknown {
+            get {
+                return ResourceManager.GetString("TrackerStatus_Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working.
+        /// </summary>
+        public static string TrackerStatus_Working {
+            get {
+                return ResourceManager.GetString("TrackerStatus_Working", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install update.
+        /// </summary>
+        public static string UpdatePrompt_Install {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new version is available. Install it now and restart Peerfluence?.
+        /// </summary>
+        public static string UpdatePrompt_Message {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peerfluence {0} is available.
+        /// </summary>
+        public static string UpdatePrompt_Title {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Peerfluence update is available.
+        /// </summary>
+        public static string UpdatePrompt_Title_Generic {
+            get {
+                return ResourceManager.GetString("UpdatePrompt_Title_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not Found: {0}.
         /// </summary>
         public static string ViewLocator_NotFound {
@@ -3880,117 +4653,107 @@ namespace Peerfluence.Properties {
                 return ResourceManager.GetString("ViewLocator_NotFound", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Seeding.
+        ///   Looks up a localized string similar to Adds trackers, peers, pieces, file selection, queueing and speed limits..
         /// </summary>
-        public static string Settings_Seeding {
+        public static string Welcome_Advanced_Body {
             get {
-                return ResourceManager.GetString("Settings_Seeding", resourceCulture);
+                return ResourceManager.GetString("Welcome_Advanced_Body", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Applies to torrents added from now on. Each torrent can still be given goals of its own..
+        ///   Looks up a localized string similar to Advanced.
         /// </summary>
-        public static string Settings_SeedingHint {
+        public static string Welcome_Advanced_Title {
             get {
-                return ResourceManager.GetString("Settings_SeedingHint", resourceCulture);
+                return ResourceManager.GetString("Welcome_Advanced_Title", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Stop at ratio.
+        ///   Looks up a localized string similar to Add a torrent, watch it download, open the folder..
         /// </summary>
-        public static string Settings_LimitSeedingRatio {
+        public static string Welcome_Simple_Body {
             get {
-                return ResourceManager.GetString("Settings_LimitSeedingRatio", resourceCulture);
+                return ResourceManager.GetString("Welcome_Simple_Body", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Stop after minutes.
+        ///   Looks up a localized string similar to Simple.
         /// </summary>
-        public static string Settings_LimitSeedingTime {
+        public static string Welcome_Simple_Title {
             get {
-                return ResourceManager.GetString("Settings_LimitSeedingTime", resourceCulture);
+                return ResourceManager.GetString("Welcome_Simple_Title", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Statistics.
+        ///   Looks up a localized string similar to You can change this later in settings..
         /// </summary>
-        public static string Nav_Statistics {
+        public static string Welcome_Subtitle {
             get {
-                return ResourceManager.GetString("Nav_Statistics", resourceCulture);
+                return ResourceManager.GetString("Welcome_Subtitle", resourceCulture);
             }
         }
+        
         /// <summary>
-        ///   Looks up a localized string similar to Downloaded this session.
+        ///   Looks up a localized string similar to Choose an interface.
         /// </summary>
-        public static string Stats_Downloaded {
+        public static string Welcome_Title {
             get {
-                return ResourceManager.GetString("Stats_Downloaded", resourceCulture);
+                return ResourceManager.GetString("Welcome_Title", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to Uploaded this session.
-        /// </summary>
-        public static string Stats_Uploaded {
+        public static string Settings_IncomingEncryption {
             get {
-                return ResourceManager.GetString("Stats_Uploaded", resourceCulture);
+                return ResourceManager.GetString("Settings_IncomingEncryption", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to Share ratio.
-        /// </summary>
-        public static string Stats_Ratio {
+
+        public static string Settings_OutgoingEncryption {
             get {
-                return ResourceManager.GetString("Stats_Ratio", resourceCulture);
+                return ResourceManager.GetString("Settings_OutgoingEncryption", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to Torrents.
-        /// </summary>
-        public static string Stats_Torrents {
+
+        public static string Settings_EncryptionInherit {
             get {
-                return ResourceManager.GetString("Stats_Torrents", resourceCulture);
+                return ResourceManager.GetString("Settings_EncryptionInherit", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to Counted since Peerfluence started, and reported by the engine itself..
-        /// </summary>
-        public static string Stats_Hint {
+
+        public static string Settings_PreferRc4 {
             get {
-                return ResourceManager.GetString("Stats_Hint", resourceCulture);
+                return ResourceManager.GetString("Settings_PreferRc4", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to Watched folder.
-        /// </summary>
-        public static string Settings_WatchFolder {
+
+        public static string Settings_EncryptionPolicyHint {
             get {
-                return ResourceManager.GetString("Settings_WatchFolder", resourceCulture);
+                return ResourceManager.GetString("Settings_EncryptionPolicyHint", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to Add torrent files from a folder.
-        /// </summary>
-        public static string Settings_EnableWatchFolder {
-            get {
-                return ResourceManager.GetString("Settings_EnableWatchFolder", resourceCulture);
-            }
-        }
-        /// <summary>
-        ///   Looks up a localized string similar to Torrent files dropped here are added automatically..
-        /// </summary>
-        public static string Settings_WatchFolderHint {
-            get {
-                return ResourceManager.GetString("Settings_WatchFolderHint", resourceCulture);
-            }
-        }
-        /// <summary>
-        ///   Looks up a localized string similar to Choose a folder to watch.
-        /// </summary>
-        public static string Settings_WatchFolderPicker_Title {
-            get {
-                return ResourceManager.GetString("Settings_WatchFolderPicker_Title", resourceCulture);
-            }
-        }
+
+        public static string Settings_EnableI2p => ResourceManager.GetString("Settings_EnableI2p", resourceCulture);
+
+        public static string Settings_I2pSamHost => ResourceManager.GetString("Settings_I2pSamHost", resourceCulture);
+
+        public static string Settings_I2pSamPort => ResourceManager.GetString("Settings_I2pSamPort", resourceCulture);
+
+        public static string Settings_I2pAllowMixedNetworks => ResourceManager.GetString("Settings_I2pAllowMixedNetworks", resourceCulture);
+
+        public static string Settings_I2pHint => ResourceManager.GetString("Settings_I2pHint", resourceCulture);
+
+        public static string AddTorrent_SslCertificate => ResourceManager.GetString("AddTorrent_SslCertificate", resourceCulture);
+
+        public static string AddTorrent_SslPassword => ResourceManager.GetString("AddTorrent_SslPassword", resourceCulture);
+
+        public static string AddTorrent_SslHint => ResourceManager.GetString("AddTorrent_SslHint", resourceCulture);
+
+        public static string AddTorrent_SslCertificateRequired => ResourceManager.GetString("AddTorrent_SslCertificateRequired", resourceCulture);
+
     }
 }

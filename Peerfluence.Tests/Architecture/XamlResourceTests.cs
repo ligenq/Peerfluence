@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -22,6 +24,81 @@ namespace Peerfluence.Tests.Architecture;
 /// </remarks>
 public sealed class XamlResourceTests
 {
+    [Fact]
+    public void SharedThemeResources_DoNotStaticallyResolveVariantOnlyResources()
+    {
+        var documents = ThemeDictionaries()
+            .Select(file => (File: file, Document: XDocument.Load(file, LoadOptions.SetLineInfo)))
+            .ToArray();
+        Assert.NotEmpty(documents);
+        XNamespace xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
+        var definitions = documents.SelectMany(item => item.Document.Descendants())
+            .Where(element => element.Attribute(xaml + "Key") is not null).ToArray();
+        var shared = definitions.Where(element => !IsVariantResource(element))
+            .Select(element => element.Attribute(xaml + "Key")!.Value).ToHashSet(StringComparer.Ordinal);
+        var variantOnly = definitions.Where(IsVariantResource)
+            .Select(element => element.Attribute(xaml + "Key")!.Value)
+            .Where(key => !shared.Contains(key)).ToHashSet(StringComparer.Ordinal);
+        Assert.NotEmpty(variantOnly);
+        var problems = new List<string>();
+
+        foreach (var (file, document) in documents)
+        {
+            problems.AddRange(StaticVariantResourceProblems(document, variantOnly)
+                .Select(problem => $"{Relative(file)}:{problem}"));
+        }
+
+        Assert.True(problems.Count == 0, string.Join(Environment.NewLine, problems));
+    }
+
+    [Theory]
+    [InlineData("<StaticResource ResourceKey='VariantColor' />")]
+    [InlineData("<SolidColorBrush Color='{StaticResource VariantColor}' />")]
+    [InlineData("<SolidColorBrush Color='{StaticResource ResourceKey=VariantColor}' />")]
+    [InlineData("<SolidColorBrush><SolidColorBrush.Color><StaticResource ResourceKey='VariantColor' /></SolidColorBrush.Color></SolidColorBrush>")]
+    [InlineData("<Setter Value='{Binding Source={StaticResource VariantColor}}' />")]
+    public void StaticVariantRule_RejectsAliasesAndMarkupExpressions(string markup)
+    {
+        var document = XDocument.Parse($"<ResourceDictionary>{markup}</ResourceDictionary>");
+        Assert.Single(StaticVariantResourceProblems(document, new HashSet<string>(StringComparer.Ordinal) { "VariantColor" }));
+    }
+
+    [Theory]
+    [InlineData("<SolidColorBrush Color='{DynamicResource VariantColor}' />")]
+    [InlineData("<StaticResource ResourceKey='SharedBrush' />")]
+    [InlineData("<ResourceDictionary.ThemeDictionaries><ResourceDictionary><SolidColorBrush Color='{StaticResource VariantColor}' /></ResourceDictionary></ResourceDictionary.ThemeDictionaries>")]
+    public void StaticVariantRule_AllowsDynamicLookupsAndVariantScopedReferences(string markup)
+    {
+        var document = XDocument.Parse($"<ResourceDictionary>{markup}</ResourceDictionary>");
+        Assert.Empty(StaticVariantResourceProblems(document, new HashSet<string>(StringComparer.Ordinal) { "VariantColor" }));
+    }
+
+    private static List<string> StaticVariantResourceProblems(XDocument document, HashSet<string> variantOnly)
+    {
+        var problems = new List<string>();
+        var expression = new Regex("""\{\s*StaticResource\s+(?:ResourceKey\s*=\s*)?['"]?([A-Za-z_][\w.-]*)['"]?\s*\}""");
+        foreach (var element in document.Descendants().Where(element => !IsVariantResource(element)))
+        {
+            var targets = element.Attributes().SelectMany(attribute => expression.Matches(attribute.Value)
+                .Select(match => match.Groups[1].Value)).ToList();
+            if (element.Name.LocalName == "StaticResource" && (string?)element.Attribute("ResourceKey") is { } alias)
+            {
+                targets.Add(alias);
+            }
+
+            foreach (string target in targets.Where(variantOnly.Contains))
+            {
+                problems.Add($"{((IXmlLineInfo)element).LineNumber}: static reference targets variant-only '{target}'; "
+                    + "move it into the variant dictionary or use a DynamicResource lookup");
+            }
+        }
+
+        return problems;
+    }
+
+    private static bool IsVariantResource(XElement element) =>
+        element.Ancestors().Any(parent => parent.Name.LocalName == "ResourceDictionary.ThemeDictionaries");
+
     /// <summary>
     /// Properties that must come from a resource, and the dictionary they belong to.
     /// </summary>
@@ -116,17 +193,16 @@ public sealed class XamlResourceTests
                 {
                     var key = match.Groups[1].Value;
 
-                    // Only the keys this application defines can be checked. SukiUI and Avalonia
-                    // bring their own, and their names are not knowable from here.
-                    if (key.StartsWith("Suki", StringComparison.Ordinal)
-                        || key.StartsWith("System", StringComparison.Ordinal)
+                    // Only the keys this application and its theme define can be checked.
+                    // Avalonia brings its own, and their names are not knowable from here.
+                    if (key.StartsWith("System", StringComparison.Ordinal)
                         || key.StartsWith("Theme", StringComparison.Ordinal)
                         || defined.Contains(key))
                     {
                         continue;
                     }
 
-                    missing.Add($"  {Relative(file)}:{i + 1}  {{StaticResource {key}}} is not defined in Peerfluence/Resources");
+                    missing.Add($"  {Relative(file)}:{i + 1}  resource key '{key}' is not defined by the application or its theme");
                 }
             }
         }
@@ -166,8 +242,9 @@ public sealed class XamlResourceTests
         var declaration = new Regex(@"x:Key\s*=\s*""([^""]+)""", RegexOptions.Compiled);
 
         // Anywhere a key is declared, not only the dictionaries: App.axaml holds the converter
-        // instances, and a view may declare its own.
-        foreach (var file in XamlFiles().Concat(ResourceDictionaries()))
+        // instances, and a view may declare its own. The theme is a separate project and declares
+        // the palette, so a view naming one of its brushes is naming something that does exist.
+        foreach (var file in XamlFiles().Concat(ResourceDictionaries()).Concat(ThemeDictionaries()))
         {
             foreach (Match match in declaration.Matches(File.ReadAllText(file)))
             {
@@ -195,13 +272,35 @@ public sealed class XamlResourceTests
     }
 
     /// <summary>
+    /// The theme package's dictionaries, which define the palette and the control metrics.
+    /// </summary>
+    /// <remarks>
+    /// A sibling project rather than this one. Without it every <c>Pf</c> brush a view names reads
+    /// as undefined, which is the opposite of the truth.
+    /// </remarks>
+    private static IEnumerable<string> ThemeDictionaries()
+    {
+        var directory = Path.Combine(
+            Path.GetDirectoryName(ProjectDirectory())!, "Peerfluence.Theme");
+
+        if (!Directory.Exists(directory))
+        {
+            return [];
+        }
+
+        return Directory
+            .EnumerateFiles(directory, "*.axaml", SearchOption.AllDirectories)
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .ToList();
+    }
+
+    /// <summary>
     /// Where the literals belong. These files exist to say what a spacing is.
     /// </summary>
     private static IEnumerable<string> ResourceDictionaries()
     {
-        return Directory
-            .EnumerateFiles(Path.Combine(ProjectDirectory(), "Resources"), "*.axaml")
-            .Where(path => !Path.GetFileName(path).Equals("SukiSeparatorFix.axaml", StringComparison.Ordinal));
+        return Directory.EnumerateFiles(Path.Combine(ProjectDirectory(), "Resources"), "*.axaml");
     }
 
     private static bool IsResourceDictionary(string path)

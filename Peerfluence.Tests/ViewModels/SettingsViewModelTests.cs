@@ -17,6 +17,87 @@ namespace Peerfluence.Tests.ViewModels;
 [Collection("Messenger")]
 public class SettingsViewModelTests
 {
+    [Fact]
+    public async Task I2pOptions_AreSavedLoadedAndReset()
+    {
+        _sut.EnableI2p = true;
+        _sut.I2pSamHost = "sam.local";
+        _sut.I2pSamPort = 7666;
+        _sut.I2pAllowMixedNetworks = true;
+        await _sut.SaveCommand.ExecuteAsync(null);
+        var restored = Create(_settingsService);
+        Assert.True(restored.EnableI2p);
+        Assert.Equal("sam.local", restored.I2pSamHost);
+        Assert.Equal(7666, restored.I2pSamPort);
+        Assert.True(restored.I2pAllowMixedNetworks);
+        _sut.ResetDefaultsCommand.Execute(null);
+        Assert.False(_sut.EnableI2p);
+        Assert.Equal("127.0.0.1", _sut.I2pSamHost);
+        Assert.Equal(7656, _sut.I2pSamPort);
+        Assert.False(_sut.I2pAllowMixedNetworks);
+        await _sut.WaitForPendingSaveAsync();
+    }
+
+    [Fact]
+    public async Task EncryptionOverrides_AreSavedPreservedAcrossLanguageChangesAndReset()
+    {
+        _sut.SelectedEncryptionMode = "Require";
+        _sut.SelectedIncomingEncryptionMode = "Allow";
+        _sut.SelectedOutgoingEncryptionMode = "Refuse";
+        _sut.PreferRc4 = false;
+        _sut.SelectedLanguage = "sv-SE";
+        try
+        {
+            await _sut.SaveCommand.ExecuteAsync(null);
+            var restored = Create(_settingsService);
+            Assert.Equal("Allow", restored.SelectedIncomingEncryptionMode);
+            Assert.Equal("Refuse", restored.SelectedOutgoingEncryptionMode);
+            Assert.False(restored.PreferRc4);
+            Assert.Contains(restored.DirectionalEncryptionModeOptions, choice => choice.Value == "Inherit");
+            _sut.ResetDefaultsCommand.Execute(null);
+            Assert.Equal("Inherit", _sut.SelectedIncomingEncryptionMode);
+            Assert.Equal("Inherit", _sut.SelectedOutgoingEncryptionMode);
+            Assert.True(_sut.PreferRc4);
+        }
+        finally
+        {
+            _sut.SelectedLanguage = "en-US";
+            await _sut.WaitForPendingSaveAsync();
+        }
+    }
+
+    [Fact]
+    public async Task StreamingPreferences_AreSavedAppliedAndRestored()
+    {
+        _sut.StreamingReadAheadMiB = 80;
+        _sut.StreamingReadAheadSeconds = 45;
+        _sut.StreamingQueueSeconds = 0;
+        _sut.StreamingDataTimeoutSeconds = 0;
+        _sut.StreamingMetadataTimeoutSeconds = 120;
+        _sut.StreamingBindAddress = "192.168.1.23";
+        _sut.StreamingPort = 8087;
+        await _sut.SaveCommand.ExecuteAsync(null);
+        Assert.Equal(80L * 1024 * 1024, _settingsService.Current.Streaming.ReadAheadBytes);
+        Assert.Equal(45, _settingsService.Current.Streaming.ReadAheadSeconds);
+        Assert.Equal(0, _settingsService.Current.Streaming.RequestQueueSecondsWhileBuffering);
+        Assert.Equal(0, _settingsService.Current.Streaming.DataWaitTimeoutSeconds);
+        Assert.Equal(120, _settingsService.Current.Streaming.MetadataWaitTimeoutSeconds);
+        Assert.Equal("192.168.1.23", _settingsService.Current.Streaming.BindAddress);
+        Assert.Equal(8087, _settingsService.Current.Streaming.Port);
+        var restored = Create(_settingsService);
+        Assert.Equal(80, restored.StreamingReadAheadMiB);
+        Assert.Equal(45, restored.StreamingReadAheadSeconds);
+        Assert.Equal(0, restored.StreamingQueueSeconds);
+        Assert.Equal(0, restored.StreamingDataTimeoutSeconds);
+        Assert.Equal(120, restored.StreamingMetadataTimeoutSeconds);
+        Assert.Equal("192.168.1.23", restored.StreamingBindAddress);
+        Assert.Equal(8087, restored.StreamingPort);
+        restored.StreamingBindAddress = "0.0.0.0";
+        Assert.True(restored.HasInvalidStreamingAddress);
+        restored.StreamingBindAddress = string.Empty;
+        Assert.False(restored.HasInvalidStreamingAddress);
+    }
+
     private readonly IAppSettingsService _settingsService;
     private readonly ThemeService _themeService = new();
     private readonly LocalizationService _localizationService = new();
@@ -94,24 +175,73 @@ public class SettingsViewModelTests
     [Fact]
     public void ThemeVariants_ContainsExpectedValues()
     {
+        // The neutral Light and Dark still ship in the theme package for other applications, but
+        // this one offers only the pair that carry its identity. A stored "Light" or "Dark" is
+        // migrated rather than listed; see ThemeVariantMigrationTests.
         Assert.Contains("System", _sut.ThemeVariants);
-        Assert.Contains("Light", _sut.ThemeVariants);
-        Assert.Contains("Dark", _sut.ThemeVariants);
+        Assert.Contains("MidnightLight", _sut.ThemeVariants);
+        Assert.Contains("Midnight", _sut.ThemeVariants);
+        Assert.DoesNotContain("Light", _sut.ThemeVariants);
+        Assert.DoesNotContain("Dark", _sut.ThemeVariants);
     }
 
     [Fact]
     public void ColorThemes_ContainsExpectedValues()
     {
-        Assert.Contains("Indigo", _sut.ColorThemes);
+        Assert.DoesNotContain("Indigo", _sut.ColorThemes);
         Assert.Contains("Cobalt", _sut.ColorThemes);
         Assert.Contains("Rose", _sut.ColorThemes);
+        Assert.Contains("Sky", _sut.ColorThemes);
+        Assert.Contains("Cyan", _sut.ColorThemes);
+        Assert.DoesNotContain("Amber", _sut.ColorThemes);
+        Assert.DoesNotContain("Slate", _sut.ColorThemes);
     }
 
-    [Fact]
-    public void BackgroundStyles_ContainsExpectedValues()
+    [Theory]
+    [InlineData("Sky")]
+    [InlineData("Cyan")]
+    public async Task SwitchingToSystemAndChangingLanguage_PreservesMidnightAccents(string accent)
     {
-        Assert.Contains("GradientSoft", _sut.BackgroundStyles);
-        Assert.Contains("Flat", _sut.BackgroundStyles);
+        try
+        {
+            _sut.SelectedThemeVariant = "Midnight";
+            _sut.SelectedColorTheme = accent;
+            _sut.SelectedThemeVariant = "System";
+            _sut.SelectedLanguage = "sv-SE";
+            await _sut.WaitForPendingSaveAsync();
+
+            Assert.Equal(accent, _sut.SelectedColorTheme);
+            Assert.Equal(accent, _settingsService.Current.Theme.ColorTheme);
+            Assert.Equal(Peerfluence.Theme.PeerfluenceTheme.MidnightAccents, _sut.ColorThemes);
+
+            var restored = Create(_settingsService);
+            Assert.Equal("System", restored.SelectedThemeVariant);
+            Assert.Equal(accent, restored.SelectedColorTheme);
+        }
+        finally
+        {
+            await _sut.WaitForPendingSaveAsync();
+            _localizationService.Apply("en-US");
+        }
+    }
+
+    [Theory]
+    [InlineData("Light", "MidnightLight")]
+    [InlineData("Dark", "Midnight")]
+    [InlineData("DARK", "Midnight")]
+    public async Task LoadingAnOldThemePreference_SelectsAndSavesItsReplacement(string stored, string expected)
+    {
+        _settingsService.Current.Theme.ThemeVariant = stored;
+        _settingsService.Current.Theme.ColorTheme = "Sky";
+        var restored = Create(_settingsService);
+
+        Assert.Equal(expected, restored.SelectedThemeVariant);
+        Assert.Contains(restored.ThemeVariantOptions, option => option.Value == expected);
+        Assert.Equal("Sky", restored.SelectedColorTheme);
+
+        restored.EnableDht = !restored.EnableDht;
+        await restored.WaitForPendingSaveAsync();
+        Assert.Equal(expected, _settingsService.Current.Theme.ThemeVariant);
     }
 
     [Fact]
@@ -383,16 +513,14 @@ public class SettingsViewModelTests
         {
             _sut.SelectedThemeVariant = "Dark";
             _sut.SelectedColorTheme = "Emerald";
-            _sut.SelectedBackgroundStyle = "Flat";
             _sut.SelectedEncryptionMode = "Require";
             _sut.SelectedProxyType = "Socks5";
             _sut.SelectedLanguage = "sv-SE";
 
             await _sut.SaveCommand.ExecuteAsync(null);
 
-            Assert.Equal("Dark", _sut.SelectedThemeVariant);
+            Assert.Equal("Midnight", _sut.SelectedThemeVariant);
             Assert.Equal("Emerald", _sut.SelectedColorTheme);
-            Assert.Equal("Flat", _sut.SelectedBackgroundStyle);
             Assert.Equal("Require", _sut.SelectedEncryptionMode);
             Assert.Equal("Socks5", _sut.SelectedProxyType);
             Assert.Equal("sv-SE", _sut.SelectedLanguage);
@@ -483,13 +611,11 @@ public class SettingsViewModelTests
 
         _sut.SelectedColorTheme = null!;
         _sut.SelectedThemeVariant = null!;
-        _sut.SelectedBackgroundStyle = null!;
         _sut.SelectedEncryptionMode = string.Empty;
         _sut.SelectedProxyType = string.Empty;
 
         Assert.Equal(before, _sut.SelectedColorTheme);
         Assert.False(string.IsNullOrEmpty(_sut.SelectedThemeVariant));
-        Assert.False(string.IsNullOrEmpty(_sut.SelectedBackgroundStyle));
         Assert.False(string.IsNullOrEmpty(_sut.SelectedEncryptionMode));
         Assert.False(string.IsNullOrEmpty(_sut.SelectedProxyType));
     }
@@ -511,7 +637,6 @@ public class SettingsViewModelTests
 
             Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.ColorTheme));
             Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.ThemeVariant));
-            Assert.False(string.IsNullOrEmpty(settingsService.Current.Theme.BackgroundStyle));
         }
         finally
         {

@@ -1,5 +1,7 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using System.Net;
+using Avalonia.Input;
+using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.Messaging;
 using Peerfluence.Core;
 using Peerfluence.Core.Messaging;
@@ -23,6 +25,7 @@ public class DetailsViewModelTests
     private readonly INotificationService _notificationService = Substitute.For<INotificationService>();
     private readonly ITopLevelService _topLevelService = Substitute.For<ITopLevelService>();
     private readonly DetailsViewModel _sut;
+    private readonly IMediaStreamingService _mediaStreaming = Substitute.For<IMediaStreamingService>();
 
     public DetailsViewModelTests()
     {
@@ -44,7 +47,7 @@ public class DetailsViewModelTests
             _localizationService,
             _notificationService,
             _topLevelService,
-            settingsService, Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>(), _mediaStreaming);
         _sut.UIDispatcher = action => action();
     }
 
@@ -195,6 +198,93 @@ public class DetailsViewModelTests
     public void IsStreaming_DefaultsFalse()
     {
         Assert.False(_sut.IsStreaming);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StreamingCommands_PlayOrCopyTheLinkWithoutChangingTheConfiguredStrategy(bool share)
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.DownloadStrategy.Returns(DownloadStrategy.Sequential);
+        _selectionService.SelectedTorrent = torrent;
+        var file = new TorrentFileItemViewModel(new TorrentFileInfo("movie.m4v", 100, 0), new FileSelection(), true);
+        var stream = new MediaStreamInfo("http://127.0.0.1:1234/secret/stream", "video/mp4");
+        _mediaStreaming.StartAsync(torrent, 0, share, Arg.Any<CancellationToken>()).Returns(stream);
+        var clipboard = Substitute.For<IClipboard>();
+        _topLevelService.GetClipboard().Returns(clipboard);
+        try
+        {
+            var command = share ? _sut.CopyStreamLinkCommand : _sut.StreamFileCommand;
+            Assert.True(command.CanExecute(file));
+            await command.ExecuteAsync(file);
+            Assert.Equal(stream.Url, _sut.ActiveStreamUrl);
+            Assert.True(_sut.HasActiveStream);
+            Assert.False(_sut.IsStreaming);
+            Assert.Equal(DownloadStrategy.Sequential, torrent.DownloadStrategy);
+            Assert.DoesNotContain(torrent.ReceivedCalls(), call => call.GetMethodInfo().Name == "set_DownloadStrategy");
+            if (share)
+            {
+                _mediaStreaming.DidNotReceive().Play(Arg.Any<MediaStreamInfo>());
+                var call = Assert.Single(clipboard.ReceivedCalls(), call => call.GetMethodInfo().Name == nameof(IClipboard.SetDataAsync));
+                var transfer = Assert.IsAssignableFrom<IAsyncDataTransfer>(call.GetArguments()[0]);
+                Assert.Equal(stream.Url, await transfer.TryGetTextAsync());
+                await clipboard.Received(1).FlushAsync();
+            }
+            else
+            {
+                _mediaStreaming.Received(1).Play(stream);
+            }
+
+            _mediaStreaming.ClearReceivedCalls();
+            _sut.StopStreamingCommand.Execute(null);
+            _mediaStreaming.Received(1).EndSession();
+            Assert.False(_sut.HasActiveStream);
+            Assert.False(_sut.StopStreamingCommand.CanExecute(null));
+        }
+        finally { ((IDisposable)_sut).Dispose(); }
+    }
+
+    [Fact]
+    public async Task CancellingPreparation_PreventsALateResultFromLaunchingThePlayer()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        _selectionService.SelectedTorrent = torrent;
+        var file = new TorrentFileItemViewModel(new TorrentFileInfo("movie.mp4", 100, 0), new FileSelection(), true);
+        var pending = new TaskCompletionSource<MediaStreamInfo>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _mediaStreaming.StartAsync(torrent, 0, false, Arg.Any<CancellationToken>()).Returns(pending.Task);
+        try
+        {
+            var preparation = _sut.StreamFileCommand.ExecuteAsync(file);
+            Assert.True(_sut.IsStreaming);
+            Assert.False(_sut.CopyStreamLinkCommand.CanExecute(file));
+            _sut.StopStreamingCommand.Execute(null);
+            pending.SetResult(new MediaStreamInfo("http://127.0.0.1:1234/stream", "video/mp4"));
+            await preparation;
+            Assert.False(_sut.IsStreaming);
+            Assert.False(_sut.HasActiveStream);
+            _mediaStreaming.DidNotReceive().Play(Arg.Any<MediaStreamInfo>());
+            _notificationService.DidNotReceive().Publish(Arg.Any<NotificationItem>(), Arg.Any<TimeSpan?>());
+        }
+        finally { ((IDisposable)_sut).Dispose(); }
+    }
+
+    [Fact]
+    public async Task FailedPreparation_ClearsTheBusyStateAndReportsTheFailure()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        _selectionService.SelectedTorrent = torrent;
+        var file = new TorrentFileItemViewModel(new TorrentFileInfo("movie.mp4", 100, 0), new FileSelection(), true);
+        _mediaStreaming.StartAsync(torrent, 0, false, Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<MediaStreamInfo>(new TimeoutException("No peers")));
+        try
+        {
+            await _sut.StreamFileCommand.ExecuteAsync(file);
+            Assert.False(_sut.IsStreaming);
+            Assert.False(_sut.HasActiveStream);
+            _notificationService.Received(1).Publish(Arg.Is<NotificationItem>(item => item.Message.Contains("No peers", StringComparison.Ordinal)), Arg.Any<TimeSpan?>());
+        }
+        finally { ((IDisposable)_sut).Dispose(); }
     }
 
     [Fact]

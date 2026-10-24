@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Messaging;
-using Peerfluence.Services;
 using Peerfluence.ViewModels;
 
 namespace Peerfluence;
@@ -89,8 +87,9 @@ public class App : Application, IDisposable
         desktop.MainWindow = mainWindow;
 
         // GeoIP data can be large and is not required to construct a usable
-        // window. Start it only after Avalonia has shown the window. The blocklist
-        // remains part of engine startup so it is active before user interaction.
+        // window, and neither is the update check. Start both only after Avalonia
+        // has shown the window. The blocklist remains part of engine startup so it
+        // is active before any restored torrent can reach a peer.
         mainWindow.Opened += OnMainWindowOpened;
 
         async void OnMainWindowOpened(object? sender, EventArgs args)
@@ -101,6 +100,19 @@ public class App : Application, IDisposable
                 .LogInformation(
                     "Main window opened in {ElapsedMs} ms",
                     _services.GetRequiredService<StartupTracker>().ElapsedMilliseconds);
+
+            // Background, which is below Render, so the check cannot hold up the first frame. It
+            // used to be posted while the window was still being built, at the default priority,
+            // and that runs ahead of rendering.
+            //
+            // The dispatcher accepts Action, so making this lambda async would turn it into async
+            // void and leave any exception with no Task to carry it. The operation owns its
+            // exception policy and catches before doing any work, making this deliberate
+            // fire-and-forget safe.
+            Dispatcher.UIThread.Post(
+                () => _ = viewModel.CheckForUpdatesOnStartupAsync(),
+                DispatcherPriority.Background);
+
             try
             {
                 var engineService = _services.GetRequiredService<ITorrentEngineService>();
@@ -164,11 +176,6 @@ public class App : Application, IDisposable
             Dispatcher.UIThread.Post(() =>
                 WeakReferenceMessenger.Default.Send(new ActivationRequestedMessage(startupArguments)));
         }
-
-        // The dispatcher accepts Action, so making this lambda async would turn it into async void
-        // and leave any exception with no Task to carry it. The operation owns its exception policy
-        // and catches before doing any work, making this deliberate fire-and-forget safe.
-        Dispatcher.UIThread.Post(() => _ = viewModel.CheckForUpdatesOnStartupAsync());
 
         base.OnFrameworkInitializationCompleted();
     }

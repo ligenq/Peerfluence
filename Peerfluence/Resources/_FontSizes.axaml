@@ -3,8 +3,8 @@
                     xmlns:sys="using:System">
 
 	<sys:Double x:Key="FontSizeTiny">10</sys:Double>
-	<sys:Double x:Key="FontSizeSmall">11</sys:Double>
-	<sys:Double x:Key="FontSizeNormal">12</sys:Double>
+	<sys:Double x:Key="FontSizeSmall">12</sys:Double>
+	<sys:Double x:Key="FontSizeNormal">13</sys:Double>
 	<sys:Double x:Key="FontSizeMedium">14</sys:Double>
 	<sys:Double x:Key="FontSizeLarge">18</sys:Double>
 	<sys:Double x:Key="FontSizeXLarge">20</sys:Double>

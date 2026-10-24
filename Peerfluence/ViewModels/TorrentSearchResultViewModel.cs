@@ -1,5 +1,4 @@
 using System;
-using Peerfluence.Core.Services;
 using Peerfluence.Properties;
 
 namespace Peerfluence.ViewModels;
@@ -30,6 +29,8 @@ public sealed class TorrentSearchResultViewModel
     public string Link => _result.Link;
 
     public bool IsMagnet => _result.IsMagnet;
+
+    public DateTimeOffset? PublishedAt => _result.PublishedAt;
 
     /// <summary>
     /// A dash where a count is missing, so the column does not claim a zero the indexer never said.

@@ -1,10 +1,10 @@
+using Peerfluence.Theme.Controls;
 using System.ComponentModel;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia;
 using Peerfluence.ViewModels;
-using SukiUI.Controls;
 
 namespace Peerfluence.Views;
 

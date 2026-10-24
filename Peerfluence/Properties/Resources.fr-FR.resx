@@ -64,6 +64,12 @@
   <data name="App_Tagline" xml:space="preserve">
     <value>Poste de travail BitTorrent</value>
   </data>
+  <data name="Nav_Navigation" xml:space="preserve">
+    <value>Navigation</value>
+  </data>
+  <data name="Find_Hint" xml:space="preserve">
+    <value>Recherchez dans les indexeurs connectés et ajoutez les résultats à vos téléchargements.</value>
+  </data>
   <data name="Nav_Downloads" xml:space="preserve">
     <value>Téléchargements</value>
   </data>
@@ -424,6 +430,12 @@
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
     <value>Sombre</value>
   </data>
+  <data name="Settings_ThemeVariant_Midnight" xml:space="preserve">
+    <value>Minuit</value>
+  </data>
+  <data name="Settings_ThemeVariant_MidnightLight" xml:space="preserve">
+    <value>Minuit clair</value>
+  </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Thème de couleur</value>
   </data>
@@ -433,8 +445,20 @@
   <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
     <value>Cobalt</value>
   </data>
+  <data name="Settings_ColorTheme_Sky" xml:space="preserve">
+    <value>Ciel</value>
+  </data>
+  <data name="Settings_ColorTheme_Cyan" xml:space="preserve">
+    <value>Cyan</value>
+  </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>Menthe</value>
+  </data>
+  <data name="Settings_ColorTheme_Teal" xml:space="preserve">
+    <value>Sarcelle</value>
+  </data>
+  <data name="Settings_ColorTheme_Violet" xml:space="preserve">
+    <value>Violet foncé</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Émeraude</value>
@@ -1545,5 +1569,89 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   </data>
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Catégorie des ajouts</value>
+  </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Saisissez une adresse IP locale précise pour partager les flux ; les adresses génériques ne sont pas prises en charge.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Le fichier sélectionné ne contient aucune donnée lisible.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Copier le lien de diffusion</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Arrêter la diffusion</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Adresse de partage des flux</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Laissez vide pour utiliser uniquement cet ordinateur. Pour partager avec un téléviseur ou un autre appareil, saisissez l&#x27;adresse IP de cet ordinateur sur le réseau commun. Toute personne disposant du lien peut lire le fichier jusqu&#x27;à l&#x27;arrêt de la diffusion.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Port de partage des flux (0 : automatique)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Tampon et délais de diffusion</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Lecture anticipée minimale (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Lecture anticipée au rythme de lecture (secondes)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>File de requêtes par pair pendant la mise en tampon (secondes)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Attente des données de lecture (secondes)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Attente des métadonnées du torrent (secondes)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Zéro supprime le délai. Les modifications s&#x27;appliquent aux flux ouverts ensuite.</value>
+  </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Connexions entrantes</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Connexions sortantes</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Utiliser le chiffrement par défaut</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Préférer les données MSE chiffrées (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Concerne les nouvelles connexions. Désactiver cette préférence autorise les données MSE en clair lorsque le chiffrement est facultatif. Le chiffrement obligatoire est conservé.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Activer I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>Hôte du routeur SAM</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>Port du routeur SAM</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Autoriser les pairs du réseau public pour les torrents I2P</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Nécessite un routeur I2P avec SAM activé. Redémarrez Peerfluence après modification. Les pairs publics peuvent révéler votre adresse IP.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>Certificat du torrent SSL (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Mot de passe du certificat</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Choisissez un certificat avec clé privée, signé par l’autorité de ce torrent. Les mots de passe et clés privées ne sont pas enregistrés ; sélectionnez à nouveau le certificat après un redémarrage.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Choisissez un certificat contenant sa clé privée.</value>
   </data>
 </root>

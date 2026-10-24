@@ -1,6 +1,6 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
 
@@ -8,7 +8,6 @@ namespace Peerfluence.Services;
 
 public sealed class AddTorrentDialogService : IAddTorrentDialogService
 {
-    private static readonly TimeSpan MagnetMetadataPreviewTimeout = TimeSpan.FromSeconds(45);
     private readonly ITorrentService _torrentService;
     private readonly ITopLevelService _topLevelService;
     private readonly ITorrentCategoryService _categoryService;
@@ -31,14 +30,15 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
 
     public async Task<bool> ShowTorrentFileAsync(string torrentPath)
     {
-        if (!_settingsService.Current.ShowAddTorrentOptions)
+        var torrentFile = await TorrentFile.LoadAsync(torrentPath);
+        if (!_settingsService.Current.ShowAddTorrentOptions && !torrentFile.IsSsl)
         {
-            await _torrentService.AddTorrentFileAsync(torrentPath);
+            await _torrentService.AddTorrentAsync(torrentFile);
             return true;
         }
 
-        var viewModel = await AddTorrentOptionsViewModel.CreateForTorrentFileAsync(
-            torrentPath,
+        var viewModel = AddTorrentOptionsViewModel.CreateForTorrentFile(
+            torrentFile, torrentPath,
             _torrentService,
             _topLevelService,
             _settingsService,
@@ -60,8 +60,18 @@ public sealed class AddTorrentDialogService : IAddTorrentDialogService
             _topLevelService,
             _settingsService,
             _categoryService);
-        viewModel.StartMetadataPreview(_metadataPreviewService, MagnetMetadataPreviewTimeout);
+        var timeoutSeconds = Math.Clamp(_settingsService.Current.Streaming.MetadataWaitTimeoutSeconds,
+            0, Peerfluence.Core.Config.StreamingSettings.MaxWaitTimeoutSeconds);
+        viewModel.StartMetadataPreview(_metadataPreviewService,
+            timeoutSeconds == 0 ? Timeout.InfiniteTimeSpan : TimeSpan.FromSeconds(timeoutSeconds));
 
+        return ShowAsync(viewModel);
+    }
+
+    public Task<bool> ShowSslCertificateAsync(PeerSharp.Interfaces.ITorrent torrent)
+    {
+        var viewModel = AddTorrentOptionsViewModel.CreateForSslCertificate(
+            torrent, _torrentService, _topLevelService, _settingsService);
         return ShowAsync(viewModel);
     }
 

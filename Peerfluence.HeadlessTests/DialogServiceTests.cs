@@ -1,13 +1,16 @@
-﻿using Avalonia.Automation;
+using Avalonia;
+using Avalonia.Controls.Primitives;
+using Peerfluence.Theme.Controls;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Peerfluence.Core.Services;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;
-using SukiUI.Controls;
-using SukiUI.Dialogs;
 
 namespace Peerfluence.HeadlessTests;
 
@@ -22,12 +25,173 @@ namespace Peerfluence.HeadlessTests;
 /// at what came out.
 /// </para>
 /// <para>
-/// It also settles a thing worth not assuming - that SukiUI lays its action buttons out in the
-/// order they were added, so putting the affirmative one first is what puts it on the left.
+/// It also settles a thing worth not assuming - that the action buttons are laid out in the order
+/// they were added, so putting the affirmative one first is what puts it on the left.
 /// </para>
 /// </remarks>
 public class DialogServiceTests
 {
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task InvalidTextStaysInThePromptWithAnErrorAndCanBeCorrected(bool clickConfirm)
+    {
+        const string errorMessage = "Enter a valid magnet link.";
+        const string valid = "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        var manager = new DialogManager();
+        var window = new Window { Content = new DialogHost { Manager = manager }, Width = 650, Height = 500 };
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
+        window.Show();
+        try
+        {
+            var answer = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add",
+                InitialText: "not a magnet", Validate: value => value == valid ? null : errorMessage));
+            Layout();
+            var dialog = Assert.IsAssignableFrom<Control>(manager.Content);
+            var box = Box(dialog);
+            Submit();
+            Layout();
+
+            Assert.False(answer.IsCompleted);
+            Assert.Same(dialog, manager.Content);
+            Assert.Equal("not a magnet", box.Text);
+            Assert.True(box.IsFocused);
+            var error = dialog.GetSelfAndLogicalDescendants().OfType<InfoBar>().Single();
+            Assert.True(error.IsVisible);
+            Assert.False(error.IsClosable);
+            Assert.Equal(ToastSeverity.Error, error.Severity);
+            Assert.Equal(errorMessage, error.Message);
+            Assert.Equal(DialogService.PromptValidationErrorId, AutomationProperties.GetAutomationId(error));
+            Assert.Equal(AutomationLiveSetting.Assertive, AutomationProperties.GetLiveSetting(error));
+            Assert.Equal(errorMessage, AutomationProperties.GetHelpText(box));
+            Assert.Single(window.GetVisualDescendants().OfType<TextBlock>(),
+                text => text.IsEffectivelyVisible && text.Text == errorMessage);
+
+            box.Text = $"  {valid}  ";
+            Layout();
+            Assert.False(error.IsVisible);
+            Submit();
+            Layout();
+            Assert.True(answer.IsCompleted);
+            Assert.Equal(valid, await answer);
+            Assert.Null(manager.Content);
+
+            void Submit()
+            {
+                if (clickConfirm)
+                {
+                    var button = Confirm(dialog);
+                    var point = button.TranslatePoint(new Point(button.Bounds.Width / 2, button.Bounds.Height / 2), window)!.Value;
+                    window.MouseMove(point);
+                    window.MouseDown(point, MouseButton.Left);
+                    window.MouseUp(point, MouseButton.Left);
+                }
+                else
+                {
+                    window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+                    window.KeyReleaseQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+                }
+            }
+        }
+        finally
+        {
+            manager.Close();
+            window.Close();
+        }
+
+        void Layout()
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task InvalidTextCanStillBeCancelledWithEscape()
+    {
+        var manager = new DialogManager();
+        var window = new Window { Content = new DialogHost { Manager = manager }, Width = 650, Height = 500 };
+        var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
+        window.Show();
+        try
+        {
+            var answer = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add",
+                InitialText: "invalid", Validate: _ => "Enter a valid magnet link."));
+            Dispatcher.UIThread.RunJobs();
+            window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+            window.KeyReleaseQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(answer.IsCompleted);
+
+            window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(answer.IsCompleted);
+            Assert.Null(await answer);
+            Assert.Null(manager.Content);
+        }
+        finally
+        {
+            manager.Close();
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ATextPrompt_CapturesTypingCyclesTabAndRestoresFocus()
+    {
+        var background = new TextBox { Text = "Background" };
+        var manager = new DialogManager();
+        var host = new DialogHost { Manager = manager };
+        var window = new Window
+        {
+            Content = new Panel { Children = { background, host } },
+            Width = 600,
+            Height = 400,
+        };
+        window.Show();
+
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            Assert.True(background.Focus());
+            var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
+            var answer = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add"));
+            Dispatcher.UIThread.RunJobs();
+            var box = Box((Control)manager.Content!);
+            Assert.True(box.IsFocused);
+            window.KeyTextInput("magnet:?xt=urn:btih:abc");
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("magnet:?xt=urn:btih:abc", box.Text);
+            Assert.Equal("Background", background.Text);
+
+            foreach (var modifiers in new[] { RawInputModifiers.None, RawInputModifiers.Shift })
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    window.KeyPressQwerty(PhysicalKey.Tab, modifiers);
+                    Dispatcher.UIThread.RunJobs();
+                    var focused = Assert.IsAssignableFrom<Visual>(window.FocusManager!.GetFocusedElement());
+                    Assert.True(host.IsVisualAncestorOf(focused));
+                }
+            }
+
+            // A programmatic focus request must not escape the modal either.
+            background.Focus();
+            Assert.False(background.IsFocused);
+            window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(answer.IsCompleted);
+            Assert.Null(await answer);
+            Assert.True(background.IsFocused);
+        }
+        finally
+        {
+            manager.Close();
+            window.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void ThePromptsBuiltInCode_PutTheAffirmativeActionFirst()
     {
@@ -50,7 +214,7 @@ public class DialogServiceTests
         var dialog = Show(service => service.PromptForTextAsync(
             new TextPrompt("Rename", "Rename", InitialText: "folder/file.bin")));
 
-        var box = (dialog.Content as Control)?.GetSelfAndLogicalDescendants().OfType<TextBox>().FirstOrDefault();
+        var box = dialog.GetSelfAndLogicalDescendants().OfType<TextBox>().FirstOrDefault();
 
         Assert.NotNull(box);
         Assert.Equal("folder/file.bin", box!.Text);
@@ -99,10 +263,10 @@ public class DialogServiceTests
         // The disabling is only worth anything if it also closes the keyboard route in. A default
         // button that is disabled is not a default button, but that is worth showing rather than
         // assuming, because it is the difference between a greyed-out button and a real refusal.
-        var manager = new SukiDialogManager();
+        var manager = new DialogManager();
         var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
 
-        var window = new Window { Content = new SukiDialogHost { Manager = manager }, Width = 600, Height = 400 };
+        var window = new Window { Content = new DialogHost { Manager = manager }, Width = 600, Height = 400 };
         window.Show();
 
         var answered = service.PromptForTextAsync(new TextPrompt("Add magnet", "Add magnet"));
@@ -131,7 +295,7 @@ public class DialogServiceTests
             new TextPrompt("Add magnet", "Add magnet")));
 
         var box = Box(dialog);
-        var buttons = dialog.ActionButtons.OfType<Button>().ToList();
+        var buttons = ActionButtons(dialog);
 
         Assert.Equal(DialogService.PromptTextBoxId, box.GetValue(AutomationProperties.AutomationIdProperty));
         Assert.Equal("Add magnet", box.GetValue(AutomationProperties.NameProperty));
@@ -139,10 +303,23 @@ public class DialogServiceTests
         Assert.Equal(DialogService.PromptCancelButtonId, buttons[1].GetValue(AutomationProperties.AutomationIdProperty));
     }
 
-    private static Button Confirm(ISukiDialog dialog) => dialog.ActionButtons.OfType<Button>().First();
+    /// <summary>
+    /// The dialog's own accept and decline buttons, in the order they are laid out.
+    /// </summary>
+    /// <remarks>
+    /// RadioButton and CheckBox both derive from Button, so a plain OfType would also return the
+    /// options inside a remove prompt. Excluding ToggleButton leaves exactly the two actions.
+    /// </remarks>
+    private static List<Button> ActionButtons(Control dialog) =>
+        dialog.GetSelfAndLogicalDescendants()
+            .OfType<Button>()
+            .Where(button => button is not ToggleButton)
+            .ToList();
 
-    private static TextBox Box(ISukiDialog dialog) =>
-        (dialog.Content as Control)!.GetSelfAndLogicalDescendants().OfType<TextBox>().First();
+    private static Button Confirm(Control dialog) => ActionButtons(dialog)[0];
+
+    private static TextBox Box(Control dialog) =>
+        dialog.GetSelfAndLogicalDescendants().OfType<TextBox>().First();
 
     [AvaloniaFact]
     public void ARemovePrompt_OffersEveryChoiceItWasGiven()
@@ -160,7 +337,7 @@ public class DialogServiceTests
             },
             "Remember")));
 
-        var options = (dialog.Content as Control)!.GetSelfAndLogicalDescendants().OfType<RadioButton>().ToList();
+        var options = dialog.GetSelfAndLogicalDescendants().OfType<RadioButton>().ToList();
 
         Assert.Equal(2, options.Count);
         Assert.Equal(["Remove only", "Delete files"], options.Select(option => option.Content as string));
@@ -174,9 +351,9 @@ public class DialogServiceTests
     public async Task Enter_AcceptsAPromptBuiltInCode()
     {
         // Until these two tests existed the prompts answered neither key: a magnet could be pasted
-        // and only added with the mouse. They work because a Suki dialog is an overlay inside the
-        // main window, so its buttons share that window's key handling - which is why these do not
-        // have to become windows of their own to behave like dialogs.
+        // and only added with the mouse. They work because a prompt is an overlay inside the main
+        // window, so its buttons share that window's key handling - which is why these do not have
+        // to become windows of their own to behave like dialogs.
         var (window, answered) = ShowConfirm();
 
         window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
@@ -207,10 +384,10 @@ public class DialogServiceTests
     /// </summary>
     private static (Window Window, Task<bool> Answered) ShowConfirm()
     {
-        var manager = new SukiDialogManager();
+        var manager = new DialogManager();
         var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
 
-        var window = new Window { Content = new SukiDialogHost { Manager = manager }, Width = 600, Height = 400 };
+        var window = new Window { Content = new DialogHost { Manager = manager }, Width = 600, Height = 400 };
         window.Show();
 
         var answered = service.ConfirmAsync(new ConfirmPrompt("Title", "Message", "Remove", "Cancel"));
@@ -221,9 +398,7 @@ public class DialogServiceTests
 
     private static List<string> ShowConfirmAndReadButtons(ConfirmPrompt prompt)
     {
-        return Show(service => service.ConfirmAsync(prompt))
-            .ActionButtons
-            .OfType<Button>()
+        return ActionButtons(Show(service => service.ConfirmAsync(prompt)))
             .Select(button => button.Content as string)
             .Where(text => !string.IsNullOrEmpty(text))
             .ToList()!;
@@ -242,16 +417,15 @@ public class DialogServiceTests
     /// and nobody is going to.
     /// </para>
     /// </remarks>
-    private static ISukiDialog Show(Func<IDialogService, Task> prompt)
+    private static Control Show(Func<IDialogService, Task> prompt)
     {
-        var manager = new SukiDialogManager();
+        var manager = new DialogManager();
         var service = new DialogService(Substitute.For<ITopLevelService>(), [], manager);
-
-        ISukiDialog? shown = null;
-        manager.OnDialogShown += (_, args) => shown = args.Dialog;
 
         _ = prompt(service);
         Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Control? shown = manager.Content as Control;
 
         Assert.True(shown is not null, "the service did not show a dialog");
         return shown!;

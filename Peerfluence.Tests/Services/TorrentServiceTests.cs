@@ -9,6 +9,71 @@ namespace Peerfluence.Tests.Services;
 [Collection("Messenger")]
 public sealed class TorrentServiceTests
 {
+    [Fact]
+    public async Task SslCertificateReplacement_RecoversStoppedEntryIfCredentialCopyFails()
+    {
+        using var data = new SslTorrentTestData();
+        var original = Substitute.For<ITorrent>();
+        original.State.Returns(TorrentState.Stopped);
+        original.ExportTorrentFile().Returns(data.Metadata);
+        original.Files.DownloadPath.Returns(Path.GetTempPath());
+        original.DiskReadLimitBytesPerSecond = 1234;
+        original.MaxConnections = 7;
+        var recovered = Substitute.For<ITorrent>();
+        var engine = Substitute.For<IClientEngine>();
+        var attemptsWithCertificate = new List<bool>();
+        engine.AddTorrentAsync(data.Metadata, Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            var options = call.Arg<AddTorrentOptions>();
+            Assert.False(options.StartImmediately);
+            Assert.False(call.Arg<CancellationToken>().CanBeCanceled);
+            attemptsWithCertificate.Add(options.SslCertificate != null);
+            return options.SslCertificate != null
+                ? Task.FromException<ITorrent>(new IOException("Credential copy failed"))
+                : Task.FromResult(recovered);
+        });
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+        using var http = new HttpClient();
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), http, SeedingDefaults.Off);
+        await Assert.ThrowsAsync<IOException>(() => sut.SetSslCertificateAsync(original, data.Certificate, TestContext.Current.CancellationToken));
+        Assert.Equal([true, false], attemptsWithCertificate);
+        Assert.False(original.QueueAutoStart);
+        Assert.Equal(1234, recovered.DiskReadLimitBytesPerSecond);
+        Assert.Equal(7, recovered.MaxConnections);
+        await engine.Received(1).RemoveTorrentAsync(original, RemoveOptions.None, Arg.Any<CancellationToken>());
+        await engine.Received(1).SaveSessionAsync(CancellationToken.None);
+    }
+
+    /// <summary>
+    /// The replacement has already removed the torrent when it finds the engine will not take it back
+    /// at all. Nothing can undo that, so the failure has to say what happened and why.
+    /// </summary>
+    [Fact]
+    public async Task SslCertificateReplacement_WhenTheEngineRefusesBothAdds_ReportsTheLossAndTheOriginalCause()
+    {
+        using var data = new SslTorrentTestData();
+        var original = Substitute.For<ITorrent>();
+        original.State.Returns(TorrentState.Stopped);
+        original.ExportTorrentFile().Returns(data.Metadata);
+        original.Files.DownloadPath.Returns(Path.GetTempPath());
+        var engine = Substitute.For<IClientEngine>();
+        var cause = new IOException("Download folder is unavailable");
+        var second = new IOException("Download folder is still unavailable");
+        engine.AddTorrentAsync(data.Metadata, Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<ITorrent>(cause), Task.FromException<ITorrent>(second));
+        var engineService = Substitute.For<ITorrentEngineService>();
+        engineService.Engine.Returns(engine);
+        using var http = new HttpClient();
+        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), http, SeedingDefaults.Off);
+
+        var failure = await Assert.ThrowsAsync<AggregateException>(
+            () => sut.SetSslCertificateAsync(original, data.Certificate, TestContext.Current.CancellationToken));
+
+        Assert.Equal([cause, second], failure.InnerExceptions);
+        Assert.Contains("no longer in the list", failure.Message, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// A settings service whose seeding defaults say what the test needs them to.
     /// </summary>

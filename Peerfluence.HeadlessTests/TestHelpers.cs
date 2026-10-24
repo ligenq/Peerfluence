@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+using Peerfluence.Theme.Controls;
+using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Runtime.Serialization;
 using System.Threading.Channels;
@@ -101,7 +102,7 @@ internal static class TestHelpers
             localizationService,
             notificationService,
             topLevelService,
-            settingsService, Substitute.For<IDialogService>());
+            settingsService, Substitute.For<IDialogService>(), Substitute.For<IMediaStreamingService>());
 
         // Replace Dispatcher call with synchronous execution for tests
         vm.UIDispatcher = action => action();
@@ -109,10 +110,12 @@ internal static class TestHelpers
         return vm;
     }
 
-    public static SettingsViewModel CreateSettingsViewModel(IInterfaceModeService? interfaceModeService = null)
+    public static SettingsViewModel CreateSettingsViewModel(
+        IInterfaceModeService? interfaceModeService = null,
+        IAppSettingsService? settingsService = null)
     {
         var store = Substitute.For<IAppSettingsStore>();
-        var settingsService = new AppSettingsService(new AppPaths(), store, new FileSystem());
+        settingsService ??= new AppSettingsService(new AppPaths(), store, new FileSystem());
         var themeService = Substitute.For<IThemeService>();
         var localizationService = new LocalizationService();
         var topLevelService = Substitute.For<ITopLevelService>();
@@ -171,7 +174,7 @@ internal static class TestHelpers
             Substitute.For<IDialogService>(),
             downloadsVm,
             settingsVm,
-            new SukiUI.Toasts.SukiToastManager(),
-            new SukiUI.Dialogs.SukiDialogManager());
+            new ToastManager(),
+            new DialogManager());
     }
 }

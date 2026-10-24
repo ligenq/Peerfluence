@@ -1,5 +1,9 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Peerfluence.Core.Services;
+using Peerfluence.Logging;
+using Peerfluence.Services.Mcp;
 
 namespace Peerfluence.Tests.Architecture;
 
@@ -80,6 +84,89 @@ public class EntryPointTests
         stopping.Cancel();
 
         Assert.False(closed);
+    }
+
+    /// <summary>
+    /// A magnet link clicked while the application is open starts a second process that only hands
+    /// the link over. It used to empty the running instance's log on the way.
+    /// </summary>
+    [Fact]
+    public void ASecondLaunch_HandsOverItsArguments_AndLeavesTheRunningInstancesLogAlone()
+    {
+        using var profile = new TemporaryLog();
+        File.WriteAllText(profile.Path, "the running instance's log\n");
+        var singleInstance = Substitute.For<ISingleInstanceService>();
+        singleInstance.TryAcquireSingleInstanceLock().Returns(false);
+        string[] arguments = ["magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567"];
+
+        using var fileLog = new FileLoggerProvider(profile.Path);
+        var claimed = Peerfluence.Program.ClaimProfile(singleInstance, RuntimeOptions(skipLock: false), fileLog, arguments);
+
+        Assert.False(claimed);
+        singleInstance.Received(1).SignalExistingInstance(arguments);
+        Assert.Equal("the running instance's log\n", File.ReadAllText(profile.Path));
+    }
+
+    [Fact]
+    public void TheInstanceThatOwnsTheProfile_TakesOverTheLog()
+    {
+        using var profile = new TemporaryLog();
+        var singleInstance = Substitute.For<ISingleInstanceService>();
+        singleInstance.TryAcquireSingleInstanceLock().Returns(true);
+
+        using (var fileLog = new FileLoggerProvider(profile.Path))
+        {
+            fileLog.CreateLogger("Startup").LogInformation("logged before the lock was decided");
+            var claimed = Peerfluence.Program.ClaimProfile(singleInstance, RuntimeOptions(skipLock: false), fileLog, []);
+
+            Assert.True(claimed);
+        }
+
+        singleInstance.DidNotReceiveWithAnyArgs().SignalExistingInstance(default);
+        Assert.Contains("logged before the lock was decided", File.ReadAllText(profile.Path));
+    }
+
+    [Fact]
+    public void UiAgentMode_SkipsTheLock_ButStillWritesItsLog()
+    {
+        using var profile = new TemporaryLog();
+        var singleInstance = Substitute.For<ISingleInstanceService>();
+
+        using (var fileLog = new FileLoggerProvider(profile.Path))
+        {
+            var claimed = Peerfluence.Program.ClaimProfile(singleInstance, RuntimeOptions(skipLock: true), fileLog, []);
+            fileLog.CreateLogger("Startup").LogInformation("agent run");
+
+            Assert.True(claimed);
+        }
+
+        singleInstance.DidNotReceive().TryAcquireSingleInstanceLock();
+        Assert.Contains("agent run", File.ReadAllText(profile.Path));
+    }
+
+    private static IMcpRuntimeOptions RuntimeOptions(bool skipLock)
+    {
+        var options = Substitute.For<IMcpRuntimeOptions>();
+        options.SkipSingleInstanceLock.Returns(skipLock);
+        return options;
+    }
+
+    private sealed class TemporaryLog : IDisposable
+    {
+        private readonly string _directory = System.IO.Path.Combine(
+            System.IO.Path.GetTempPath(), $"peerfluence_entry_{Guid.NewGuid():N}");
+
+        public TemporaryLog()
+        {
+            Directory.CreateDirectory(_directory);
+        }
+
+        public string Path => System.IO.Path.Combine(_directory, "peerfluence.log");
+
+        public void Dispose()
+        {
+            try { Directory.Delete(_directory, recursive: true); } catch (IOException) { }
+        }
     }
 
     private static MethodInfo EntryPoint()

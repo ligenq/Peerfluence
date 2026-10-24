@@ -32,6 +32,8 @@ public sealed class AppSettings
 
     public SearchSettings Search { get; set; } = new();
 
+    public StreamingSettings Streaming { get; set; } = new();
+
     /// <summary>
     /// "Simple" or "Advanced". Empty means the user has not been asked yet, which is what brings up
     /// the welcome on first launch; anything unrecognised is read as Advanced, so a hand-edited or

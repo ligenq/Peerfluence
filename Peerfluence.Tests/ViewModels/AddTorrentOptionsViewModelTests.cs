@@ -4,11 +4,84 @@ using Peerfluence.Services;
 using Peerfluence.ViewModels;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
+using PeerSharp.Config;
 
 namespace Peerfluence.Tests.ViewModels;
 
 public class AddTorrentOptionsViewModelTests
 {
+    [Fact]
+    public async Task SslCertificate_IsRequiredAndWrongPasswordsStayInTheDialog()
+    {
+        using var data = new SslTorrentTestData();
+        var path = Path.GetTempFileName();
+        try
+        {
+            await File.WriteAllBytesAsync(path, data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12, "secret"), TestContext.Current.CancellationToken);
+            var service = Substitute.For<ITorrentService>();
+            var sut = AddTorrentOptionsViewModel.CreateForTorrentFile(data.Metadata, "test.torrent", service,
+                Substitute.For<ITopLevelService>(), CreateSettingsService(Path.GetTempPath()), Substitute.For<ITorrentCategoryService>());
+            Assert.True(sut.IsSsl);
+            await sut.AddCommand.ExecuteAsync(null);
+            Assert.True(sut.HasError);
+            Assert.False(sut.WasAdded);
+            sut.SslCertificatePath = path;
+            sut.SslCertificatePassword = "wrong";
+            await sut.AddCommand.ExecuteAsync(null);
+            Assert.True(sut.HasError);
+            await service.DidNotReceive().AddTorrentAsync(Arg.Any<TorrentFile>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
+
+            byte[]? exported = null;
+            service.AddTorrentAsync(data.Metadata, Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>()).Returns(call =>
+            {
+                var certificate = call.Arg<AddTorrentOptions>().SslCertificate!;
+                Assert.True(certificate.HasPrivateKey);
+                exported = certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12);
+                return Task.FromResult(Substitute.For<ITorrent>());
+            });
+            sut.SslCertificatePassword = "secret";
+            await sut.AddCommand.ExecuteAsync(null);
+            Assert.True(sut.WasAdded);
+            Assert.False(sut.HasError);
+            Assert.NotEmpty(exported!);
+            Assert.Empty(sut.SslCertificatePassword);
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public async Task RestoredSslCertificate_CanBeRetriedAfterAuthorizationFailure()
+    {
+        using var data = new SslTorrentTestData();
+        var path = Path.GetTempFileName();
+        try
+        {
+            await File.WriteAllBytesAsync(path, data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12), TestContext.Current.CancellationToken);
+            var original = Substitute.For<ITorrent>();
+            original.ExportTorrentFile().Returns(data.Metadata);
+            original.Files.DownloadPath.Returns(Path.GetTempPath());
+            original.Name.Returns(data.Metadata.Name);
+            var rejected = Substitute.For<ITorrent>();
+            rejected.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Rejected")));
+            var accepted = Substitute.For<ITorrent>();
+            var service = Substitute.For<ITorrentService>();
+            service.SetSslCertificateAsync(original, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>()).Returns(rejected);
+            service.SetSslCertificateAsync(rejected, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>()).Returns(accepted);
+            var sut = AddTorrentOptionsViewModel.CreateForSslCertificate(original, service,
+                Substitute.For<ITopLevelService>(), CreateSettingsService(Path.GetTempPath()));
+            Assert.False(sut.IsNewTorrent);
+            sut.SslCertificatePath = path;
+            await sut.AddCommand.ExecuteAsync(null);
+            Assert.True(sut.HasError);
+            Assert.False(sut.WasAdded);
+            Assert.False(rejected.QueueAutoStart);
+            await sut.AddCommand.ExecuteAsync(null);
+            Assert.True(sut.WasAdded);
+            await accepted.Received(1).StartAsync(Arg.Any<CancellationToken>());
+        }
+        finally { File.Delete(path); }
+    }
+
     [Fact]
     public void BuildOptions_MapsUserChoicesToAddTorrentOptions()
     {

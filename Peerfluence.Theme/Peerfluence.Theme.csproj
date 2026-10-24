@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The Peerfluence look, as a library rather than as resources inside the application, so it can be
+    published on its own and used by other Avalonia applications. Nothing here references
+    Peerfluence: if it does one day, that is the bug.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+
+    <!-- Consumed by a NativeAOT, trimmed application, so the library has to survive both. -->
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Peerfluence.Theme</PackageId>
+    <Description>A clean, dense theme for Avalonia desktop applications, with light and dark variants and selectable accents.</Description>
+    <PackageTags>avalonia;theme;ui;dark-mode</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <!--
+      Open Sans, embedded rather than named. A theme that names a font family it does not carry
+      crashes the moment a consumer has not registered it, which is how the Inter dependency was
+      found. The licence travels with it: SIL OFL 1.1 requires the notice to ship alongside.
+    -->
+    <AvaloniaResource Include="Assets/Fonts/*.ttf" />
+    <None Include="Assets/Fonts/OFL.txt" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+    <!--
+      For the grid styles. A consumer that does not use DataGrid simply never matches them; the
+      theme needs the reference to compile them at all.
+    -->
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+  </ItemGroup>
+
+</Project>

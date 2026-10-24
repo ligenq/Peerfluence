@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+using Peerfluence.Theme.Controls;
+using System.IO.Abstractions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
@@ -40,7 +41,7 @@ public class MainWindowViewModelTests
         var localizationService = new LocalizationService();
         var themeService = new ThemeService();
 
-        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService, Substitute.For<IDialogService>());
+        _detailsVm = new DetailsViewModel(selectionService, torrentService, localizationService, _notificationService, topLevelService, _settingsService, Substitute.For<IDialogService>(), Substitute.For<IMediaStreamingService>());
         var updateLogger = Substitute.For<Microsoft.Extensions.Logging.ILogger<UpdateService>>();
         _updateService = new UpdateService(updateLogger, _settingsService);
         _settingsVm = new SettingsViewModel(_settingsService, themeService, localizationService, topLevelService, engineService, _updateService, Substitute.For<IWindowsAssociationService>(), Substitute.For<IInterfaceModeService>(), Substitute.For<ITorrentSearchService>(), Substitute.For<ITorrentCategoryService>());
@@ -76,8 +77,8 @@ public class MainWindowViewModelTests
             Substitute.For<IDialogService>(),
             downloadsVm,
             _settingsVm,
-            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
-            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
     }
 
     [Fact]
@@ -141,8 +142,8 @@ public class MainWindowViewModelTests
             Substitute.For<IDialogService>(),
             _downloadsVm,
             _settingsVm,
-            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
-            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -167,8 +168,8 @@ public class MainWindowViewModelTests
             Substitute.For<IDialogService>(),
             _downloadsVm,
             _settingsVm,
-            Substitute.For<SukiUI.Toasts.ISukiToastManager>(),
-            Substitute.For<SukiUI.Dialogs.ISukiDialogManager>());
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
 
         await sut.CheckForUpdatesOnStartupAsync();
 
@@ -183,4 +184,94 @@ public class MainWindowViewModelTests
         _sut.Dispose();
     }
 
+    private (MainWindowViewModel Window, StatisticsViewModel Statistics, ITorrentService Engine) WithStatistics()
+    {
+        var engine = Substitute.For<ITorrentService>();
+        engine.GetStats().Returns(new PeerSharp.Core.EngineStats());
+        var statistics = new StatisticsViewModel(engine);
+
+        var window = new MainWindowViewModel(
+            new IFeatureViewModel[] { _downloadsVm, statistics, _settingsVm },
+            new AboutViewModel(NullLogger<AboutViewModel>.Instance),
+            _notificationService,
+            _settingsService,
+            _updateService,
+            Substitute.For<IInterfaceModeService>(),
+            Substitute.For<IDialogService>(),
+            _downloadsVm,
+            _settingsVm,
+            Substitute.For<IToastManager>(),
+            Substitute.For<IDialogManager>());
+
+        return (window, statistics, engine);
+    }
+
+    private static NavigationItem ItemFor(MainWindowViewModel window, ViewModelBase page) =>
+        window.NavigationItems.Single(item => ReferenceEquals(item.ViewModel, page));
+
+    [Fact]
+    public void AStatisticsPageNobodyHasOpened_IsNotOnScreen()
+    {
+        var (_, statistics, engine) = WithStatistics();
+
+        Assert.False(statistics.IsOnScreen);
+        engine.DidNotReceive().GetStats();
+    }
+
+    [Fact]
+    public void SelectingStatistics_PutsItOnScreen_AndLeavingTakesItOff()
+    {
+        var (window, statistics, engine) = WithStatistics();
+
+        window.SelectedNavigationItem = ItemFor(window, statistics);
+
+        Assert.True(statistics.IsOnScreen);
+        engine.Received(1).GetStats();
+
+        window.SelectedNavigationItem = ItemFor(window, _settingsVm);
+
+        Assert.False(statistics.IsOnScreen);
+    }
+
+    [Fact]
+    public void ShowingAbout_TakesTheCurrentPageOffScreen()
+    {
+        var (window, statistics, _) = WithStatistics();
+        window.SelectedNavigationItem = ItemFor(window, statistics);
+
+        window.ShowAboutCommand.Execute(null);
+
+        Assert.False(statistics.IsOnScreen);
+    }
+
+    [Fact]
+    public async Task SimpleMode_HidesTheAdvancedPage_AndSwitchingBackShowsItAgain()
+    {
+        // Simple mode leaves the current page as it was and draws its own screen over it.
+        var (window, statistics, _) = WithStatistics();
+        window.SelectedNavigationItem = ItemFor(window, statistics);
+
+        await window.ChooseSimpleModeCommand.ExecuteAsync(null);
+        Assert.False(statistics.IsOnScreen);
+
+        await window.ChooseAdvancedModeCommand.ExecuteAsync(null);
+        Assert.True(statistics.IsOnScreen);
+    }
+
+    [Fact]
+    public async Task SimpleDownloadsPage_IsTheDownloadsOnlyInSimpleMode()
+    {
+        // Null outside simple mode, so the simple screen's view is never built for it.
+        Assert.Null(_sut.SimpleDownloadsPage);
+
+        var changed = new List<string>();
+        _sut.PropertyChanged += (_, e) => changed.Add(e.PropertyName!);
+        await _sut.ChooseSimpleModeCommand.ExecuteAsync(null);
+
+        Assert.Same(_downloadsVm, _sut.SimpleDownloadsPage);
+        Assert.Contains(nameof(_sut.SimpleDownloadsPage), changed);
+
+        await _sut.ChooseAdvancedModeCommand.ExecuteAsync(null);
+        Assert.Null(_sut.SimpleDownloadsPage);
+    }
 }

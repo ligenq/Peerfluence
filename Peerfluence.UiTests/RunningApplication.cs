@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using FlaUI.Core.AutomationElements;
 using FlaUI.UIA3;
+using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol;
 
 namespace Peerfluence.UiTests;
 
@@ -71,6 +73,22 @@ public sealed class RunningApplication : IDisposable
 
     public Window Window { get; }
 
+    /// <summary>Renders only this application's visual tree, even when another window covers it.</summary>
+    public async Task CaptureWindowToFileAsync(string path, CancellationToken cancellationToken)
+    {
+        var transport = new StdioClientTransport(new StdioClientTransportOptions
+        {
+            Command = ExecutablePath(),
+            Arguments = ["--mcp", "--profile", ProfileDirectory],
+            Name = "Peerfluence gallery",
+        });
+        await using var client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken);
+        var result = await client.CallToolAsync("take_screenshot", cancellationToken: cancellationToken);
+        var image = result.Content.OfType<ImageContentBlock>().SingleOrDefault()
+            ?? throw new InvalidOperationException("The application did not return a rendered window image.");
+        await File.WriteAllBytesAsync(path, image.DecodedData.ToArray(), cancellationToken);
+    }
+
     /// <summary>The throwaway directory this instance keeps everything in.</summary>
     public string ProfileDirectory { get; }
 
@@ -128,8 +146,13 @@ public sealed class RunningApplication : IDisposable
     /// Found by control type rather than by an id: they come from a template, so one id would name
     /// every one of them. Position is the only stable handle, and it is the same in every language.
     /// </remarks>
+    /// <summary>The navigation destinations, as the accessibility tree reports them.</summary>
+    /// <remarks>
+    /// List items. The sidebar is a ListBox, which is what a single-selection list of destinations
+    /// is; the control it replaced reported itself as a tree, which it never was.
+    /// </remarks>
     public AutomationElement[] NavigationItems() =>
-        Window.FindAllDescendants(by => by.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem));
+        Window.FindAllDescendants(by => by.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
 
     /// <summary>Selects an element, by the pattern it offers rather than by aiming the mouse at it.</summary>
     public static void Activate(AutomationElement element)

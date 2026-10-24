@@ -1,12 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
-using NSubstitute;
 using Peerfluence.Core.Services;
 using Peerfluence.HeadlessTests.XUnit;
 using Peerfluence.Services;
 using Peerfluence.ViewModels;
 using Peerfluence.Views;
-using SukiUI.Controls;
 
 namespace Peerfluence.HeadlessTests;
 
@@ -59,7 +57,7 @@ public class FindTorrentsViewTests
         var (view, _) = CreateView(configured: false);
 
         Assert.False(view.FindControl<Grid>("QueryBar")!.IsVisible);
-        Assert.False(view.FindControl<GlassCard>("ResultsCard")!.IsVisible);
+        Assert.False(view.FindControl<Border>("ResultsCard")!.IsVisible);
         Assert.True(view.FindControl<StackPanel>("EmptyState")!.IsVisible);
     }
 
@@ -69,7 +67,7 @@ public class FindTorrentsViewTests
         var (view, _) = CreateView(configured: true);
 
         Assert.True(view.FindControl<Grid>("QueryBar")!.IsVisible);
-        Assert.True(view.FindControl<GlassCard>("ResultsCard")!.IsVisible);
+        Assert.True(view.FindControl<Border>("ResultsCard")!.IsVisible);
         Assert.False(view.FindControl<StackPanel>("EmptyState")!.IsVisible);
     }
 

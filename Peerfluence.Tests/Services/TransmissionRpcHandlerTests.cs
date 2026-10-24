@@ -448,6 +448,112 @@ public sealed class TransmissionRpcHandlerTests
     }
 
     [Fact]
+    public async Task SessionSet_ChangesTheSpeedLimitsAndSavesThem()
+    {
+        var response = await CallAsync("""
+            {"method":"session-set","tag":3,"arguments":{
+              "speed-limit-down-enabled":true,"speed-limit-down":500,
+              "speed-limit-up-enabled":true,"speed-limit-up":64}}
+            """);
+
+        Assert.Equal("success", response.GetProperty("result").GetString());
+        Assert.Equal(3, response.GetProperty("tag").GetInt32());
+        Assert.Equal(500 * 1024, _settings.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(64 * 1024, _settings.Network.MaxUploadSpeedBytesPerSecond);
+        await _settingsService.Received(1).SaveAsync(Arg.Any<CancellationToken>());
+
+        // What the client reads back is what it set, which is how it confirms the change took.
+        var session = (await CallAsync("""{"method":"session-get"}""")).GetProperty("arguments");
+        Assert.True(session.GetProperty("speed-limit-down-enabled").GetBoolean());
+        Assert.Equal(500, session.GetProperty("speed-limit-down").GetInt64());
+        Assert.Equal(64, session.GetProperty("speed-limit-up").GetInt64());
+    }
+
+    [Fact]
+    public async Task SessionSet_ADisabledLimitIsUnlimited_AndLeavesTheOtherDirectionAlone()
+    {
+        _settings.Network.MaxDownloadSpeedBytesPerSecond = 100 * 1024;
+        _settings.Network.MaxUploadSpeedBytesPerSecond = 20 * 1024;
+
+        var response = await CallAsync("""
+            {"method":"session-set","arguments":{"speed-limit-down-enabled":false,"speed-limit-down":300}}
+            """);
+
+        Assert.Equal("success", response.GetProperty("result").GetString());
+        Assert.Equal(0, _settings.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(20 * 1024, _settings.Network.MaxUploadSpeedBytesPerSecond);
+        await _settingsService.Received(1).SaveAsync(Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// Transmission keeps the value and the switch apart; here they are one number, so a value sent
+    /// on its own moves a limit that is on and leaves one that is off unlimited, as Transmission would.
+    /// </summary>
+    [Theory]
+    [InlineData(100 * 1024, 300L * 1024)]
+    [InlineData(0, 0L)]
+    public async Task SessionSet_AValueWithoutTheSwitch_ChangesOnlyALimitThatIsOn(long current, long expected)
+    {
+        _settings.Network.MaxDownloadSpeedBytesPerSecond = current;
+
+        var response = await CallAsync("""{"method":"session-set","arguments":{"speed-limit-down":300}}""");
+
+        Assert.Equal("success", response.GetProperty("result").GetString());
+        Assert.Equal(expected, _settings.Network.MaxDownloadSpeedBytesPerSecond);
+    }
+
+    /// <summary>
+    /// Clients send whatever session fields they know. One that is not implemented must not cost the
+    /// ones that are.
+    /// </summary>
+    [Fact]
+    public async Task SessionSet_IgnoresFieldsItDoesNotKnow()
+    {
+        var response = await CallAsync("""
+            {"method":"session-set","arguments":{"alt-speed-enabled":true,"speed-limit-up-enabled":true,"speed-limit-up":10}}
+            """);
+
+        Assert.Equal("success", response.GetProperty("result").GetString());
+        Assert.Equal(10 * 1024, _settings.Network.MaxUploadSpeedBytesPerSecond);
+    }
+
+    [Fact]
+    public async Task SessionSet_WithNothingItKnows_SavesNothing()
+    {
+        var response = await CallAsync("""{"method":"session-set","arguments":{"alt-speed-enabled":true}}""");
+
+        Assert.Equal("success", response.GetProperty("result").GetString());
+        await _settingsService.DidNotReceive().SaveAsync(Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// A wrong value anywhere in the call refuses all of it, including the valid parts, so a client
+    /// never ends up with half of what it asked for. The last two are well typed but ask for what one
+    /// number cannot hold: a zero limit, which Transmission takes as no transfer at all, and switching
+    /// on a limit that has no value.
+    /// </summary>
+    [Theory]
+    [InlineData("""{"speed-limit-up-enabled":true,"speed-limit-up":10,"speed-limit-down-enabled":"yes"}""")]
+    [InlineData("""{"speed-limit-up-enabled":true,"speed-limit-up":10,"speed-limit-down":"500"}""")]
+    [InlineData("""{"speed-limit-down-enabled":true,"speed-limit-down":10,"speed-limit-up":1.5}""")]
+    [InlineData("""{"speed-limit-down-enabled":true,"speed-limit-down":10,"speed-limit-up":-1}""")]
+    [InlineData("""{"speed-limit-down-enabled":true,"speed-limit-down":10,"speed-limit-up-enabled":1}""")]
+    [InlineData("""{"speed-limit-down-enabled":true,"speed-limit-down":10,"speed-limit-up":null}""")]
+    [InlineData("""{"speed-limit-down-enabled":true,"speed-limit-down":99999999999999999}""")]
+    [InlineData("""{"speed-limit-up-enabled":true,"speed-limit-up":10,"speed-limit-down-enabled":true,"speed-limit-down":0}""")]
+    [InlineData("""{"speed-limit-up-enabled":true,"speed-limit-up":10,"speed-limit-down-enabled":true}""")]
+    public async Task SessionSet_RefusesBadValues_AndChangesNothing(string arguments)
+    {
+        var response = await CallAsync($$"""{"method":"session-set","tag":9,"arguments":{{arguments}}}""");
+
+        Assert.NotEqual("success", response.GetProperty("result").GetString());
+        Assert.Equal(9, response.GetProperty("tag").GetInt32());
+        Assert.Equal(0, _settings.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(0, _settings.Network.MaxUploadSpeedBytesPerSecond);
+        await _settingsService.DidNotReceive().SaveAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task TorrentSet_FilesAndUnfilesByLabel()
     {
         var torrent = Torrent();

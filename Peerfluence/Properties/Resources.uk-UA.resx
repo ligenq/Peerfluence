@@ -64,6 +64,12 @@
   <data name="App_Tagline" xml:space="preserve">
     <value>Робоча станція BitTorrent</value>
   </data>
+  <data name="Nav_Navigation" xml:space="preserve">
+    <value>Навігація</value>
+  </data>
+  <data name="Find_Hint" xml:space="preserve">
+    <value>Шукайте в підключених індексаторах і додавайте результати до завантажень.</value>
+  </data>
   <data name="Nav_Downloads" xml:space="preserve">
     <value>Завантаження</value>
   </data>
@@ -424,6 +430,12 @@
   <data name="Settings_ThemeVariant_Dark" xml:space="preserve">
     <value>Темна</value>
   </data>
+  <data name="Settings_ThemeVariant_Midnight" xml:space="preserve">
+    <value>Опівніч</value>
+  </data>
+  <data name="Settings_ThemeVariant_MidnightLight" xml:space="preserve">
+    <value>Опівніч світла</value>
+  </data>
   <data name="Settings_ColorTheme" xml:space="preserve">
     <value>Кольорова тема</value>
   </data>
@@ -433,8 +445,20 @@
   <data name="Settings_ColorTheme_Cobalt" xml:space="preserve">
     <value>Кобальт</value>
   </data>
+  <data name="Settings_ColorTheme_Sky" xml:space="preserve">
+    <value>Небесний</value>
+  </data>
+  <data name="Settings_ColorTheme_Cyan" xml:space="preserve">
+    <value>Блакитний</value>
+  </data>
   <data name="Settings_ColorTheme_Mint" xml:space="preserve">
     <value>М'ятний</value>
+  </data>
+  <data name="Settings_ColorTheme_Teal" xml:space="preserve">
+    <value>Синьо-зелений</value>
+  </data>
+  <data name="Settings_ColorTheme_Violet" xml:space="preserve">
+    <value>Фіолетовий</value>
   </data>
   <data name="Settings_ColorTheme_Emerald" xml:space="preserve">
     <value>Смарагдовий</value>
@@ -1545,5 +1569,89 @@ Peerfluence поширюється за MIT License. Установлюючи а
   </data>
   <data name="Settings_AutoSearchCategory" xml:space="preserve">
     <value>Категорія для доданого</value>
+  </data>
+  <data name="Settings_StreamingAddressInvalid" xml:space="preserve">
+    <value>Укажіть конкретну локальну IP-адресу для спільних потоків; адреси із символами підстановки не підтримуються.</value>
+  </data>
+  <data name="Details_StreamNoData" xml:space="preserve">
+    <value>Вибраний файл не містить даних для відтворення.</value>
+  </data>
+  <data name="Details_CopyStreamLink" xml:space="preserve">
+    <value>Копіювати посилання на потік</value>
+  </data>
+  <data name="Details_StopStreaming" xml:space="preserve">
+    <value>Зупинити трансляцію</value>
+  </data>
+  <data name="Settings_StreamingAddress" xml:space="preserve">
+    <value>Адреса спільного доступу до потоків</value>
+  </data>
+  <data name="Settings_StreamingAddressHint" xml:space="preserve">
+    <value>Залиште порожнім для доступу лише з цього комп&#x27;ютера. Для телевізора або іншого пристрою вкажіть IP-адресу цього комп&#x27;ютера в спільній мережі. Кожен, хто має посилання, може відтворювати файл до зупинки трансляції.</value>
+  </data>
+  <data name="Settings_StreamingPort" xml:space="preserve">
+    <value>Порт спільного потоку (0: автоматично)</value>
+  </data>
+  <data name="Settings_StreamingBuffer" xml:space="preserve">
+    <value>Буфер і час очікування</value>
+  </data>
+  <data name="Settings_StreamingReadAheadMiB" xml:space="preserve">
+    <value>Мінімальне випереджальне читання (MiB)</value>
+  </data>
+  <data name="Settings_StreamingReadAheadSeconds" xml:space="preserve">
+    <value>Випереджальне читання зі швидкістю відтворення (секунди)</value>
+  </data>
+  <data name="Settings_StreamingQueueSeconds" xml:space="preserve">
+    <value>Черга запитів піра під час буферизації (секунди)</value>
+  </data>
+  <data name="Settings_StreamingDataTimeout" xml:space="preserve">
+    <value>Очікування даних відтворення (секунди)</value>
+  </data>
+  <data name="Settings_StreamingMetadataTimeout" xml:space="preserve">
+    <value>Очікування метаданих торента (секунди)</value>
+  </data>
+  <data name="Settings_StreamingTimeoutHint" xml:space="preserve">
+    <value>Нуль скасовує обмеження часу. Зміни застосовуються до потоків, відкритих після цього.</value>
+  </data>
+  <data name="Settings_IncomingEncryption" xml:space="preserve">
+    <value>Вхідні з’єднання</value>
+  </data>
+  <data name="Settings_OutgoingEncryption" xml:space="preserve">
+    <value>Вихідні з’єднання</value>
+  </data>
+  <data name="Settings_EncryptionInherit" xml:space="preserve">
+    <value>Використовувати типовий режим шифрування</value>
+  </data>
+  <data name="Settings_PreferRc4" xml:space="preserve">
+    <value>Надавати перевагу шифруванню даних MSE (RC4)</value>
+  </data>
+  <data name="Settings_EncryptionPolicyHint" xml:space="preserve">
+    <value>Застосовується до нових з’єднань. Вимкнення цього параметра дозволяє незашифровані дані MSE, якщо шифрування необов’язкове. Обов’язкове шифрування зберігається.</value>
+  </data>
+  <data name="Settings_EnableI2p" xml:space="preserve">
+    <value>Увімкнути I2P</value>
+  </data>
+  <data name="Settings_I2pSamHost" xml:space="preserve">
+    <value>Адреса маршрутизатора SAM</value>
+  </data>
+  <data name="Settings_I2pSamPort" xml:space="preserve">
+    <value>Порт маршрутизатора SAM</value>
+  </data>
+  <data name="Settings_I2pAllowMixedNetworks" xml:space="preserve">
+    <value>Дозволити піри публічної мережі для I2P-торентів</value>
+  </data>
+  <data name="Settings_I2pHint" xml:space="preserve">
+    <value>Потрібен маршрутизатор I2P з увімкненим SAM. Після змін перезапустіть Peerfluence. Публічні піри можуть розкрити вашу IP-адресу.</value>
+  </data>
+  <data name="AddTorrent_SslCertificate" xml:space="preserve">
+    <value>Сертифікат SSL-торента (.pfx / .p12)</value>
+  </data>
+  <data name="AddTorrent_SslPassword" xml:space="preserve">
+    <value>Пароль сертифіката</value>
+  </data>
+  <data name="AddTorrent_SslHint" xml:space="preserve">
+    <value>Виберіть сертифікат із приватним ключем, підписаний центром сертифікації цього торента. Паролі та приватні ключі не зберігаються; після перезапуску виберіть сертифікат знову.</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
+    <value>Виберіть сертифікат, що містить приватний ключ.</value>
   </data>
 </root>
