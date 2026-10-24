@@ -353,7 +353,8 @@ is installed through Velopack.
 
 Linux releases provide portable AppDir archives and Debian packages for x64 and ARM64.
 The Debian package registers the application launcher, `.torrent` MIME handler, and
-`magnet:` URL handler. Build one locally with:
+`magnet:` URL handler. Both are Native AOT builds, so build on a host of the target
+architecture with `clang` and `zlib1g-dev` installed:
 
 ```shell
 ./ReleasePackaging/build-linux.sh --version 2.1.0 --rid linux-x64

@@ -3,20 +3,25 @@
 ## Linux
 
 Linux packaging uses one AppDir staging layout to avoid duplicating application files
-between formats. On an x64 Linux host, run:
+between formats. The application is published with Native AOT, which compiles only for the
+host architecture and needs a native toolchain. On an x64 Debian or Ubuntu host, install it
+and run:
 
 ```bash
+sudo apt-get install clang zlib1g-dev
 ./ReleasePackaging/build-linux.sh --version 1.0.0 --rid linux-x64
 ```
 
-The script creates a self-contained single-file publish and produces:
+The publish output is the native `Peerfluence` executable with the native libraries it
+loads, such as `libSkiaSharp.so`, beside it. The script packages that directory and produces:
 
 - `Peerfluence-1.0.0-linux-x64.tar.gz`, a portable AppDir archive;
 - `Peerfluence-1.0.0-linux-x64.deb`, a Debian/Ubuntu package;
 - optionally, `Peerfluence-1.0.0-linux-x64.AppImage` when `--appimage` is passed and
   `appimagetool` is already available on `PATH`.
 
-Use `linux-arm64` to create ARM64 packages. The Debian package installs the application
+Use `linux-arm64` on an ARM64 host to create ARM64 packages; the release workflow builds
+each architecture on a runner of its own. The Debian package installs the application
 under `/opt/peerfluence`, exposes `/usr/bin/peerfluence`, and installs its desktop entry,
 AppStream metadata, and icon. The desktop entry declares `.torrent` and `magnet:` support;
 the desktop environment may still ask the user before making Peerfluence the default.
