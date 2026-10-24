@@ -83,6 +83,50 @@ public class McpToolHandlerTests
         await store.Received(1).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
     }
 
+    [Fact]
+    public async Task SpeedLimitUpdates_ReachTheRunningEngine_AndNegativesAreRefusedAtomically()
+    {
+        var paths = Substitute.For<IAppPaths>();
+        paths.DefaultDownloadDirectory.Returns(Path.GetTempPath());
+        paths.SessionDirectory.Returns(Path.GetTempPath());
+        var store = Substitute.For<IAppSettingsStore>();
+        var settings = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
+        settings.Current.Mcp.AllowDestructiveTools = true;
+        settings.Current.Storage.EnableSessionPersistence = false;
+        settings.Current.Network.UseAutomaticListeningPort = true;
+        settings.Current.Network.EnableDht = false;
+        settings.Current.Network.EnableNatPmp = false;
+        settings.Current.Network.EnableUpnp = false;
+        await using var engine = new TorrentEngineService(settings, Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance, TimeProvider.System);
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            settings, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+
+        var result = await handler.UpdateSettingsAsync(
+            """{"Network":{"MaxDownloadSpeedBytesPerSecond":512000,"MaxUploadSpeedBytesPerSecond":65536}}""",
+            TestContext.Current.CancellationToken);
+        Assert.False(result.IsError);
+        Assert.Equal(512000, settings.Current.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(65536, settings.Current.Network.MaxUploadSpeedBytesPerSecond);
+        var transfer = engine.Engine.Settings.Transfer;
+        Assert.Equal(512000, transfer.MaxDownloadSpeed);
+        Assert.Equal(65536, transfer.MaxUploadSpeed);
+
+        var rejected = await handler.UpdateSettingsAsync(
+            """{"Network":{"MaxDownloadSpeedBytesPerSecond":0,"MaxUploadSpeedBytesPerSecond":-1}}""",
+            TestContext.Current.CancellationToken);
+        Assert.True(rejected.IsError);
+        Assert.Equal(512000, settings.Current.Network.MaxDownloadSpeedBytesPerSecond);
+        Assert.Equal(65536, settings.Current.Network.MaxUploadSpeedBytesPerSecond);
+        Assert.Equal(512000, transfer.MaxDownloadSpeed);
+
+        var unlimited = await handler.UpdateSettingsAsync(
+            """{"Network":{"MaxDownloadSpeedBytesPerSecond":0}}""", TestContext.Current.CancellationToken);
+        Assert.False(unlimited.IsError);
+        Assert.Equal(0, transfer.MaxDownloadSpeed);
+        await store.Received(2).SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
     [Theory]
     [InlineData("192.168.1.23", false)]
     [InlineData("0.0.0.0", true)]

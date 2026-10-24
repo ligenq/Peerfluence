@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -338,6 +338,8 @@ public class McpToolHandler : IMcpToolHandler
             case "listeningport": current.Network.ListeningPort = value.GetInt32(); break;
             case "maxdiskreadspeedbytespersecond": current.Network.MaxDiskReadSpeedBytesPerSecond = value.GetInt64(); break;
             case "maxdiskwritespeedbytespersecond": current.Network.MaxDiskWriteSpeedBytesPerSecond = value.GetInt64(); break;
+            case "maxdownloadspeedbytespersecond": current.Network.MaxDownloadSpeedBytesPerSecond = ReadSpeedLimit(value); break;
+            case "maxuploadspeedbytespersecond": current.Network.MaxUploadSpeedBytesPerSecond = ReadSpeedLimit(value); break;
             case "themevariant": current.Theme.ThemeVariant = value.GetString() ?? current.Theme.ThemeVariant; break;
             case "colortheme": current.Theme.ColorTheme = value.GetString() ?? current.Theme.ColorTheme; break;
             case "language": current.Language = value.GetString() ?? current.Language; break;
@@ -389,6 +391,14 @@ public class McpToolHandler : IMcpToolHandler
         throw new ArgumentException(allowInherit
             ? "Encryption mode must be Inherit, Allow, Require, or Refuse."
             : "Encryption mode must be Allow, Require, or Refuse.", nameof(value));
+    }
+
+    /// <summary>Zero is unlimited; a negative limit has no meaning and is refused rather than read as zero.</summary>
+    private static long ReadSpeedLimit(JsonElement value)
+    {
+        var bytesPerSecond = value.GetInt64();
+        if (bytesPerSecond < 0) throw new ArgumentOutOfRangeException(nameof(value), "Speed limits cannot be negative; use 0 for unlimited.");
+        return bytesPerSecond;
     }
 
     private static void ApplyNetworkSettings(AppSettings current, JsonElement value) => ApplyNested(current, value);
