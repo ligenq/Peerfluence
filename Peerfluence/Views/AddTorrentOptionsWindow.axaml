@@ -6,6 +6,7 @@
                  xmlns:controls="using:Peerfluence.Controls"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
+                 xmlns:app="using:Peerfluence"
                  mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="760"
                  x:Class="Peerfluence.Views.AddTorrentOptionsWindow"
                  x:DataType="vm:AddTorrentOptionsViewModel"
@@ -18,6 +19,11 @@
         <Grid RowDefinitions="*, Auto" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
             <ScrollViewer Grid.Row="0" Classes="dialogForm">
                 <StackPanel Spacing="{StaticResource SpacingLarge}">
+                    <!-- The title, where the title bar cannot show it. See ChromeOs. -->
+                    <TextBlock Classes="title"
+                               Text="{Binding $parent[Window].Title}"
+                               IsVisible="{x:Static app:ChromeOs.HidesWindowTitles}"/>
+
                     <Border Classes="panel">
                         <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
                             <materialIcons:MaterialIcon Grid.RowSpan="2"
