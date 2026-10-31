@@ -5,6 +5,7 @@
                  xmlns:vm="using:Peerfluence.ViewModels"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
+                 xmlns:app="using:Peerfluence"
                  mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
                  x:Class="Peerfluence.Views.CreateTorrentWindow"
                  x:DataType="vm:CreateTorrentViewModel"
@@ -18,6 +19,11 @@
               Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
             <ScrollViewer x:Name="FormScrollViewer" Classes="dialogForm">
                 <StackPanel Spacing="{StaticResource SpacingLarge}">
+                    <!-- The title, where the title bar cannot show it. See ChromeOs. -->
+                    <TextBlock Classes="title"
+                               Text="{Binding $parent[Window].Title}"
+                               IsVisible="{x:Static app:ChromeOs.HidesWindowTitles}"/>
+
                     <Border Classes="panel">
                         <StackPanel Spacing="{StaticResource SpacingStandard}">
                             <!-- Source -->
