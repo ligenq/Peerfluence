@@ -47,10 +47,11 @@ public sealed class TorrentServiceTests
     private static ITorrent CheckingForever()
     {
         var torrent = Substitute.For<ITorrent>();
-        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(call =>
+        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(_ =>
         {
             torrent.QueueAutoStart = true;
-            return Task.Delay(Timeout.Infinite, call.Arg<CancellationToken>());
+            torrent.State.Returns(TorrentState.CheckingFiles);
+            return new TaskCompletionSource().Task;
         });
         return torrent;
     }
@@ -94,7 +95,6 @@ public sealed class TorrentServiceTests
         // Asking again changes nothing: the first start has not finished.
         await sut.StartAsync(torrent, TestContext.Current.CancellationToken);
         await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
-        await sut.StopAsync(torrent, TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -129,11 +129,11 @@ public sealed class TorrentServiceTests
     }
 
     /// <summary>
-    /// A stop waits for the check rather than ending it, so without this nothing could. And a start
-    /// that was cancelled has already set auto-start, which would have the queue start it again.
+    /// The engine ends the check, and the start it ends has already set auto-start, which would have
+    /// the queue start the torrent again.
     /// </summary>
     [Fact]
-    public async Task Stop_EndsAStartStillCheckingFiles()
+    public async Task Stop_DuringAFileCheck_KeepsTheQueueFromStartingTheTorrentAgain()
     {
         var torrent = CheckingForever();
         var sut = Sut();
@@ -143,46 +143,20 @@ public sealed class TorrentServiceTests
         await sut.StopAsync(torrent, TestContext.Current.CancellationToken);
 
         await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
-        await WaitUntil(() => !torrent.QueueAutoStart);
-    }
-
-    /// <summary>The engine holds its lifecycle lock across a removal, so this would hold up every add.</summary>
-    [Fact]
-    public async Task Remove_EndsAStartStillCheckingFiles()
-    {
-        var torrent = CheckingForever();
-        var engine = Substitute.For<IClientEngine>();
-        var sut = Sut(engine);
-        await sut.StartAsync(torrent, TestContext.Current.CancellationToken);
-
-        await sut.RemoveAsync(torrent, RemoveOptions.None, TestContext.Current.CancellationToken);
-
-        await engine.Received(1).RemoveTorrentAsync(torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
-        await WaitUntil(() => !torrent.QueueAutoStart);
+        Assert.False(torrent.QueueAutoStart);
     }
 
     [Fact]
-    public async Task Shutdown_EndsAStartStillCheckingFiles()
+    public async Task Stop_OfARunningTorrent_LeavesTheQueueAlone()
     {
-        var torrent = CheckingForever();
-        using var shutdown = new CancellationTokenSource();
-        var engineService = Substitute.For<ITorrentEngineService>();
-        engineService.ShutdownToken.Returns(shutdown.Token);
-        await Sut(engineService: engineService).StartAsync(torrent, TestContext.Current.CancellationToken);
+        var torrent = Substitute.For<ITorrent>();
+        torrent.State.Returns(TorrentState.Active);
+        torrent.QueueAutoStart = true;
 
-        await shutdown.CancelAsync();
+        await Sut().StopAsync(torrent, TestContext.Current.CancellationToken);
 
-        await WaitUntil(() => !torrent.QueueAutoStart);
-    }
-
-    private static async Task WaitUntil(Func<bool> condition)
-    {
-        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
-        deadline.CancelAfter(TimeSpan.FromSeconds(10));
-        while (!condition())
-        {
-            await Task.Delay(5, deadline.Token);
-        }
+        await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+        Assert.True(torrent.QueueAutoStart);
     }
 
     private static IClientEngine EngineAdding(ITorrent torrent, Action<AddTorrentOptions>? onAdd = null)
@@ -227,7 +201,6 @@ public sealed class TorrentServiceTests
             PlainTorrentTestData.Metadata(), new AddTorrentOptions { DownloadPath = Path.GetTempPath() }, TestContext.Current.CancellationToken);
 
         Assert.Same(torrent, added);
-        await sut.StopAsync(torrent, TestContext.Current.CancellationToken);
     }
 
     [Fact]

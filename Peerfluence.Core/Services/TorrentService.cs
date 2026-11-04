@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Config;
@@ -16,9 +15,6 @@ public sealed partial class TorrentService : ITorrentService
 
     private readonly HttpClient _httpClient;
     private readonly ILogger<TorrentService> _logger;
-
-    /// <summary>The starts still under way, which are what stopping or removing has to cancel.</summary>
-    private readonly ConcurrentDictionary<ITorrent, CancellationTokenSource> _starting = new();
 
     public TorrentService(
         ITorrentEngineService engineService,
@@ -159,11 +155,10 @@ public sealed partial class TorrentService : ITorrentService
     /// </summary>
     /// <remarks>
     /// An add that starts the torrent returns only after hashing any files already at its
-    /// destination, and while that runs the engine holds up every other start in the session. Left
-    /// together, one torrent added over 100 GB of existing data would hold the add dialog, a
-    /// Transmission client's request and the next add behind it for as long as the disk takes.
-    /// A start that fails straight away still fails the add, as it does in the engine, so nothing
-    /// that could not start is left in the list.
+    /// destination. Left together, one torrent added over 100 GB of existing data would hold the add
+    /// dialog or a Transmission client's request for as long as the disk takes. A start that fails
+    /// straight away still fails the add, as it does in the engine, so nothing that could not start
+    /// is left in the list.
     /// </remarks>
     private async Task<ITorrent> AddThenStartAsync(AddTorrentOptions options, Func<Task<ITorrent>> add, CancellationToken cancellationToken)
     {
@@ -238,14 +233,7 @@ public sealed partial class TorrentService : ITorrentService
             return;
         }
 
-        var starting = CancellationTokenSource.CreateLinkedTokenSource(_engineService.ShutdownToken);
-        if (!_starting.TryAdd(torrent, starting))
-        {
-            starting.Dispose();
-            return;
-        }
-
-        var start = RunStartAsync(torrent, starting);
+        var start = torrent.StartAsync(CancellationToken.None);
         try
         {
             // Only the wait is the caller's to cancel. A Transmission client that gives up on its
@@ -255,25 +243,6 @@ public sealed partial class TorrentService : ITorrentService
         catch (TimeoutException) when (!start.IsCompleted)
         {
             _ = ReportLateStartFailureAsync(torrent, start);
-        }
-    }
-
-    private async Task RunStartAsync(ITorrent torrent, CancellationTokenSource starting)
-    {
-        try
-        {
-            await torrent.StartAsync(starting.Token).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) when (starting.IsCancellationRequested)
-        {
-            // Stopped while checking its files. The start set auto-start before it began, and left
-            // set the queue would start the torrent the person just stopped.
-            torrent.QueueAutoStart = false;
-        }
-        finally
-        {
-            _starting.TryRemove(torrent, out _);
-            starting.Dispose();
         }
     }
 
@@ -292,27 +261,14 @@ public sealed partial class TorrentService : ITorrentService
 
     public async Task StopAsync(ITorrent torrent, CancellationToken cancellationToken = default)
     {
-        await CancelStartAsync(torrent).ConfigureAwait(false);
-        await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Ends a start still checking files, which is the only way to end one: a stop, a removal and
-    /// engine shutdown all wait for the check to finish, however long that is.
-    /// </summary>
-    private async Task CancelStartAsync(ITorrent torrent)
-    {
-        if (_starting.TryGetValue(torrent, out var starting))
+        // The stop ends the check, and the start it ends has already set auto-start, so left set the
+        // queue would start the torrent the person just stopped.
+        if (torrent.State == TorrentState.CheckingFiles)
         {
-            try
-            {
-                await starting.CancelAsync().ConfigureAwait(false);
-            }
-            catch (ObjectDisposedException)
-            {
-                // Finished in between, so there is nothing left to cancel.
-            }
+            torrent.QueueAutoStart = false;
         }
+
+        await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public Task SaveSessionAsync(CancellationToken cancellationToken = default)
@@ -325,10 +281,9 @@ public sealed partial class TorrentService : ITorrentService
         return torrent.ForceRecheckAsync(progress, cancellationToken);
     }
 
-    public async Task RemoveAsync(ITorrent torrent, RemoveOptions options = RemoveOptions.None, CancellationToken cancellationToken = default)
+    public Task RemoveAsync(ITorrent torrent, RemoveOptions options = RemoveOptions.None, CancellationToken cancellationToken = default)
     {
-        await CancelStartAsync(torrent).ConfigureAwait(false);
-        await _engineService.Engine.RemoveTorrentAsync(torrent, options, cancellationToken).ConfigureAwait(false);
+        return _engineService.Engine.RemoveTorrentAsync(torrent, options, cancellationToken);
     }
 
     public bool IsSessionPaused

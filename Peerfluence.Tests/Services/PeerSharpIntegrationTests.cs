@@ -152,8 +152,8 @@ public sealed class PeerSharpIntegrationTests
     }
 
     /// <summary>
-    /// A stop waits for a check rather than ending it. Whichever way this races, a stop that returns
-    /// has to leave the torrent stopped, with the engine still willing to start it again.
+    /// Whichever way this races with the check, a stop that returns has to leave the torrent stopped,
+    /// with the engine still willing to start it again.
     /// </summary>
     [Fact]
     public async Task StoppingATorrentCheckingItsFiles_LeavesItStopped()
