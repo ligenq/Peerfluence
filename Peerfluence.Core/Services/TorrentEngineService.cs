@@ -15,6 +15,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     private readonly Func<TorrentClientOptions, IClientEngine> _createEngine;
     private IClientEngine? _engine;
     private Task? _shutdownTask;
+    private readonly CancellationTokenSource _shutdown = new();
 
     public TorrentEngineService(
         IAppSettingsService settingsService,
@@ -49,19 +50,27 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     /// </summary>
     public bool ProxyRestrictionApplied { get; private set; }
 
+    public CancellationToken ShutdownToken => _shutdown.Token;
+
+    /// <summary>
+    /// How long startup waits for restored torrents before opening the window without them.
+    /// </summary>
+    internal TimeSpan RestoredStartWait { get; init; } = TimeSpan.FromSeconds(2);
+
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         _engine ??= CreateEngine();
         // PeerSharp does not persist SSL private keys. Defer restored starts so a missing
         // certificate cannot make the add fail and discard the restored torrent entirely.
-        var queueEnabled = _engine.Settings.Queue.Enabled;
-        _engine.Settings.Queue.Enabled = false;
+        var engine = _engine;
+        var queueEnabled = engine.Settings.Queue.Enabled;
+        engine.Settings.Queue.Enabled = false;
         long blocklistElapsedMs;
         try
         {
-            await _engine.PauseAsync(cancellationToken).ConfigureAwait(false);
-            await _engine.InitializeAsync(cancellationToken).ConfigureAwait(false);
+            await engine.PauseAsync(cancellationToken).ConfigureAwait(false);
+            await engine.InitializeAsync(cancellationToken).ConfigureAwait(false);
 
             // While the session is still paused: the blocklist has nowhere to go before the engine
             // is initialized, and after resuming is too late. It is consulted only as a peer is
@@ -70,20 +79,30 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             var blocklistStartedMs = stopwatch.ElapsedMilliseconds;
             await LoadBlocklistAsync(cancellationToken).ConfigureAwait(false);
             blocklistElapsedMs = stopwatch.ElapsedMilliseconds - blocklistStartedMs;
-
-            await _engine.ResumeAsync(cancellationToken).ConfigureAwait(false);
-            KeepSslTorrentsWithoutCertificatesFromAutoStarting(_engine);
         }
-        finally
+        catch
         {
-            // Only this, so a failure above is the exception that leaves here. The SSL pass used to
-            // run here too, and a throw from it while initialization was already failing replaced
-            // the reason startup failed with a secondary one.
-            _engine.Settings.Queue.Enabled = queueEnabled;
+            engine.Settings.Queue.Enabled = queueEnabled;
+            throw;
         }
+
+        // The window opens after this returns, and resuming hashes any restored torrent that has
+        // files on disk and no resume data, one after another. After a crash that could be minutes
+        // of an application that appears not to have launched, so it is not waited for past this.
+        var resume = ResumeRestoredTorrentsAsync(engine, queueEnabled);
+        try
+        {
+            await resume.WaitAsync(RestoredStartWait, _timeProvider, cancellationToken).ConfigureAwait(false);
+        }
+        catch (TimeoutException) when (!resume.IsCompleted)
+        {
+            LogRestoredTorrentsStillStarting(_logger);
+            _ = ObserveLateResumeFailureAsync(resume);
+        }
+
         if (_logger.IsEnabled(LogLevel.Information))
         {
-            var torrentCount = _engine.GetTorrents().Count;
+            var torrentCount = engine.GetTorrents().Count;
             LogTorrentEngineInitialized(
                 _logger,
                 stopwatch.ElapsedMilliseconds,
@@ -92,22 +111,47 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         }
     }
 
+    private async Task ResumeRestoredTorrentsAsync(IClientEngine engine, bool queueEnabled)
+    {
+        try
+        {
+            await engine.ResumeAsync(ShutdownToken).ConfigureAwait(false);
+            KeepSslTorrentsWithoutCertificatesFromAutoStarting(engine);
+        }
+        finally
+        {
+            // Only this, so a failure above is the exception that leaves here. The SSL pass used to
+            // run here too, and a throw from it while resuming was already failing replaced the
+            // reason with a secondary one.
+            engine.Settings.Queue.Enabled = queueEnabled;
+        }
+    }
+
+    private async Task ObserveLateResumeFailureAsync(Task resume)
+    {
+        try
+        {
+            await resume.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (ShutdownToken.IsCancellationRequested)
+        {
+            // Shutting down, which is what the token is for.
+        }
+        catch (Exception ex)
+        {
+            LogRestoredTorrentsFailed(_logger, ex);
+        }
+    }
+
     /// <summary>
     /// Stops the queue retrying restored SSL torrents, which cannot start until a certificate is
     /// supplied again.
     /// </summary>
-    /// <remarks>
-    /// Only torrents still set to auto-start are examined. A failed resume leaves its torrent set,
-    /// and clearing the flag on any other torrent changes nothing - which matters, because the
-    /// only way to ask whether a torrent is SSL is <see cref="ITorrent.ExportTorrentFile"/>, which
-    /// serializes and re-parses its whole metadata. Asked of every stopped torrent, that was a
-    /// startup cost growing with the size of a seeding library, for an answer that was not needed.
-    /// </remarks>
     private static void KeepSslTorrentsWithoutCertificatesFromAutoStarting(IClientEngine engine)
     {
         foreach (var torrent in engine.GetTorrents())
         {
-            if (!torrent.Started && torrent.QueueAutoStart && torrent.HasMetadata && torrent.ExportTorrentFile().IsSsl)
+            if (!torrent.Started && torrent.IsSsl)
             {
                 torrent.QueueAutoStart = false;
             }
@@ -124,6 +168,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     public ValueTask DisposeAsync()
     {
         _settingsService.SettingsSaved -= OnSettingsSavedAsync;
+        _shutdown.Cancel();
         if (_shutdownTask != null)
         {
             // ShutdownAsync already initiated disposal. In particular, do not
@@ -139,6 +184,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     {
         _settingsService.SettingsSaved -= OnSettingsSavedAsync;
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        await _shutdown.CancelAsync().ConfigureAwait(false);
         var engine = Interlocked.Exchange(ref _engine, null);
         if (engine != null)
         {
@@ -207,6 +253,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
             },
             Connection =
             {
+                SsrfMitigation = ParseSsrfMitigation(settings.Network.SsrfMitigation),
                 I2pSamHost = settings.Network.EnableI2p
                     ? NetworkSettings.NormalizeI2pSamHost(settings.Network.I2pSamHost)
                     : null,
@@ -290,6 +337,14 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         }
     }
 
+    public void ApplySsrfMitigation()
+    {
+        if (_engine is { } engine)
+        {
+            engine.Settings.Connection.SsrfMitigation = ParseSsrfMitigation(_settingsService.Current.Network.SsrfMitigation);
+        }
+    }
+
     /// <summary>
     /// Puts every setting the running engine can take into force, whoever saved them.
     /// </summary>
@@ -304,6 +359,7 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         ApplySpeedLimits();
         ApplyStreamingSettings();
         ApplyEncryptionSettings();
+        ApplySsrfMitigation();
         return Task.CompletedTask;
     }
 
@@ -314,6 +370,13 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         target.OutgoingEncryption = ParseEncryptionOverride(source.Network.OutgoingEncryptionMode);
         target.PreferRc4 = source.Network.PreferRc4;
     }
+
+    private static SsrfMitigation ParseSsrfMitigation(string mode) => mode switch
+    {
+        NetworkSettings.SsrfMitigationOff => SsrfMitigation.None,
+        NetworkSettings.SsrfMitigationLocalNetworks => SsrfMitigation.LocalNetworks,
+        _ => SsrfMitigation.ThisDevice
+    };
 
     private static Encryption? ParseEncryptionOverride(string mode) =>
         NetworkSettings.IsEncryptionMode(mode) ? ParseEncryption(mode) : null;
@@ -486,4 +549,16 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
 
     [LoggerMessage(EventId = 8, Level = LogLevel.Warning, Message = "GeoIP data failed to load from {GeoIpPath}")]
     private static partial void LogGeoIpLoadFailed(ILogger logger, Exception exception, string geoIpPath);
+
+    [LoggerMessage(
+        EventId = 20,
+        Level = LogLevel.Information,
+        Message = "Restored torrents are still starting, so the window is opening without waiting for them")]
+    private static partial void LogRestoredTorrentsStillStarting(ILogger logger);
+
+    [LoggerMessage(
+        EventId = 21,
+        Level = LogLevel.Error,
+        Message = "Restored torrents could not finish starting")]
+    private static partial void LogRestoredTorrentsFailed(ILogger logger, Exception exception);
 }

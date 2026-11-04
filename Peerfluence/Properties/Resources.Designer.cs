@@ -4755,5 +4755,19 @@ namespace Peerfluence.Properties {
 
         public static string AddTorrent_SslCertificateRequired => ResourceManager.GetString("AddTorrent_SslCertificateRequired", resourceCulture);
 
+        public static string Status_StartTorrentFailed => ResourceManager.GetString("Status_StartTorrentFailed", resourceCulture);
+
+        public static string AddTorrent_SslCertificateRejected => ResourceManager.GetString("AddTorrent_SslCertificateRejected", resourceCulture);
+
+        public static string Settings_SsrfMitigation => ResourceManager.GetString("Settings_SsrfMitigation", resourceCulture);
+
+        public static string Settings_SsrfMitigationThisDevice => ResourceManager.GetString("Settings_SsrfMitigationThisDevice", resourceCulture);
+
+        public static string Settings_SsrfMitigationLocalNetworks => ResourceManager.GetString("Settings_SsrfMitigationLocalNetworks", resourceCulture);
+
+        public static string Settings_SsrfMitigationOff => ResourceManager.GetString("Settings_SsrfMitigationOff", resourceCulture);
+
+        public static string Settings_SsrfMitigationHint => ResourceManager.GetString("Settings_SsrfMitigationHint", resourceCulture);
+
     }
 }

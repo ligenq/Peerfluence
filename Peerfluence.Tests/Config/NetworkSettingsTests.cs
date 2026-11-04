@@ -33,4 +33,19 @@ public class NetworkSettingsTests
         Assert.Equal(changed ? "Inherit" : outgoing, settings.OutgoingEncryptionMode);
         Assert.True(settings.PreferRc4);
     }
+
+    [Theory]
+    [InlineData("ThisDevice", false)]
+    [InlineData("LocalNetworks", false)]
+    [InlineData("None", false)]
+    [InlineData("none", true)]
+    [InlineData("Everything", true)]
+    [InlineData(null, true)]
+    public void NormalizeSsrfMitigation_RepairsUnknownValuesToTheGuardRatherThanToNoGuard(string? stored, bool changed)
+    {
+        var settings = new NetworkSettings { SsrfMitigation = stored! };
+
+        Assert.Equal(changed, settings.NormalizeSsrfMitigation());
+        Assert.Equal(changed ? "ThisDevice" : stored, settings.SsrfMitigation);
+    }
 }

@@ -107,7 +107,7 @@ public sealed class UiAgentToolHandlerTests
         var result = await sut.StopTorrentAsync("ubuntu", TestContext.Current.CancellationToken);
 
         Assert.False(result.IsError);
-        await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+        await torrentService.Received(1).StopAsync(torrent, Arg.Any<CancellationToken>());
         selectionService.Received(1).SelectedTorrent = torrent;
     }
 
@@ -128,7 +128,7 @@ public sealed class UiAgentToolHandlerTests
         var result = await sut.ResumeTorrentAsync("ubuntu", TestContext.Current.CancellationToken);
 
         Assert.False(result.IsError);
-        await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
+        await torrentService.Received(1).StartAsync(torrent, Arg.Any<CancellationToken>());
         selectionService.Received(1).SelectedTorrent = torrent;
     }
 
@@ -149,7 +149,7 @@ public sealed class UiAgentToolHandlerTests
         var result = await sut.ResumeTorrentAsync("ubuntu", TestContext.Current.CancellationToken);
 
         Assert.False(result.IsError);
-        await torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+        await torrentService.DidNotReceive().StartAsync(torrent, Arg.Any<CancellationToken>());
         selectionService.Received(1).SelectedTorrent = torrent;
     }
 

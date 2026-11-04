@@ -58,15 +58,14 @@ public class AddTorrentOptionsViewModelTests
         {
             await File.WriteAllBytesAsync(path, data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12), TestContext.Current.CancellationToken);
             var original = Substitute.For<ITorrent>();
+            original.IsSsl.Returns(true);
             original.ExportTorrentFile().Returns(data.Metadata);
             original.Files.DownloadPath.Returns(Path.GetTempPath());
             original.Name.Returns(data.Metadata.Name);
-            var rejected = Substitute.For<ITorrent>();
-            rejected.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Rejected")));
-            var accepted = Substitute.For<ITorrent>();
             var service = Substitute.For<ITorrentService>();
-            service.SetSslCertificateAsync(original, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>()).Returns(rejected);
-            service.SetSslCertificateAsync(rejected, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>()).Returns(accepted);
+            service.StartAsync(original, Arg.Any<CancellationToken>()).Returns(
+                Task.FromException(new System.Security.Authentication.AuthenticationException("Rejected")),
+                Task.CompletedTask);
             var sut = AddTorrentOptionsViewModel.CreateForSslCertificate(original, service,
                 Substitute.For<ITopLevelService>(), CreateSettingsService(Path.GetTempPath()));
             Assert.False(sut.IsNewTorrent);
@@ -74,10 +73,42 @@ public class AddTorrentOptionsViewModelTests
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.HasError);
             Assert.False(sut.WasAdded);
-            Assert.False(rejected.QueueAutoStart);
+            Assert.False(original.QueueAutoStart);
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.WasAdded);
-            await accepted.Received(1).StartAsync(Arg.Any<CancellationToken>());
+            await service.Received(2).SetSslCertificateAsync(original, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>());
+            await service.Received(2).StartAsync(original, Arg.Any<CancellationToken>());
+        }
+        finally { File.Delete(path); }
+    }
+
+    /// <summary>
+    /// The engine says why as an argument exception, whose message ends in the name of a parameter.
+    /// </summary>
+    [Fact]
+    public async Task ACertificateTheEngineRefuses_IsReportedInTheDialog_AndNothingStarts()
+    {
+        using var data = new SslTorrentTestData();
+        var path = Path.GetTempFileName();
+        try
+        {
+            await File.WriteAllBytesAsync(path, data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12), TestContext.Current.CancellationToken);
+            var torrent = Substitute.For<ITorrent>();
+            torrent.IsSsl.Returns(true);
+            torrent.ExportTorrentFile().Returns(data.Metadata);
+            torrent.Files.DownloadPath.Returns(Path.GetTempPath());
+            var service = Substitute.For<ITorrentService>();
+            service.SetSslCertificateAsync(torrent, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromException(new ArgumentException("Not issued for this torrent.", "certificate")));
+            var sut = AddTorrentOptionsViewModel.CreateForSslCertificate(torrent, service,
+                Substitute.For<ITopLevelService>(), CreateSettingsService(Path.GetTempPath()));
+            sut.SslCertificatePath = path;
+
+            await sut.AddCommand.ExecuteAsync(null);
+
+            Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_SslCertificateRejected, sut.ErrorMessage);
+            Assert.False(sut.WasAdded);
+            await service.DidNotReceive().StartAsync(torrent, Arg.Any<CancellationToken>());
         }
         finally { File.Delete(path); }
     }

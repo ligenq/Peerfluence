@@ -1654,4 +1654,25 @@ Peerfluence steht unter der MIT License. Durch die Installation oder Nutzung von
   <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
     <value>Wählen Sie ein Zertifikat mit privatem Schlüssel.</value>
   </data>
+  <data name="Status_StartTorrentFailed" xml:space="preserve">
+    <value>{0} konnte nicht gestartet werden: {1}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRejected" xml:space="preserve">
+    <value>Dieses Zertifikat wurde nicht für diesen Torrent ausgestellt.</value>
+  </data>
+  <data name="Settings_SsrfMitigation" xml:space="preserve">
+    <value>Torrents von lokalen Diensten fernhalten</value>
+  </data>
+  <data name="Settings_SsrfMitigationThisDevice" xml:space="preserve">
+    <value>Dieses Gerät</value>
+  </data>
+  <data name="Settings_SsrfMitigationLocalNetworks" xml:space="preserve">
+    <value>Dieses Gerät und seine lokalen Netzwerke</value>
+  </data>
+  <data name="Settings_SsrfMitigationOff" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="Settings_SsrfMitigationHint" xml:space="preserve">
+    <value>Ein Torrent legt seine Tracker- und Webseed-Adressen selbst fest und könnte daher versuchen, Anfragen an Dienste auf diesem Gerät oder in deinem Netzwerk zu senden. Wenn ein Tracker in deinem eigenen Netzwerk nicht mehr funktioniert, gib ihn mit seiner IP-Adresse an oder wähle eine niedrigere Einstellung.</value>
+  </data>
 </root>

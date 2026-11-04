@@ -562,6 +562,16 @@
                         <TextBlock Text="{m:L Settings_I2pHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
 
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Settings_SsrfMitigation}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <ComboBox ItemsSource="{Binding SsrfMitigationOptions}" SelectedValue="{Binding SelectedSsrfMitigation}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_SsrfMitigation}" AutomationProperties.AutomationId="SsrfMitigationComboBox">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption"><TextBlock Text="{Binding DisplayName}"/></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Text="{m:L Settings_SsrfMitigationHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
+                    </StackPanel>
+
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">

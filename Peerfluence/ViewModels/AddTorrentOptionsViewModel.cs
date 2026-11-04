@@ -59,8 +59,8 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     public static AddTorrentOptionsViewModel CreateForSslCertificate(ITorrent torrent,
         ITorrentService torrentService, ITopLevelService topLevelService, IAppSettingsService settingsService)
     {
+        if (!torrent.IsSsl) throw new ArgumentException("This torrent does not require an SSL certificate.", nameof(torrent));
         var file = torrent.ExportTorrentFile();
-        if (!file.IsSsl) throw new ArgumentException("This torrent does not require an SSL certificate.", nameof(torrent));
         return new AddTorrentOptionsViewModel(torrentService, topLevelService, settingsService, string.Empty, false)
         {
             _existingSslTorrent = torrent,
@@ -414,9 +414,9 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             ITorrent added;
             if (_existingSslTorrent != null)
             {
-                _existingSslTorrent = await _torrentService.SetSslCertificateAsync(_existingSslTorrent, certificate!);
+                await _torrentService.SetSslCertificateAsync(_existingSslTorrent, certificate!);
                 added = _existingSslTorrent;
-                try { await added.StartAsync(); }
+                try { await _torrentService.StartAsync(added); }
                 catch { added.QueueAutoStart = false; throw; }
             }
             else if (_previewTorrentFile != null)
@@ -446,10 +446,13 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             WasAdded = true;
             RequestClose();
         }
+        catch (ArgumentException) when (_existingSslTorrent != null)
+        {
+            // The engine's message names its parameter, and only this can be wrong with what was given.
+            ErrorMessage = Resources.AddTorrent_SslCertificateRejected;
+        }
         catch (Exception ex)
         {
-            if (_existingSslTorrent != null)
-                _existingSslTorrent = _torrentService.GetTorrents().FirstOrDefault(t => TorrentIdentity.SameTorrent(t, _existingSslTorrent)) ?? _existingSslTorrent;
             ErrorMessage = ex.Message;
         }
         finally

@@ -21,14 +21,12 @@ public class DownloadsViewModelTests
     [InlineData(true)]
     public async Task StartingSslTorrentWithoutCredential_OpensCertificateDialogAndDisablesAutoStart(bool rowAction)
     {
-        using var data = new SslTorrentTestData();
         var sut = CreateViewModelWithTorrents(("ssl", Complete: false, Running: false));
         try
         {
             var row = Assert.Single(sut.Torrents);
-            row.Torrent.HasMetadata.Returns(true);
-            row.Torrent.ExportTorrentFile().Returns(data.Metadata);
-            row.Torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Certificate required")));
+            row.Torrent.IsSsl.Returns(true);
+            GetTorrentService(sut).StartAsync(row.Torrent, Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Certificate required")));
             sut.SetSelectedTorrents([row]);
             if (rowAction) await sut.ToggleTorrentCommand.ExecuteAsync(row);
             else await sut.StartSelectedCommand.ExecuteAsync(null);
@@ -45,19 +43,17 @@ public class DownloadsViewModelTests
     [Fact]
     public async Task SslMagnetMetadataArriving_StopsTheTorrentAndAsksForACertificate()
     {
-        using var data = new SslTorrentTestData();
         var sut = CreateViewModelWithTorrents(("ssl-magnet", Complete: false, Running: true));
         try
         {
             var torrent = Assert.Single(sut.Torrents).Torrent;
-            torrent.HasMetadata.Returns(true);
-            torrent.ExportTorrentFile().Returns(data.Metadata);
+            torrent.IsSsl.Returns(true);
             torrent.QueueAutoStart = true;
 
             await sut.RequestCertificateIfSslAsync(torrent);
 
             Assert.False(torrent.QueueAutoStart);
-            await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+            await GetTorrentService(sut).Received(1).StopAsync(torrent, Arg.Any<CancellationToken>());
             await GetAddTorrentDialogService(sut).Received(1).ShowSslCertificateAsync(torrent);
         }
         finally { StopLoops(sut); }
@@ -70,15 +66,38 @@ public class DownloadsViewModelTests
         try
         {
             var torrent = Assert.Single(sut.Torrents).Torrent;
-            torrent.HasMetadata.Returns(true);
-            torrent.ExportTorrentFile().Returns(PlainTorrentTestData.Metadata());
             torrent.QueueAutoStart = true;
 
             await sut.RequestCertificateIfSslAsync(torrent);
 
             Assert.True(torrent.QueueAutoStart);
-            await torrent.DidNotReceive().StopAsync(Arg.Any<CancellationToken>());
+            await GetTorrentService(sut).DidNotReceive().StopAsync(torrent, Arg.Any<CancellationToken>());
             await GetAddTorrentDialogService(sut).DidNotReceiveWithAnyArgs().ShowSslCertificateAsync(default!);
+        }
+        finally { StopLoops(sut); }
+    }
+
+    /// <summary>
+    /// A first start over existing files spends minutes checking them, before the torrent reports
+    /// itself started. That is exactly when someone wants out of it.
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ATorrentCheckingItsFilesBeforeStarting_CanBeStopped(bool rowAction)
+    {
+        var sut = CreateViewModelWithTorrents(("checking", Complete: false, Running: false));
+        try
+        {
+            var row = Assert.Single(sut.Torrents);
+            row.Torrent.State.Returns(TorrentState.CheckingFiles);
+            sut.SetSelectedTorrents([row]);
+
+            if (rowAction) await sut.ToggleTorrentCommand.ExecuteAsync(row);
+            else await sut.StopSelectedCommand.ExecuteAsync(null);
+
+            await GetTorrentService(sut).Received(1).StopAsync(row.Torrent, Arg.Any<CancellationToken>());
+            await GetTorrentService(sut).DidNotReceive().StartAsync(row.Torrent, Arg.Any<CancellationToken>());
         }
         finally { StopLoops(sut); }
     }
@@ -715,11 +734,11 @@ public class DownloadsViewModelTests
             // The running one is left alone rather than restarted.
             foreach (var item in sut.Torrents.Where(t => t.Name.StartsWith("stopped", StringComparison.Ordinal)))
             {
-                await item.Torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
+                await GetTorrentService(sut).Received(1).StartAsync(item.Torrent, Arg.Any<CancellationToken>());
             }
 
             var running = sut.Torrents.Single(t => t.Name == "already-running");
-            await running.Torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+            await GetTorrentService(sut).DidNotReceive().StartAsync(running.Torrent, Arg.Any<CancellationToken>());
         }
         finally
         {
@@ -741,7 +760,7 @@ public class DownloadsViewModelTests
 
             foreach (var item in sut.Torrents)
             {
-                await item.Torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+                await GetTorrentService(sut).Received(1).StopAsync(item.Torrent, Arg.Any<CancellationToken>());
             }
         }
         finally
@@ -992,6 +1011,14 @@ public class DownloadsViewModelTests
 
         clipboard.TryGetDataAsync().Returns(Task.FromResult(dataTransfer));
         return clipboard;
+    }
+
+    private static ITorrentService GetTorrentService(DownloadsViewModel vm)
+    {
+        var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+        return (ITorrentService)typeof(DownloadsViewModel)
+            .GetField("_torrentService", flags)!
+            .GetValue(vm)!;
     }
 
     private static IAddTorrentDialogService GetAddTorrentDialogService(DownloadsViewModel vm)

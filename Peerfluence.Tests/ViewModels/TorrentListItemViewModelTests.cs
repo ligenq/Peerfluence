@@ -23,6 +23,20 @@ public class TorrentListItemViewModelTests
         _sut = new TorrentListItemViewModel(_torrent);
     }
 
+    /// <summary>
+    /// Not started until its files are checked, but the row's button stops it and has to say so.
+    /// </summary>
+    [Fact]
+    public void ATorrentCheckingItsFiles_ShowsAsRunning()
+    {
+        _torrent.Started.Returns(false);
+        _torrent.State.Returns(TorrentState.CheckingFiles);
+
+        _sut.UpdateFrom(_torrent);
+
+        Assert.True(_sut.IsRunning);
+    }
+
     [Fact]
     public void Constructor_SetsPropertiesFromTorrent()
     {

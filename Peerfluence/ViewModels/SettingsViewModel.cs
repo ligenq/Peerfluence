@@ -26,6 +26,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     private IReadOnlyList<SettingsOption> _encryptionModeOptions = CreateEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _directionalEncryptionModeOptions = CreateDirectionalEncryptionModeOptions();
     private IReadOnlyList<SettingsOption> _proxyTypeOptions = CreateProxyTypeOptions();
+    private IReadOnlyList<SettingsOption> _ssrfMitigationOptions = CreateSsrfMitigationOptions();
 
     /// <summary>
     /// Long enough to swallow a burst of changes - a slider being dragged, or Reset writing every
@@ -183,7 +184,8 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         nameof(ColorThemeOptions),
         nameof(EncryptionModeOptions),
         nameof(DirectionalEncryptionModeOptions),
-        nameof(ProxyTypeOptions)
+        nameof(ProxyTypeOptions),
+        nameof(SsrfMitigationOptions)
     };
 
     /// <summary>
@@ -1007,6 +1009,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         set => SetChoice(ref field, value);
     } = "Allow";
 
+    public string SelectedSsrfMitigation
+    {
+        get;
+        set => SetChoice(ref field, value);
+    } = NetworkSettings.SsrfMitigationThisDevice;
+
     // Proxy
     public string SelectedProxyType
     {
@@ -1139,6 +1147,12 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
     {
         get => _directionalEncryptionModeOptions;
         private set => SetProperty(ref _directionalEncryptionModeOptions, value);
+    }
+
+    public IReadOnlyList<SettingsOption> SsrfMitigationOptions
+    {
+        get => _ssrfMitigationOptions;
+        private set => SetProperty(ref _ssrfMitigationOptions, value);
     }
 
     public IReadOnlyList<SettingsOption> ProxyTypeOptions
@@ -1372,6 +1386,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         SelectedEncryptionMode = settings.EncryptionMode;
         SelectedIncomingEncryptionMode = settings.Network.IncomingEncryptionMode;
         SelectedOutgoingEncryptionMode = settings.Network.OutgoingEncryptionMode;
+        SelectedSsrfMitigation = settings.Network.SsrfMitigation;
         PreferRc4 = settings.Network.PreferRc4;
         EnableI2p = settings.Network.EnableI2p;
         I2pSamHost = settings.Network.I2pSamHost;
@@ -1501,6 +1516,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             settings.EncryptionMode = SelectedEncryptionMode;
             settings.Network.IncomingEncryptionMode = SelectedIncomingEncryptionMode;
             settings.Network.OutgoingEncryptionMode = SelectedOutgoingEncryptionMode;
+            settings.Network.SsrfMitigation = SelectedSsrfMitigation;
             settings.Network.PreferRc4 = PreferRc4;
             settings.Network.EnableI2p = EnableI2p;
             settings.Network.I2pSamHost = I2pSamHost;
@@ -1581,6 +1597,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         _engineService.ApplySpeedLimits();
         _engineService.ApplyStreamingSettings();
         _engineService.ApplyEncryptionSettings();
+        _engineService.ApplySsrfMitigation();
     }
 
     /// <summary>
@@ -1666,6 +1683,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         SelectedEncryptionMode = defaults.EncryptionMode;
         SelectedIncomingEncryptionMode = defaults.Network.IncomingEncryptionMode;
         SelectedOutgoingEncryptionMode = defaults.Network.OutgoingEncryptionMode;
+        SelectedSsrfMitigation = defaults.Network.SsrfMitigation;
         PreferRc4 = defaults.Network.PreferRc4;
         EnableI2p = defaults.Network.EnableI2p;
         I2pSamHost = defaults.Network.I2pSamHost;
@@ -1737,6 +1755,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         var selectedEncryptionMode = SelectedEncryptionMode;
         var selectedIncomingEncryptionMode = SelectedIncomingEncryptionMode;
         var selectedOutgoingEncryptionMode = SelectedOutgoingEncryptionMode;
+        var selectedSsrfMitigation = SelectedSsrfMitigation;
         var selectedProxyType = SelectedProxyType;
 
         ThemeVariantOptions = CreateThemeVariantOptions();
@@ -1744,6 +1763,7 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
             Services.ThemeService.Resolve(selectedThemeVariant));
         EncryptionModeOptions = CreateEncryptionModeOptions();
         DirectionalEncryptionModeOptions = CreateDirectionalEncryptionModeOptions();
+        SsrfMitigationOptions = CreateSsrfMitigationOptions();
         ProxyTypeOptions = CreateProxyTypeOptions();
 
         SelectedThemeVariant = selectedThemeVariant;
@@ -1751,12 +1771,14 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
         SelectedEncryptionMode = selectedEncryptionMode;
         SelectedIncomingEncryptionMode = selectedIncomingEncryptionMode;
         SelectedOutgoingEncryptionMode = selectedOutgoingEncryptionMode;
+        SelectedSsrfMitigation = selectedSsrfMitigation;
         SelectedProxyType = selectedProxyType;
         OnPropertyChanged(nameof(SelectedThemeVariant));
         OnPropertyChanged(nameof(SelectedColorTheme));
         OnPropertyChanged(nameof(SelectedEncryptionMode));
         OnPropertyChanged(nameof(SelectedIncomingEncryptionMode));
         OnPropertyChanged(nameof(SelectedOutgoingEncryptionMode));
+        OnPropertyChanged(nameof(SelectedSsrfMitigation));
         OnPropertyChanged(nameof(SelectedProxyType));
         OnPropertyChanged(nameof(UpdateManagementMessage));
         foreach (var status in PortMappingStatuses)
@@ -1827,6 +1849,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
 
     private static IReadOnlyList<SettingsOption> CreateDirectionalEncryptionModeOptions() =>
         [new SettingsOption(NetworkSettings.InheritEncryption, Properties.Resources.Settings_EncryptionInherit), .. CreateEncryptionModeOptions()];
+
+    private static IReadOnlyList<SettingsOption> CreateSsrfMitigationOptions() =>
+    [
+        new SettingsOption(NetworkSettings.SsrfMitigationThisDevice, Properties.Resources.Settings_SsrfMitigationThisDevice),
+        new SettingsOption(NetworkSettings.SsrfMitigationLocalNetworks, Properties.Resources.Settings_SsrfMitigationLocalNetworks),
+        new SettingsOption(NetworkSettings.SsrfMitigationOff, Properties.Resources.Settings_SsrfMitigationOff)
+    ];
 
     private async Task BrowseBlocklistAsync()
     {

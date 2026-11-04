@@ -1620,4 +1620,25 @@
   <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
     <value>Choose a certificate that includes its private key.</value>
   </data>
+  <data name="Status_StartTorrentFailed" xml:space="preserve">
+    <value>Could not start {0}: {1}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRejected" xml:space="preserve">
+    <value>This certificate was not issued for this torrent.</value>
+  </data>
+  <data name="Settings_SsrfMitigation" xml:space="preserve">
+    <value>Keep torrents away from local services</value>
+  </data>
+  <data name="Settings_SsrfMitigationThisDevice" xml:space="preserve">
+    <value>This device</value>
+  </data>
+  <data name="Settings_SsrfMitigationLocalNetworks" xml:space="preserve">
+    <value>This device and its local networks</value>
+  </data>
+  <data name="Settings_SsrfMitigationOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Settings_SsrfMitigationHint" xml:space="preserve">
+    <value>A torrent chooses its own tracker and web seed addresses, so it could try to send requests to services on this device or your network. If a tracker on your own network stops working, enter it by its IP address or choose a lower setting.</value>
+  </data>
 </root>

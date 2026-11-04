@@ -89,6 +89,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
         WeakReferenceMessenger.Default.Register<CategoriesChangedMessage>(this, (_, _) => RefreshCategories());
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
+        WeakReferenceMessenger.Default.Register<TorrentStartFailedMessage>(this, (_, msg) => Dispatcher.UIThread.Post(() =>
+            SetStatusMessage(string.Format(Resources.Status_StartTorrentFailed, msg.Torrent.Name, msg.Exception.Message))));
         WeakReferenceMessenger.Default.Register<ActivationRequestedMessage>(this, (_, msg) =>
         {
             _ = Dispatcher.UIThread.InvokeAsync(async () => await HandleActivationAsync(msg.Arguments));
@@ -601,7 +603,14 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private bool CanStopSelected()
     {
-        return SelectionOrFocused().Any(item => item.Torrent.Started);
+        return SelectionOrFocused().Any(item => CanStop(item.Torrent));
+    }
+
+    // A torrent checking its files before it starts is not started yet, and that check can run for
+    // minutes, which is when someone is most likely to want out of it.
+    private static bool CanStop(ITorrent torrent)
+    {
+        return torrent.Started || torrent.State == TorrentState.CheckingFiles;
     }
 
     private bool CanRemoveSelected()
@@ -854,8 +863,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private async Task StartOrSelectSslCertificateAsync(ITorrent torrent)
     {
-        try { await TorrentService.StartAsync(torrent); }
-        catch (System.Security.Authentication.AuthenticationException) when (torrent.HasMetadata && torrent.ExportTorrentFile().IsSsl)
+        try { await _torrentService.StartAsync(torrent); }
+        catch (System.Security.Authentication.AuthenticationException) when (torrent.IsSsl)
         {
             torrent.QueueAutoStart = false;
             await _addTorrentDialogService.ShowSslCertificateAsync(torrent);
@@ -875,22 +884,21 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     /// </para>
     /// <para>
     /// Every torrent raising this alert lacks a certificate: the alert comes only from a magnet's
-    /// metadata download, and a certificate can only be attached while adding a torrent whose
-    /// metadata is already known. So there is no case in which this stops a torrent that could
-    /// have run.
+    /// metadata download, and the engine refuses a certificate for a torrent whose metadata is not
+    /// known yet. So there is no case in which this stops a torrent that could have run.
     /// </para>
     /// </remarks>
     internal async Task RequestCertificateIfSslAsync(ITorrent torrent)
     {
         try
         {
-            if (!torrent.HasMetadata || !torrent.ExportTorrentFile().IsSsl)
+            if (!torrent.IsSsl)
             {
                 return;
             }
 
             torrent.QueueAutoStart = false;
-            await TorrentService.StopAsync(torrent);
+            await _torrentService.StopAsync(torrent);
             await _addTorrentDialogService.ShowSslCertificateAsync(torrent);
         }
         catch (Exception ex)
@@ -903,9 +911,9 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private async Task StopSelectedAsync()
     {
-        foreach (var item in SelectionOrFocused().Where(item => item.Torrent.Started))
+        foreach (var item in SelectionOrFocused().Where(item => CanStop(item.Torrent)))
         {
-            await TorrentService.StopAsync(item.Torrent);
+            await _torrentService.StopAsync(item.Torrent);
         }
     }
 
@@ -1036,8 +1044,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             return Task.CompletedTask;
         }
 
-        return item.Torrent.Started
-            ? TorrentService.StopAsync(item.Torrent)
+        return CanStop(item.Torrent)
+            ? _torrentService.StopAsync(item.Torrent)
             : StartOrSelectSslCertificateAsync(item.Torrent);
     }
 
