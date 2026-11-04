@@ -345,7 +345,7 @@ Run the app:
 dotnet run --project Peerfluence/Peerfluence.csproj
 ```
 
-Builds use the published **PeerSharp 5.3.0** NuGet package, including when a sibling engine
+Builds use the published **PeerSharp 5.3.1** NuGet package, including when a sibling engine
 checkout exists. No local package feed is needed. For engine development, explicitly opt into
 the sibling checkout (including the headless tests):
 

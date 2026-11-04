@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Peerfluence.Core.Config;
 using PeerSharp.Clients;
 using PeerSharp.Config;
@@ -15,7 +15,6 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     private readonly Func<TorrentClientOptions, IClientEngine> _createEngine;
     private IClientEngine? _engine;
     private Task? _shutdownTask;
-    private readonly CancellationTokenSource _shutdown = new();
 
     public TorrentEngineService(
         IAppSettingsService settingsService,
@@ -49,8 +48,6 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     /// the user can be told rather than left wondering why no peers arrive.
     /// </summary>
     public bool ProxyRestrictionApplied { get; private set; }
-
-    public CancellationToken ShutdownToken => _shutdown.Token;
 
     /// <summary>
     /// How long startup waits for restored torrents before opening the window without them.
@@ -111,11 +108,11 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         }
     }
 
-    private async Task ResumeRestoredTorrentsAsync(IClientEngine engine, bool queueEnabled)
+    private static async Task ResumeRestoredTorrentsAsync(IClientEngine engine, bool queueEnabled)
     {
         try
         {
-            await engine.ResumeAsync(ShutdownToken).ConfigureAwait(false);
+            await engine.ResumeAsync(CancellationToken.None).ConfigureAwait(false);
             KeepSslTorrentsWithoutCertificatesFromAutoStarting(engine);
         }
         finally
@@ -132,10 +129,6 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         try
         {
             await resume.ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) when (ShutdownToken.IsCancellationRequested)
-        {
-            // Shutting down, which is what the token is for.
         }
         catch (Exception ex)
         {
@@ -168,7 +161,6 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     public ValueTask DisposeAsync()
     {
         _settingsService.SettingsSaved -= OnSettingsSavedAsync;
-        _shutdown.Cancel();
         if (_shutdownTask != null)
         {
             // ShutdownAsync already initiated disposal. In particular, do not
@@ -184,7 +176,6 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     {
         _settingsService.SettingsSaved -= OnSettingsSavedAsync;
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        await _shutdown.CancelAsync().ConfigureAwait(false);
         var engine = Interlocked.Exchange(ref _engine, null);
         if (engine != null)
         {

@@ -12,13 +12,6 @@ public interface ITorrentEngineService : IAsyncDisposable
     /// </summary>
     bool ProxyRestrictionApplied { get; }
 
-    /// <summary>
-    /// Cancelled when the application begins shutting down. Long engine work has to be handed this,
-    /// because disposing the engine waits for a torrent that is checking its files rather than
-    /// ending the check.
-    /// </summary>
-    CancellationToken ShutdownToken { get; }
-
     Task InitializeAsync(CancellationToken cancellationToken);
 
     /// <summary>

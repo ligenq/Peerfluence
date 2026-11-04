@@ -249,26 +249,6 @@ public class TorrentEngineServiceTests
         Assert.False(sslTorrent.QueueAutoStart);
     }
 
-    /// <summary>Disposing the engine waits for a check rather than ending one.</summary>
-    [Fact]
-    public async Task Shutdown_EndsRestoredTorrentsStillCheckingFiles()
-    {
-        var engine = SubstituteEngine();
-        var resumeToken = CancellationToken.None;
-        engine.ResumeAsync(Arg.Any<CancellationToken>()).Returns(call =>
-        {
-            resumeToken = call.Arg<CancellationToken>();
-            return Task.Delay(Timeout.Infinite, resumeToken);
-        });
-        await using var sut = CreateSut(BaseSettings(), engine, restoredStartWait: TimeSpan.FromMilliseconds(20));
-        await sut.InitializeAsync(TestContext.Current.CancellationToken);
-        Assert.False(resumeToken.IsCancellationRequested);
-
-        await sut.ShutdownAsync(TestContext.Current.CancellationToken);
-
-        Assert.True(resumeToken.IsCancellationRequested);
-    }
-
     [Fact]
     public async Task InitializeAsync_WhenResumingFailsStraightAway_ReportsThatFailure_AndRestoresTheQueue()
     {
