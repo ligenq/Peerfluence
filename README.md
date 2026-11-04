@@ -392,13 +392,13 @@ The Debian package registers the application launcher, `.torrent` MIME handler, 
 architecture with `clang` and `zlib1g-dev` installed:
 
 ```shell
-./ReleasePackaging/build-linux.sh --version 2.2.0 --rid linux-x64
+./ReleasePackaging/build-linux.sh --version 2.3.0 --rid linux-x64
 ```
 
 Build a Velopack release:
 
 ```powershell
-.\ReleasePackaging\build-velopack.ps1 -Version 2.2.0
+.\ReleasePackaging\build-velopack.ps1 -Version 2.3.0
 ```
 
 The script publishes the app, creates the Velopack release, and writes artifacts to
