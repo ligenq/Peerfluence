@@ -28,12 +28,26 @@ public interface ITorrentService
     Task<ITorrent> AddTorrentFromUrlAsync(string url, AddTorrentOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Reattaches a caller-owned SSL credential to a stopped torrent while preserving its
-    /// resume data, files and per-torrent configuration. The returned torrent remains stopped.
+    /// Gives a stopped SSL torrent its certificate, which it keeps a copy of, so the caller may
+    /// dispose this one. The torrent stays stopped.
     /// </summary>
-    Task<ITorrent> SetSslCertificateAsync(ITorrent torrent,
+    Task SetSslCertificateAsync(ITorrent torrent,
         System.Security.Cryptography.X509Certificates.X509Certificate2 certificate,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Starts a torrent, returning once it is running or once it is clear it will be a while.
+    /// </summary>
+    /// <remarks>
+    /// A first start over files already on disk hashes them before it transfers anything, which can
+    /// take minutes. Everything a start can be refused for fails at once and is thrown here; the
+    /// start carries on after this returns, and a failure that late is published as
+    /// <see cref="Messaging.TorrentStartFailedMessage"/>.
+    /// </remarks>
+    Task StartAsync(ITorrent torrent, CancellationToken cancellationToken = default);
+
+    /// <summary>Stops a torrent, including one still checking its files before it starts.</summary>
+    Task StopAsync(ITorrent torrent, CancellationToken cancellationToken = default);
 
     Task SaveSessionAsync(CancellationToken cancellationToken = default);
 

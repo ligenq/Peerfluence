@@ -153,7 +153,7 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     {
         Name = torrent.Name;
         Progress = torrent.Progress;
-        IsRunning = torrent.Started;
+        IsRunning = torrent.Started || torrent.State == TorrentState.CheckingFiles;
         State = torrent.State.ToDisplayString();
         TotalSizeBytes = torrent.TotalSize;
         DataLeftBytes = torrent.DataLeft;

@@ -1,4 +1,4 @@
-﻿using Peerfluence.Core.Services;
+using Peerfluence.Core.Services;
 using Peerfluence.Core.Messaging;
 using PeerSharp.Config;
 using PeerSharp.Core;
@@ -9,69 +9,290 @@ namespace Peerfluence.Tests.Services;
 [Collection("Messenger")]
 public sealed class TorrentServiceTests
 {
+    /// <summary>
+    /// A restored SSL torrent needs this every session. Removing it and adding it back did the same
+    /// thing, and lost the torrent if the second add failed.
+    /// </summary>
     [Fact]
-    public async Task SslCertificateReplacement_RecoversStoppedEntryIfCredentialCopyFails()
+    public async Task SslCertificate_IsGivenToTheTorrentInPlace()
     {
         using var data = new SslTorrentTestData();
-        var original = Substitute.For<ITorrent>();
-        original.State.Returns(TorrentState.Stopped);
-        original.ExportTorrentFile().Returns(data.Metadata);
-        original.Files.DownloadPath.Returns(Path.GetTempPath());
-        original.DiskReadLimitBytesPerSecond = 1234;
-        original.MaxConnections = 7;
-        var recovered = Substitute.For<ITorrent>();
+        var torrent = Substitute.For<ITorrent>();
+        torrent.State.Returns(TorrentState.Stopped);
+        torrent.QueueAutoStart = true;
         var engine = Substitute.For<IClientEngine>();
-        var attemptsWithCertificate = new List<bool>();
-        engine.AddTorrentAsync(data.Metadata, Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>()).Returns(call =>
+        var sut = Sut(engine);
+
+        await sut.SetSslCertificateAsync(torrent, data.Certificate, TestContext.Current.CancellationToken);
+
+        await torrent.Received(1).SetSslCertificateAsync(data.Certificate, Arg.Any<CancellationToken>());
+        Assert.False(torrent.QueueAutoStart);
+        await engine.DidNotReceive().RemoveTorrentAsync(Arg.Any<ITorrent>(), Arg.Any<RemoveOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SslCertificate_ForARunningTorrent_IsRefusedWithoutStoppingIt()
+    {
+        using var data = new SslTorrentTestData();
+        var torrent = Substitute.For<ITorrent>();
+        torrent.State.Returns(TorrentState.Active);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => Sut().SetSslCertificateAsync(torrent, data.Certificate, TestContext.Current.CancellationToken));
+
+        await torrent.DidNotReceive().StopAsync(Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>What a torrent looks like while it hashes the files already at its destination.</summary>
+    private static ITorrent CheckingForever()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(call =>
         {
-            var options = call.Arg<AddTorrentOptions>();
-            Assert.False(options.StartImmediately);
-            Assert.False(call.Arg<CancellationToken>().CanBeCanceled);
-            attemptsWithCertificate.Add(options.SslCertificate != null);
-            return options.SslCertificate != null
-                ? Task.FromException<ITorrent>(new IOException("Credential copy failed"))
-                : Task.FromResult(recovered);
+            torrent.QueueAutoStart = true;
+            return Task.Delay(Timeout.Infinite, call.Arg<CancellationToken>());
         });
-        var engineService = Substitute.For<ITorrentEngineService>();
-        engineService.Engine.Returns(engine);
-        using var http = new HttpClient();
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), http, SeedingDefaults.Off);
-        await Assert.ThrowsAsync<IOException>(() => sut.SetSslCertificateAsync(original, data.Certificate, TestContext.Current.CancellationToken));
-        Assert.Equal([true, false], attemptsWithCertificate);
-        Assert.False(original.QueueAutoStart);
-        Assert.Equal(1234, recovered.DiskReadLimitBytesPerSecond);
-        Assert.Equal(7, recovered.MaxConnections);
-        await engine.Received(1).RemoveTorrentAsync(original, RemoveOptions.None, Arg.Any<CancellationToken>());
-        await engine.Received(1).SaveSessionAsync(CancellationToken.None);
+        return torrent;
+    }
+
+    private static TorrentService Sut(IClientEngine? engine = null, IAppMessenger? messenger = null, ITorrentEngineService? engineService = null)
+    {
+        if (engineService == null)
+        {
+            engineService = Substitute.For<ITorrentEngineService>();
+            engineService.Engine.Returns(engine ?? Substitute.For<IClientEngine>());
+        }
+
+        return new TorrentService(engineService, messenger ?? Substitute.For<IAppMessenger>(), new HttpClient(), SeedingDefaults.Off)
+        {
+            StartWait = TimeSpan.FromMilliseconds(20)
+        };
+    }
+
+    /// <summary>Everything a start can be refused for happens at once, and the caller has to hear it.</summary>
+    [Fact]
+    public async Task Start_ThatFailsStraightAway_FailsForTheCaller()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        var refused = new System.Security.Authentication.AuthenticationException("Certificate required");
+        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(refused));
+
+        var thrown = await Assert.ThrowsAsync<System.Security.Authentication.AuthenticationException>(
+            () => Sut().StartAsync(torrent, TestContext.Current.CancellationToken));
+
+        Assert.Same(refused, thrown);
+    }
+
+    [Fact]
+    public async Task Start_ThatIsCheckingFiles_ReturnsAndCarriesOn()
+    {
+        var torrent = CheckingForever();
+        var sut = Sut();
+
+        await sut.StartAsync(torrent, TestContext.Current.CancellationToken);
+
+        // Asking again changes nothing: the first start has not finished.
+        await sut.StartAsync(torrent, TestContext.Current.CancellationToken);
+        await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
+        await sut.StopAsync(torrent, TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public async Task Start_OfATorrentAlreadyChecking_LeavesItAlone()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.State.Returns(TorrentState.CheckingFiles);
+
+        await Sut().StartAsync(torrent, TestContext.Current.CancellationToken);
+
+        await torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Start_ThatFailsAfterTheWait_IsReported()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        var check = new TaskCompletionSource();
+        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(check.Task);
+        var published = new TaskCompletionSource<TorrentStartFailedMessage>();
+        var messenger = Substitute.For<IAppMessenger>();
+        messenger.When(m => m.Publish(Arg.Any<TorrentStartFailedMessage>()))
+            .Do(call => published.TrySetResult(call.Arg<TorrentStartFailedMessage>()));
+
+        await Sut(messenger: messenger).StartAsync(torrent, TestContext.Current.CancellationToken);
+        var failure = new IOException("The disk went away");
+        check.SetException(failure);
+
+        var message = await published.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+        Assert.Same(torrent, message.Torrent);
+        Assert.Same(failure, message.Exception);
     }
 
     /// <summary>
-    /// The replacement has already removed the torrent when it finds the engine will not take it back
-    /// at all. Nothing can undo that, so the failure has to say what happened and why.
+    /// A stop waits for the check rather than ending it, so without this nothing could. And a start
+    /// that was cancelled has already set auto-start, which would have the queue start it again.
     /// </summary>
     [Fact]
-    public async Task SslCertificateReplacement_WhenTheEngineRefusesBothAdds_ReportsTheLossAndTheOriginalCause()
+    public async Task Stop_EndsAStartStillCheckingFiles()
     {
-        using var data = new SslTorrentTestData();
-        var original = Substitute.For<ITorrent>();
-        original.State.Returns(TorrentState.Stopped);
-        original.ExportTorrentFile().Returns(data.Metadata);
-        original.Files.DownloadPath.Returns(Path.GetTempPath());
+        var torrent = CheckingForever();
+        var sut = Sut();
+        await sut.StartAsync(torrent, TestContext.Current.CancellationToken);
+        Assert.True(torrent.QueueAutoStart);
+
+        await sut.StopAsync(torrent, TestContext.Current.CancellationToken);
+
+        await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+        await WaitUntil(() => !torrent.QueueAutoStart);
+    }
+
+    /// <summary>The engine holds its lifecycle lock across a removal, so this would hold up every add.</summary>
+    [Fact]
+    public async Task Remove_EndsAStartStillCheckingFiles()
+    {
+        var torrent = CheckingForever();
         var engine = Substitute.For<IClientEngine>();
-        var cause = new IOException("Download folder is unavailable");
-        var second = new IOException("Download folder is still unavailable");
-        engine.AddTorrentAsync(data.Metadata, Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<ITorrent>(cause), Task.FromException<ITorrent>(second));
+        var sut = Sut(engine);
+        await sut.StartAsync(torrent, TestContext.Current.CancellationToken);
+
+        await sut.RemoveAsync(torrent, RemoveOptions.None, TestContext.Current.CancellationToken);
+
+        await engine.Received(1).RemoveTorrentAsync(torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
+        await WaitUntil(() => !torrent.QueueAutoStart);
+    }
+
+    [Fact]
+    public async Task Shutdown_EndsAStartStillCheckingFiles()
+    {
+        var torrent = CheckingForever();
+        using var shutdown = new CancellationTokenSource();
         var engineService = Substitute.For<ITorrentEngineService>();
-        engineService.Engine.Returns(engine);
-        using var http = new HttpClient();
-        var sut = new TorrentService(engineService, Substitute.For<IAppMessenger>(), http, SeedingDefaults.Off);
+        engineService.ShutdownToken.Returns(shutdown.Token);
+        await Sut(engineService: engineService).StartAsync(torrent, TestContext.Current.CancellationToken);
 
-        var failure = await Assert.ThrowsAsync<AggregateException>(
-            () => sut.SetSslCertificateAsync(original, data.Certificate, TestContext.Current.CancellationToken));
+        await shutdown.CancelAsync();
 
-        Assert.Equal([cause, second], failure.InnerExceptions);
-        Assert.Contains("no longer in the list", failure.Message, StringComparison.Ordinal);
+        await WaitUntil(() => !torrent.QueueAutoStart);
+    }
+
+    private static async Task WaitUntil(Func<bool> condition)
+    {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        deadline.CancelAfter(TimeSpan.FromSeconds(10));
+        while (!condition())
+        {
+            await Task.Delay(5, deadline.Token);
+        }
+    }
+
+    private static IClientEngine EngineAdding(ITorrent torrent, Action<AddTorrentOptions>? onAdd = null)
+    {
+        var engine = Substitute.For<IClientEngine>();
+        engine.Settings.Returns(new Settings());
+        engine.AddTorrentAsync(Arg.Any<TorrentFile>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            onAdd?.Invoke(call.Arg<AddTorrentOptions>());
+            return Task.FromResult(torrent);
+        });
+        return engine;
+    }
+
+    /// <summary>
+    /// An add that lets the engine start the torrent returns after hashing whatever is already on
+    /// disk, which would hold the add dialog or a Transmission client's request for all of it.
+    /// </summary>
+    [Fact]
+    public async Task AddingATorrent_AddsItStopped_ThenStartsIt()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        var startImmediatelyAtAdd = true;
+        var engine = EngineAdding(torrent, options => startImmediatelyAtAdd = options.StartImmediately);
+        var options = new AddTorrentOptions { DownloadPath = Path.GetTempPath() };
+
+        var added = await Sut(engine).AddTorrentAsync(PlainTorrentTestData.Metadata(), options, TestContext.Current.CancellationToken);
+
+        Assert.Same(torrent, added);
+        Assert.False(startImmediatelyAtAdd);
+        Assert.True(options.StartImmediately);
+        await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AddingATorrentOverExistingFiles_ReturnsWhileTheyAreChecked()
+    {
+        var torrent = CheckingForever();
+        var sut = Sut(EngineAdding(torrent));
+
+        var added = await sut.AddTorrentAsync(
+            PlainTorrentTestData.Metadata(), new AddTorrentOptions { DownloadPath = Path.GetTempPath() }, TestContext.Current.CancellationToken);
+
+        Assert.Same(torrent, added);
+        await sut.StopAsync(torrent, TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public async Task AddingATorrentStopped_DoesNotStartIt()
+    {
+        var torrent = Substitute.For<ITorrent>();
+
+        await Sut(EngineAdding(torrent)).AddTorrentAsync(
+            PlainTorrentTestData.Metadata(),
+            new AddTorrentOptions { DownloadPath = Path.GetTempPath(), StartImmediately = false },
+            TestContext.Current.CancellationToken);
+
+        await torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>The engine discards a torrent it could not start, and this has to go on doing so.</summary>
+    [Fact]
+    public async Task AddingATorrentThatCannotStart_FailsAndLeavesNothingBehind()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        var refused = new System.Security.Authentication.AuthenticationException("Certificate required");
+        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(refused));
+        var engine = EngineAdding(torrent);
+
+        var thrown = await Assert.ThrowsAsync<System.Security.Authentication.AuthenticationException>(() => Sut(engine).AddTorrentAsync(
+            PlainTorrentTestData.Metadata(), new AddTorrentOptions { DownloadPath = Path.GetTempPath() }, TestContext.Current.CancellationToken));
+
+        Assert.Same(refused, thrown);
+        await engine.Received(1).RemoveTorrentAsync(torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AddingATorrentThatCannotStart_ReportsWhyEvenIfItCannotBeDiscarded()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        var refused = new System.Security.Authentication.AuthenticationException("Certificate required");
+        torrent.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(refused));
+        var engine = EngineAdding(torrent);
+        engine.RemoveTorrentAsync(torrent, Arg.Any<RemoveOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException(new IOException("Session folder is gone")));
+
+        var thrown = await Assert.ThrowsAsync<System.Security.Authentication.AuthenticationException>(() => Sut(engine).AddTorrentAsync(
+            PlainTorrentTestData.Metadata(), new AddTorrentOptions { DownloadPath = Path.GetTempPath() }, TestContext.Current.CancellationToken));
+
+        Assert.Same(refused, thrown);
+    }
+
+    [Fact]
+    public async Task AddingAMagnet_AddsItStopped_ThenStartsIt()
+    {
+        var (engineService, captured) = CapturingEngine();
+        var torrent = Substitute.For<ITorrent>();
+        var startImmediatelyAtAdd = true;
+        engineService.Engine.AddMagnetAsync(Arg.Any<MagnetLink>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                startImmediatelyAtAdd = call.Arg<AddTorrentOptions>().StartImmediately;
+                return Task.FromResult(torrent);
+            });
+
+        await Sut(engineService: engineService).AddMagnetAsync(Magnet, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(captured());
+        Assert.False(startImmediatelyAtAdd);
+        await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
     }
 
     /// <summary>

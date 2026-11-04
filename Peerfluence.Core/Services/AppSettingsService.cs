@@ -103,6 +103,12 @@ public sealed class AppSettingsService : IAppSettingsService
         {
             changed = true;
         }
+
+        if (settings.Network.NormalizeSsrfMitigation())
+        {
+            changed = true;
+        }
+
         if (string.IsNullOrWhiteSpace(settings.Storage.DownloadPath))
         {
             settings.Storage.DownloadPath = _paths.DefaultDownloadDirectory;

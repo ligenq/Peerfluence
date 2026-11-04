@@ -1,115 +1,63 @@
-﻿using Peerfluence.Core.Messaging;
+﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Peerfluence.Core.Messaging;
 using PeerSharp.Config;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Core.Services;
 
-public sealed class TorrentService : ITorrentService
+public sealed partial class TorrentService : ITorrentService
 {
     private readonly ITorrentEngineService _engineService;
     private readonly IAppMessenger _messenger;
     private readonly IAppSettingsService _settings;
 
     private readonly HttpClient _httpClient;
+    private readonly ILogger<TorrentService> _logger;
+
+    /// <summary>The starts still under way, which are what stopping or removing has to cancel.</summary>
+    private readonly ConcurrentDictionary<ITorrent, CancellationTokenSource> _starting = new();
 
     public TorrentService(
         ITorrentEngineService engineService,
         IAppMessenger messenger,
         HttpClient httpClient,
-        IAppSettingsService settings)
+        IAppSettingsService settings,
+        ILogger<TorrentService>? logger = null)
     {
         _engineService = engineService;
         _messenger = messenger;
         _httpClient = httpClient;
         _settings = settings;
+        _logger = logger ?? NullLogger<TorrentService>.Instance;
     }
+
+    /// <summary>
+    /// How long a start is waited for before it is left to finish on its own. Long enough to hear
+    /// about a start that cannot happen, which fails at once, so those still reach the caller.
+    /// </summary>
+    internal TimeSpan StartWait { get; init; } = TimeSpan.FromSeconds(2);
 
     public IReadOnlyList<ITorrent> GetTorrents()
     {
         return _engineService.Engine.GetTorrents();
     }
 
-    public async Task<ITorrent> SetSslCertificateAsync(ITorrent torrent,
+    public async Task SetSslCertificateAsync(ITorrent torrent,
         System.Security.Cryptography.X509Certificates.X509Certificate2 certificate,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(torrent);
         ArgumentNullException.ThrowIfNull(certificate);
-        if (!certificate.HasPrivateKey) throw new ArgumentException("The SSL certificate must include its private key.", nameof(certificate));
         if (torrent.State != TorrentState.Stopped) throw new InvalidOperationException("Stop the torrent before changing its SSL certificate.");
-        var metadata = torrent.ExportTorrentFile();
-        if (!metadata.IsSsl) throw new InvalidOperationException("This torrent does not require an SSL certificate.");
         // Not redundant with the guard above. Stopped is what the caller has to ask for; this closes
         // the gap after it, where a queue that still saw auto-start set could have started the
-        // torrent again before its resume data is read below.
+        // torrent again, and the engine refuses a certificate for a running torrent.
         torrent.QueueAutoStart = false;
         await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
-        var options = new AddTorrentOptions
-        {
-            StartImmediately = false,
-            SslCertificate = certificate,
-            DownloadPath = torrent.Files.DownloadPath,
-            ResumeData = torrent.GetResumeData(),
-            FileSelections = torrent.GetAllFileSelections(),
-            AdditionalTrackers = torrent.Trackers.GetTrackers().Select(tracker => tracker.Url).ToArray(),
-            AdditionalWebSeeds = torrent.WebSeeds.GetAll(),
-            DownloadStrategy = torrent.DownloadStrategy,
-            DownloadLimitBytesPerSecond = torrent.DownloadLimitBytesPerSecond,
-            UploadLimitBytesPerSecond = torrent.UploadLimitBytesPerSecond,
-            QueuePriority = torrent.QueuePriority,
-            RatioLimit = torrent.RatioLimit,
-            SeedTimeLimit = torrent.SeedTimeLimit,
-            SuperSeeding = torrent.SuperSeeding,
-            Events = torrent.Events
-        };
-        var readLimit = torrent.DiskReadLimitBytesPerSecond;
-        var writeLimit = torrent.DiskWriteLimitBytesPerSecond;
-        var maxConnections = torrent.MaxConnections;
-        var maxUploadSlots = torrent.MaxUploadSlots;
-        var engine = _engineService.Engine;
-        // The released API accepts certificates only at add time. After removal, finish the
-        // replacement even if the caller cancels; leave a stopped entry on any start failure.
-        await engine.RemoveTorrentAsync(torrent, RemoveOptions.None, cancellationToken).ConfigureAwait(false);
-        ITorrent replacement;
-        try
-        {
-            replacement = await engine.AddTorrentAsync(metadata, options, CancellationToken.None).ConfigureAwait(false);
-        }
-        catch (Exception replacementFailure)
-        {
-            options.SslCertificate = null;
-            ITorrent recovered;
-            try
-            {
-                recovered = await engine.AddTorrentAsync(metadata, options, CancellationToken.None).ConfigureAwait(false);
-            }
-            catch (Exception recoveryFailure)
-            {
-                // Both adds failed, so the cause was not the certificate, and the torrent is already
-                // out of the session with nothing left to put it back. Say so, and keep the first
-                // failure: it is the reason, and letting the second replace it hid both.
-                throw new AggregateException(
-                    $"Torrent '{metadata.Name}' could not be re-added after its certificate change and is no longer in the list. Add its .torrent file again to resume it.",
-                    replacementFailure,
-                    recoveryFailure);
-            }
-
-            RestoreLimits(recovered);
-            await engine.SaveSessionAsync(CancellationToken.None).ConfigureAwait(false);
-            throw;
-        }
-        RestoreLimits(replacement);
-        await engine.SaveSessionAsync(CancellationToken.None).ConfigureAwait(false);
-        return replacement;
-
-        void RestoreLimits(ITorrent target)
-        {
-            target.DiskReadLimitBytesPerSecond = readLimit;
-            target.DiskWriteLimitBytesPerSecond = writeLimit;
-            target.MaxConnections = maxConnections;
-            target.MaxUploadSlots = maxUploadSlots;
-        }
+        await torrent.SetSslCertificateAsync(certificate, cancellationToken).ConfigureAwait(false);
     }
 
     public EngineStats GetStats()
@@ -144,7 +92,10 @@ public sealed class TorrentService : ITorrentService
 
         ApplySeedingDefaults(options);
 
-        return await _engineService.Engine.AddMagnetAsync(magnet, options, cancellationToken).ConfigureAwait(false);
+        return await AddThenStartAsync(
+            options,
+            () => _engineService.Engine.AddMagnetAsync(magnet, options, cancellationToken),
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -197,7 +148,61 @@ public sealed class TorrentService : ITorrentService
 
         ApplySeedingDefaults(options);
 
-        return await _engineService.Engine.AddTorrentAsync(torrentFile, options, cancellationToken).ConfigureAwait(false);
+        return await AddThenStartAsync(
+            options,
+            () => _engineService.Engine.AddTorrentAsync(torrentFile, options, cancellationToken),
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Adds a torrent stopped and then starts it, rather than letting the engine do both.
+    /// </summary>
+    /// <remarks>
+    /// An add that starts the torrent returns only after hashing any files already at its
+    /// destination, and while that runs the engine holds up every other start in the session. Left
+    /// together, one torrent added over 100 GB of existing data would hold the add dialog, a
+    /// Transmission client's request and the next add behind it for as long as the disk takes.
+    /// A start that fails straight away still fails the add, as it does in the engine, so nothing
+    /// that could not start is left in the list.
+    /// </remarks>
+    private async Task<ITorrent> AddThenStartAsync(AddTorrentOptions options, Func<Task<ITorrent>> add, CancellationToken cancellationToken)
+    {
+        var startImmediately = options.StartImmediately;
+        options.StartImmediately = false;
+        ITorrent torrent;
+        try
+        {
+            torrent = await add().ConfigureAwait(false);
+        }
+        finally
+        {
+            options.StartImmediately = startImmediately;
+        }
+
+        if (!startImmediately)
+        {
+            return torrent;
+        }
+
+        try
+        {
+            await StartAsync(torrent, cancellationToken).ConfigureAwait(false);
+            return torrent;
+        }
+        catch
+        {
+            try
+            {
+                await RemoveAsync(torrent, RemoveOptions.None, CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception removeFailure)
+            {
+                // Kept out of the way of the failure leaving here, which is the reason.
+                LogFailedAddNotDiscarded(_logger, removeFailure, torrent.Name);
+            }
+
+            throw;
+        }
     }
 
     /// <summary>
@@ -223,14 +228,91 @@ public sealed class TorrentService : ITorrentService
         }
     }
 
-    public static Task StartAsync(ITorrent torrent, CancellationToken cancellationToken = default)
+    public async Task StartAsync(ITorrent torrent, CancellationToken cancellationToken = default)
     {
-        return torrent.StartAsync(cancellationToken);
+        ArgumentNullException.ThrowIfNull(torrent);
+
+        // Already on its way. Another start would wait out the check and then fail as already started.
+        if (torrent.State == TorrentState.CheckingFiles)
+        {
+            return;
+        }
+
+        var starting = CancellationTokenSource.CreateLinkedTokenSource(_engineService.ShutdownToken);
+        if (!_starting.TryAdd(torrent, starting))
+        {
+            starting.Dispose();
+            return;
+        }
+
+        var start = RunStartAsync(torrent, starting);
+        try
+        {
+            // Only the wait is the caller's to cancel. A Transmission client that gives up on its
+            // request has not asked for the torrent to stop.
+            await start.WaitAsync(StartWait, cancellationToken).ConfigureAwait(false);
+        }
+        catch (TimeoutException) when (!start.IsCompleted)
+        {
+            _ = ReportLateStartFailureAsync(torrent, start);
+        }
     }
 
-    public static Task StopAsync(ITorrent torrent, CancellationToken cancellationToken = default)
+    private async Task RunStartAsync(ITorrent torrent, CancellationTokenSource starting)
     {
-        return torrent.StopAsync(cancellationToken);
+        try
+        {
+            await torrent.StartAsync(starting.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (starting.IsCancellationRequested)
+        {
+            // Stopped while checking its files. The start set auto-start before it began, and left
+            // set the queue would start the torrent the person just stopped.
+            torrent.QueueAutoStart = false;
+        }
+        finally
+        {
+            _starting.TryRemove(torrent, out _);
+            starting.Dispose();
+        }
+    }
+
+    private async Task ReportLateStartFailureAsync(ITorrent torrent, Task start)
+    {
+        try
+        {
+            await start.ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            LogLateStartFailed(_logger, ex, torrent.Name);
+            _messenger.Publish(new TorrentStartFailedMessage(torrent, ex));
+        }
+    }
+
+    public async Task StopAsync(ITorrent torrent, CancellationToken cancellationToken = default)
+    {
+        await CancelStartAsync(torrent).ConfigureAwait(false);
+        await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Ends a start still checking files, which is the only way to end one: a stop, a removal and
+    /// engine shutdown all wait for the check to finish, however long that is.
+    /// </summary>
+    private async Task CancelStartAsync(ITorrent torrent)
+    {
+        if (_starting.TryGetValue(torrent, out var starting))
+        {
+            try
+            {
+                await starting.CancelAsync().ConfigureAwait(false);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Finished in between, so there is nothing left to cancel.
+            }
+        }
     }
 
     public Task SaveSessionAsync(CancellationToken cancellationToken = default)
@@ -243,9 +325,10 @@ public sealed class TorrentService : ITorrentService
         return torrent.ForceRecheckAsync(progress, cancellationToken);
     }
 
-    public Task RemoveAsync(ITorrent torrent, RemoveOptions options = RemoveOptions.None, CancellationToken cancellationToken = default)
+    public async Task RemoveAsync(ITorrent torrent, RemoveOptions options = RemoveOptions.None, CancellationToken cancellationToken = default)
     {
-        return _engineService.Engine.RemoveTorrentAsync(torrent, options, cancellationToken);
+        await CancelStartAsync(torrent).ConfigureAwait(false);
+        await _engineService.Engine.RemoveTorrentAsync(torrent, options, cancellationToken).ConfigureAwait(false);
     }
 
     public bool IsSessionPaused
@@ -362,4 +445,10 @@ public sealed class TorrentService : ITorrentService
 
         return torrents.Any(existing => TorrentIdentity.SameTorrent(existing, torrent));
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Could not start torrent {Name} after checking its files")]
+    private static partial void LogLateStartFailed(ILogger logger, Exception exception, string name);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Could not remove torrent {Name} after its start failed")]
+    private static partial void LogFailedAddNotDiscarded(ILogger logger, Exception exception, string name);
 }

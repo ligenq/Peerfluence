@@ -19,6 +19,8 @@ lifecycle, and PeerSharp for BitTorrent engine behavior.
 - Optionally associate `.torrent` files and `magnet:` links with Peerfluence on Windows.
 - Preview add-torrent options before adding, including torrent name, size, files,
   destination, limits, trackers, and metadata.
+- Add a torrent for files you already have: they are checked first, so what is there is kept
+  and only what is missing is downloaded.
 - Fetch magnet metadata in the background so magnet links can show the same details as
   torrent files once metadata arrives.
 - Optionally skip the add-torrent options dialog for future additions.
@@ -54,6 +56,8 @@ lifecycle, and PeerSharp for BitTorrent engine behavior.
   completion actions.
 - Persist session data and settings across restarts.
 - Use DHT, NAT-PMP, UPnP, proxy settings, encryption mode, blocklist, and GeoIP settings.
+  Blocklists can be P2P, eMule DAT or CIDR lists.
+- Keep the addresses a torrent names from reaching services on this device or its network.
 - Download I2P torrents through a configured SAM router, and SSL torrents using a certificate
   issued by the torrent's embedded certificate authority.
 - Use fixed or automatic OS-assigned listening ports for TCP/uTP.
@@ -106,6 +110,10 @@ time limits, private flag, and trackers.
 For magnet links, Peerfluence starts metadata discovery in the background. The dialog can
 initially show pending metadata and then update once the network returns torrent metadata.
 
+A torrent added over files that already hold data shows **Checking files** while they are hashed,
+which can take a while on a large torrent, and transfers once that is done. The add does not wait
+for it, and Stop or Remove ends the check.
+
 On Windows, Settings can register Peerfluence as the per-user handler for `.torrent`
 files and `magnet:` links. Launch arguments are forwarded to the running instance, so
 double-clicking a torrent file or opening a browser magnet link adds it to the existing
@@ -142,8 +150,8 @@ Settings are stored as JSON and loaded on startup. The major settings groups are
 - Performance: disk read/write limits.
 - Queue management: enable queueing, max active downloads, max active seeds.
 - Security and privacy: default encryption mode, independent incoming/outgoing overrides,
-  encrypted MSE payload preference, blocklist, GeoIP, proxy type/host/port,
-  credentials, proxy peers, and proxy trackers.
+  encrypted MSE payload preference, local service protection, blocklist, GeoIP, proxy
+  type/host/port, credentials, proxy peers, and proxy trackers.
 - Search: Torznab endpoint URL and API key used by the Find Torrents page.
 - Media player: external media player path.
 - Completion action: program/script, arguments, working directory, timeout, run hidden.
@@ -161,9 +169,19 @@ The MCP settings tool accepts `Network.IncomingEncryptionMode`, `Network.Outgoin
 connections after saving. The metadata wait timeout also controls magnet previews; zero waits
 until the dialog is cancelled or the magnet is added.
 
-PeerSharp 5.2.0's reduced resume/autosave allocations, pooled streaming read-ahead, larger magnet
-metadata budget, HTTP seed support, and protocol/lifecycle fixes apply through the existing engine
-integration. Session persistence uses PeerSharp's implementation directly.
+A torrent chooses its own tracker and web seed addresses, so one could try to make Peerfluence
+send requests to a service on this device or your network. **Keep torrents away from local
+services** limits that: **This device**, the default, also covers redirects and host names that
+lead to loopback; **This device and its local networks** extends that to private addresses, so a
+tracker on an internal network has to be entered by IP address; **Off** removes the guard. A local
+tracker at `/announce` keeps working on the default. Changes apply to the next request, and through
+a proxy only the URLs themselves can be checked. The MCP settings tool accepts this as
+`Network.SsrfMitigation` (`ThisDevice`, `LocalNetworks`, or `None`).
+
+PeerSharp 5.3.0's faster downloading from and seeding to fast peers, faster rechecks and blocklist
+loading, v2-only seeding fixes, and protocol/lifecycle fixes apply through the existing engine
+integration. Session persistence uses PeerSharp's implementation directly. Downloading can use
+more memory at its peak than it did before 5.3.0.
 
 For I2P, enable **I2P** in Security and privacy and enter the SAM router host and port
 (default `127.0.0.1:7656`). A running I2P router with SAM enabled is required. Restart Peerfluence
@@ -176,9 +194,9 @@ For SSL torrents, open the `.torrent` file and select a `.pfx` or `.p12` certifi
 its private key, signed by the torrent's authority and authorized for its name. The certificate
 dialog appears even when ordinary add options are skipped. Passwords and private keys are not
 stored in settings or session files. After restarting, SSL torrents remain stopped and visible;
-press **Start** to select their certificate again. Attaching a certificate preserves downloaded
-files, resume progress, file selections, and per-torrent limits. Certificate errors remain in the
-dialog so they can be corrected.
+press **Start** to select their certificate again. The certificate is given to the existing
+torrent, so its downloaded files, progress, file selections and per-torrent limits are untouched,
+and one that was not issued for the torrent is refused in the dialog so it can be corrected.
 
 Settings apply and persist as they are changed; there is no Save button. Reset restores
 the defaults. In simple mode the screen shows only the download folder and appearance —
@@ -327,7 +345,7 @@ Run the app:
 dotnet run --project Peerfluence/Peerfluence.csproj
 ```
 
-Builds use the published **PeerSharp 5.2.0** NuGet package, including when a sibling engine
+Builds use the published **PeerSharp 5.3.0** NuGet package, including when a sibling engine
 checkout exists. No local package feed is needed. For engine development, explicitly opt into
 the sibling checkout (including the headless tests):
 

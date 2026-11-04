@@ -35,6 +35,23 @@ public class McpToolHandlerTests
     }
 
     [Fact]
+    public async Task SsrfMitigationUpdates_AreStoredAndRejectUnknownValues()
+    {
+        var settings = new AppSettings { Mcp = { AllowDestructiveTools = true } };
+        var service = Substitute.For<IAppSettingsService>();
+        service.Current.Returns(settings);
+        var handler = new McpToolHandler(Substitute.For<ITorrentService>(), Substitute.For<ITopLevelService>(),
+            service, Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+
+        var valid = await handler.UpdateSettingsAsync("""{"Network":{"SsrfMitigation":"LocalNetworks"}}""", TestContext.Current.CancellationToken);
+        var invalid = await handler.UpdateSettingsAsync("""{"Network":{"SsrfMitigation":"Everything"}}""", TestContext.Current.CancellationToken);
+
+        Assert.False(valid.IsError);
+        Assert.True(invalid.IsError);
+        Assert.Equal("LocalNetworks", settings.Network.SsrfMitigation);
+    }
+
+    [Fact]
     public async Task EncryptionUpdates_ApplyToRunningEngineAndRejectUnknownModes()
     {
         var paths = Substitute.For<IAppPaths>();
@@ -337,8 +354,8 @@ public class McpToolHandlerTests
         Assert.Contains("Successfully paused", Text(pauseResult));
         Assert.Contains("Successfully resumed", Text(resumeResult));
         Assert.Contains("Successfully removed", Text(removeResult));
-        await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
-        await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
+        await torrentService.Received(1).StopAsync(torrent, Arg.Any<CancellationToken>());
+        await torrentService.Received(1).StartAsync(torrent, Arg.Any<CancellationToken>());
         await torrentService.Received(1).RemoveAsync(torrent, PeerSharp.Config.RemoveOptions.None, Arg.Any<CancellationToken>());
     }
 
@@ -384,7 +401,7 @@ public class McpToolHandlerTests
 
         Assert.False(result.IsError);
         Assert.Contains("already active", Text(result));
-        await torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+        await torrentService.DidNotReceive().StartAsync(torrent, Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -407,7 +424,7 @@ public class McpToolHandlerTests
 
         Assert.False(result.IsError);
         Assert.Contains("already paused", Text(result));
-        await torrent.DidNotReceive().StopAsync(Arg.Any<CancellationToken>());
+        await torrentService.DidNotReceive().StopAsync(torrent, Arg.Any<CancellationToken>());
     }
 
     [Fact]

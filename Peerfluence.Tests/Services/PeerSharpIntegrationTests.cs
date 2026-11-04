@@ -65,31 +65,20 @@ public sealed class PeerSharpIntegrationTests
             ssl.Trackers.AddTracker("https://tracker.invalid/announce");
             Assert.True(ssl.WebSeeds.Add("https://seed.invalid/files/"));
             var service = new TorrentService(restored, Substitute.For<IAppMessenger>(), http, settings);
-            var rejected = await service.SetSslCertificateAsync(ssl, other.Certificate, TestContext.Current.CancellationToken);
-            await Assert.ThrowsAsync<System.Security.Authentication.AuthenticationException>(() => rejected.StartAsync(TestContext.Current.CancellationToken));
-            rejected.QueueAutoStart = false;
-            Assert.Contains(rejected, service.GetTorrents());
-            PeerSharp.Interfaces.ITorrent attached;
+            // Refused where it is given, and the torrent is left exactly as it was.
+            await Assert.ThrowsAsync<ArgumentException>(() => service.SetSslCertificateAsync(ssl, other.Certificate, TestContext.Current.CancellationToken));
+            await Assert.ThrowsAsync<System.Security.Authentication.AuthenticationException>(() => ssl.StartAsync(TestContext.Current.CancellationToken));
+            ssl.QueueAutoStart = false;
+            Assert.Contains(ssl, service.GetTorrents());
             using (var credential = System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12(
                 data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12), null,
                 System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.EphemeralKeySet | System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable))
             {
-                attached = await service.SetSslCertificateAsync(rejected, credential, TestContext.Current.CancellationToken);
+                await service.SetSslCertificateAsync(ssl, credential, TestContext.Current.CancellationToken);
             }
+            var attached = Assert.Single(service.GetTorrents(), t => t.Name == SslTorrentTestData.Name);
+            Assert.Same(ssl, attached);
             Assert.False(attached.Started);
-            Assert.Equal(12345, attached.DownloadLimitBytesPerSecond);
-            Assert.Equal(23456, attached.UploadLimitBytesPerSecond);
-            Assert.Equal(34567, attached.DiskReadLimitBytesPerSecond);
-            Assert.Equal(45678, attached.DiskWriteLimitBytesPerSecond);
-            Assert.Equal(7, attached.MaxConnections);
-            Assert.Equal(2, attached.MaxUploadSlots);
-            Assert.Equal(9, attached.QueuePriority);
-            Assert.Equal(3, attached.RatioLimit);
-            Assert.Equal(TimeSpan.FromMinutes(17), attached.SeedTimeLimit);
-            Assert.Equal(Priority.High, attached.GetAllFileSelections()[0].Priority);
-            Assert.Equal("renamed.bin", attached.GetRenamedFiles()[0]);
-            Assert.Contains(attached.Trackers.GetTrackers(), t => t.Url == "https://tracker.invalid/announce");
-            Assert.Contains("https://seed.invalid/files/", attached.WebSeeds.GetAll());
             await attached.StartAsync(TestContext.Current.CancellationToken);
             Assert.Equal(1024UL, attached.FinishedBytes);
             Assert.Equal(data.Content, await File.ReadAllBytesAsync(Path.Combine(directory, "renamed.bin"), TestContext.Current.CancellationToken));
@@ -122,6 +111,99 @@ public sealed class PeerSharpIntegrationTests
         {
             if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
         }
+    }
+
+    /// <summary>
+    /// Adding a .torrent for files already on disk is the usual way to start seeding them. The real
+    /// engine, because what matters is what its check does with real files.
+    /// </summary>
+    [Fact]
+    public async Task AddingATorrentOverItsOwnFiles_ChecksThemRatherThanDownloadingThemAgain()
+    {
+        var (directory, settings) = ExistingFilesProfile();
+        Directory.CreateDirectory(directory);
+        var content = new byte[1024 * 1024];
+        Random.Shared.NextBytes(content);
+        await File.WriteAllBytesAsync(Path.Combine(directory, "existing.bin"), content, TestContext.Current.CancellationToken);
+        var metadata = new TorrentFileBuilder().WithName("existing.bin").WithPieceLength(16 * 1024).AddFile("existing.bin", content).Build();
+        var engine = new TorrentEngineService(settings, NullLoggerFactory.Instance, TimeProvider.System);
+        try
+        {
+            await engine.InitializeAsync(TestContext.Current.CancellationToken);
+            using var http = new HttpClient();
+            var service = new TorrentService(engine, Substitute.For<IAppMessenger>(), http, settings);
+
+            var torrent = await service.AddTorrentAsync(metadata, new AddTorrentOptions(directory), TestContext.Current.CancellationToken);
+
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+            deadline.CancelAfter(TimeSpan.FromSeconds(30));
+            while (!torrent.Finished)
+            {
+                await Task.Delay(10, deadline.Token);
+            }
+
+            Assert.Equal((ulong)content.Length, torrent.FinishedBytes);
+        }
+        finally
+        {
+            await engine.ShutdownAsync(TestContext.Current.CancellationToken);
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// A stop waits for a check rather than ending it. Whichever way this races, a stop that returns
+    /// has to leave the torrent stopped, with the engine still willing to start it again.
+    /// </summary>
+    [Fact]
+    public async Task StoppingATorrentCheckingItsFiles_LeavesItStopped()
+    {
+        var (directory, settings) = ExistingFilesProfile();
+        Directory.CreateDirectory(directory);
+        var content = new byte[64 * 1024 * 1024];
+        await File.WriteAllBytesAsync(Path.Combine(directory, "large.bin"), content, TestContext.Current.CancellationToken);
+        var metadata = new TorrentFileBuilder().WithName("large.bin").WithPieceLength(16 * 1024).AddFile("large.bin", content).Build();
+        var engine = new TorrentEngineService(settings, NullLoggerFactory.Instance, TimeProvider.System);
+        try
+        {
+            await engine.InitializeAsync(TestContext.Current.CancellationToken);
+            using var http = new HttpClient();
+            var service = new TorrentService(engine, Substitute.For<IAppMessenger>(), http, settings)
+            {
+                StartWait = TimeSpan.FromMilliseconds(1)
+            };
+            var torrent = await service.AddTorrentAsync(metadata, new AddTorrentOptions(directory), TestContext.Current.CancellationToken);
+
+            await service.StopAsync(torrent, TestContext.Current.CancellationToken);
+
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+            deadline.CancelAfter(TimeSpan.FromSeconds(30));
+            while (torrent.State != PeerSharp.Interfaces.TorrentState.Stopped)
+            {
+                await Task.Delay(5, deadline.Token);
+            }
+
+            Assert.False(torrent.Started);
+            await service.StartAsync(torrent, TestContext.Current.CancellationToken);
+            await service.StopAsync(torrent, TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            await engine.ShutdownAsync(TestContext.Current.CancellationToken);
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    private static (string Directory, IAppSettingsService Settings) ExistingFilesProfile()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), $"peerfluence-peersharp-{Guid.NewGuid():N}");
+        var settings = Substitute.For<IAppSettingsService>();
+        settings.Current.Returns(new AppSettings
+        {
+            Storage = { DownloadPath = directory, EnableSessionPersistence = false },
+            Network = { EnableDht = false, EnableNatPmp = false, EnableUpnp = false, UseAutomaticListeningPort = true },
+        });
+        return (directory, settings);
     }
 
     [Fact]

@@ -137,6 +137,23 @@ public sealed class MediaStreamingServiceTests
         Assert.Equal("127.0.0.1", new Uri(local.Url).Host);
     }
 
+    /// <summary>
+    /// Checking its files is a start already under way, and the torrent does not report itself
+    /// started until that ends. A second start would wait for it and then fail as already started.
+    /// </summary>
+    [Fact]
+    public async Task Playback_DoesNotStartATorrentAlreadyCheckingItsFiles()
+    {
+        using var service = Service();
+        var torrent = Torrent();
+        torrent.Started.Returns(false);
+        torrent.State.Returns(TorrentState.CheckingFiles);
+
+        await service.StartAsync(torrent, 0, false, TestContext.Current.CancellationToken);
+
+        await torrent.DidNotReceive().StartAsync(Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task Playback_StartsAStoppedTorrentAndRejectsUnstreamableFiles()
     {

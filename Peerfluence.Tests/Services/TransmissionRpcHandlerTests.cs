@@ -257,8 +257,8 @@ public sealed class TransmissionRpcHandlerTests
         await CallAsync("""{"method":"torrent-start-now","arguments":{}}""");
         await CallAsync("""{"method":"torrent-stop","arguments":{}}""");
 
-        await torrent.Received(1).StartAsync(Arg.Any<CancellationToken>());
-        await torrent.Received(1).StopAsync(Arg.Any<CancellationToken>());
+        await _torrentService.Received(1).StartAsync(torrent, Arg.Any<CancellationToken>());
+        await _torrentService.Received(1).StopAsync(torrent, Arg.Any<CancellationToken>());
     }
 
     /// <summary>
