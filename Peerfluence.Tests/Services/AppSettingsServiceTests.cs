@@ -87,7 +87,11 @@ public sealed class AppSettingsServiceTests : IDisposable
         paths.DefaultDownloadDirectory.Returns("downloads");
         paths.SessionDirectory.Returns("session");
         var store = Substitute.For<IAppSettingsStore>();
-        var loaded = new AppSettings { Storage = { DownloadPath = "downloads", SessionPath = "session" } };
+        var loaded = new AppSettings
+        {
+            Storage = { DownloadPath = "downloads", SessionPath = "session" },
+            Theme = { DefaultsRevision = ThemeSettings.CurrentDefaultsRevision },
+        };
         var defaults = new StreamingSettings();
         store.LoadAsync(Arg.Any<CancellationToken>()).Returns(loaded);
         var sut = new AppSettingsService(paths, store, Substitute.For<IFileSystem>());
@@ -140,7 +144,7 @@ public sealed class AppSettingsServiceTests : IDisposable
         Assert.Equal(paths.DefaultDownloadDirectory, sut.Current.Storage.DownloadPath);
         Assert.Equal(paths.SessionDirectory, sut.Current.Storage.SessionPath);
         Assert.Equal("System", sut.Current.Theme.ThemeVariant);
-        Assert.Equal("Teal", sut.Current.Theme.ColorTheme);
+        Assert.Equal("Cobalt", sut.Current.Theme.ColorTheme);
         Assert.Equal("en-US", sut.Current.Language);
         Assert.True(sut.Current.ShowRemoveTorrentOptions);
         Assert.Equal("RemoveOnly", sut.Current.DefaultRemoveTorrentAction);
@@ -177,7 +181,9 @@ public sealed class AppSettingsServiceTests : IDisposable
             Theme =
             {
                 ThemeVariant = "System",
+                // Teal, but chosen after the move to Cobalt, which the revision says.
                 ColorTheme = "Teal",
+                DefaultsRevision = ThemeSettings.CurrentDefaultsRevision,
             },
             Language = "en-US",
             DefaultRemoveTorrentAction = "RemoveOnly",
@@ -195,6 +201,56 @@ public sealed class AppSettingsServiceTests : IDisposable
         await sut.LoadAsync(TestContext.Current.CancellationToken);
 
         await store.DidNotReceive().SaveAsync(Arg.Any<AppSettings>(), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// Every earlier profile saved Teal, the old default, whether or not anyone chose it, so they all
+    /// move to Cobalt. Once: a Teal chosen afterwards is a choice, and survives a save and a restart.
+    /// </summary>
+    [Fact]
+    public async Task AProfileFromBeforeCobalt_MovesFromTealOnce_AndATealChosenAfterwardsStays()
+    {
+        var paths = CreatePaths();
+        var store = new JsonAppSettingsStore(paths, new FileSystem());
+        // As 2.2.0 wrote it: the theme as it was, with no revision.
+        await File.WriteAllTextAsync(paths.SettingsFilePath,
+            """{"Theme":{"ThemeVariant":"System","ColorTheme":"Teal"},"Language":"en-US"}""",
+            TestContext.Current.CancellationToken);
+
+        var upgraded = new AppSettingsService(paths, store, new FileSystem());
+        await upgraded.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal("Cobalt", upgraded.Current.Theme.ColorTheme);
+        Assert.Equal("System", upgraded.Current.Theme.ThemeVariant);
+        var saved = await store.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("Cobalt", saved!.Theme.ColorTheme);
+        Assert.Equal(ThemeSettings.CurrentDefaultsRevision, saved.Theme.DefaultsRevision);
+
+        upgraded.Current.Theme.ColorTheme = "Teal";
+        await upgraded.SaveAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("Teal", upgraded.Current.Theme.ColorTheme);
+
+        var restarted = new AppSettingsService(paths, store, new FileSystem());
+        await restarted.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("Teal", restarted.Current.Theme.ColorTheme);
+    }
+
+    /// <summary>A new profile starts on the current defaults, so a Teal chosen in it is never moved.</summary>
+    [Fact]
+    public async Task ANewProfile_StartsOnTheCurrentDefaults()
+    {
+        var paths = CreatePaths();
+        var store = new JsonAppSettingsStore(paths, new FileSystem());
+        var sut = new AppSettingsService(paths, store, new FileSystem());
+
+        await sut.LoadAsync(TestContext.Current.CancellationToken);
+        sut.Current.Theme.ColorTheme = "Teal";
+        await sut.SaveAsync(TestContext.Current.CancellationToken);
+
+        var restarted = new AppSettingsService(paths, store, new FileSystem());
+        await restarted.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("Teal", restarted.Current.Theme.ColorTheme);
+        Assert.Equal(ThemeSettings.CurrentDefaultsRevision, restarted.Current.Theme.DefaultsRevision);
     }
 
     [Fact]

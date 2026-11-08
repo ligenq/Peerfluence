@@ -52,7 +52,7 @@ artifact_base="Peerfluence-$version-$rid"
 rm -rf -- "$publish_dir" "$app_dir" "$package_root"
 mkdir -p "$publish_dir" "$app_dir/usr/lib/peerfluence" "$app_dir/usr/bin" \
     "$app_dir/usr/share/applications" "$app_dir/usr/share/metainfo" \
-    "$app_dir/usr/share/icons/hicolor/386x386/apps"
+    "$app_dir/usr/share/icons/hicolor/256x256/apps"
 
 # Native AOT, as on Windows (the project sets PublishAot). Measured on Windows, the window appears in
 # about 175 ms, against about 415 ms ReadyToRun and 920 ms JIT, from a package a third the size.
@@ -69,10 +69,13 @@ find "$publish_dir" -type f \( -name '*.pdb' -o -name '*.dbg' \) -delete
 cp -a "$publish_dir/." "$app_dir/usr/lib/peerfluence/"
 cp "$script_dir/linux/io.github.ligenq.Peerfluence.desktop" "$app_dir/usr/share/applications/"
 cp "$script_dir/linux/io.github.ligenq.Peerfluence.metainfo.xml" "$app_dir/usr/share/metainfo/"
-cp "$repo_root/Peerfluence/Assets/application-icon.png" \
-    "$app_dir/usr/share/icons/hicolor/386x386/apps/io.github.ligenq.Peerfluence.png"
+# 256x256, not the 386x386 window icon: an icon theme only searches the sizes its index.theme
+# lists, and hicolor lists no 386x386, so a launcher looking the icon up by name found nothing.
+# The image is the 256x256 frame of application-icon.ico.
+cp "$script_dir/linux/io.github.ligenq.Peerfluence.png" \
+    "$app_dir/usr/share/icons/hicolor/256x256/apps/io.github.ligenq.Peerfluence.png"
 cp "$script_dir/linux/AppRun" "$app_dir/AppRun"
-cp "$repo_root/Peerfluence/Assets/application-icon.png" "$app_dir/io.github.ligenq.Peerfluence.png"
+cp "$script_dir/linux/io.github.ligenq.Peerfluence.png" "$app_dir/io.github.ligenq.Peerfluence.png"
 ln -s ../lib/peerfluence/Peerfluence "$app_dir/usr/bin/peerfluence"
 chmod +x "$app_dir/AppRun" "$app_dir/usr/lib/peerfluence/Peerfluence"
 find "$app_dir" -type d -exec chmod 755 {} +
@@ -82,12 +85,12 @@ tar -C "$app_dir" -czf "$output_root/$artifact_base.tar.gz" .
 
 mkdir -p "$package_root/opt/peerfluence" "$package_root/usr/bin" \
     "$package_root/usr/share/applications" "$package_root/usr/share/metainfo" \
-    "$package_root/usr/share/icons/hicolor/386x386/apps" "$package_root/DEBIAN"
+    "$package_root/usr/share/icons/hicolor/256x256/apps" "$package_root/DEBIAN"
 cp -a "$publish_dir/." "$package_root/opt/peerfluence/"
 cp "$script_dir/linux/io.github.ligenq.Peerfluence.desktop" "$package_root/usr/share/applications/"
 cp "$script_dir/linux/io.github.ligenq.Peerfluence.metainfo.xml" "$package_root/usr/share/metainfo/"
-cp "$repo_root/Peerfluence/Assets/application-icon.png" \
-    "$package_root/usr/share/icons/hicolor/386x386/apps/io.github.ligenq.Peerfluence.png"
+cp "$script_dir/linux/io.github.ligenq.Peerfluence.png" \
+    "$package_root/usr/share/icons/hicolor/256x256/apps/io.github.ligenq.Peerfluence.png"
 ln -s /opt/peerfluence/Peerfluence "$package_root/usr/bin/peerfluence"
 find "$package_root" -type d -exec chmod 755 {} +
 find "$package_root" -type f ! -name Peerfluence -exec chmod 644 {} +

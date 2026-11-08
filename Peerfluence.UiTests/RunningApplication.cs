@@ -107,6 +107,57 @@ public sealed class RunningApplication : IDisposable
         return new RunningApplication(ProfileDirectory, settingsJson: null);
     }
 
+    /// <summary>
+    /// Closes the application as a person would, letting it save, and starts it on the same profile.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Restart"/> kills the process, which is a crash as far as the application can tell.
+    /// That is the right test of what the last save was worth, and the wrong one of what closing saves.
+    /// </remarks>
+    public RunningApplication RestartGracefully()
+    {
+        _ownsProfile = false;
+        ShutDown();
+        return new RunningApplication(ProfileDirectory, settingsJson: null);
+    }
+
+    /// <summary>Asks the application to close, and waits until the process has gone.</summary>
+    public void ShutDown()
+    {
+        using var process = Process.GetProcessById(_application.ProcessId);
+        CallToolAsync("shutdown_application", [], CancellationToken.None).GetAwaiter().GetResult();
+        if (!process.WaitForExit(TimeSpan.FromSeconds(60)))
+        {
+            throw new InvalidOperationException("the application did not close");
+        }
+
+        Dispose();
+    }
+
+    /// <summary>Calls one of the application's MCP tools, failing if the tool reports an error.</summary>
+    public async Task CallToolAsync(string name, Dictionary<string, object?> arguments, CancellationToken cancellationToken)
+    {
+        var transport = new StdioClientTransport(new StdioClientTransportOptions
+        {
+            Command = ExecutablePath(),
+            Arguments = ["--mcp", "--profile", ProfileDirectory],
+            Name = "Peerfluence tests",
+        });
+        await using var client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken);
+        var result = await client.CallToolAsync(name, arguments, cancellationToken: cancellationToken);
+        if (result.IsError == true)
+        {
+            var text = string.Join(" ", result.Content.OfType<TextContentBlock>().Select(block => block.Text));
+            throw new InvalidOperationException($"{name} failed: {text}");
+        }
+    }
+
+    /// <summary>
+    /// Long enough for the periodic save to have run, so a crash after this finds something saved.
+    /// </summary>
+    public static Task SaveSessionByWaitingAsync(CancellationToken cancellationToken) =>
+        Task.Delay(TimeSpan.FromSeconds(65), cancellationToken);
+
     /// <summary>The modal windows this one has opened.</summary>
     public Window[] ModalWindows => Window.ModalWindows;
 
@@ -278,6 +329,12 @@ public sealed class RunningApplication : IDisposable
     /// </summary>
     private static string ExecutablePath()
     {
+        // A published build, which is what people actually run, rather than the one beside these tests.
+        if (Environment.GetEnvironmentVariable("PEERFLUENCE_UI_TEST_EXECUTABLE") is { Length: > 0 } published)
+        {
+            return published;
+        }
+
         var configuration = Path.GetFileName(Path.GetDirectoryName(AppContext.BaseDirectory.TrimEnd(
             Path.DirectorySeparatorChar)))!;
 

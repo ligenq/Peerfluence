@@ -552,7 +552,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
     {
         foreach (var torrent in Resolve(arguments))
         {
-            await torrent.StartAsync(cancellationToken).ConfigureAwait(false);
+            await _torrentService.StartAsync(torrent, cancellationToken).ConfigureAwait(false);
         }
 
         return Success(tag);
@@ -562,7 +562,7 @@ public sealed class TransmissionRpcHandler : ITransmissionRpcHandler
     {
         foreach (var torrent in Resolve(arguments))
         {
-            await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
+            await _torrentService.StopAsync(torrent, cancellationToken).ConfigureAwait(false);
         }
 
         return Success(tag);

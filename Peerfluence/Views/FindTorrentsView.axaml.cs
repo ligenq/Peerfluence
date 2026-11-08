@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Peerfluence.ViewModels;
 
 namespace Peerfluence.Views;
@@ -10,6 +11,25 @@ public partial class FindTorrentsView : UserControl
     {
         InitializeComponent();
         DataContextChanged += (_, _) => (DataContext as FindTorrentsViewModel)?.Refresh();
+
+        // Tunnelling, because the grid takes Enter for itself to move down a row, and a handled
+        // event never bubbles back up to here.
+        ResultsGrid.AddHandler(KeyDownEvent, ResultsGrid_OnKeyDown, RoutingStrategies.Tunnel);
+    }
+
+    /// <summary>
+    /// Enter adds the selected result, so the results can be worked through without a mouse.
+    /// </summary>
+    private void ResultsGrid_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter
+            && e.KeyModifiers == KeyModifiers.None
+            && DataContext is FindTorrentsViewModel viewModel
+            && viewModel.AddCommand.CanExecute(viewModel.SelectedResult))
+        {
+            viewModel.AddCommand.Execute(viewModel.SelectedResult);
+            e.Handled = true;
+        }
     }
 
     /// <summary>

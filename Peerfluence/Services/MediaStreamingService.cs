@@ -77,7 +77,9 @@ public sealed class MediaStreamingService : IMediaStreamingService
         try
         {
             server.Start();
-            if (!torrent.Started)
+            // Checking its files is a start already under way. A second one would wait for it and
+            // then fail as already started; the stream below waits for the data either way.
+            if (!torrent.Started && torrent.State != TorrentState.CheckingFiles)
             {
                 await torrent.StartAsync(session.Token).ConfigureAwait(false);
             }

@@ -25,10 +25,13 @@ public class AddTorrentOptionsViewModelTests
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.HasError);
             Assert.False(sut.WasAdded);
+            Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_SslCertificateRequired, sut.ErrorMessage);
             sut.SslCertificatePath = path;
             sut.SslCertificatePassword = "wrong";
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.HasError);
+            // Says what to check, rather than passing on the cryptography library's own words.
+            Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_SslCertificateUnreadable, sut.ErrorMessage);
             await service.DidNotReceive().AddTorrentAsync(Arg.Any<TorrentFile>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
 
             byte[]? exported = null;
@@ -58,15 +61,14 @@ public class AddTorrentOptionsViewModelTests
         {
             await File.WriteAllBytesAsync(path, data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12), TestContext.Current.CancellationToken);
             var original = Substitute.For<ITorrent>();
+            original.IsSsl.Returns(true);
             original.ExportTorrentFile().Returns(data.Metadata);
             original.Files.DownloadPath.Returns(Path.GetTempPath());
             original.Name.Returns(data.Metadata.Name);
-            var rejected = Substitute.For<ITorrent>();
-            rejected.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(new System.Security.Authentication.AuthenticationException("Rejected")));
-            var accepted = Substitute.For<ITorrent>();
             var service = Substitute.For<ITorrentService>();
-            service.SetSslCertificateAsync(original, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>()).Returns(rejected);
-            service.SetSslCertificateAsync(rejected, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>()).Returns(accepted);
+            service.StartAsync(original, Arg.Any<CancellationToken>()).Returns(
+                Task.FromException(new System.Security.Authentication.AuthenticationException("Rejected")),
+                Task.CompletedTask);
             var sut = AddTorrentOptionsViewModel.CreateForSslCertificate(original, service,
                 Substitute.For<ITopLevelService>(), CreateSettingsService(Path.GetTempPath()));
             Assert.False(sut.IsNewTorrent);
@@ -74,12 +76,85 @@ public class AddTorrentOptionsViewModelTests
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.HasError);
             Assert.False(sut.WasAdded);
-            Assert.False(rejected.QueueAutoStart);
+            Assert.False(original.QueueAutoStart);
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.WasAdded);
-            await accepted.Received(1).StartAsync(Arg.Any<CancellationToken>());
+            await service.Received(2).SetSslCertificateAsync(original, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>());
+            await service.Received(2).StartAsync(original, Arg.Any<CancellationToken>());
         }
         finally { File.Delete(path); }
+    }
+
+    /// <summary>
+    /// The engine says why as an argument exception, whose message ends in the name of a parameter.
+    /// </summary>
+    [Fact]
+    public async Task ACertificateTheEngineRefuses_IsReportedInTheDialog_AndNothingStarts()
+    {
+        using var data = new SslTorrentTestData();
+        var path = Path.GetTempFileName();
+        try
+        {
+            await File.WriteAllBytesAsync(path, data.Certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12), TestContext.Current.CancellationToken);
+            var torrent = Substitute.For<ITorrent>();
+            torrent.IsSsl.Returns(true);
+            torrent.ExportTorrentFile().Returns(data.Metadata);
+            torrent.Files.DownloadPath.Returns(Path.GetTempPath());
+            var service = Substitute.For<ITorrentService>();
+            service.SetSslCertificateAsync(torrent, Arg.Any<System.Security.Cryptography.X509Certificates.X509Certificate2>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromException(new ArgumentException("Not issued for this torrent.", "certificate")));
+            var sut = AddTorrentOptionsViewModel.CreateForSslCertificate(torrent, service,
+                Substitute.For<ITopLevelService>(), CreateSettingsService(Path.GetTempPath()));
+            sut.SslCertificatePath = path;
+
+            await sut.AddCommand.ExecuteAsync(null);
+
+            Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_SslCertificateRejected, sut.ErrorMessage);
+            Assert.False(sut.WasAdded);
+            await service.DidNotReceive().StartAsync(torrent, Arg.Any<CancellationToken>());
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public async Task AFailedAdd_SaysWhatToDoAboutIt_AndStaysOpen()
+    {
+        var service = Substitute.For<ITorrentService>();
+        service.AddMagnetAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns<Task<ITorrent>>(_ => throw new PeerSharp.Exceptions.TorrentAlreadyExistsException(Substitute.For<ITorrent>()));
+        var sut = AddTorrentOptionsViewModel.CreateForMagnet(
+            "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&dn=Test",
+            service,
+            Substitute.For<ITopLevelService>(),
+            CreateSettingsService(Path.GetTempPath()), Substitute.For<ITorrentCategoryService>());
+
+        await sut.AddCommand.ExecuteAsync(null);
+
+        Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_AlreadyAdded, sut.ErrorMessage);
+        Assert.False(sut.WasAdded);
+    }
+
+    [Fact]
+    public void AddFailures_TheUserCanFix_AreSaidInTheirTerms()
+    {
+        Assert.Equal(
+            Peerfluence.Properties.Resources.AddTorrent_AlreadyAdded,
+            AddTorrentOptionsViewModel.DescribeAddFailure(new PeerSharp.Exceptions.TorrentAlreadyExistsException(Substitute.For<ITorrent>())));
+        Assert.Equal(
+            Peerfluence.Properties.Resources.AddTorrent_FolderNotWritable,
+            AddTorrentOptionsViewModel.DescribeAddFailure(new UnauthorizedAccessException("Access to the path is denied.")));
+    }
+
+    /// <summary>
+    /// Anything else keeps the engine's words, which may be all there is to go on, after a sentence
+    /// saying what they are about.
+    /// </summary>
+    [Fact]
+    public void AnUnforeseenAddFailure_IsIntroduced_RatherThanShownBare()
+    {
+        var described = AddTorrentOptionsViewModel.DescribeAddFailure(new InvalidOperationException("Engine is not running"));
+
+        Assert.Equal(string.Format(Peerfluence.Properties.Resources.AddTorrent_Failed, "Engine is not running"), described);
     }
 
     [Fact]

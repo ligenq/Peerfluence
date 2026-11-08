@@ -284,6 +284,24 @@ public class FindTorrentsViewModelTests
         Assert.Contains("Engine is not running", sut.StatusMessage);
     }
 
+    /// <summary>
+    /// The visible Add button follows the selection, rather than sitting enabled over an empty grid.
+    /// </summary>
+    [Fact]
+    public void Add_IsOfferedOnlyOnceAResultIsSelected()
+    {
+        var sut = Create();
+        var changes = 0;
+        sut.AddCommand.CanExecuteChanged += (_, _) => changes++;
+
+        Assert.False(sut.AddCommand.CanExecute(sut.SelectedResult));
+
+        sut.SelectedResult = new TorrentSearchResultViewModel(Result("ubuntu"));
+
+        Assert.True(sut.AddCommand.CanExecute(sut.SelectedResult));
+        Assert.Equal(1, changes);
+    }
+
     [Fact]
     public async Task Add_IgnoresNothingBeingSelected()
     {

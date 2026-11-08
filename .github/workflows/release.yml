@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.400
+          dotnet-version: 10.0.403
       - name: Install Native AOT prerequisites
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang zlib1g-dev
       - name: Build Linux packages
@@ -88,7 +88,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.400
+          dotnet-version: 10.0.403
       - name: Install CycloneDX
         run: dotnet tool install -g CycloneDX
       - name: Generate SBOM
@@ -105,7 +105,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.400
+          dotnet-version: 10.0.403
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
       - name: Build Windows release

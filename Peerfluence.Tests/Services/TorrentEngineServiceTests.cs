@@ -205,34 +205,111 @@ public class TorrentEngineServiceTests
         }
     }
 
-    /// <summary>
-    /// Asking whether a torrent is SSL serializes its whole metadata, so startup asks only the
-    /// torrents whose answer changes something: the ones the queue would otherwise retry.
-    /// </summary>
     [Fact]
-    public async Task InitializeAsync_StopsOnlyAutoStartingSslTorrentsRetrying_AndLeavesTheRestUnexamined()
+    public async Task InitializeAsync_StopsTheQueueRetryingSslTorrents_AndOnlyThose()
     {
-        using var ssl = new SslTorrentTestData();
-        var idleTorrent = StoppedTorrent(queueAutoStart: false, PlainTorrentTestData.Metadata());
-        var waitingPlainTorrent = StoppedTorrent(queueAutoStart: true, PlainTorrentTestData.Metadata());
-        var waitingSslTorrent = StoppedTorrent(queueAutoStart: true, ssl.Metadata);
-        var engine = SubstituteEngine(idleTorrent, waitingPlainTorrent, waitingSslTorrent);
+        var plainTorrent = StoppedTorrent(queueAutoStart: true, isSsl: false);
+        var sslTorrent = StoppedTorrent(queueAutoStart: true, isSsl: true);
+        var engine = SubstituteEngine(plainTorrent, sslTorrent);
 
         await using var sut = CreateSut(BaseSettings(), engine);
         await sut.InitializeAsync(TestContext.Current.CancellationToken);
 
-        idleTorrent.DidNotReceive().ExportTorrentFile();
-        Assert.True(waitingPlainTorrent.QueueAutoStart);
-        Assert.False(waitingSslTorrent.QueueAutoStart);
+        Assert.True(plainTorrent.QueueAutoStart);
+        Assert.False(sslTorrent.QueueAutoStart);
+    }
+
+    /// <summary>
+    /// The pause made here is for starting up. One the session was left in is the person's, and
+    /// resuming it would start transfers they had stopped, on a metered connection perhaps.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_LeavesASessionThatWasLeftPausedPaused()
+    {
+        var sslTorrent = StoppedTorrent(queueAutoStart: true, isSsl: true);
+        var engine = SubstituteEngine(sslTorrent);
+        engine.Settings.Queue.Enabled = true;
+        engine.SessionRestoredPaused.Returns(true);
+
+        await using var sut = CreateSut(BaseSettings(), engine);
+        await sut.InitializeAsync(TestContext.Current.CancellationToken);
+
+        await engine.DidNotReceive().ResumeAsync(Arg.Any<CancellationToken>());
+        Assert.False(sslTorrent.QueueAutoStart);
+        Assert.True(engine.Settings.Queue.Enabled);
+    }
+
+    /// <summary>
+    /// Resuming hashes any restored torrent with files on disk and no resume data, and the window
+    /// opens only after this returns. After a crash that could be minutes.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_DoesNotWaitForRestoredTorrentsStillCheckingFiles()
+    {
+        var sslTorrent = StoppedTorrent(queueAutoStart: true, isSsl: true);
+        var engine = SubstituteEngine(sslTorrent);
+        engine.Settings.Queue.Enabled = true;
+        var checking = new TaskCompletionSource();
+        engine.ResumeAsync(Arg.Any<CancellationToken>()).Returns(checking.Task);
+        await using var sut = CreateSut(BaseSettings(), engine, restoredStartWait: TimeSpan.FromMilliseconds(20));
+
+        await sut.InitializeAsync(TestContext.Current.CancellationToken);
+
+        // Not finished, so the queue must not be let loose on torrents still resuming.
+        Assert.False(engine.Settings.Queue.Enabled);
+
+        checking.SetResult();
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        deadline.CancelAfter(TimeSpan.FromSeconds(10));
+        while (!engine.Settings.Queue.Enabled)
+        {
+            await Task.Delay(5, deadline.Token);
+        }
+
+        Assert.False(sslTorrent.QueueAutoStart);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_WhenResumingFailsStraightAway_ReportsThatFailure_AndRestoresTheQueue()
+    {
+        var cause = new InvalidOperationException("The session could not resume.");
+        var engine = SubstituteEngine();
+        engine.Settings.Queue.Enabled = true;
+        engine.ResumeAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(cause));
+
+        await using var sut = CreateSut(BaseSettings(), engine);
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => sut.InitializeAsync(TestContext.Current.CancellationToken));
+
+        Assert.Same(cause, thrown);
+        Assert.True(engine.Settings.Queue.Enabled);
+    }
+
+    [Theory]
+    [InlineData(NetworkSettings.SsrfMitigationThisDevice, SsrfMitigation.ThisDevice)]
+    [InlineData(NetworkSettings.SsrfMitigationLocalNetworks, SsrfMitigation.LocalNetworks)]
+    [InlineData(NetworkSettings.SsrfMitigationOff, SsrfMitigation.None)]
+    public async Task TheEngineIsBuiltWithTheChosenSsrfMitigation(string stored, SsrfMitigation expected)
+    {
+        var settingsService = Substitute.For<IAppSettingsService>();
+        settingsService.Current.Returns(BaseSettings(s => s.Network.SsrfMitigation = stored));
+        var built = SsrfMitigation.None;
+        await using var sut = new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>(), TimeProvider.System, options =>
+        {
+            built = options.Settings!.Connection.SsrfMitigation;
+            return SubstituteEngine();
+        });
+
+        await sut.InitializeAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(expected, built);
     }
 
     [Fact]
     public async Task InitializeAsync_WhenTheEngineFailsToStart_ReportsThatFailure_AndRestoresTheQueue()
     {
         var cause = new InvalidOperationException("Could not bind the listening port.");
-        var unreadable = StoppedTorrent(queueAutoStart: true, PlainTorrentTestData.Metadata());
-        unreadable.ExportTorrentFile().Returns(_ => throw new ObjectDisposedException("torrent"));
-        var engine = SubstituteEngine(unreadable);
+        var engine = SubstituteEngine();
         engine.Settings.Queue.Enabled = true;
         engine.InitializeAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException(cause));
 
@@ -262,11 +339,13 @@ public class TorrentEngineServiceTests
         settings.Network.MaxDownloadSpeedBytesPerSecond = 250 * 1024;
         settings.Streaming.ReadAheadBytes = 32 * 1024 * 1024;
         settings.EncryptionMode = "Require";
+        settings.Network.SsrfMitigation = NetworkSettings.SsrfMitigationLocalNetworks;
         settingsService.SettingsSaved += Raise.Event<Func<CancellationToken, Task>>(CancellationToken.None);
 
         Assert.Equal(250 * 1024, engine.Settings.Transfer.MaxDownloadSpeed);
         Assert.Equal(32 * 1024 * 1024, engine.Settings.Streaming.ReadAheadBytes);
         Assert.Equal(Encryption.Require, engine.Settings.Connection.Encryption);
+        Assert.Equal(SsrfMitigation.LocalNetworks, engine.Settings.Connection.SsrfMitigation);
     }
 
     private static IClientEngine SubstituteEngine(params ITorrent[] torrents)
@@ -277,13 +356,12 @@ public class TorrentEngineServiceTests
         return engine;
     }
 
-    private static ITorrent StoppedTorrent(bool queueAutoStart, PeerSharp.Core.TorrentFile metadata)
+    private static ITorrent StoppedTorrent(bool queueAutoStart, bool isSsl)
     {
         var torrent = Substitute.For<ITorrent>();
         torrent.Started.Returns(false);
-        torrent.HasMetadata.Returns(true);
+        torrent.IsSsl.Returns(isSsl);
         torrent.QueueAutoStart = queueAutoStart;
-        torrent.ExportTorrentFile().Returns(metadata);
         return torrent;
     }
 
@@ -292,6 +370,16 @@ public class TorrentEngineServiceTests
         var settingsService = Substitute.For<IAppSettingsService>();
         settingsService.Current.Returns(settings);
         return new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>(), TimeProvider.System, _ => engine);
+    }
+
+    private static TorrentEngineService CreateSut(AppSettings settings, IClientEngine engine, TimeSpan restoredStartWait)
+    {
+        var settingsService = Substitute.For<IAppSettingsService>();
+        settingsService.Current.Returns(settings);
+        return new TorrentEngineService(settingsService, Substitute.For<ILoggerFactory>(), TimeProvider.System, _ => engine)
+        {
+            RestoredStartWait = restoredStartWait
+        };
     }
 
     private static TorrentEngineService CreateSut(AppSettings settings)

@@ -124,9 +124,6 @@
   <data name="Simple_EmptyBody" xml:space="preserve">
     <value>Adicione um ficheiro .torrent ou cole uma ligação magnet para começar a transferir.</value>
   </data>
-  <data name="Simple_PauseResume" xml:space="preserve">
-    <value>Pausar ou retomar</value>
-  </data>
   <data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Mudar para avançado</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Concluídas</value>
   </data>
   <data name="Downloads_NoMatches" xml:space="preserve">
-    <value>Nenhuma transferência corresponde à sua procura.</value>
+    <value>Nenhuma transferência corresponde à procura e aos filtros.</value>
   </data>
   <data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Interface</value>
@@ -884,13 +881,13 @@
     <value>Selecione a pasta de dados da sessão</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Remover {0} transferências da lista?</value>
+    <value>Remover {0} torrents?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Remover torrent</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Remover "{0}" da lista de downloads?</value>
+    <value>Remover "{0}"?</value>
   </data>
   <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Exclua também arquivos do disco</value>
@@ -1277,7 +1274,7 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
     <value>Chave de API</value>
   </data>
   <data name="Settings_Search_Test" xml:space="preserve">
-    <value>Testar</value>
+    <value>Testar ligação</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Endereço preenchido. A verificar se responde...</value>
@@ -1653,5 +1650,74 @@ O Peerfluence está licenciado ao abrigo da MIT License. Ao instalar ou utilizar
   </data>
   <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
     <value>Escolha um certificado que inclua a sua chave privada.</value>
+  </data>
+  <data name="Status_StartTorrentFailed" xml:space="preserve">
+    <value>Não foi possível iniciar {0}: {1}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRejected" xml:space="preserve">
+    <value>Este certificado não foi emitido para este torrent.</value>
+  </data>
+  <data name="Settings_SsrfMitigation" xml:space="preserve">
+    <value>Manter os torrents afastados dos serviços locais</value>
+  </data>
+  <data name="Settings_SsrfMitigationThisDevice" xml:space="preserve">
+    <value>Este dispositivo</value>
+  </data>
+  <data name="Settings_SsrfMitigationLocalNetworks" xml:space="preserve">
+    <value>Este dispositivo e as suas redes locais</value>
+  </data>
+  <data name="Settings_SsrfMitigationOff" xml:space="preserve">
+    <value>Desativado</value>
+  </data>
+  <data name="Settings_SsrfMitigationHint" xml:space="preserve">
+    <value>Um torrent escolhe os seus próprios endereços de tracker e de semente web, pelo que pode tentar enviar pedidos a serviços deste dispositivo ou da sua rede. Se um tracker da sua rede deixar de funcionar, indique-o pelo endereço IP ou escolha uma definição inferior.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Remover torrents</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Remover {0} torrents e eliminar os ficheiros transferidos? Esta ação não pode ser anulada.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Remover {0} torrents e eliminar os respetivos metadados? Os ficheiros transferidos são mantidos.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Remover {0} torrents e eliminar tanto os ficheiros transferidos como os respetivos metadados? Esta ação não pode ser anulada.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Limpar filtros</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Ligar a um indexador</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Adicionar seleção</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>Este torrent já está nas suas transferências.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>O Peerfluence não consegue escrever na pasta de transferências. Escolha outra pasta.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>Não foi possível adicionar o torrent: {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>Não foi possível abrir o certificado. Verifique o ficheiro e a palavra-passe.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Pausar {0}</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Retomar {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Abrir a pasta de {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>Mais ações para {0}</value>
   </data>
 </root>

@@ -32,6 +32,9 @@ public interface ITorrentEngineService : IAsyncDisposable
     /// <summary>Applies encryption preferences to future peer handshakes.</summary>
     void ApplyEncryptionSettings();
 
+    /// <summary>Sets how far the next tracker and web seed requests are kept from local services.</summary>
+    void ApplySsrfMitigation();
+
     Task LoadOptionalDataAsync(CancellationToken cancellationToken);
 
     Task ShutdownAsync(CancellationToken cancellationToken);

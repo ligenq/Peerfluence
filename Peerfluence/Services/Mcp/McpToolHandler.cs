@@ -147,12 +147,13 @@ public class McpToolHandler : IMcpToolHandler
             switch (action.ToLowerInvariant())
             {
                 case "pause":
-                    if (torrent.State == TorrentState.Stopped)
+                    // One waiting for the queue would start by itself, so it is not paused yet.
+                    if (torrent.State == TorrentState.Stopped && !_torrentService.IsQueued(torrent))
                     {
                         return ToolSuccess($"Torrent {infoHash} is already paused.");
                     }
 
-                    await TorrentService.StopAsync(torrent, cancellationToken);
+                    await _torrentService.StopAsync(torrent, cancellationToken);
                     return ToolSuccess($"Successfully paused torrent {infoHash}.");
                 case "resume":
                     if (torrent.State == TorrentState.Active)
@@ -160,7 +161,7 @@ public class McpToolHandler : IMcpToolHandler
                         return ToolSuccess($"Torrent {infoHash} is already active.");
                     }
 
-                    await TorrentService.StartAsync(torrent, cancellationToken);
+                    await _torrentService.StartAsync(torrent, cancellationToken);
                     return ToolSuccess($"Successfully resumed torrent {infoHash}.");
                 case "remove":
                     if (!DestructiveToolsAllowed)
@@ -349,6 +350,11 @@ public class McpToolHandler : IMcpToolHandler
             case "incomingencryptionmode": current.Network.IncomingEncryptionMode = ReadEncryptionMode(value, allowInherit: true); break;
             case "outgoingencryptionmode": current.Network.OutgoingEncryptionMode = ReadEncryptionMode(value, allowInherit: true); break;
             case "enablei2p": current.Network.EnableI2p = value.GetBoolean(); break;
+            case "ssrfmitigation":
+                var ssrfMitigation = value.GetString();
+                if (!NetworkSettings.IsSsrfMitigation(ssrfMitigation)) throw new ArgumentOutOfRangeException(nameof(value), "SSRF mitigation must be ThisDevice, LocalNetworks or None.");
+                current.Network.SsrfMitigation = ssrfMitigation!;
+                break;
             case "i2psamhost": current.Network.I2pSamHost = NetworkSettings.NormalizeI2pSamHost(value.GetString()); break;
             case "i2psamport":
                 // Refused rather than clamped: a client that asked for a port it cannot have should

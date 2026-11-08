@@ -6,6 +6,7 @@
                  xmlns:controls="using:Peerfluence.Controls"
                  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                  xmlns:m="using:Peerfluence.Markup"
+                 xmlns:app="using:Peerfluence"
                  mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="760"
                  x:Class="Peerfluence.Views.AddTorrentOptionsWindow"
                  x:DataType="vm:AddTorrentOptionsViewModel"
@@ -18,6 +19,11 @@
         <Grid RowDefinitions="*, Auto" Margin="{StaticResource MLargeLeftTopRightBottomMargin}">
             <ScrollViewer Grid.Row="0" Classes="dialogForm">
                 <StackPanel Spacing="{StaticResource SpacingLarge}">
+                    <!-- The title, where the title bar cannot show it. See ChromeOs. -->
+                    <TextBlock Classes="title"
+                               Text="{Binding $parent[Window].Title}"
+                               IsVisible="{x:Static app:ChromeOs.HidesWindowTitles}"/>
+
                     <Border Classes="panel">
                         <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" RowSpacing="{StaticResource SpacingNormal}" ColumnSpacing="{StaticResource SpacingLarge}">
                             <materialIcons:MaterialIcon Grid.RowSpan="2"
@@ -217,22 +223,32 @@
                             </Border>
                         </StackPanel>
                     </Expander>
-
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               IsVisible="{Binding HasError}"
-                               Foreground="{StaticResource ErrorColor}"
-                               TextWrapping="Wrap"/>
                 </StackPanel>
             </ScrollViewer>
 
+            <!--
+                The error sits with the buttons, which never scroll, rather than at the foot of a form
+                that can run to hundreds of files. Down there a failed add looked like nothing
+                happening at all.
+            -->
             <Grid Grid.Row="1"
+                  RowDefinitions="Auto, Auto"
                   ColumnDefinitions="*, Auto"
+                  RowSpacing="{StaticResource SpacingNormal}"
                   ColumnSpacing="{StaticResource SpacingStandard}"
                   Margin="{StaticResource MediumTopMargin}">
-                <CheckBox IsVisible="{Binding IsNewTorrent}" Content="{m:L AddTorrent_SkipThisStepNextTime}"
+                <TextBlock x:Name="AddErrorText"
+                           Grid.ColumnSpan="2"
+                           Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           Foreground="{StaticResource ErrorColor}"
+                           TextWrapping="Wrap"
+                           AutomationProperties.LiveSetting="Assertive"
+                           AutomationProperties.AutomationId="AddErrorText"/>
+                <CheckBox Grid.Row="1" IsVisible="{Binding IsNewTorrent}" Content="{m:L AddTorrent_SkipThisStepNextTime}"
                           IsChecked="{Binding SkipThisStepNextTime}"
                           VerticalAlignment="Center" AutomationProperties.AutomationId="SkipThisStepNextTimeCheckBox"/>
-                <StackPanel Grid.Column="1"
+                <StackPanel Grid.Row="1" Grid.Column="1"
                             Classes="dialogActions"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">

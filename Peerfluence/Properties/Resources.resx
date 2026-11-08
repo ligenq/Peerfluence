@@ -124,9 +124,6 @@
 	<data name="Simple_EmptyBody" xml:space="preserve">
     <value>Add a .torrent file or paste a magnet link to start downloading.</value>
   </data>
-	<data name="Simple_PauseResume" xml:space="preserve">
-    <value>Pause or resume</value>
-  </data>
 	<data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Switch to advanced</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Completed</value>
   </data>
 	<data name="Downloads_NoMatches" xml:space="preserve">
-    <value>No downloads match your search.</value>
+    <value>No downloads match the search and filters.</value>
   </data>
 	<data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Interface</value>
@@ -884,13 +881,13 @@
     <value>Select session data folder</value>
   </data>
 	<data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Remove {0} downloads from the list?</value>
+    <value>Remove {0} torrents?</value>
   </data>
 	<data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Remove torrent</value>
   </data>
 	<data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Remove "{0}" from the download list?</value>
+    <value>Remove "{0}"?</value>
   </data>
 	<data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Also delete files from disk</value>
@@ -1271,7 +1268,7 @@
     <value>API key</value>
   </data>
 	<data name="Settings_Search_Test" xml:space="preserve">
-    <value>Test</value>
+    <value>Test connection</value>
   </data>
 	<data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Address filled in. Checking whether it answers...</value>
@@ -1619,5 +1616,74 @@
   </data>
   <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
     <value>Choose a certificate that includes its private key.</value>
+  </data>
+  <data name="Status_StartTorrentFailed" xml:space="preserve">
+    <value>Could not start {0}: {1}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRejected" xml:space="preserve">
+    <value>This certificate was not issued for this torrent.</value>
+  </data>
+  <data name="Settings_SsrfMitigation" xml:space="preserve">
+    <value>Keep torrents away from local services</value>
+  </data>
+  <data name="Settings_SsrfMitigationThisDevice" xml:space="preserve">
+    <value>This device</value>
+  </data>
+  <data name="Settings_SsrfMitigationLocalNetworks" xml:space="preserve">
+    <value>This device and its local networks</value>
+  </data>
+  <data name="Settings_SsrfMitigationOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Settings_SsrfMitigationHint" xml:space="preserve">
+    <value>A torrent chooses its own tracker and web seed addresses, so it could try to send requests to services on this device or your network. If a tracker on your own network stops working, enter it by its IP address or choose a lower setting.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Remove torrents</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Remove {0} torrents and delete the files they downloaded? This cannot be undone.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Remove {0} torrents and delete their torrent metadata? The downloaded files are kept.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Remove {0} torrents and delete both the files they downloaded and their torrent metadata? This cannot be undone.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Clear filters</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Connect an indexer</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Add selected</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>This torrent is already in your downloads.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>Peerfluence cannot write to the download folder. Choose another folder.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>The torrent could not be added: {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>The certificate could not be opened. Check the file and its password.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Pause {0}</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Resume {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Open the folder for {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>More actions for {0}</value>
   </data>
 </root>

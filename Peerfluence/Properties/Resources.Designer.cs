@@ -1739,7 +1739,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No downloads match your search..
+        ///   Looks up a localized string similar to No downloads match the search and filters..
         /// </summary>
         public static string Downloads_NoMatches {
             get {
@@ -1793,7 +1793,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove {0} downloads from the list?.
+        ///   Looks up a localized string similar to Remove {0} torrents?.
         /// </summary>
         public static string Downloads_Remove_Confirm_Many {
             get {
@@ -1802,7 +1802,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove &quot;{0}&quot; from the download list?.
+        ///   Looks up a localized string similar to Remove &quot;{0}&quot;?.
         /// </summary>
         public static string Downloads_Remove_Confirm_Message {
             get {
@@ -3827,7 +3827,7 @@ namespace Peerfluence.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test.
+        ///   Looks up a localized string similar to Test connection.
         /// </summary>
         public static string Settings_Search_Test {
             get {
@@ -4282,15 +4282,6 @@ namespace Peerfluence.Properties {
         public static string Simple_EmptyBody {
             get {
                 return ResourceManager.GetString("Simple_EmptyBody", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Pause or resume.
-        /// </summary>
-        public static string Simple_PauseResume {
-            get {
-                return ResourceManager.GetString("Simple_PauseResume", resourceCulture);
             }
         }
         
@@ -4755,5 +4746,163 @@ namespace Peerfluence.Properties {
 
         public static string AddTorrent_SslCertificateRequired => ResourceManager.GetString("AddTorrent_SslCertificateRequired", resourceCulture);
 
+        public static string Status_StartTorrentFailed => ResourceManager.GetString("Status_StartTorrentFailed", resourceCulture);
+
+        public static string AddTorrent_SslCertificateRejected => ResourceManager.GetString("AddTorrent_SslCertificateRejected", resourceCulture);
+
+        public static string Settings_SsrfMitigation => ResourceManager.GetString("Settings_SsrfMitigation", resourceCulture);
+
+        public static string Settings_SsrfMitigationThisDevice => ResourceManager.GetString("Settings_SsrfMitigationThisDevice", resourceCulture);
+
+        public static string Settings_SsrfMitigationLocalNetworks => ResourceManager.GetString("Settings_SsrfMitigationLocalNetworks", resourceCulture);
+
+        public static string Settings_SsrfMitigationOff => ResourceManager.GetString("Settings_SsrfMitigationOff", resourceCulture);
+
+        public static string Settings_SsrfMitigationHint => ResourceManager.GetString("Settings_SsrfMitigationHint", resourceCulture);
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove torrents.
+        /// </summary>
+        public static string Downloads_Remove_Confirm_Title_Many {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_Confirm_Title_Many", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove {0} torrents and delete the files they downloaded? This cannot be undone..
+        /// </summary>
+        public static string Downloads_Remove_ConfirmDelete_Files {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_ConfirmDelete_Files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove {0} torrents and delete their torrent metadata? The downloaded files are kept..
+        /// </summary>
+        public static string Downloads_Remove_ConfirmDelete_Metadata {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_ConfirmDelete_Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove {0} torrents and delete both the files they downloaded and their torrent metadata? This cannot be undone..
+        /// </summary>
+        public static string Downloads_Remove_ConfirmDelete_All {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_ConfirmDelete_All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Downloads_Remove_Delete {
+            get {
+                return ResourceManager.GetString("Downloads_Remove_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear filters.
+        /// </summary>
+        public static string Downloads_ClearFilters {
+            get {
+                return ResourceManager.GetString("Downloads_ClearFilters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect an indexer.
+        /// </summary>
+        public static string Settings_Search_Indexer {
+            get {
+                return ResourceManager.GetString("Settings_Search_Indexer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add selected.
+        /// </summary>
+        public static string Find_AddSelected {
+            get {
+                return ResourceManager.GetString("Find_AddSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This torrent is already in your downloads..
+        /// </summary>
+        public static string AddTorrent_AlreadyAdded {
+            get {
+                return ResourceManager.GetString("AddTorrent_AlreadyAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peerfluence cannot write to the download folder. Choose another folder..
+        /// </summary>
+        public static string AddTorrent_FolderNotWritable {
+            get {
+                return ResourceManager.GetString("AddTorrent_FolderNotWritable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The torrent could not be added: {0}.
+        /// </summary>
+        public static string AddTorrent_Failed {
+            get {
+                return ResourceManager.GetString("AddTorrent_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The certificate could not be opened. Check the file and its password..
+        /// </summary>
+        public static string AddTorrent_SslCertificateUnreadable {
+            get {
+                return ResourceManager.GetString("AddTorrent_SslCertificateUnreadable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause {0}.
+        /// </summary>
+        public static string Simple_Pause {
+            get {
+                return ResourceManager.GetString("Simple_Pause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resume {0}.
+        /// </summary>
+        public static string Simple_Resume {
+            get {
+                return ResourceManager.GetString("Simple_Resume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the folder for {0}.
+        /// </summary>
+        public static string Simple_OpenFolder {
+            get {
+                return ResourceManager.GetString("Simple_OpenFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More actions for {0}.
+        /// </summary>
+        public static string Simple_MoreActions {
+            get {
+                return ResourceManager.GetString("Simple_MoreActions", resourceCulture);
+            }
+        }
+        
     }
 }

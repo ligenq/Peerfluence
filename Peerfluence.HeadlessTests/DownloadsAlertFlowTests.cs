@@ -96,6 +96,84 @@ public sealed class DownloadsAlertFlowTests : IDisposable
         StopLoops(vm);
     }
 
+    private static readonly DateTimeOffset FirstAdded = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+    /// <summary>The engine reads a saved session in parallel, so after a restart the torrents come in any order.</summary>
+    [AvaloniaFact]
+    public void TorrentsFromARestart_AreListedInTheOrderTheyWereAdded_WhateverOrderTheyLoadIn()
+    {
+        // The oldest last, so it has to go back past both of the others.
+        ITorrent[] loaded = [
+            CreateTorrent("second", started: false, added: FirstAdded.AddDays(1)),
+            CreateTorrent("third", started: false, added: FirstAdded.AddDays(2)),
+            CreateTorrent("first", started: false, added: FirstAdded)];
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns(loaded);
+        torrentService.GetStats().Returns(new EngineStats());
+
+        var vm = CreateRuntimeViewModel(torrentService);
+
+        Assert.Equal(["first", "second", "third"], vm.Torrents.Select(item => item.Name));
+        Assert.Equal(["first", "second", "third"], vm.VisibleTorrents.Select(item => item.Name));
+        StopLoops(vm);
+    }
+
+    /// <summary>
+    /// A torrent announced by an alert after the list was filled goes where its time added puts it,
+    /// not at the end: during a restart the engine is still announcing torrents it loaded in any order.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task ATorrentAnnouncedLate_GoesWhereItsTimeAddedPutsIt()
+    {
+        ITorrent[] loaded = [
+            CreateTorrent("first", started: false, added: FirstAdded),
+            CreateTorrent("third", started: false, added: FirstAdded.AddDays(2))];
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns(loaded);
+        torrentService.GetStats().Returns(new EngineStats());
+        var vm = CreateRuntimeViewModel(torrentService);
+
+        AnnounceAdded(CreateTorrent("second", started: false, added: FirstAdded.AddDays(1)));
+        AnnounceAdded(CreateTorrent("newest", started: false, added: FirstAdded.AddDays(3)));
+        await Dispatcher.UIThread.InvokeAsync(() => { });
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        Assert.Equal(["first", "second", "third", "newest"], vm.Torrents.Select(item => item.Name));
+        StopLoops(vm);
+    }
+
+    /// <summary>
+    /// The time added is kept to the second, so torrents added together tie. They go by hash, which
+    /// never changes, so they come back in the same order after a restart as before it.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task TorrentsAddedInTheSameSecond_GoByHash_WhicheverArrivesFirst()
+    {
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns(Array.Empty<ITorrent>());
+        torrentService.GetStats().Returns(new EngineStats());
+        var vm = CreateRuntimeViewModel(torrentService);
+        var lowHash = new InfoHash(Enumerable.Repeat((byte)0x01, InfoHash.V1Length).ToArray());
+        var highHash = new InfoHash(Enumerable.Repeat((byte)0xfe, InfoHash.V1Length).ToArray());
+
+        AnnounceAdded(CreateTorrent("high", started: false, added: FirstAdded, hash: highHash));
+        AnnounceAdded(CreateTorrent("low", started: false, added: FirstAdded, hash: lowHash));
+        await Dispatcher.UIThread.InvokeAsync(() => { });
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        Assert.Equal(["low", "high"], vm.Torrents.Select(item => item.Name));
+        StopLoops(vm);
+    }
+
+    private static void AnnounceAdded(ITorrent torrent) =>
+        WeakReferenceMessenger.Default.Send(new TorrentAlertMessage(
+            torrent,
+            new SimpleTorrentAlert
+            {
+                Id = AlertId.TorrentAdded,
+                Torrent = torrent
+            }));
+
     private static DownloadsViewModel CreateRuntimeViewModel(ITorrentService torrentService)
     {
         var selectionService = new Peerfluence.Core.Services.TorrentSelectionService(Substitute.For<IAppMessenger>());
@@ -118,12 +196,13 @@ public sealed class DownloadsAlertFlowTests : IDisposable
             detailsViewModel);
     }
 
-    private static ITorrent CreateTorrent(string name, bool started, long dataLeft = 0)
+    private static ITorrent CreateTorrent(string name, bool started, long dataLeft = 0,
+        DateTimeOffset added = default, InfoHash? hash = null)
     {
         var torrent = Substitute.For<ITorrent>();
-        var hash = InfoHash.CreateRandom();
         torrent.Name.Returns(name);
-        torrent.Hash.Returns(hash);
+        torrent.Hash.Returns(hash ?? InfoHash.CreateRandom());
+        torrent.TimeAdded.Returns(added);
         torrent.HashV2.Returns(InfoHash.EmptyV2);
         torrent.Started.Returns(started);
         torrent.State.Returns(started ? TorrentState.Active : TorrentState.Stopped);

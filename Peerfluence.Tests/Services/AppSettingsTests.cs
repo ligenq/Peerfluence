@@ -20,7 +20,7 @@ public class AppSettingsTests
         Assert.Equal(0, settings.Network.MaxDiskReadSpeedBytesPerSecond);
         Assert.Equal(0, settings.Network.MaxDiskWriteSpeedBytesPerSecond);
         Assert.Equal("System", settings.Theme.ThemeVariant);
-        Assert.Equal("Teal", settings.Theme.ColorTheme);
+        Assert.Equal("Cobalt", settings.Theme.ColorTheme);
         Assert.Equal("en-US", settings.Language);
         Assert.True(settings.ShowRemoveTorrentOptions);
         Assert.Equal("RemoveOnly", settings.DefaultRemoveTorrentAction);

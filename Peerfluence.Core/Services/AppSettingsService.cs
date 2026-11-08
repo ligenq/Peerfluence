@@ -81,8 +81,8 @@ public sealed class AppSettingsService : IAppSettingsService
             },
             Theme =
             {
-                ThemeVariant = "System",
-                ColorTheme = "Teal"
+                ThemeVariant = ThemeSettings.DefaultThemeVariant,
+                ColorTheme = ThemeSettings.DefaultColorTheme
             },
             ShowRemoveTorrentOptions = true,
             ShowDetailsPane = false,
@@ -103,6 +103,12 @@ public sealed class AppSettingsService : IAppSettingsService
         {
             changed = true;
         }
+
+        if (settings.Network.NormalizeSsrfMitigation())
+        {
+            changed = true;
+        }
+
         if (string.IsNullOrWhiteSpace(settings.Storage.DownloadPath))
         {
             settings.Storage.DownloadPath = _paths.DefaultDownloadDirectory;
@@ -125,15 +131,20 @@ public sealed class AppSettingsService : IAppSettingsService
             _fileSystem.Directory.CreateDirectory(settings.Storage.SessionPath);
         }
 
+        if (settings.Theme.ApplyNewerDefaults())
+        {
+            changed = true;
+        }
+
         if (string.IsNullOrWhiteSpace(settings.Theme.ThemeVariant))
         {
-            settings.Theme.ThemeVariant = "System";
+            settings.Theme.ThemeVariant = ThemeSettings.DefaultThemeVariant;
             changed = true;
         }
 
         if (string.IsNullOrWhiteSpace(settings.Theme.ColorTheme))
         {
-            settings.Theme.ColorTheme = "Teal";
+            settings.Theme.ColorTheme = ThemeSettings.DefaultColorTheme;
             changed = true;
         }
 

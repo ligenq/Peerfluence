@@ -14,7 +14,9 @@ namespace Peerfluence.HeadlessTests;
 /// </summary>
 public class FindTorrentsViewTests
 {
-    private static (FindTorrentsView View, FindTorrentsViewModel Vm) CreateView(bool configured)
+    private static (FindTorrentsView View, FindTorrentsViewModel Vm) CreateView(
+        bool configured,
+        IAddTorrentDialogService? addTorrentDialogService = null)
     {
         var searchService = Substitute.For<ITorrentSearchService>();
         searchService.IsConfigured.Returns(configured);
@@ -22,7 +24,7 @@ public class FindTorrentsViewTests
         var vm = new FindTorrentsViewModel(
             searchService,
             Substitute.For<ITorrentService>(),
-            Substitute.For<IAddTorrentDialogService>());
+            addTorrentDialogService ?? Substitute.For<IAddTorrentDialogService>());
 
         var view = new FindTorrentsView { DataContext = vm };
         var window = new Window { Content = view, Width = 1200, Height = 800 };
@@ -106,6 +108,58 @@ public class FindTorrentsViewTests
         var button = view.FindControl<Button>("FixInSettingsButton")!;
 
         Assert.False(button.IsVisible);
+    }
+
+    private static TorrentSearchResultViewModel AResult()
+    {
+        return new TorrentSearchResultViewModel(new TorrentSearchResult(
+            "ubuntu-24.04.iso", SizeBytes: 1024, Seeders: 10, Peers: 2, IndexerName: "Example",
+            PublishedAt: null, Link: "magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567"));
+    }
+
+    /// <summary>
+    /// Double-click and the context menu both add, and neither can be seen. The button can, and it
+    /// is there only once there is something selected to add.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheResults_CarryAnAddButton_ThatFollowsTheSelection()
+    {
+        var (view, vm) = CreateView(configured: true);
+
+        var button = view.FindControl<Button>("AddSelectedButton")!;
+
+        Assert.True(button.IsVisible);
+        Assert.Same(vm.AddCommand, button.Command);
+        Assert.False(button.IsEffectivelyEnabled);
+
+        vm.SelectedResult = AResult();
+
+        Assert.True(button.IsEffectivelyEnabled);
+    }
+
+    /// <summary>
+    /// The grid takes Enter for itself, to move down a row, so this has to get to it first.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task PressingEnterOnAResult_AddsIt()
+    {
+        var addTorrentDialogService = Substitute.For<IAddTorrentDialogService>();
+        var (view, vm) = CreateView(configured: true, addTorrentDialogService);
+        var result = AResult();
+        vm.Results.Add(result);
+        vm.SelectedResult = result;
+        var grid = view.FindControl<DataGrid>("ResultsGrid")!;
+
+        var enter = new Avalonia.Input.KeyEventArgs
+        {
+            RoutedEvent = Avalonia.Input.InputElement.KeyDownEvent,
+            Key = Avalonia.Input.Key.Enter,
+            Source = grid,
+        };
+        grid.RaiseEvent(enter);
+
+        Assert.True(enter.Handled);
+        await addTorrentDialogService.Received(1).ShowMagnetAsync(result.Link);
     }
 
     [AvaloniaFact]

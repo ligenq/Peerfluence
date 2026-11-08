@@ -124,9 +124,6 @@
   <data name="Simple_EmptyBody" xml:space="preserve">
     <value>Добавьте файл .torrent или вставьте magnet-ссылку, чтобы начать загрузку.</value>
   </data>
-  <data name="Simple_PauseResume" xml:space="preserve">
-    <value>Приостановить или продолжить</value>
-  </data>
   <data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Перейти в расширенный режим</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Завершены</value>
   </data>
   <data name="Downloads_NoMatches" xml:space="preserve">
-    <value>Ни одна загрузка не соответствует запросу.</value>
+    <value>Ни одна загрузка не соответствует поиску и фильтрам.</value>
   </data>
   <data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Интерфейс</value>
@@ -884,13 +881,13 @@
     <value>Выберите папку данных сеанса</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Убрать {0} загрузок из списка?</value>
+    <value>Удалить торренты ({0})?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Удалить торрент</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Удалить «{0}» из списка загрузок?</value>
+    <value>Удалить «{0}»?</value>
   </data>
   <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Также удалить файлы с диска</value>
@@ -1277,7 +1274,7 @@ Peerfluence распространяется по MIT License. Устанавл�
     <value>Ключ API</value>
   </data>
   <data name="Settings_Search_Test" xml:space="preserve">
-    <value>Проверить</value>
+    <value>Проверить подключение</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Адрес заполнен. Проверяем, отвечает ли он...</value>
@@ -1653,5 +1650,74 @@ Peerfluence распространяется по MIT License. Устанавл�
   </data>
   <data name="AddTorrent_SslCertificateRequired" xml:space="preserve">
     <value>Выберите сертификат, содержащий закрытый ключ.</value>
+  </data>
+  <data name="Status_StartTorrentFailed" xml:space="preserve">
+    <value>Не удалось запустить {0}: {1}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateRejected" xml:space="preserve">
+    <value>Этот сертификат выдан не для этого торрента.</value>
+  </data>
+  <data name="Settings_SsrfMitigation" xml:space="preserve">
+    <value>Не подпускать торренты к локальным службам</value>
+  </data>
+  <data name="Settings_SsrfMitigationThisDevice" xml:space="preserve">
+    <value>Это устройство</value>
+  </data>
+  <data name="Settings_SsrfMitigationLocalNetworks" xml:space="preserve">
+    <value>Это устройство и его локальные сети</value>
+  </data>
+  <data name="Settings_SsrfMitigationOff" xml:space="preserve">
+    <value>Выключено</value>
+  </data>
+  <data name="Settings_SsrfMitigationHint" xml:space="preserve">
+    <value>Торрент сам выбирает адреса трекеров и веб-сидов, поэтому может попытаться отправить запросы службам на этом устройстве или в вашей сети. Если трекер в вашей сети перестал работать, укажите его по IP-адресу или выберите более низкий уровень.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Удалить торренты</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Удалить торренты ({0}) и стереть скачанные файлы? Это действие нельзя отменить.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Удалить торренты ({0}) и стереть их метаданные? Скачанные файлы сохранятся.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Удалить торренты ({0}) и стереть как скачанные файлы, так и их метаданные? Это действие нельзя отменить.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Стереть</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Сбросить фильтры</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Подключить индексатор</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Добавить выбранное</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>Этот торрент уже есть в списке загрузок.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>Peerfluence не может записывать в папку загрузок. Выберите другую папку.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>Не удалось добавить торрент: {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>Не удалось открыть сертификат. Проверьте файл и пароль.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Приостановить {0}</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Продолжить {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Открыть папку: {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>Другие действия: {0}</value>
   </data>
 </root>

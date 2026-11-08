@@ -79,6 +79,7 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
         ToggleDetailsPaneCommand = new RelayCommand(ToggleDetailsPane);
         SetFilterCommand = new RelayCommand<TorrentFilter>(filter => Filter = filter);
         SetCategoryFilterCommand = new RelayCommand<string?>(SetCategoryFilter);
+        ClearFiltersCommand = new RelayCommand(ClearFilters);
         AssignCategoryCommand = new AsyncRelayCommand<string?>(AssignCategoryToSelectionAsync);
         ToggleTorrentCommand = new AsyncRelayCommand<TorrentListItemViewModel?>(ToggleTorrentAsync);
         OpenTorrentFolderCommand = new RelayCommand<TorrentListItemViewModel?>(OpenFolderFor);
@@ -89,6 +90,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
         WeakReferenceMessenger.Default.Register<CategoriesChangedMessage>(this, (_, _) => RefreshCategories());
         WeakReferenceMessenger.Default.Register<TorrentAlertMessage>(this, (_, msg) => OnTorrentAlert(msg));
+        WeakReferenceMessenger.Default.Register<TorrentStartFailedMessage>(this, (_, msg) => Dispatcher.UIThread.Post(() =>
+            SetStatusMessage(string.Format(Resources.Status_StartTorrentFailed, msg.Torrent.Name, msg.Exception.Message))));
         WeakReferenceMessenger.Default.Register<ActivationRequestedMessage>(this, (_, msg) =>
         {
             _ = Dispatcher.UIThread.InvokeAsync(async () => await HandleActivationAsync(msg.Arguments));
@@ -241,6 +244,19 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     /// <summary>Narrows the list to one category, or back to all of them when given nothing.</summary>
     public IRelayCommand<string?> SetCategoryFilterCommand { get; }
+
+    /// <summary>
+    /// Puts back everything the search, the state chips and the category chips have hidden, which
+    /// is the way out of a list narrowed to nothing.
+    /// </summary>
+    public IRelayCommand ClearFiltersCommand { get; }
+
+    private void ClearFilters()
+    {
+        SearchText = string.Empty;
+        Filter = TorrentFilter.All;
+        CategoryFilter = string.Empty;
+    }
 
     /// <summary>
     /// Files everything selected under a category, or unfiles it when given nothing. Works on the
@@ -601,7 +617,15 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private bool CanStopSelected()
     {
-        return SelectionOrFocused().Any(item => item.Torrent.Started);
+        return SelectionOrFocused().Any(item => CanStop(item.Torrent));
+    }
+
+    // A torrent checking its files before it starts is not started yet, and that check can run for
+    // minutes, which is when someone is most likely to want out of it. One waiting for the queue
+    // looks stopped, but will start by itself when there is room unless it is stopped too.
+    private bool CanStop(ITorrent torrent)
+    {
+        return torrent.Started || torrent.State == TorrentState.CheckingFiles || _torrentService.IsQueued(torrent);
     }
 
     private bool CanRemoveSelected()
@@ -854,8 +878,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private async Task StartOrSelectSslCertificateAsync(ITorrent torrent)
     {
-        try { await TorrentService.StartAsync(torrent); }
-        catch (System.Security.Authentication.AuthenticationException) when (torrent.HasMetadata && torrent.ExportTorrentFile().IsSsl)
+        try { await _torrentService.StartAsync(torrent); }
+        catch (System.Security.Authentication.AuthenticationException) when (torrent.IsSsl)
         {
             torrent.QueueAutoStart = false;
             await _addTorrentDialogService.ShowSslCertificateAsync(torrent);
@@ -875,22 +899,21 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
     /// </para>
     /// <para>
     /// Every torrent raising this alert lacks a certificate: the alert comes only from a magnet's
-    /// metadata download, and a certificate can only be attached while adding a torrent whose
-    /// metadata is already known. So there is no case in which this stops a torrent that could
-    /// have run.
+    /// metadata download, and the engine refuses a certificate for a torrent whose metadata is not
+    /// known yet. So there is no case in which this stops a torrent that could have run.
     /// </para>
     /// </remarks>
     internal async Task RequestCertificateIfSslAsync(ITorrent torrent)
     {
         try
         {
-            if (!torrent.HasMetadata || !torrent.ExportTorrentFile().IsSsl)
+            if (!torrent.IsSsl)
             {
                 return;
             }
 
             torrent.QueueAutoStart = false;
-            await TorrentService.StopAsync(torrent);
+            await _torrentService.StopAsync(torrent);
             await _addTorrentDialogService.ShowSslCertificateAsync(torrent);
         }
         catch (Exception ex)
@@ -903,92 +926,107 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
 
     private async Task StopSelectedAsync()
     {
-        foreach (var item in SelectionOrFocused().Where(item => item.Torrent.Started))
+        foreach (var item in SelectionOrFocused().Where(item => CanStop(item.Torrent)))
         {
-            await TorrentService.StopAsync(item.Torrent);
+            await _torrentService.StopAsync(item.Torrent);
         }
     }
 
     /// <summary>
-    /// Removes everything selected. One torrent gets the usual dialog naming it; several are
-    /// confirmed once, together, rather than asking the same question over and over.
+    /// Removes everything selected, asking once for the lot rather than once per torrent.
     /// </summary>
-    private async Task RemoveSelectedAsync()
+    private Task RemoveSelectedAsync()
     {
-        var selection = SelectionOrFocused();
-        if (selection.Count <= 1)
+        return RemoveAsync(SelectionOrFocused());
+    }
+
+    private Task RemoveTorrentAsync(TorrentListItemViewModel? item)
+    {
+        return item == null ? Task.CompletedTask : RemoveAsync([item]);
+    }
+
+    private async Task RemoveAsync(IReadOnlyList<TorrentListItemViewModel> items)
+    {
+        if (items.Count == 0)
         {
-            await RemoveTorrentAsync(selection.Count > 0 ? selection[0] : null);
             return;
         }
 
-        var removeAction = GetDefaultRemoveAction();
-        if (_settingsService.Current.ShowRemoveTorrentOptions
-            && !await ConfirmRemoveManyAsync(selection.Count))
+        if (await ChooseRemoveActionAsync(items) is not { } action)
         {
             return;
         }
 
-        foreach (var item in selection)
+        foreach (var item in items)
         {
-            await _torrentService.RemoveAsync(item.Torrent, ToRemoveOptions(removeAction));
+            await _torrentService.RemoveAsync(item.Torrent, ToRemoveOptions(action));
         }
     }
 
-    private Task<bool> ConfirmRemoveManyAsync(int count)
+    /// <summary>
+    /// Works out how much to remove, asking where the user has not already said.
+    /// </summary>
+    /// <returns>What to remove, or <see langword="null"/> if the user backed out.</returns>
+    /// <remarks>
+    /// <para>
+    /// One torrent or many, the same dialog: the options it lists are what say whether anything is
+    /// deleted, so a prompt for several cannot claim to take them off the list and then delete their
+    /// files.
+    /// </para>
+    /// <para>
+    /// A remembered choice is used without asking, as the user asked, with one exception: deleting
+    /// from disk for several torrents at once is said in full first. "Remember this choice" was
+    /// ticked over one prompt, and it should not turn a selection of fifty into fifty deletions
+    /// nobody saw coming.
+    /// </para>
+    /// <para>
+    /// Nowhere to ask means the window is not up, which happens only at startup and in tests. Then
+    /// nothing is deleted: the torrents go and what they downloaded stays.
+    /// </para>
+    /// </remarks>
+    private async Task<RemoveTorrentAction?> ChooseRemoveActionAsync(IReadOnlyList<TorrentListItemViewModel> items)
     {
-        // Nowhere to ask means the window is not up, which happens only at startup and in tests.
-        // Going ahead is what this did before the prompt moved behind the service, and changing it
-        // in a refactor would be changing it by accident.
-        if (!_dialogService.CanPrompt)
-        {
-            return Task.FromResult(true);
-        }
-
-        return _dialogService.ConfirmAsync(new ConfirmPrompt(
-            Resources.Downloads_Remove_Confirm_Title,
-            string.Format(Resources.Downloads_Remove_Confirm_Many, count),
-            Resources.Downloads_Remove,
-            Resources.Common_Cancel));
-    }
-
-    private async Task RemoveTorrentAsync(TorrentListItemViewModel? item)
-    {
-        if (item == null)
-        {
-            return;
-        }
-
-        var torrent = item.Torrent;
-        var torrentName = item.Name;
-        var removeAction = GetDefaultRemoveAction();
+        var remembered = GetDefaultRemoveAction();
 
         if (!_settingsService.Current.ShowRemoveTorrentOptions)
         {
-            await _torrentService.RemoveAsync(torrent, ToRemoveOptions(removeAction));
-            return;
+            if (items.Count == 1 || remembered == RemoveTorrentAction.RemoveOnly)
+            {
+                return remembered;
+            }
+
+            if (!_dialogService.CanPrompt)
+            {
+                return RemoveTorrentAction.RemoveOnly;
+            }
+
+            var confirmed = await _dialogService.ConfirmAsync(new ConfirmPrompt(
+                Resources.Downloads_Remove_Confirm_Title_Many,
+                string.Format(DeleteManyMessage(remembered), items.Count),
+                Resources.Downloads_Remove_Delete,
+                Resources.Common_Cancel));
+            return confirmed ? remembered : null;
         }
 
         if (!_dialogService.CanPrompt)
         {
-            // Cannot ask which files to delete, so delete none of them: remove the torrent and
-            // leave what it downloaded alone.
-            await _torrentService.RemoveAsync(torrent, RemoveOptions.None);
-            return;
+            return RemoveTorrentAction.RemoveOnly;
         }
 
         var choice = await _dialogService.PromptForRemoveOptionsAsync(new RemoveTorrentPrompt(
-            Resources.Downloads_Remove_Confirm_Title,
-            string.Format(Resources.Downloads_Remove_Confirm_Message, torrentName),
+            items.Count == 1 ? Resources.Downloads_Remove_Confirm_Title : Resources.Downloads_Remove_Confirm_Title_Many,
+            items.Count == 1
+                ? string.Format(Resources.Downloads_Remove_Confirm_Message, items[0].Name)
+                : string.Format(Resources.Downloads_Remove_Confirm_Many, items.Count),
             Resources.Downloads_Remove,
             Resources.Common_Cancel,
-            removeAction,
+            remembered,
             RemoveOptionLabels(),
             Resources.Downloads_Remove_RememberChoice));
 
         if (choice is null)
         {
-            return;
+            return null;
         }
 
         if (choice.RememberChoice)
@@ -998,7 +1036,18 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             await _settingsService.SaveAsync(default);
         }
 
-        await _torrentService.RemoveAsync(torrent, ToRemoveOptions(choice.Action));
+        return choice.Action;
+    }
+
+    /// <summary>What deleting with a remembered choice will delete, for this many torrents.</summary>
+    private static string DeleteManyMessage(RemoveTorrentAction action)
+    {
+        return action switch
+        {
+            RemoveTorrentAction.DeleteFiles => Resources.Downloads_Remove_ConfirmDelete_Files,
+            RemoveTorrentAction.DeleteMetadata => Resources.Downloads_Remove_ConfirmDelete_Metadata,
+            _ => Resources.Downloads_Remove_ConfirmDelete_All
+        };
     }
 
     private void OpenFolder()
@@ -1036,8 +1085,8 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             return Task.CompletedTask;
         }
 
-        return item.Torrent.Started
-            ? TorrentService.StopAsync(item.Torrent)
+        return CanStop(item.Torrent)
+            ? _torrentService.StopAsync(item.Torrent)
             : StartOrSelectSslCertificateAsync(item.Torrent);
     }
 
@@ -1258,7 +1307,36 @@ public sealed class DownloadsViewModel : ViewModelBase, IFeatureViewModel, ITorr
             Category = _categoryService.GetCategory(torrent.PrimaryHash()) ?? string.Empty
         };
         _torrentLookup[key] = viewModel;
-        Torrents.Add(viewModel);
+        Torrents.Insert(PlaceInAddedOrder(viewModel), viewModel);
+    }
+
+    /// <summary>
+    /// Where a torrent goes in the list: after everything added before it, so the list reads in the
+    /// order torrents were added and comes back in that order after a restart.
+    /// </summary>
+    /// <remarks>
+    /// The order torrents arrive in is no guide. The engine reads a saved session in parallel, so
+    /// after a restart they come in any order. The time added is kept to the second, so torrents
+    /// added in the same second go by hash, which never changes, rather than by when they arrived.
+    /// A torrent added now is the newest, so the search starts from the end and usually stops there.
+    /// </remarks>
+    private int PlaceInAddedOrder(TorrentListItemViewModel item)
+    {
+        var index = Torrents.Count;
+        while (index > 0 && ComesAfter(Torrents[index - 1], item))
+        {
+            index--;
+        }
+
+        return index;
+
+        static bool ComesAfter(TorrentListItemViewModel existing, TorrentListItemViewModel added)
+        {
+            var byTime = existing.TimeAdded.CompareTo(added.TimeAdded);
+            return byTime != 0
+                ? byTime > 0
+                : string.CompareOrdinal(existing.Hash.ToHexString(), added.Hash.ToHexString()) > 0;
+        }
     }
 
     private void UpdateTorrent(ITorrent torrent, Alert alert)

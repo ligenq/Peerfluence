@@ -13,6 +13,16 @@ public sealed class NetworkSettings
     /// </summary>
     public static bool IsEncryptionMode(string? mode) => mode is "Allow" or "Require" or "Refuse";
 
+    /// <summary>The default: a torrent's own URLs may not be used to reach this device.</summary>
+    public const string SsrfMitigationThisDevice = "ThisDevice";
+
+    public const string SsrfMitigationLocalNetworks = "LocalNetworks";
+
+    public const string SsrfMitigationOff = "None";
+
+    public static bool IsSsrfMitigation(string? mode) =>
+        mode is SsrfMitigationThisDevice or SsrfMitigationLocalNetworks or SsrfMitigationOff;
+
     public static string NormalizeI2pSamHost(string? host) =>
         string.IsNullOrWhiteSpace(host) ? DefaultI2pSamHost : host.Trim();
 
@@ -36,6 +46,24 @@ public sealed class NetworkSettings
     }
 
     private static string NormalizeMode(string mode) => IsEncryptionMode(mode) ? mode : InheritEncryption;
+
+    /// <summary>
+    /// How far the HTTP requests a torrent causes, to its trackers and web seeds, are kept from
+    /// services on this device and its network. Those URLs are chosen by whoever made the torrent.
+    /// </summary>
+    public string SsrfMitigation { get; set; } = SsrfMitigationThisDevice;
+
+    /// <summary>Repairs an unknown stored value to the default rather than to no guard at all.</summary>
+    public bool NormalizeSsrfMitigation()
+    {
+        if (IsSsrfMitigation(SsrfMitigation))
+        {
+            return false;
+        }
+
+        SsrfMitigation = SsrfMitigationThisDevice;
+        return true;
+    }
 
     public bool EnableI2p { get; set; }
 

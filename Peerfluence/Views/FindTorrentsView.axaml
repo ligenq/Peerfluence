@@ -61,42 +61,64 @@
                             x:Name="ResultsCard"
                             IsVisible="{Binding IsConfigured}"
                             Padding="{StaticResource ZeroThickness}">
-                <DataGrid x:Name="ResultsGrid"
-                          ItemsSource="{Binding Results}"
-                          SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
-                          DoubleTapped="ResultsGrid_OnDoubleTapped"
-                          SelectionMode="Single"
-                          AutoGenerateColumns="False"
-                          HeadersVisibility="Column"
-                          IsReadOnly="True"
-                          CanUserReorderColumns="False"
-                          CanUserResizeColumns="True"
-                          GridLinesVisibility="None"
-                          BorderThickness="0" AutomationProperties.AutomationId="ResultGrid">
-                    <DataGrid.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="{m:L Find_Add}" Command="{Binding AddCommand}" CommandParameter="{Binding SelectedResult}" AutomationProperties.AutomationId="AddMenuItem">
-                                <MenuItem.Icon>
-                                    <materialIcons:MaterialIcon Kind="Plus"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                        </ContextMenu>
-                    </DataGrid.ContextMenu>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="{m:L Find_Column_Name}" Binding="{Binding Title}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchTitle}"/>
-                        <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
-                                            Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}"
-                                            Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchSize}"/>
-                        <DataGridTextColumn Header="{m:L Find_Column_Seeds}"
-                                            Binding="{Binding SeedersText}"
-                                            Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchSeeds}"/>
-                        <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}"
-                                            Binding="{Binding PeersText}"
-                                            Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchPeers}"/>
-                        <DataGridTextColumn Header="{m:L Find_Column_Indexer}" Binding="{Binding IndexerName}" Width="140" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchIndexer}"/>
-                        <DataGridTextColumn Header="{m:L Find_Column_Age}" Binding="{Binding AgeText}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchAge}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <!--
+                    Adding has a button of its own, under the results. Double-click, Enter and the
+                    context menu all do the same, but none of them can be seen.
+                -->
+                <DockPanel>
+                    <Border DockPanel.Dock="Bottom"
+                            BorderThickness="0,1,0,0"
+                            BorderBrush="{DynamicResource PfBorder}"
+                            Padding="{StaticResource NormalLeftTopRightBottomMargin}">
+                        <Button x:Name="AddSelectedButton"
+                                HorizontalAlignment="Right"
+                                Command="{Binding AddCommand}"
+                                CommandParameter="{Binding SelectedResult}"
+                                AutomationProperties.Name="{m:L Find_AddSelected}"
+                                AutomationProperties.AutomationId="AddSelectedButton">
+                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingNormal}">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="{StaticResource IconSizeMedium}" Height="{StaticResource IconSizeMedium}"/>
+                                <TextBlock Text="{m:L Find_AddSelected}"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+                    <DataGrid x:Name="ResultsGrid"
+                              ItemsSource="{Binding Results}"
+                              SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
+                              DoubleTapped="ResultsGrid_OnDoubleTapped"
+                              SelectionMode="Single"
+                              AutoGenerateColumns="False"
+                              HeadersVisibility="Column"
+                              IsReadOnly="True"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="True"
+                              GridLinesVisibility="None"
+                              BorderThickness="0" AutomationProperties.AutomationId="ResultGrid">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{m:L Find_Add}" Command="{Binding AddCommand}" CommandParameter="{Binding SelectedResult}" AutomationProperties.AutomationId="AddMenuItem">
+                                    <MenuItem.Icon>
+                                        <materialIcons:MaterialIcon Kind="Plus"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{m:L Find_Column_Name}" Binding="{Binding Title}" Width="*" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchTitle}"/>
+                            <DataGridTextColumn Header="{m:L Downloads_Grid_Size}"
+                                                Binding="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}, Mode=OneWay}"
+                                                Width="100" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchSize}"/>
+                            <DataGridTextColumn Header="{m:L Find_Column_Seeds}"
+                                                Binding="{Binding SeedersText}"
+                                                Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchSeeds}"/>
+                            <DataGridTextColumn Header="{m:L Downloads_Grid_Peers}"
+                                                Binding="{Binding PeersText}"
+                                                Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchPeers}"/>
+                            <DataGridTextColumn Header="{m:L Find_Column_Indexer}" Binding="{Binding IndexerName}" Width="140" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchIndexer}"/>
+                            <DataGridTextColumn Header="{m:L Find_Column_Age}" Binding="{Binding AgeText}" Width="80" CanUserSort="True" CustomSortComparer="{x:Static controls:DataGridComparers.SearchAge}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </Border>
 
             <StackPanel Grid.Row="3"

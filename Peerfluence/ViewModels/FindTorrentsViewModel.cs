@@ -29,7 +29,7 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
         _addTorrentDialogService = addTorrentDialogService;
 
         SearchCommand = new AsyncRelayCommand(SearchAsync, () => !string.IsNullOrWhiteSpace(Query));
-        AddCommand = new AsyncRelayCommand<TorrentSearchResultViewModel?>(AddAsync);
+        AddCommand = new AsyncRelayCommand<TorrentSearchResultViewModel?>(AddAsync, result => result != null);
         OpenSearchSettingsCommand = new RelayCommand(
             () => WeakReferenceMessenger.Default.Send(new ShowSearchSettingsMessage()));
     }
@@ -58,7 +58,13 @@ public sealed class FindTorrentsViewModel : ViewModelBase, IFeatureViewModel
     public TorrentSearchResultViewModel? SelectedResult
     {
         get;
-        set => SetProperty(ref field, value);
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AddCommand.NotifyCanExecuteChanged();
+            }
+        }
     }
 
     public bool IsSearching

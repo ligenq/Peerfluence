@@ -14,7 +14,8 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     {
         Torrent = torrent;
         Hash = torrent.PrimaryHash();
-        WeakReferenceMessenger.Default.Register<LanguageChangedMessage>(this, (_, _) => UpdateStatusDetail());
+        TimeAdded = torrent.TimeAdded;
+        WeakReferenceMessenger.Default.Register<LanguageChangedMessage>(this, (_, _) => OnLanguageChanged());
         UpdateFrom(torrent);
     }
 
@@ -26,6 +27,12 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     public ITorrent Torrent { get; }
 
     public InfoHash Hash { get; }
+
+    /// <summary>
+    /// When the torrent was first added, kept by the engine across restarts. The list is in this
+    /// order.
+    /// </summary>
+    public DateTimeOffset TimeAdded { get; }
 
     /// <summary>
     /// Which category this torrent is filed under, or empty. Set by the list rather than read from
@@ -40,7 +47,15 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     public string Name
     {
         get;
-        set => SetProperty(ref field, value);
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(ToggleLabel));
+                OnPropertyChanged(nameof(OpenFolderLabel));
+                OnPropertyChanged(nameof(MoreActionsLabel));
+            }
+        }
     } = string.Empty;
 
     public float Progress
@@ -144,8 +159,26 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     public bool IsRunning
     {
         get;
-        private set => SetProperty(ref field, value);
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(ToggleLabel));
+            }
+        }
     }
+
+    // What the row's buttons are called. Each says what it will do and to which download: a list of
+    // rows that all read "Pause or resume" tells somebody using a screen reader neither.
+
+    /// <summary>What the pause and resume button will do, said with the download it does it to.</summary>
+    public string ToggleLabel => string.Format(IsRunning ? Properties.Resources.Simple_Pause : Properties.Resources.Simple_Resume, Name);
+
+    /// <summary>The open folder button's name, with the download whose folder it opens.</summary>
+    public string OpenFolderLabel => string.Format(Properties.Resources.Simple_OpenFolder, Name);
+
+    /// <summary>The name of the button that opens the row's menu.</summary>
+    public string MoreActionsLabel => string.Format(Properties.Resources.Simple_MoreActions, Name);
 
     public bool IsComplete => Progress >= 1f;
 
@@ -153,7 +186,7 @@ public sealed class TorrentListItemViewModel : ViewModelBase
     {
         Name = torrent.Name;
         Progress = torrent.Progress;
-        IsRunning = torrent.Started;
+        IsRunning = torrent.Started || torrent.State == TorrentState.CheckingFiles;
         State = torrent.State.ToDisplayString();
         TotalSizeBytes = torrent.TotalSize;
         DataLeftBytes = torrent.DataLeft;
@@ -171,6 +204,18 @@ public sealed class TorrentListItemViewModel : ViewModelBase
         Progress = torrent.Progress;
         TotalSizeBytes = torrent.TotalSize;
         DataLeftBytes = torrent.DataLeft;
+    }
+
+    /// <summary>
+    /// Re-reads everything this row says in the interface's language. The button names are worked
+    /// out when asked for, so they only need announcing.
+    /// </summary>
+    private void OnLanguageChanged()
+    {
+        UpdateStatusDetail();
+        OnPropertyChanged(nameof(ToggleLabel));
+        OnPropertyChanged(nameof(OpenFolderLabel));
+        OnPropertyChanged(nameof(MoreActionsLabel));
     }
 
     private void UpdateStatusDetail()

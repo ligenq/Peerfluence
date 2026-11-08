@@ -562,6 +562,16 @@
                         <TextBlock Text="{m:L Settings_I2pHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
                     </StackPanel>
 
+                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                        <TextBlock Text="{m:L Settings_SsrfMitigation}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                        <ComboBox ItemsSource="{Binding SsrfMitigationOptions}" SelectedValue="{Binding SelectedSsrfMitigation}" SelectedValueBinding="{Binding Value}" HorizontalAlignment="Stretch" AutomationProperties.Name="{m:L Settings_SsrfMitigation}" AutomationProperties.AutomationId="SsrfMitigationComboBox">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsOption"><TextBlock Text="{Binding DisplayName}"/></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Text="{m:L Settings_SsrfMitigationHint}" TextWrapping="Wrap" Opacity="{StaticResource OpacitySecondary}"/>
+                    </StackPanel>
+
                     <StackPanel Spacing="{StaticResource SpacingMedium}">
                         <ToggleSwitch IsChecked="{Binding EnableBlocklist, Mode=TwoWay}" Content="{m:L Settings_EnableBlocklist}" AutomationProperties.AutomationId="EnableBlocklistSwitch"/>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpacingNormal}" IsEnabled="{Binding EnableBlocklist}">
@@ -750,44 +760,15 @@
                 <ScrollViewer>
                     <StackPanel Spacing="{StaticResource SpacingLarge}" Width="{Binding $parent[ScrollViewer].Viewport.Width}" MaxWidth="{StaticResource ContentMaxWidth}" HorizontalAlignment="Left" Margin="{StaticResource SmallTopBottomMargin}">
                         <!--
-                            A saved query that runs on its own. Anyone with Sonarr or Radarr already
-                            has this through the Transmission endpoint; this is for everyone else.
+                            The connection first. Nothing else on this page, automatic search
+                            included, does anything until there is an indexer to ask, and the
+                            automatic search's own hint points up to this.
                         -->
                         <Border Classes="panel">
                             <StackPanel Spacing="{StaticResource SpacingStandard}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
-                                    <materialIcons:MaterialIcon Kind="AutoFix" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
-                                    <TextBlock Text="{m:L Settings_AutoSearch}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                </StackPanel>
-
-                                <ToggleSwitch IsChecked="{Binding AutoSearchEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableAutoSearch}" AutomationProperties.AutomationId="EnableAutoSearchSwitch"/>
-                                <TextBlock Text="{m:L Settings_AutoSearchHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
-
-                                <StackPanel Spacing="{StaticResource SpacingMedium}" IsEnabled="{Binding AutoSearchEnabled}">
-                                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                        <TextBlock Text="{m:L Settings_AutoSearchQuery}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                        <TextBox Text="{Binding AutoSearchQuery, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchQuery}" AutomationProperties.AutomationId="AutoSearchQueryTextBox"/>
-                                    </StackPanel>
-
-                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
-                                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Settings_AutoSearchInterval}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                            <NumericUpDown Value="{Binding AutoSearchIntervalMinutes}" Minimum="15" AutomationProperties.Name="{m:L Settings_AutoSearchInterval}" AutomationProperties.AutomationId="AutoSearchIntervalInput"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
-                                            <TextBlock Text="{m:L Settings_AutoSearchCategory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
-                                            <TextBox Text="{Binding AutoSearchCategory, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchCategory}" AutomationProperties.AutomationId="AutoSearchCategoryTextBox"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Classes="panel">
-                            <StackPanel Spacing="{StaticResource SpacingStandard}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
                                     <materialIcons:MaterialIcon Kind="Magnify" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
-                                    <TextBlock Text="{m:L Settings_Search}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{m:L Settings_Search_Indexer}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
 
                                 <TextBlock Text="{m:L Settings_SearchHint}"
@@ -835,6 +816,40 @@
                                 <pf:InfoBar IsVisible="{Binding HasSearchStatusMessage}"
                                               IsClosable="False"
                                               Message="{Binding SearchStatusMessage}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!--
+                            A saved query that runs on its own. Anyone with Sonarr or Radarr already
+                            has this through the Transmission endpoint; this is for everyone else.
+                        -->
+                        <Border Classes="panel">
+                            <StackPanel Spacing="{StaticResource SpacingStandard}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingMedium}">
+                                    <materialIcons:MaterialIcon Kind="AutoFix" Foreground="{DynamicResource PfAccent}" Width="{StaticResource IconSizeXLarge}" Height="{StaticResource IconSizeXLarge}"/>
+                                    <TextBlock Text="{m:L Settings_AutoSearch}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <ToggleSwitch IsChecked="{Binding AutoSearchEnabled, Mode=TwoWay}" Content="{m:L Settings_EnableAutoSearch}" AutomationProperties.AutomationId="EnableAutoSearchSwitch"/>
+                                <TextBlock Text="{m:L Settings_AutoSearchHint}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}" TextWrapping="Wrap"/>
+
+                                <StackPanel Spacing="{StaticResource SpacingMedium}" IsEnabled="{Binding AutoSearchEnabled}">
+                                    <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                        <TextBlock Text="{m:L Settings_AutoSearchQuery}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                        <TextBox Text="{Binding AutoSearchQuery, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchQuery}" AutomationProperties.AutomationId="AutoSearchQueryTextBox"/>
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpacingLarge}">
+                                        <StackPanel Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_AutoSearchInterval}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <NumericUpDown Value="{Binding AutoSearchIntervalMinutes}" Minimum="15" AutomationProperties.Name="{m:L Settings_AutoSearchInterval}" AutomationProperties.AutomationId="AutoSearchIntervalInput"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="{StaticResource SpacingXSmall}">
+                                            <TextBlock Text="{m:L Settings_AutoSearchCategory}" Opacity="{StaticResource OpacitySecondary}" FontSize="{StaticResource FontSizeNormal}"/>
+                                            <TextBox Text="{Binding AutoSearchCategory, Mode=TwoWay}" AutomationProperties.Name="{m:L Settings_AutoSearchCategory}" AutomationProperties.AutomationId="AutoSearchCategoryTextBox"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>

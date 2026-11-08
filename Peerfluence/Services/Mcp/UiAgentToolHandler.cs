@@ -88,7 +88,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
                 return McpResultFactory.Error("Torrent not found.", "torrent_not_found");
             }
 
-            await TorrentService.StopAsync(torrent, cancellationToken);
+            await _torrentService.StopAsync(torrent, cancellationToken);
             _selectionService.SelectedTorrent = torrent;
             _timeline.Record("action", $"Stopped torrent {torrent.PrimaryHash().ToHexString()}.");
             return McpResultFactory.Success($"Stopped torrent {torrent.PrimaryHash().ToHexString()}.");
@@ -119,7 +119,7 @@ public sealed class UiAgentToolHandler : IUiAgentToolHandler
 
             if (torrent.State != PeerSharp.Interfaces.TorrentState.Active)
             {
-                await TorrentService.StartAsync(torrent, cancellationToken);
+                await _torrentService.StartAsync(torrent, cancellationToken);
             }
 
             _selectionService.SelectedTorrent = torrent;

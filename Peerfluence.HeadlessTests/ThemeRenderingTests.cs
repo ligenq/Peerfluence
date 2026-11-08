@@ -310,6 +310,37 @@ public sealed class ThemeRenderingTests
         }
     }
 
+    /// <summary>
+    /// Fluent will not lay a horizontal progress bar out narrower than 200, so in less room the bar
+    /// is cut off rather than shrunk and the part left showing fills up too early.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData(80)]
+    [InlineData(134)]
+    public void AProgressBar_InLessRoomThanFluentsMinimum_ShrinksToFit_AndFillsInProportion(double room)
+    {
+        var bar = new ProgressBar { Minimum = 0, Maximum = 100, Value = 25 };
+        var window = new Window
+        {
+            Content = new Border { Width = room, ClipToBounds = true, Child = bar, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left },
+            Width = 400,
+            Height = 100,
+        };
+        window.Show();
+
+        try
+        {
+            Layout(window);
+            Assert.Equal(room, bar.Bounds.Width);
+            var indicator = bar.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_Indicator");
+            Assert.Equal(room / 4, indicator.Bounds.Width, tolerance: 1.0);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void ChangingAccentAndVariant_RepaintsExistingFluentControls()
     {
