@@ -8,7 +8,10 @@ set -eu
 # refreshes later. Paths into it are saved once and point at a revision that is later deleted.
 
 # The data, the session included, goes in the one folder that keeps its path across refreshes.
+# Made first: .NET reports a data folder only once it exists, and otherwise falls back to the
+# revision's config folder.
 export XDG_DATA_HOME="$SNAP_USER_COMMON/.local/share"
+mkdir -p "$XDG_DATA_HOME"
 
 # Downloads go to the user's real Downloads folder. The extension copies the desktop's own folder
 # settings in with the real home written out, when the desktop has them. Without them, the folder
