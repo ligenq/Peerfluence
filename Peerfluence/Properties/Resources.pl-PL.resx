@@ -124,9 +124,6 @@
   <data name="Simple_EmptyBody" xml:space="preserve">
     <value>Dodaj plik .torrent lub wklej link magnet, aby rozpocząć pobieranie.</value>
   </data>
-  <data name="Simple_PauseResume" xml:space="preserve">
-    <value>Wstrzymaj lub wznów</value>
-  </data>
   <data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Przełącz na tryb zaawansowany</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Ukończone</value>
   </data>
   <data name="Downloads_NoMatches" xml:space="preserve">
-    <value>Żadne pobieranie nie pasuje do wyszukiwania.</value>
+    <value>Żadne pobieranie nie pasuje do wyszukiwania i filtrów.</value>
   </data>
   <data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Interfejs</value>
@@ -884,13 +881,13 @@
     <value>Wybierz Folder danych sesji</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Usunąć {0} pobierań z listy?</value>
+    <value>Usunąć torrenty ({0})?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Usuń torrenta</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Usunąć „{0}” z listy pobierania?</value>
+    <value>Usunąć „{0}”?</value>
   </data>
   <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Usuń także pliki z dysku</value>
@@ -1277,7 +1274,7 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
     <value>Klucz API</value>
   </data>
   <data name="Settings_Search_Test" xml:space="preserve">
-    <value>Testuj</value>
+    <value>Testuj połączenie</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Adres wpisany. Sprawdzanie, czy odpowiada...</value>
@@ -1674,5 +1671,53 @@ Peerfluence jest objęty licencją MIT License. Instalując lub używając Peerf
   </data>
   <data name="Settings_SsrfMitigationHint" xml:space="preserve">
     <value>Torrent sam wybiera adresy trackerów i źródeł WWW, więc mógłby próbować wysyłać żądania do usług na tym urządzeniu lub w Twojej sieci. Jeśli tracker w Twojej sieci przestanie działać, podaj go za pomocą adresu IP lub wybierz niższe ustawienie.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Usuń torrenty</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Usunąć torrenty ({0}) i skasować pobrane pliki? Tej operacji nie można cofnąć.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Usunąć torrenty ({0}) i skasować ich metadane? Pobrane pliki zostaną zachowane.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Usunąć torrenty ({0}) i skasować zarówno pobrane pliki, jak i ich metadane? Tej operacji nie można cofnąć.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Skasuj</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Wyczyść filtry</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Połącz z indekserem</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Dodaj zaznaczone</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>Ten torrent jest już na liście pobierania.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>Peerfluence nie może zapisywać w folderze pobierania. Wybierz inny folder.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>Nie udało się dodać torrenta: {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>Nie udało się otworzyć certyfikatu. Sprawdź plik i hasło.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Wstrzymaj {0}</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Wznów {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Otwórz folder: {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>Więcej działań: {0}</value>
   </data>
 </root>

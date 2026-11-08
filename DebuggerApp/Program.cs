@@ -9,7 +9,7 @@ using ModelContextProtocol;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 
-class Program
+sealed class Program
 {
     static async Task Main()
     {
@@ -49,7 +49,7 @@ class Program
             {
                 foreach (var b in res.Content)
                 {
-                    if (b is TextContentBlock txt && txt.Text.StartsWith("[IMAGE_BASE64]"))
+                    if (b is TextContentBlock txt && txt.Text.StartsWith("[IMAGE_BASE64]", StringComparison.Ordinal))
                     {
                         var base64 = txt.Text.Substring("[IMAGE_BASE64] ".Length);
                         File.WriteAllBytes("debug_screenshot.png", Convert.FromBase64String(base64));

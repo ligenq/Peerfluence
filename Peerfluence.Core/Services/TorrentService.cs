@@ -139,7 +139,7 @@ public sealed partial class TorrentService : ITorrentService
         if (string.IsNullOrEmpty(options.DownloadPath))
         {
             var basePath = _engineService.Engine.Settings.Files.DefaultDownloadPath;
-            options.DownloadPath = Path.Combine(basePath, torrentFile.Name);
+            options.DownloadPath = TorrentFolder.Within(basePath, torrentFile.Name);
         }
 
         ApplySeedingDefaults(options);
@@ -182,6 +182,12 @@ public sealed partial class TorrentService : ITorrentService
         try
         {
             await StartAsync(torrent, cancellationToken).ConfigureAwait(false);
+            return torrent;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Only the wait was given up. The torrent was added and is starting, and someone who
+            // stopped waiting has not asked for it to go.
             return torrent;
         }
         catch
@@ -227,8 +233,9 @@ public sealed partial class TorrentService : ITorrentService
     {
         ArgumentNullException.ThrowIfNull(torrent);
 
-        // Already on its way. Another start would wait out the check and then fail as already started.
-        if (torrent.State == TorrentState.CheckingFiles)
+        // Starting what is already running is nothing to report: a Transmission client asks for it
+        // whenever it starts everything, and failing would leave the rest of that request undone.
+        if (torrent.Started)
         {
             return;
         }
@@ -240,9 +247,19 @@ public sealed partial class TorrentService : ITorrentService
             // request has not asked for the torrent to stop.
             await start.WaitAsync(StartWait, cancellationToken).ConfigureAwait(false);
         }
-        catch (TimeoutException) when (!start.IsCompleted)
+        catch (TimeoutException ex) when (ex.IsFromWaitingFor(start))
         {
             _ = ReportLateStartFailureAsync(torrent, start);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _ = ReportLateStartFailureAsync(torrent, start);
+            throw;
+        }
+        catch (InvalidOperationException) when (torrent.Started)
+        {
+            // Another start got there first, which is all this one was asking for. A torrent still
+            // checking its files is the usual way: this start waits for that one and finds it running.
         }
     }
 
@@ -251,6 +268,10 @@ public sealed partial class TorrentService : ITorrentService
         try
         {
             await start.ConfigureAwait(false);
+        }
+        catch (InvalidOperationException) when (torrent.Started)
+        {
+            // As in StartAsync: it is running, as it was asked to be.
         }
         catch (Exception ex)
         {
@@ -261,14 +282,18 @@ public sealed partial class TorrentService : ITorrentService
 
     public async Task StopAsync(ITorrent torrent, CancellationToken cancellationToken = default)
     {
-        // The stop ends the check, and the start it ends has already set auto-start, so left set the
-        // queue would start the torrent the person just stopped.
-        if (torrent.State == TorrentState.CheckingFiles)
-        {
-            torrent.QueueAutoStart = false;
-        }
-
+        // The engine's stop leaves auto-start set, because that is also how its queue parks a torrent
+        // over the limit, to start again when there is room. Left set here, the queue would undo this
+        // within seconds. Starting a torrent sets it again.
+        torrent.QueueAutoStart = false;
         await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public bool IsQueued(ITorrent torrent)
+    {
+        return _settings.Current.Queue.EnableQueueManagement
+            && torrent.State == TorrentState.Stopped
+            && torrent.QueueAutoStart;
     }
 
     public Task SaveSessionAsync(CancellationToken cancellationToken = default)
@@ -307,9 +332,36 @@ public sealed partial class TorrentService : ITorrentService
         return _engineService.Engine.PauseAsync(cancellationToken);
     }
 
-    public Task ResumeSessionAsync(CancellationToken cancellationToken = default)
+    public async Task ResumeSessionAsync(CancellationToken cancellationToken = default)
     {
-        return _engineService.Engine.ResumeAsync(cancellationToken);
+        // The engine answers once every torrent it resumed has checked its files, which can be
+        // minutes. Waiting that long would hold the toolbar's button, so nobody could pause again.
+        var resume = _engineService.Engine.ResumeAsync(CancellationToken.None);
+        try
+        {
+            await resume.WaitAsync(StartWait, cancellationToken).ConfigureAwait(false);
+        }
+        catch (TimeoutException ex) when (ex.IsFromWaitingFor(resume))
+        {
+            _ = LogLateResumeFailureAsync(resume);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _ = LogLateResumeFailureAsync(resume);
+            throw;
+        }
+    }
+
+    private async Task LogLateResumeFailureAsync(Task resume)
+    {
+        try
+        {
+            await resume.ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            LogLateResumeFailed(_logger, ex);
+        }
     }
 
     public void RegisterAlertMask(uint alertMask)
@@ -356,18 +408,26 @@ public sealed partial class TorrentService : ITorrentService
     /// </summary>
     private async Task EnsureUniqueDownloadPathAsync(ITorrent torrent, CancellationToken cancellationToken)
     {
+        bool wasStarted = false;
         try
         {
             var currentPath = torrent.Files.DownloadPath;
             var defaultRoot = _engineService.Engine.Settings.Files.DefaultDownloadPath;
 
-            if (string.Equals(currentPath, defaultRoot, StringComparison.OrdinalIgnoreCase) && IsRegistered(torrent))
+            // A single file is all the torrent has, so it needs no folder, and it could not have this
+            // one anyway: the folder would have the name of the file that is already there.
+            if (string.Equals(currentPath, defaultRoot, StringComparison.OrdinalIgnoreCase)
+                && torrent.GetAllFileInfo().Count != 1
+                && IsRegistered(torrent))
             {
-                var uniquePath = Path.Combine(defaultRoot, torrent.Name);
+                var uniquePath = TorrentFolder.Within(defaultRoot, torrent.Name);
 
-                bool wasStarted = torrent.Started;
+                wasStarted = torrent.Started;
                 if (wasStarted)
                 {
+                    // Cleared for the moment it spends stopped. The queue could otherwise start it
+                    // again in that moment, and the engine refuses a new path for a running torrent.
+                    torrent.QueueAutoStart = false;
                     await torrent.StopAsync(cancellationToken).ConfigureAwait(false);
                 }
 
@@ -376,7 +436,7 @@ public sealed partial class TorrentService : ITorrentService
                     return;
                 }
 
-                await torrent.SetDownloadPathAsync(uniquePath, cancellationToken).ConfigureAwait(false);
+                await MoveToOwnFolderAsync(torrent, uniquePath, cancellationToken).ConfigureAwait(false);
 
                 if (wasStarted && IsRegistered(torrent))
                 {
@@ -384,9 +444,46 @@ public sealed partial class TorrentService : ITorrentService
                 }
             }
         }
-        catch
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // Best-effort
+            // Shutting down, which is what the token is for.
+        }
+        catch (ObjectDisposedException)
+        {
+            // As above, from an engine that got there first.
+        }
+        catch (Exception ex)
+        {
+            LogLateStartFailed(_logger, ex, torrent.Name);
+            if (wasStarted && !torrent.Started)
+            {
+                _messenger.Publish(new TorrentStartFailedMessage(torrent, ex));
+            }
+        }
+        finally
+        {
+            // It was running, so it still wants to, whatever came of the move.
+            if (wasStarted && !torrent.Started)
+            {
+                torrent.QueueAutoStart = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Moved rather than repointed: by now the torrent has started writing to the root, and repointing
+    /// would leave those files behind beside a second copy. Not worth stopping a torrent over: one left
+    /// in the root still downloads, so a failure here is noted and the restart goes ahead.
+    /// </summary>
+    private async Task MoveToOwnFolderAsync(ITorrent torrent, string uniquePath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await torrent.MoveStorageAsync(uniquePath, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException and not ObjectDisposedException)
+        {
+            LogDownloadFolderNotChanged(_logger, ex, torrent.Name);
         }
     }
 
@@ -406,4 +503,10 @@ public sealed partial class TorrentService : ITorrentService
 
     [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Could not remove torrent {Name} after its start failed")]
     private static partial void LogFailedAddNotDiscarded(ILogger logger, Exception exception, string name);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "Could not resume the session after checking files")]
+    private static partial void LogLateResumeFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "Could not give torrent {Name} its own folder")]
+    private static partial void LogDownloadFolderNotChanged(ILogger logger, Exception exception, string name);
 }

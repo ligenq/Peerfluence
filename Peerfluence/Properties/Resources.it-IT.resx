@@ -124,9 +124,6 @@
   <data name="Simple_EmptyBody" xml:space="preserve">
     <value>Aggiungi un file .torrent o incolla un link magnet per iniziare a scaricare.</value>
   </data>
-  <data name="Simple_PauseResume" xml:space="preserve">
-    <value>Metti in pausa o riprendi</value>
-  </data>
   <data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Passa alla modalità avanzata</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Completati</value>
   </data>
   <data name="Downloads_NoMatches" xml:space="preserve">
-    <value>Nessun download corrisponde alla ricerca.</value>
+    <value>Nessun download corrisponde alla ricerca e ai filtri.</value>
   </data>
   <data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Interfaccia</value>
@@ -884,13 +881,13 @@
     <value>Seleziona Cartella dati sessione</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Rimuovere {0} download dall'elenco?</value>
+    <value>Rimuovere {0} torrent?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Rimuovi Torrent</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Rimuovere "{0}" dall'elenco dei download?</value>
+    <value>Rimuovere "{0}"?</value>
   </data>
   <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Elimina anche i file dal disco</value>
@@ -1277,7 +1274,7 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
     <value>Chiave API</value>
   </data>
   <data name="Settings_Search_Test" xml:space="preserve">
-    <value>Prova</value>
+    <value>Verifica connessione</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Indirizzo inserito. Verifica della risposta in corso...</value>
@@ -1674,5 +1671,53 @@ Peerfluence è distribuito con MIT License. Installando o usando Peerfluence, ri
   </data>
   <data name="Settings_SsrfMitigationHint" xml:space="preserve">
     <value>Un torrent sceglie i propri indirizzi di tracker e web seed, quindi potrebbe tentare di inviare richieste ai servizi di questo dispositivo o della tua rete. Se un tracker della tua rete smette di funzionare, indicalo con il suo indirizzo IP o scegli un'impostazione inferiore.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Rimuovi torrent</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Rimuovere {0} torrent ed eliminare i file scaricati? L'operazione non può essere annullata.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Rimuovere {0} torrent ed eliminarne i metadati? I file scaricati vengono mantenuti.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Rimuovere {0} torrent ed eliminare sia i file scaricati sia i metadati? L'operazione non può essere annullata.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Cancella filtri</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Connetti un indicizzatore</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Aggiungi selezionato</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>Questo torrent è già tra i tuoi download.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>Peerfluence non può scrivere nella cartella di download. Scegli un'altra cartella.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>Impossibile aggiungere il torrent: {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>Impossibile aprire il certificato. Controlla il file e la password.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Metti in pausa {0}</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Riprendi {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Apri la cartella di {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>Altre azioni per {0}</value>
   </data>
 </root>

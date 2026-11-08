@@ -124,9 +124,6 @@
   <data name="Simple_EmptyBody" xml:space="preserve">
     <value>Ajoutez un fichier .torrent ou collez un lien magnet pour lancer le téléchargement.</value>
   </data>
-  <data name="Simple_PauseResume" xml:space="preserve">
-    <value>Mettre en pause ou reprendre</value>
-  </data>
   <data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Passer en mode avancé</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Terminés</value>
   </data>
   <data name="Downloads_NoMatches" xml:space="preserve">
-    <value>Aucun téléchargement ne correspond à votre recherche.</value>
+    <value>Aucun téléchargement ne correspond à la recherche et aux filtres.</value>
   </data>
   <data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Interface</value>
@@ -884,13 +881,13 @@
     <value>Sélectionnez le dossier de données de session</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Retirer {0} téléchargements de la liste ?</value>
+    <value>Retirer {0} torrents ?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Supprimer le torrent</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Supprimer « {0} » de la liste de téléchargement ?</value>
+    <value>Retirer « {0} » ?</value>
   </data>
   <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Supprimez également les fichiers du disque</value>
@@ -1277,7 +1274,7 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
     <value>Clé d'API</value>
   </data>
   <data name="Settings_Search_Test" xml:space="preserve">
-    <value>Tester</value>
+    <value>Tester la connexion</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Adresse renseignée. Vérification de sa réponse...</value>
@@ -1674,5 +1671,53 @@ Peerfluence est distribué sous la MIT License. En installant ou en utilisant Pe
   </data>
   <data name="Settings_SsrfMitigationHint" xml:space="preserve">
     <value>Un torrent choisit lui-même ses adresses de tracker et de source web : il pourrait donc tenter d'envoyer des requêtes à des services de cet appareil ou de votre réseau. Si un tracker de votre propre réseau cesse de fonctionner, indiquez son adresse IP ou choisissez un réglage moins strict.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Retirer des torrents</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Retirer {0} torrents et supprimer les fichiers téléchargés ? Cette action est irréversible.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Retirer {0} torrents et supprimer leurs métadonnées ? Les fichiers téléchargés sont conservés.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Retirer {0} torrents et supprimer à la fois les fichiers téléchargés et leurs métadonnées ? Cette action est irréversible.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Effacer les filtres</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Connecter un indexeur</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Ajouter la sélection</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>Ce torrent figure déjà dans vos téléchargements.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>Peerfluence ne peut pas écrire dans le dossier de téléchargement. Choisissez un autre dossier.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>Impossible d'ajouter le torrent : {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>Impossible d'ouvrir le certificat. Vérifiez le fichier et son mot de passe.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Mettre {0} en pause</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Reprendre {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Ouvrir le dossier de {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>Plus d'actions pour {0}</value>
   </data>
 </root>

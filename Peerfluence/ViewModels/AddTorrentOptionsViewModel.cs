@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Linq;
 using System.Threading;
@@ -10,8 +11,10 @@ using Avalonia.Threading;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Peerfluence.Core.Services;
 using Peerfluence.Properties;
 using PeerSharp.Config;
+using PeerSharp.Exceptions;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.ViewModels;
@@ -255,7 +258,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             return;
         }
 
-        DownloadPath = _isMagnet ? savePath : Path.Combine(savePath, Name);
+        DownloadPath = _isMagnet ? savePath : TorrentFolder.Within(savePath, Name);
     }
 
     public static async Task<AddTorrentOptionsViewModel> CreateForTorrentFileAsync(
@@ -288,7 +291,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             IsPrivate = torrentFile.IsPrivate,
             IsSsl = torrentFile.IsSsl,
             ExistingTrackers = string.Join(Environment.NewLine, torrentFile.Trackers),
-            DownloadPath = Path.Combine(GetDefaultDownloadPath(settingsService), torrentFile.Name)
+            DownloadPath = TorrentFolder.Within(GetDefaultDownloadPath(settingsService), torrentFile.Name)
         };
 
         foreach (var file in torrentFile.GetFiles())
@@ -353,7 +356,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         var defaultDownloadPath = GetDefaultDownloadPath(_settingsService);
         if (string.Equals(DownloadPath, defaultDownloadPath, StringComparison.OrdinalIgnoreCase))
         {
-            DownloadPath = Path.Combine(defaultDownloadPath, preview.Name);
+            DownloadPath = TorrentFolder.Within(defaultDownloadPath, preview.Name);
         }
 
         Files.Clear();
@@ -400,6 +403,16 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
     {
         ErrorMessage = string.Empty;
 
+        // Checked before anything else happens, so a mistyped password leaves the metadata preview
+        // running and the dialog exactly as it was.
+        X509Certificate2? certificate = null;
+        if (IsSsl && LoadSslCertificate(out certificate) is { } certificateProblem)
+        {
+            ErrorMessage = certificateProblem;
+            return;
+        }
+
+        using var ownedCertificate = certificate;
         try
         {
             IsBusy = true;
@@ -408,7 +421,6 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
             // the add no longer has to wait out an unwind that is already under way.
             CancelMetadataPreview();
 
-            using var certificate = IsSsl ? LoadSslCertificate() : null;
             var options = BuildOptions();
             options.SslCertificate = certificate;
             ITorrent added;
@@ -453,7 +465,7 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            ErrorMessage = DescribeAddFailure(ex);
         }
         finally
         {
@@ -461,18 +473,57 @@ public partial class AddTorrentOptionsViewModel : ViewModelBase
         }
     }
 
-    private X509Certificate2 LoadSslCertificate()
+    /// <summary>
+    /// Says why an add failed in terms of what the user can change in this dialog, where there is
+    /// such a thing.
+    /// </summary>
+    /// <remarks>
+    /// Anything else keeps the engine's own words after a sentence of ours. They are often all
+    /// there is to go on, and a bare "it failed" would leave nobody anything to try.
+    /// </remarks>
+    internal static string DescribeAddFailure(Exception failure)
     {
-        if (string.IsNullOrWhiteSpace(SslCertificatePath))
-            throw new InvalidOperationException(Resources.AddTorrent_SslCertificateRequired);
-        var certificate = X509CertificateLoader.LoadPkcs12FromFile(
-            SslCertificatePath.Trim(), SslCertificatePassword, X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
-        if (!certificate.HasPrivateKey)
+        return failure switch
         {
-            certificate.Dispose();
-            throw new InvalidOperationException(Resources.AddTorrent_SslCertificateRequired);
+            TorrentAlreadyExistsException => Resources.AddTorrent_AlreadyAdded,
+            UnauthorizedAccessException => Resources.AddTorrent_FolderNotWritable,
+            _ => string.Format(Resources.AddTorrent_Failed, failure.Message)
+        };
+    }
+
+    /// <summary>
+    /// Opens the chosen certificate with the password given.
+    /// </summary>
+    /// <returns>What is wrong with the certificate, or <see langword="null"/> once it is loaded.</returns>
+    private string? LoadSslCertificate(out X509Certificate2? certificate)
+    {
+        certificate = null;
+        if (string.IsNullOrWhiteSpace(SslCertificatePath))
+        {
+            return Resources.AddTorrent_SslCertificateRequired;
         }
-        return certificate;
+
+        X509Certificate2 loaded;
+        try
+        {
+            loaded = X509CertificateLoader.LoadPkcs12FromFile(
+                SslCertificatePath.Trim(), SslCertificatePassword, X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+        }
+        catch (Exception ex) when (ex is CryptographicException or IOException or UnauthorizedAccessException)
+        {
+            // A wrong password and a damaged file both arrive as CryptographicException, and the
+            // loader does not say which; the message names both.
+            return Resources.AddTorrent_SslCertificateUnreadable;
+        }
+
+        if (!loaded.HasPrivateKey)
+        {
+            loaded.Dispose();
+            return Resources.AddTorrent_SslCertificateRequired;
+        }
+
+        certificate = loaded;
+        return null;
     }
 
     internal AddTorrentOptions BuildOptions()

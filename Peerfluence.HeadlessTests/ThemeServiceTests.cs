@@ -90,6 +90,44 @@ public sealed class ThemeServiceTests
         }
     }
 
+    /// <summary>
+    /// A new profile follows the operating system: Midnight when it is dark, Midnight Light when it
+    /// is light, in Cobalt either way.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData(PlatformThemeVariant.Dark)]
+    [InlineData(PlatformThemeVariant.Light)]
+    public void ANewProfile_FollowsTheSystem_InCobalt(PlatformThemeVariant system)
+    {
+        var platform = Substitute.For<IPlatformSettings>();
+        platform.GetColorValues().Returns(new PlatformColorValues { ThemeVariant = system });
+        using var service = new ThemeService(platform);
+        var app = Application.Current!;
+        var previous = app.RequestedThemeVariant;
+        var theme = app.Styles.OfType<PeerfluenceTheme>().Single();
+        var expected = system == PlatformThemeVariant.Dark ? PeerfluenceTheme.Midnight : PeerfluenceTheme.MidnightLight;
+        try
+        {
+            var settings = new ThemeSettings();
+            Assert.Equal("System", settings.ThemeVariant);
+            Assert.Equal("Cobalt", settings.ColorTheme);
+
+            service.Apply(settings);
+
+            Assert.Equal(expected, app.RequestedThemeVariant);
+            Assert.True(theme.TryGetResource("CobaltAccentColor", expected, out var cobalt));
+            Assert.True(theme.TryGetResource("PfAccentColor", expected, out var accent));
+            Assert.Equal(cobalt, accent);
+        }
+        finally
+        {
+            service.Dispose();
+            theme.UseVariant(previous);
+            theme.UseAccent(PeerfluenceTheme.DefaultAccent);
+            app.RequestedThemeVariant = previous;
+        }
+    }
+
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]

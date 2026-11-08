@@ -25,10 +25,13 @@ public class AddTorrentOptionsViewModelTests
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.HasError);
             Assert.False(sut.WasAdded);
+            Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_SslCertificateRequired, sut.ErrorMessage);
             sut.SslCertificatePath = path;
             sut.SslCertificatePassword = "wrong";
             await sut.AddCommand.ExecuteAsync(null);
             Assert.True(sut.HasError);
+            // Says what to check, rather than passing on the cryptography library's own words.
+            Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_SslCertificateUnreadable, sut.ErrorMessage);
             await service.DidNotReceive().AddTorrentAsync(Arg.Any<TorrentFile>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>());
 
             byte[]? exported = null;
@@ -111,6 +114,47 @@ public class AddTorrentOptionsViewModelTests
             await service.DidNotReceive().StartAsync(torrent, Arg.Any<CancellationToken>());
         }
         finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public async Task AFailedAdd_SaysWhatToDoAboutIt_AndStaysOpen()
+    {
+        var service = Substitute.For<ITorrentService>();
+        service.AddMagnetAsync(Arg.Any<string>(), Arg.Any<AddTorrentOptions>(), Arg.Any<CancellationToken>())
+            .Returns<Task<ITorrent>>(_ => throw new PeerSharp.Exceptions.TorrentAlreadyExistsException(Substitute.For<ITorrent>()));
+        var sut = AddTorrentOptionsViewModel.CreateForMagnet(
+            "magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&dn=Test",
+            service,
+            Substitute.For<ITopLevelService>(),
+            CreateSettingsService(Path.GetTempPath()), Substitute.For<ITorrentCategoryService>());
+
+        await sut.AddCommand.ExecuteAsync(null);
+
+        Assert.Equal(Peerfluence.Properties.Resources.AddTorrent_AlreadyAdded, sut.ErrorMessage);
+        Assert.False(sut.WasAdded);
+    }
+
+    [Fact]
+    public void AddFailures_TheUserCanFix_AreSaidInTheirTerms()
+    {
+        Assert.Equal(
+            Peerfluence.Properties.Resources.AddTorrent_AlreadyAdded,
+            AddTorrentOptionsViewModel.DescribeAddFailure(new PeerSharp.Exceptions.TorrentAlreadyExistsException(Substitute.For<ITorrent>())));
+        Assert.Equal(
+            Peerfluence.Properties.Resources.AddTorrent_FolderNotWritable,
+            AddTorrentOptionsViewModel.DescribeAddFailure(new UnauthorizedAccessException("Access to the path is denied.")));
+    }
+
+    /// <summary>
+    /// Anything else keeps the engine's words, which may be all there is to go on, after a sentence
+    /// saying what they are about.
+    /// </summary>
+    [Fact]
+    public void AnUnforeseenAddFailure_IsIntroduced_RatherThanShownBare()
+    {
+        var described = AddTorrentOptionsViewModel.DescribeAddFailure(new InvalidOperationException("Engine is not running"));
+
+        Assert.Equal(string.Format(Peerfluence.Properties.Resources.AddTorrent_Failed, "Engine is not running"), described);
     }
 
     [Fact]

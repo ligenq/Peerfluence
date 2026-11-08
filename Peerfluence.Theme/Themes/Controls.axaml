@@ -363,6 +363,16 @@
     <Setter Property="MinHeight" Value="6" />
     <Setter Property="Height" Value="6" />
   </Style>
+  <!-- Fluent will not lay a bar out shorter than 200 along its length. Given less room than that,
+       the bar overran it and was cut off where the room ended, so the part that showed filled up
+       early: in a 134-wide table cell it looked full at two thirds. A bar takes the room it is
+       given. The selectors repeat Fluent's own, which outrank a plain ProgressBar style. -->
+  <Style Selector="ProgressBar:horizontal">
+    <Setter Property="MinWidth" Value="0" />
+  </Style>
+  <Style Selector="ProgressBar:vertical">
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
 
   <Style Selector="Separator">
     <Setter Property="Background" Value="{DynamicResource PfBorder}" />

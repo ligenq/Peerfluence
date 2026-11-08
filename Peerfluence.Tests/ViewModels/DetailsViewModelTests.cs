@@ -109,6 +109,22 @@ public class DetailsViewModelTests
             option.DisplayName == "Do not download");
     }
 
+    /// <summary>Stopping the torrent ends its recheck, which is not the recheck failing.</summary>
+    [Fact]
+    public async Task ARecheckEndedByStoppingTheTorrent_IsNotReportedAsAFailure()
+    {
+        var torrent = Substitute.For<ITorrent>();
+        torrent.State.Returns(TorrentState.Stopped);
+        torrent.ForceRecheckAsync(Arg.Any<IProgress<PieceCheckProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<int>(new OperationCanceledException()));
+        _selectionService.SelectedTorrent = torrent;
+
+        await _sut.ForceRecheckCommand.ExecuteAsync(null);
+
+        Assert.False(_sut.IsRechecking);
+        Assert.Equal(string.Empty, _sut.RecheckStatus);
+    }
+
     [Fact]
     public void ForceRecheckCommand_CannotExecuteWhenNoTorrentSelected()
     {

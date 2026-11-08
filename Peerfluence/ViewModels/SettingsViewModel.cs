@@ -737,13 +737,13 @@ public sealed class SettingsViewModel : ViewModelBase, IFeatureViewModel
                 RefreshColorThemeOptions();
             }
         }
-    } = "System";
+    } = Core.Config.ThemeSettings.DefaultThemeVariant;
 
     public string SelectedColorTheme
     {
         get;
         set => SetChoice(ref field, value);
-    } = Theme.PeerfluenceTheme.DefaultAccent;
+    } = Core.Config.ThemeSettings.DefaultColorTheme;
 
     /// <summary>
     /// Re-offers the accents, because the variants do not offer the same ones.

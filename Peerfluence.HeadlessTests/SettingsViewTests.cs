@@ -100,6 +100,25 @@ public class SettingsViewTests
         return (view, vm);
     }
 
+    /// <summary>
+    /// Automatic search runs on the indexer, so the indexer comes first: following "Open search
+    /// settings" used to land on the automation, with the connection it needs further down.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheSearchTab_PutsTheIndexerConnectionBeforeAutomaticSearch()
+    {
+        var (view, _) = CreateView();
+
+        var ids = view.GetLogicalDescendants()
+            .OfType<Control>()
+            .Select(Avalonia.Automation.AutomationProperties.GetAutomationId)
+            .ToList();
+
+        Assert.True(ids.IndexOf("TorznabUrlTextBox") >= 0);
+        Assert.True(ids.IndexOf("TestIndexerButton") < ids.IndexOf("EnableAutoSearchSwitch"));
+        Assert.True(ids.IndexOf("TorznabUrlTextBox") < ids.IndexOf("EnableAutoSearchSwitch"));
+    }
+
     [AvaloniaFact]
     public void View_CanBeCreated()
     {

@@ -688,11 +688,22 @@ public class DownloadsViewModelTests
 
     private DownloadsViewModel CreateViewModelWithTorrents(params (string Name, bool Complete, bool Running)[] torrents)
     {
+        return CreateViewModelWithTorrents(_settingsService, Substitute.For<IDialogService>(), torrents);
+    }
+
+    private DownloadsViewModel CreateViewModelWithTorrents(
+        IAppSettingsService settingsService,
+        IDialogService dialogService,
+        params (string Name, bool Complete, bool Running)[] torrents)
+    {
         var torrentService = Substitute.For<ITorrentService>();
-        var built = torrents.Select(spec =>
+        // Added a minute apart in the order given, so the list keeps that order.
+        var firstAdded = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var built = torrents.Select((spec, index) =>
         {
             var torrent = Substitute.For<ITorrent>();
             torrent.Name.Returns(spec.Name);
+            torrent.TimeAdded.Returns(firstAdded.AddMinutes(index));
             torrent.Hash.Returns(InfoHash.CreateRandom());
             torrent.HashV2.Returns(InfoHash.EmptyV2);
             torrent.Progress.Returns(spec.Complete ? 1f : 0.5f);
@@ -709,11 +720,39 @@ public class DownloadsViewModelTests
             new TorrentSelectionService(Substitute.For<IAppMessenger>()),
             new LocalizationService(),
             Substitute.For<ITopLevelService>(),
-            Substitute.For<IDialogService>(),
+            dialogService,
             Substitute.For<IAddTorrentDialogService>(),
-            _settingsService,
+            settingsService,
             Substitute.For<ITorrentCategoryService>(),
             _detailsVm);
+    }
+
+    [Fact]
+    public void ClearFilters_BringsBackEverythingTheSearchAndTheChipsHid()
+    {
+        var sut = CreateViewModelWithTorrents(
+            ("ubuntu-24.04.iso", Complete: false, Running: true),
+            ("debian-12.iso", Complete: true, Running: false));
+
+        try
+        {
+            sut.SearchText = "nothing matches this";
+            sut.SetFilterCommand.Execute(TorrentFilter.Seeding);
+            sut.SetCategoryFilterCommand.Execute("films");
+            Assert.True(sut.HasNoMatches);
+
+            sut.ClearFiltersCommand.Execute(null);
+
+            Assert.Equal(string.Empty, sut.SearchText);
+            Assert.Equal(TorrentFilter.All, sut.Filter);
+            Assert.True(sut.IsAllCategories);
+            Assert.False(sut.HasNoMatches);
+            Assert.Equal(["ubuntu-24.04.iso", "debian-12.iso"], sut.VisibleTorrents.Select(t => t.Name));
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
     }
 
     [Fact]
@@ -762,6 +801,29 @@ public class DownloadsViewModelTests
             {
                 await GetTorrentService(sut).Received(1).StopAsync(item.Torrent, Arg.Any<CancellationToken>());
             }
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    /// <summary>It shows as stopped and starts by itself when there is room, unless it is stopped too.</summary>
+    [Fact]
+    public async Task ATorrentWaitingForTheQueue_CanBeStopped()
+    {
+        var sut = CreateViewModelWithTorrents(("waiting", Complete: false, Running: false));
+
+        try
+        {
+            var waiting = sut.Torrents[0].Torrent;
+            GetTorrentService(sut).IsQueued(waiting).Returns(true);
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            Assert.True(sut.StopSelectedCommand.CanExecute(null));
+            await sut.StopSelectedCommand.ExecuteAsync(null);
+
+            await GetTorrentService(sut).Received(1).StopAsync(waiting, Arg.Any<CancellationToken>());
         }
         finally
         {
@@ -979,6 +1041,192 @@ public class DownloadsViewModelTests
                 torrent,
                 RemoveOptions.None,
                 Arg.Any<CancellationToken>());
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    private static IAppSettingsService RemoveSettings(bool askEachTime, string rememberedAction)
+    {
+        var settingsService = Substitute.For<IAppSettingsService>();
+        settingsService.Current.Returns(new Peerfluence.Core.Config.AppSettings
+        {
+            ShowRemoveTorrentOptions = askEachTime,
+            DefaultRemoveTorrentAction = rememberedAction
+        });
+        return settingsService;
+    }
+
+    private static IDialogService DialogsThatCanAsk()
+    {
+        var dialogs = Substitute.For<IDialogService>();
+        dialogs.CanPrompt.Returns(true);
+        return dialogs;
+    }
+
+    /// <summary>
+    /// The prompt for several used to say they would come off the list and then apply whatever was
+    /// remembered, which could be deleting their files. Now it is the same dialog as for one, whose
+    /// options say what will be deleted.
+    /// </summary>
+    [Fact]
+    public async Task RemovingSeveral_OffersTheSameChoicesAsRemovingOne_AndAppliesTheChoiceToAll()
+    {
+        var dialogs = DialogsThatCanAsk();
+        RemoveTorrentPrompt? asked = null;
+        dialogs.PromptForRemoveOptionsAsync(Arg.Do<RemoveTorrentPrompt>(prompt => asked = prompt))
+            .Returns(new RemoveTorrentChoice(RemoveTorrentAction.DeleteFiles, RememberChoice: false));
+        var sut = CreateViewModelWithTorrents(
+            RemoveSettings(askEachTime: true, "RemoveOnly"),
+            dialogs,
+            ("one", Complete: true, Running: false),
+            ("two", Complete: true, Running: false),
+            ("three", Complete: false, Running: true));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            Assert.NotNull(asked);
+            Assert.Equal(string.Format(Peerfluence.Properties.Resources.Downloads_Remove_Confirm_Many, 3), asked.Message);
+            Assert.Equal(RemoveTorrentAction.RemoveOnly, asked.DefaultAction);
+            Assert.Equal(Enum.GetValues<RemoveTorrentAction>().Order(), asked.OptionLabels.Keys.Order());
+            await dialogs.DidNotReceive().ConfirmAsync(Arg.Any<ConfirmPrompt>());
+            foreach (var item in sut.Torrents)
+            {
+                await GetTorrentService(sut).Received(1).RemoveAsync(item.Torrent, RemoveOptions.DeleteFiles, Arg.Any<CancellationToken>());
+            }
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    /// <summary>
+    /// Remembering a choice was asked for over one prompt. Deleting from disk for a whole selection
+    /// is said in full first, naming how many and what goes.
+    /// </summary>
+    [Theory]
+    [InlineData("DeleteFiles", nameof(Peerfluence.Properties.Resources.Downloads_Remove_ConfirmDelete_Files), RemoveOptions.DeleteFiles)]
+    [InlineData("DeleteMetadata", nameof(Peerfluence.Properties.Resources.Downloads_Remove_ConfirmDelete_Metadata), RemoveOptions.DeleteTorrentFile)]
+    [InlineData("DeleteAll", nameof(Peerfluence.Properties.Resources.Downloads_Remove_ConfirmDelete_All), RemoveOptions.DeleteAll)]
+    public async Task ARememberedDeletion_IsSpelledOutBeforeItRunsOnSeveral(string remembered, string messageKey, RemoveOptions expected)
+    {
+        var dialogs = DialogsThatCanAsk();
+        ConfirmPrompt? asked = null;
+        dialogs.ConfirmAsync(Arg.Do<ConfirmPrompt>(prompt => asked = prompt)).Returns(true);
+        var sut = CreateViewModelWithTorrents(
+            RemoveSettings(askEachTime: false, remembered),
+            dialogs,
+            ("one", Complete: true, Running: false),
+            ("two", Complete: true, Running: false));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            Assert.NotNull(asked);
+            var template = Peerfluence.Properties.Resources.ResourceManager.GetString(messageKey, Peerfluence.Properties.Resources.Culture);
+            Assert.Equal(string.Format(template!, 2), asked.Message);
+            Assert.Equal(Peerfluence.Properties.Resources.Downloads_Remove_Delete, asked.ConfirmLabel);
+            await dialogs.DidNotReceive().PromptForRemoveOptionsAsync(Arg.Any<RemoveTorrentPrompt>());
+            foreach (var item in sut.Torrents)
+            {
+                await GetTorrentService(sut).Received(1).RemoveAsync(item.Torrent, expected, Arg.Any<CancellationToken>());
+            }
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task DecliningARememberedDeletion_RemovesNothing()
+    {
+        var dialogs = DialogsThatCanAsk();
+        dialogs.ConfirmAsync(Arg.Any<ConfirmPrompt>()).Returns(false);
+        var sut = CreateViewModelWithTorrents(
+            RemoveSettings(askEachTime: false, "DeleteAll"),
+            dialogs,
+            ("one", Complete: true, Running: false),
+            ("two", Complete: true, Running: false));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            await GetTorrentService(sut).DidNotReceive().RemoveAsync(Arg.Any<ITorrent>(), Arg.Any<RemoveOptions>(), Arg.Any<CancellationToken>());
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    [Fact]
+    public async Task RemovingSeveral_WithKeepingTheFilesRemembered_AsksNothing()
+    {
+        var dialogs = DialogsThatCanAsk();
+        var sut = CreateViewModelWithTorrents(
+            RemoveSettings(askEachTime: false, "RemoveOnly"),
+            dialogs,
+            ("one", Complete: true, Running: false),
+            ("two", Complete: true, Running: false));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            await dialogs.DidNotReceive().ConfirmAsync(Arg.Any<ConfirmPrompt>());
+            await dialogs.DidNotReceive().PromptForRemoveOptionsAsync(Arg.Any<RemoveTorrentPrompt>());
+            foreach (var item in sut.Torrents)
+            {
+                await GetTorrentService(sut).Received(1).RemoveAsync(item.Torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
+            }
+        }
+        finally
+        {
+            StopLoops(sut);
+        }
+    }
+
+    /// <summary>
+    /// With the window not up there is nobody to ask, so nothing is deleted, whether the user is
+    /// usually asked or a deletion was remembered.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task RemovingSeveral_WithNowhereToAsk_DeletesNothing(bool askEachTime)
+    {
+        var sut = CreateViewModelWithTorrents(
+            RemoveSettings(askEachTime, "DeleteAll"),
+            Substitute.For<IDialogService>(),
+            ("one", Complete: true, Running: false),
+            ("two", Complete: true, Running: false));
+
+        try
+        {
+            sut.SetSelectedTorrents(sut.Torrents);
+
+            await sut.RemoveSelectedCommand.ExecuteAsync(null);
+
+            foreach (var item in sut.Torrents)
+            {
+                await GetTorrentService(sut).Received(1).RemoveAsync(item.Torrent, RemoveOptions.None, Arg.Any<CancellationToken>());
+            }
         }
         finally
         {

@@ -197,6 +197,42 @@ public class AddTorrentOptionsWindowTests
         }
     }
 
+    /// <summary>
+    /// The error used to be the last thing in a scrolling form. With a long file list a failed add
+    /// put it out of sight, and pressing Add seemed to do nothing.
+    /// </summary>
+    [AvaloniaFact]
+    public void AnError_IsShownBesideAdd_OutsideTheScrollingForm()
+    {
+        var model = CreateLoadedMagnet();
+        var window = new AddTorrentOptionsWindow { DataContext = model, Width = 860, Height = 640 };
+        window.Show();
+
+        try
+        {
+            model.ErrorMessage = "Something the user can fix.";
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            var error = window.GetVisualDescendants().OfType<TextBlock>()
+                .Single(text => Avalonia.Automation.AutomationProperties.GetAutomationId(text) == "AddErrorText");
+            var form = window.GetVisualDescendants().OfType<ScrollViewer>().First(viewer => viewer.Classes.Contains("dialogForm"));
+            var add = window.GetVisualDescendants().OfType<Button>()
+                .Single(button => Avalonia.Automation.AutomationProperties.GetAutomationId(button) == "AddButton");
+
+            Assert.True(error.IsEffectivelyVisible);
+            Assert.DoesNotContain(error, form.GetVisualDescendants());
+            Assert.Same(add.GetVisualParent()!.GetVisualParent(), error.GetVisualParent());
+
+            var errorBottom = error.TranslatePoint(new Point(0, error.Bounds.Height), window)!.Value.Y;
+            Assert.True(errorBottom <= window.Bounds.Height, "The error is below the bottom of the window");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void TheWindow_LoadsWithEveryResourceItReferences()
     {

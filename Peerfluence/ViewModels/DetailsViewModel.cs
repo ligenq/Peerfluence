@@ -870,6 +870,15 @@ public sealed class DetailsViewModel : ViewModelBase, IDisposable
                 }
             });
         }
+        catch (OperationCanceledException)
+        {
+            // Stopping the torrent ends its recheck, which someone did on purpose.
+            UIDispatcher(() =>
+            {
+                RecheckStatus = string.Empty;
+                IsRechecking = false;
+            });
+        }
         catch (Exception ex)
         {
             UIDispatcher(() =>

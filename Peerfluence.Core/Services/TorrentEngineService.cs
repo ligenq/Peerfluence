@@ -84,14 +84,14 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
         }
 
         // The window opens after this returns, and resuming hashes any restored torrent that has
-        // files on disk and no resume data, one after another. After a crash that could be minutes
-        // of an application that appears not to have launched, so it is not waited for past this.
+        // files on disk and no resume data. After a crash that could be minutes of an application
+        // that appears not to have launched, so it is not waited for past this.
         var resume = ResumeRestoredTorrentsAsync(engine, queueEnabled);
         try
         {
             await resume.WaitAsync(RestoredStartWait, _timeProvider, cancellationToken).ConfigureAwait(false);
         }
-        catch (TimeoutException) when (!resume.IsCompleted)
+        catch (TimeoutException ex) when (ex.IsFromWaitingFor(resume))
         {
             LogRestoredTorrentsStillStarting(_logger);
             _ = ObserveLateResumeFailureAsync(resume);
@@ -112,7 +112,13 @@ public sealed partial class TorrentEngineService : ITorrentEngineService
     {
         try
         {
-            await engine.ResumeAsync(CancellationToken.None).ConfigureAwait(false);
+            // The pause above was this method's, and is this method's to undo. One the session was
+            // left in is not: whoever paused it has to be the one to resume it.
+            if (!engine.SessionRestoredPaused)
+            {
+                await engine.ResumeAsync(CancellationToken.None).ConfigureAwait(false);
+            }
+
             KeepSslTorrentsWithoutCertificatesFromAutoStarting(engine);
         }
         finally

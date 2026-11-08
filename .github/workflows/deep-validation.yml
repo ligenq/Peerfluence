@@ -24,7 +24,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.400
+          dotnet-version: 10.0.403
 
       - name: Restore
         run: dotnet restore Peerfluence.slnx
@@ -57,7 +57,7 @@ jobs:
           if-no-files-found: error
 
       - name: Install Stryker
-        run: dotnet tool install --global dotnet-stryker --version 4.16.0
+        run: dotnet tool install --global dotnet-stryker --version 5.0.0
 
       - name: Mutation analysis
         run: dotnet stryker --config-file stryker-config.json
@@ -73,7 +73,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.400
+          dotnet-version: 10.0.403
 
       - name: Restore
         run: dotnet restore Peerfluence.slnx

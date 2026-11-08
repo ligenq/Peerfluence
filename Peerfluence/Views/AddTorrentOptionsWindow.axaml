@@ -223,22 +223,32 @@
                             </Border>
                         </StackPanel>
                     </Expander>
-
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               IsVisible="{Binding HasError}"
-                               Foreground="{StaticResource ErrorColor}"
-                               TextWrapping="Wrap"/>
                 </StackPanel>
             </ScrollViewer>
 
+            <!--
+                The error sits with the buttons, which never scroll, rather than at the foot of a form
+                that can run to hundreds of files. Down there a failed add looked like nothing
+                happening at all.
+            -->
             <Grid Grid.Row="1"
+                  RowDefinitions="Auto, Auto"
                   ColumnDefinitions="*, Auto"
+                  RowSpacing="{StaticResource SpacingNormal}"
                   ColumnSpacing="{StaticResource SpacingStandard}"
                   Margin="{StaticResource MediumTopMargin}">
-                <CheckBox IsVisible="{Binding IsNewTorrent}" Content="{m:L AddTorrent_SkipThisStepNextTime}"
+                <TextBlock x:Name="AddErrorText"
+                           Grid.ColumnSpan="2"
+                           Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           Foreground="{StaticResource ErrorColor}"
+                           TextWrapping="Wrap"
+                           AutomationProperties.LiveSetting="Assertive"
+                           AutomationProperties.AutomationId="AddErrorText"/>
+                <CheckBox Grid.Row="1" IsVisible="{Binding IsNewTorrent}" Content="{m:L AddTorrent_SkipThisStepNextTime}"
                           IsChecked="{Binding SkipThisStepNextTime}"
                           VerticalAlignment="Center" AutomationProperties.AutomationId="SkipThisStepNextTimeCheckBox"/>
-                <StackPanel Grid.Column="1"
+                <StackPanel Grid.Row="1" Grid.Column="1"
                             Classes="dialogActions"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">

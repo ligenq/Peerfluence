@@ -404,6 +404,29 @@ public class McpToolHandlerTests
         await torrentService.DidNotReceive().StartAsync(torrent, Arg.Any<CancellationToken>());
     }
 
+    /// <summary>It looks stopped, but would start by itself, which "already paused" would hide.</summary>
+    [Fact]
+    public async Task ManageTorrentAsync_Pause_TakesATorrentOutOfTheQueue()
+    {
+        var infoHash = new InfoHash(Enumerable.Repeat((byte)0x12, InfoHash.V1Length).ToArray());
+        var torrent = Substitute.For<ITorrent>();
+        torrent.Hash.Returns(infoHash);
+        torrent.State.Returns(TorrentState.Stopped);
+        var torrentService = Substitute.For<ITorrentService>();
+        torrentService.GetTorrents().Returns([torrent]);
+        torrentService.IsQueued(torrent).Returns(true);
+        var handler = new McpToolHandler(
+            torrentService,
+            Substitute.For<ITopLevelService>(),
+            CreateSettingsService(),
+            Substitute.For<IHostApplicationLifetime>(), Substitute.For<ITorrentSearchService>());
+
+        var result = await handler.ManageTorrentAsync(infoHash.ToHexString(), "pause", TestContext.Current.CancellationToken);
+
+        Assert.Contains("Successfully paused", Text(result));
+        await torrentService.Received(1).StopAsync(torrent, Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task ManageTorrentAsync_Pause_ReturnsSuccess_WhenTorrentIsAlreadyStopped()
     {

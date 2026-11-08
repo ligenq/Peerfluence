@@ -124,9 +124,6 @@
   <data name="Simple_EmptyBody" xml:space="preserve">
     <value>Lägg till en .torrent-fil eller klistra in en magnetlänk för att börja hämta.</value>
   </data>
-  <data name="Simple_PauseResume" xml:space="preserve">
-    <value>Pausa eller återuppta</value>
-  </data>
   <data name="Simple_SwitchToAdvanced" xml:space="preserve">
     <value>Byt till avancerat</value>
   </data>
@@ -164,7 +161,7 @@
     <value>Färdiga</value>
   </data>
   <data name="Downloads_NoMatches" xml:space="preserve">
-    <value>Inga hämtningar matchar din sökning.</value>
+    <value>Inga hämtningar matchar sökningen och filtren.</value>
   </data>
   <data name="Settings_InterfaceMode" xml:space="preserve">
     <value>Gränssnitt</value>
@@ -884,13 +881,13 @@
     <value>Välj mapp för sessionsdata</value>
   </data>
   <data name="Downloads_Remove_Confirm_Many" xml:space="preserve">
-    <value>Ta bort {0} hämtningar från listan?</value>
+    <value>Ta bort {0} torrenter?</value>
   </data>
   <data name="Downloads_Remove_Confirm_Title" xml:space="preserve">
     <value>Ta bort torrent</value>
   </data>
   <data name="Downloads_Remove_Confirm_Message" xml:space="preserve">
-    <value>Ta bort "{0}" från nedladdningslistan?</value>
+    <value>Ta bort "{0}"?</value>
   </data>
   <data name="Downloads_Remove_DeleteFiles" xml:space="preserve">
     <value>Ta även bort filer från disk</value>
@@ -1277,7 +1274,7 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
     <value>API-nyckel</value>
   </data>
   <data name="Settings_Search_Test" xml:space="preserve">
-    <value>Testa</value>
+    <value>Testa anslutningen</value>
   </data>
   <data name="Settings_Search_PresetApplied" xml:space="preserve">
     <value>Adressen ifylld. Kontrollerar om den svarar...</value>
@@ -1674,5 +1671,53 @@ Peerfluence licensieras under MIT-licensen. Genom att installera eller använda 
   </data>
   <data name="Settings_SsrfMitigationHint" xml:space="preserve">
     <value>En torrent väljer själv sina tracker- och webbseed-adresser och kan därför försöka skicka förfrågningar till tjänster på den här enheten eller i ditt nätverk. Om en tracker i ditt eget nätverk slutar fungera anger du den med IP-adress eller väljer en lägre inställning.</value>
+  </data>
+  <data name="Downloads_Remove_Confirm_Title_Many" xml:space="preserve">
+    <value>Ta bort torrenter</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Files" xml:space="preserve">
+    <value>Ta bort {0} torrenter och radera filerna de hämtade? Det går inte att ångra.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_Metadata" xml:space="preserve">
+    <value>Ta bort {0} torrenter och radera deras torrentmetadata? De hämtade filerna behålls.</value>
+  </data>
+  <data name="Downloads_Remove_ConfirmDelete_All" xml:space="preserve">
+    <value>Ta bort {0} torrenter och radera både filerna de hämtade och deras torrentmetadata? Det går inte att ångra.</value>
+  </data>
+  <data name="Downloads_Remove_Delete" xml:space="preserve">
+    <value>Radera</value>
+  </data>
+  <data name="Downloads_ClearFilters" xml:space="preserve">
+    <value>Rensa filter</value>
+  </data>
+  <data name="Settings_Search_Indexer" xml:space="preserve">
+    <value>Anslut en indexerare</value>
+  </data>
+  <data name="Find_AddSelected" xml:space="preserve">
+    <value>Lägg till markerad</value>
+  </data>
+  <data name="AddTorrent_AlreadyAdded" xml:space="preserve">
+    <value>Den här torrenten finns redan bland dina hämtningar.</value>
+  </data>
+  <data name="AddTorrent_FolderNotWritable" xml:space="preserve">
+    <value>Peerfluence kan inte skriva till hämtningsmappen. Välj en annan mapp.</value>
+  </data>
+  <data name="AddTorrent_Failed" xml:space="preserve">
+    <value>Det gick inte att lägga till torrenten: {0}</value>
+  </data>
+  <data name="AddTorrent_SslCertificateUnreadable" xml:space="preserve">
+    <value>Det gick inte att öppna certifikatet. Kontrollera filen och lösenordet.</value>
+  </data>
+  <data name="Simple_Pause" xml:space="preserve">
+    <value>Pausa {0}</value>
+  </data>
+  <data name="Simple_Resume" xml:space="preserve">
+    <value>Återuppta {0}</value>
+  </data>
+  <data name="Simple_OpenFolder" xml:space="preserve">
+    <value>Öppna mappen för {0}</value>
+  </data>
+  <data name="Simple_MoreActions" xml:space="preserve">
+    <value>Fler åtgärder för {0}</value>
   </data>
 </root>

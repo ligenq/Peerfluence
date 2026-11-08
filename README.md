@@ -336,7 +336,7 @@ on a running indexer. Set `PEERFLUENCE_RUN_LIVE_TESTS=1` when intentionally runn
 
 Requirements:
 
-- Windows, Linux, or macOS with the .NET SDK selected by `global.json` (10.0.400 or a
+- Windows, Linux, or macOS with the .NET SDK selected by `global.json` (10.0.403 or a
   compatible patch).
 
 Run the app:
@@ -345,7 +345,7 @@ Run the app:
 dotnet run --project Peerfluence/Peerfluence.csproj
 ```
 
-Builds use the published **PeerSharp 5.3.1** NuGet package, including when a sibling engine
+Builds use the published **PeerSharp 5.4.0** NuGet package, including when a sibling engine
 checkout exists. No local package feed is needed. For engine development, explicitly opt into
 the sibling checkout (including the headless tests):
 
@@ -354,6 +354,17 @@ dotnet run --project Peerfluence/Peerfluence.csproj -p:UseLocalPeerSharp=true
 ```
 
 Set `-p:PeerSharpProjectPath=/path/to/PeerSharp.csproj` as well to use another checkout.
+
+Visual Studio takes no `-p` arguments, so set the same properties in a `Directory.Build.props.user`
+beside `Directory.Build.props`, which git ignores:
+
+```xml
+<Project>
+  <PropertyGroup>
+    <UseLocalPeerSharp>true</UseLocalPeerSharp>
+  </PropertyGroup>
+</Project>
+```
 
 Run with an isolated profile:
 

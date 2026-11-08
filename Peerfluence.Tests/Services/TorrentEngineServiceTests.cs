@@ -220,8 +220,28 @@ public class TorrentEngineServiceTests
     }
 
     /// <summary>
-    /// Resuming hashes any restored torrent with files on disk and no resume data, one after another,
-    /// and the window opens only after this returns. After a crash that could be minutes.
+    /// The pause made here is for starting up. One the session was left in is the person's, and
+    /// resuming it would start transfers they had stopped, on a metered connection perhaps.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_LeavesASessionThatWasLeftPausedPaused()
+    {
+        var sslTorrent = StoppedTorrent(queueAutoStart: true, isSsl: true);
+        var engine = SubstituteEngine(sslTorrent);
+        engine.Settings.Queue.Enabled = true;
+        engine.SessionRestoredPaused.Returns(true);
+
+        await using var sut = CreateSut(BaseSettings(), engine);
+        await sut.InitializeAsync(TestContext.Current.CancellationToken);
+
+        await engine.DidNotReceive().ResumeAsync(Arg.Any<CancellationToken>());
+        Assert.False(sslTorrent.QueueAutoStart);
+        Assert.True(engine.Settings.Queue.Enabled);
+    }
+
+    /// <summary>
+    /// Resuming hashes any restored torrent with files on disk and no resume data, and the window
+    /// opens only after this returns. After a crash that could be minutes.
     /// </summary>
     [Fact]
     public async Task InitializeAsync_DoesNotWaitForRestoredTorrentsStillCheckingFiles()

@@ -147,7 +147,8 @@ public class McpToolHandler : IMcpToolHandler
             switch (action.ToLowerInvariant())
             {
                 case "pause":
-                    if (torrent.State == TorrentState.Stopped)
+                    // One waiting for the queue would start by itself, so it is not paused yet.
+                    if (torrent.State == TorrentState.Stopped && !_torrentService.IsQueued(torrent))
                     {
                         return ToolSuccess($"Torrent {infoHash} is already paused.");
                     }

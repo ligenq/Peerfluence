@@ -1,9 +1,16 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Peerfluence.Core.Messaging;
 using Peerfluence.ViewModels;
 using PeerSharp.Core;
 using PeerSharp.Interfaces;
 
 namespace Peerfluence.Tests.ViewModels;
 
+/// <summary>
+/// In the messenger collection: a row listens for language changes on the shared default messenger,
+/// and one test here sends one.
+/// </summary>
+[Collection("Messenger")]
 public class TorrentListItemViewModelTests
 {
     private readonly ITorrent _torrent = Substitute.For<ITorrent>();
@@ -35,6 +42,69 @@ public class TorrentListItemViewModelTests
         _sut.UpdateFrom(_torrent);
 
         Assert.True(_sut.IsRunning);
+    }
+
+    /// <summary>
+    /// Simple mode's row buttons are icons. Their names say what pressing one does, and to which
+    /// download, so a screen reader going down the list does not hear the same words on every row.
+    /// </summary>
+    [Fact]
+    public void TheRowsButtons_AreNamedForWhatTheyDo_AndTheDownloadTheyDoItTo()
+    {
+        _torrent.Started.Returns(true);
+        _sut.UpdateFrom(_torrent);
+
+        Assert.Equal(string.Format(Peerfluence.Properties.Resources.Simple_Pause, "Test Torrent"), _sut.ToggleLabel);
+        Assert.Equal(string.Format(Peerfluence.Properties.Resources.Simple_OpenFolder, "Test Torrent"), _sut.OpenFolderLabel);
+        Assert.Equal(string.Format(Peerfluence.Properties.Resources.Simple_MoreActions, "Test Torrent"), _sut.MoreActionsLabel);
+    }
+
+    [Fact]
+    public void ThePauseButtonsName_FollowsWhetherTheDownloadIsRunning()
+    {
+        _torrent.Started.Returns(true);
+        _sut.UpdateFrom(_torrent);
+        var changed = new List<string?>();
+        _sut.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        _torrent.Started.Returns(false);
+        _torrent.State.Returns(TorrentState.Stopped);
+        _sut.UpdateFrom(_torrent);
+
+        Assert.Equal(string.Format(Peerfluence.Properties.Resources.Simple_Resume, "Test Torrent"), _sut.ToggleLabel);
+        Assert.Contains(nameof(TorrentListItemViewModel.ToggleLabel), changed);
+    }
+
+    /// <summary>
+    /// The names come from the interface's language, so switching it has to say them again.
+    /// </summary>
+    [Fact]
+    public void ChangingTheLanguage_RenamesTheButtons()
+    {
+        var changed = new List<string?>();
+        _sut.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        WeakReferenceMessenger.Default.Send(new LanguageChangedMessage("sv-SE"));
+
+        Assert.Contains(nameof(TorrentListItemViewModel.ToggleLabel), changed);
+        Assert.Contains(nameof(TorrentListItemViewModel.OpenFolderLabel), changed);
+        Assert.Contains(nameof(TorrentListItemViewModel.MoreActionsLabel), changed);
+    }
+
+    [Fact]
+    public void Renaming_RenamesTheButtonsToo()
+    {
+        var changed = new List<string?>();
+        _sut.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        _sut.Name = "Renamed";
+
+        Assert.Contains("Renamed", _sut.ToggleLabel, StringComparison.Ordinal);
+        Assert.Contains("Renamed", _sut.OpenFolderLabel, StringComparison.Ordinal);
+        Assert.Contains("Renamed", _sut.MoreActionsLabel, StringComparison.Ordinal);
+        Assert.Contains(nameof(TorrentListItemViewModel.ToggleLabel), changed);
+        Assert.Contains(nameof(TorrentListItemViewModel.OpenFolderLabel), changed);
+        Assert.Contains(nameof(TorrentListItemViewModel.MoreActionsLabel), changed);
     }
 
     [Fact]

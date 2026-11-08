@@ -36,18 +36,28 @@ public interface ITorrentService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Starts a torrent, returning once it is running or once it is clear it will be a while.
+    /// Starts a torrent, returning once it is running or once it is clear it will be a while. Asking
+    /// for a torrent that is already running is not a failure.
     /// </summary>
     /// <remarks>
     /// A first start over files already on disk hashes them before it transfers anything, which can
     /// take minutes. Everything a start can be refused for fails at once and is thrown here; the
     /// start carries on after this returns, and a failure that late is published as
-    /// <see cref="Messaging.TorrentStartFailedMessage"/>.
+    /// <see cref="Messaging.TorrentStartFailedMessage"/>. Cancelling gives up the wait, not the start.
     /// </remarks>
     Task StartAsync(ITorrent torrent, CancellationToken cancellationToken = default);
 
-    /// <summary>Stops a torrent, including one still checking its files before it starts.</summary>
+    /// <summary>
+    /// Stops a torrent because someone asked to, including one still checking its files before it
+    /// starts, and keeps the queue from starting it again until someone asks for that.
+    /// </summary>
     Task StopAsync(ITorrent torrent, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Whether a stopped torrent is waiting for the queue, which will start it when there is room
+    /// unless it is stopped too.
+    /// </summary>
+    bool IsQueued(ITorrent torrent);
 
     Task SaveSessionAsync(CancellationToken cancellationToken = default);
 
@@ -69,7 +79,11 @@ public interface ITorrentService
     /// </remarks>
     Task PauseSessionAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Starts the torrents <see cref="PauseSessionAsync"/> stopped.</summary>
+    /// <summary>
+    /// Starts the torrents <see cref="PauseSessionAsync"/> stopped, returning once the session has
+    /// resumed. Any of them that have files to check carry on after this returns, as
+    /// <see cref="StartAsync"/> does.
+    /// </summary>
     Task ResumeSessionAsync(CancellationToken cancellationToken = default);
 
     void RegisterAlertMask(uint alertMask);
