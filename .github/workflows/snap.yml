@@ -1,0 +1,130 @@
+name: Snap
+
+# Packs the snap from a published release's Linux tarballs, so the store gets the build the release
+# page has, byte for byte, and checks that the tarball is the one the release workflow attested.
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      upload:
+        type: boolean
+        default: false
+    secrets:
+      SNAPCRAFT_STORE_CREDENTIALS:
+        required: false
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to pack, such as v2.3.0"
+        type: string
+        required: true
+      upload:
+        description: "Upload to the Snap Store's stable channel"
+        type: boolean
+        default: false
+  # Packing changes are tried against the latest release, without uploading.
+  pull_request:
+    paths:
+      - ReleasePackaging/build-snap.sh
+      - ReleasePackaging/linux/**
+      - .github/workflows/snap.yml
+
+permissions:
+  contents: read
+  attestations: read
+
+concurrency:
+  group: snap-${{ github.ref }}-${{ inputs.tag || 'latest' }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Resolve release
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [ -z "$TAG" ]; then
+            TAG=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          fi
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || { echo "::error::Not a release tag: $TAG"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        # Destructive mode packs for the host's own architecture, on a host matching core24.
+        include:
+          - rid: linux-x64
+            runner: ubuntu-24.04
+          - rid: linux-arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.resolve.outputs.tag }}
+      VERSION: ${{ needs.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify the release tarball
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir release \
+            --pattern "Peerfluence-$VERSION-${{ matrix.rid }}.tar.gz"
+          gh attestation verify "release/Peerfluence-$VERSION-${{ matrix.rid }}.tar.gz" \
+            --repo "$GITHUB_REPOSITORY" --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+      - name: Pack
+        run: |
+          ./ReleasePackaging/build-snap.sh --version "$VERSION" --rid "${{ matrix.rid }}" \
+            --tarball "release/Peerfluence-$VERSION-${{ matrix.rid }}.tar.gz" --output snap-out
+      # Installs the snap and starts it under a virtual display. Still running when the timeout ends
+      # it means the window came up: a missing library or a sandbox denial ends it sooner.
+      - name: Start it
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb
+          sudo snap install --dangerous snap-out/*.snap
+          set +e
+          xvfb-run -a timeout 30 snap run peerfluence
+          status=$?
+          set -e
+          test "$status" -eq 124 || { echo "::error::Peerfluence exited with $status before the timeout"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snap-${{ needs.resolve.outputs.version }}-${{ matrix.rid }}
+          path: snap-out/*.snap
+
+  upload:
+    if: ${{ inputs.upload }}
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: snaps
+          pattern: snap-${{ needs.resolve.outputs.version }}-*
+          merge-multiple: true
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+      # The login is a store credential exported with
+      #   snapcraft export-login --snaps=peerfluence --acls=package_access,package_push,package_release -
+      # and saved as the repository secret SNAPCRAFT_STORE_CREDENTIALS.
+      - name: Upload to the stable channel
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          test -n "$SNAPCRAFT_STORE_CREDENTIALS" || { echo "::error::SNAPCRAFT_STORE_CREDENTIALS is not set"; exit 1; }
+          for snap in snaps/*.snap; do
+            snapcraft upload --release=stable "$snap"
+          done

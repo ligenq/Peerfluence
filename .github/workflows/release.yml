@@ -145,3 +145,17 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: gh release create "v$VERSION" release-artifacts/* --title "v$VERSION" --generate-notes --target "${{ github.sha }}"
 
+  # After the GitHub release, from the tarballs it published, so the store never offers a version
+  # the release page does not have, nor a build other than the one there.
+  snap:
+    if: ${{ !inputs.dry_run }}
+    needs: [prepare, publish]
+    permissions:
+      contents: read
+      attestations: read
+    uses: ./.github/workflows/snap.yml
+    with:
+      tag: v${{ needs.prepare.outputs.version }}
+      upload: true
+    secrets:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

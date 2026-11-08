@@ -399,7 +399,8 @@ is installed through Velopack.
 
 Linux releases provide portable AppDir archives and Debian packages for x64 and ARM64.
 The Debian package registers the application launcher, `.torrent` MIME handler, and
-`magnet:` URL handler. Both are Native AOT builds, so build on a host of the target
+`magnet:` URL handler. The same builds are published to the Snap Store as `peerfluence`
+(`sudo snap install peerfluence`). All of them are Native AOT builds, so build on a host of the target
 architecture with `clang` and `zlib1g-dev` installed:
 
 ```shell
