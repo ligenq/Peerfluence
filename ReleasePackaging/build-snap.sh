@@ -72,8 +72,10 @@ sudo_cmd=()
 if ((EUID != 0)); then
     sudo_cmd=(sudo)
 fi
-snap_file="$output_root/peerfluence_${version}_${snap_arch}.snap"
-(cd "$project" && "${sudo_cmd[@]}" snapcraft pack --destructive-mode --output "$snap_file")
-test -f "$snap_file"
+# Snapcraft writes the snap only inside its project folder, so it is moved out afterwards.
+snap_name="peerfluence_${version}_${snap_arch}.snap"
+snap_file="$output_root/$snap_name"
+(cd "$project" && "${sudo_cmd[@]}" snapcraft pack --destructive-mode --output "$snap_name")
+mv -f -- "$project/$snap_name" "$snap_file"
 
 echo "Snap written to $snap_file"
