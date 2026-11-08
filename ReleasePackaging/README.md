@@ -56,6 +56,12 @@ snapcraft export-login --snaps=peerfluence \
     --acls=package_access,package_push,package_release -
 ```
 
+The snap starts Peerfluence through `linux/snap-launch`. Peerfluence saves its folders as
+absolute paths, but snapd gives every revision its own data folder and deletes old ones a
+few updates later. The launcher therefore keeps Peerfluence's data in the snap's `common`
+folder, which keeps its path across updates, and points the default download folder at the
+user's real Downloads folder rather than one inside the snap.
+
 The snap is strictly confined. It can reach the network, accept incoming peers, and write
 anywhere in the home folder except hidden folders. External drives need the
 `removable-media` connection, which users make with

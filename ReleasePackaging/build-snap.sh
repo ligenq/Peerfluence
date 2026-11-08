@@ -65,6 +65,7 @@ rm -rf -- "$project"
 mkdir -p "$project/snap" "$project/appdir"
 tar -xzf "$tarball" -C "$project/appdir"
 test -x "$project/appdir/usr/lib/peerfluence/Peerfluence"
+install -m 755 "$script_dir/linux/snap-launch" "$project/appdir/usr/bin/peerfluence-launch"
 sed -e "s/@VERSION@/$version/g" -e "s/@SNAP_ARCH@/$snap_arch/g" \
     "$script_dir/linux/snapcraft.yaml.in" > "$project/snap/snapcraft.yaml"
 

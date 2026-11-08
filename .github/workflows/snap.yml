@@ -109,13 +109,21 @@ jobs:
           done
           kill "$app" 2>/dev/null || true
           echo "--- Peerfluence output"; cat peerfluence.out
-          echo "--- What it keeps"
-          ls -la ~/snap/peerfluence/current/.local/share/Peerfluence || true
-          grep -i "download" ~/snap/peerfluence/current/.local/share/Peerfluence/settings.json || true
           echo "--- Sandbox denials"
           sudo journalctl -k --no-pager | grep -E 'apparmor="DENIED".*snap\.peerfluence' || echo "none"
           $shown || { echo "::error::No Peerfluence window within 60 seconds"; exit 1; }
           echo "The Peerfluence window came up."
+          # Paths it saves have to outlast the revision: snapd deletes old revisions' data.
+          settings=~/snap/peerfluence/common/.local/share/Peerfluence/settings.json
+          test -f "$settings" || { echo "::error::No settings in the snap's common folder"; exit 1; }
+          storage=$(jq -c .Storage "$settings")
+          echo "Saved paths: $storage"
+          test "$(jq -r .Storage.DownloadPath "$settings")" = "$HOME/Downloads/Peerfluence" \
+            || { echo "::error::Downloads do not default to the real Downloads folder"; exit 1; }
+          case "$(jq -r .Storage.SessionPath "$settings")" in
+            "$HOME/snap/peerfluence/common/"*) ;;
+            *) echo "::error::The session is not kept in the snap's common folder"; exit 1 ;;
+          esac
       - uses: actions/upload-artifact@v4
         with:
           name: snap-${{ needs.resolve.outputs.version }}-${{ matrix.rid }}

@@ -24,12 +24,12 @@ platforms:
 
 apps:
   peerfluence:
-    command: usr/lib/peerfluence/Peerfluence
+    # Points the data and download folders at paths that last; see snap-launch.
+    command: usr/bin/peerfluence-launch
     desktop: usr/share/applications/io.github.ligenq.Peerfluence.desktop
     common-id: io.github.ligenq.Peerfluence
     # The GNOME runtime brings the X11, fontconfig and theme libraries the .deb lists as
-    # dependencies, and points the user folders at the real home rather than the snap's own,
-    # which is where the default download folder is looked up.
+    # dependencies, and copies in the desktop's own user folders.
     extensions: [gnome]
     plugs:
       - home
