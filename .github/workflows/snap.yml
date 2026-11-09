@@ -101,7 +101,8 @@ jobs:
           Xvfb :99 -screen 0 1280x800x24 &
           export DISPLAY=:99
           sleep 2
-          snap run peerfluence > peerfluence.out 2>&1 &
+          # From the home folder, as a launcher starts it: the workspace is outside its reach.
+          (cd ~ && exec snap run peerfluence) > peerfluence.out 2>&1 &
           app=$!
           shown=false
           for _ in $(seq 60); do
@@ -121,7 +122,11 @@ jobs:
           echo "${denials:-none}"
           $shown || { echo "::error::No Peerfluence window within 60 seconds"; exit 1; }
           echo "The Peerfluence window came up."
-          test -z "$denials" || { echo "::error::The sandbox blocked Peerfluence"; exit 1; }
+          # .NET takes a shared advisory lock on every file it opens. The sandbox refuses that lock
+          # on system files such as the routing table, .NET carries on without it, and the read
+          # goes ahead, so those are the one kind let through.
+          blocked=$(echo "$denials" | grep -v 'operation="file_lock"' | grep . || true)
+          test -z "$blocked" || { echo "::error::The sandbox blocked Peerfluence"; exit 1; }
           # Paths it saves have to outlast the revision: snapd deletes old revisions' data.
           settings=~/snap/peerfluence/common/.local/share/Peerfluence/settings.json
           test -f "$settings" || { echo "::error::No settings in the snap's common folder"; exit 1; }
