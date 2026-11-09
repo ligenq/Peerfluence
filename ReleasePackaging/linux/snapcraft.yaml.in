@@ -36,6 +36,9 @@ apps:
       - network
       # Peers connect in, and the Transmission-compatible remote listens.
       - network-bind
+      # Reads the routing table, which is how automatic port forwarding (NAT-PMP) finds the
+      # router. Users connect it themselves unless the store grants it.
+      - network-observe
       # Downloads on external drives. Users connect it themselves unless the store grants it.
       - removable-media
 

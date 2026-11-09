@@ -65,7 +65,10 @@ user's real Downloads folder rather than one inside the snap.
 The snap is strictly confined. It can reach the network, accept incoming peers, and write
 anywhere in the home folder except hidden folders. External drives need the
 `removable-media` connection, which users make with
-`snap connect peerfluence:removable-media`. A snap's temporary folder is private to it, so
+`snap connect peerfluence:removable-media`. Automatic port forwarding (NAT-PMP) finds the
+router through the routing table, which needs the `network-observe` connection
+(`snap connect peerfluence:network-observe`). Unless the store grants it, the snap still
+downloads without it, with fewer incoming peers. A snap's temporary folder is private to it, so
 MCP clients outside the snap cannot reach the local automation pipe.
 
 ## Windows
