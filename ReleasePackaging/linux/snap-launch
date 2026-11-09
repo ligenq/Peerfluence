@@ -1,0 +1,38 @@
+#!/bin/sh
+set -eu
+
+# Runs inside the snap, after the GNOME extension's launcher, and before Peerfluence.
+#
+# Peerfluence saves its data and download folders as absolute paths. snapd gives every revision a
+# data folder of its own, $SNAP_USER_DATA, copies it on each refresh and deletes old ones a few
+# refreshes later. Paths into it are saved once and point at a revision that is later deleted.
+
+# The data, the session included, goes in the one folder that keeps its path across refreshes.
+# Made first: .NET reports a data folder only once it exists, and otherwise falls back to the
+# revision's config folder.
+export XDG_DATA_HOME="$SNAP_USER_COMMON/.local/share"
+mkdir -p "$XDG_DATA_HOME"
+
+# Downloads go to the user's real Downloads folder. The extension copies the desktop's own folder
+# settings in with the real home written out, when the desktop has them. Without them, the folder
+# it falls back to is inside the snap: an unexpanded $HOME, $HOME itself and $SNAP_USER_DATA are
+# all paths into the snap here, so each is moved to the real home.
+download_dir=${XDG_DOWNLOAD_DIR:-}
+user_dirs="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
+if [ -z "$download_dir" ] && [ -r "$user_dirs" ]; then
+    download_dir=$(sed -n 's/^XDG_DOWNLOAD_DIR="\(.*\)"$/\1/p' "$user_dirs" | head -n 1)
+fi
+case "$download_dir" in
+    '$HOME'/*) download_dir="$SNAP_REAL_HOME/${download_dir#\$HOME/}" ;;
+    "$SNAP_USER_DATA"/*) download_dir="$SNAP_REAL_HOME/${download_dir#"$SNAP_USER_DATA"/}" ;;
+    "$HOME"/*) download_dir="$SNAP_REAL_HOME/${download_dir#"$HOME"/}" ;;
+esac
+# Outside the real home the snap can write only to external drives, and only once someone connects
+# removable-media, so it is not a default to start from.
+case "$download_dir" in
+    "$SNAP_REAL_HOME"/?*) ;;
+    *) download_dir="$SNAP_REAL_HOME/Downloads" ;;
+esac
+export XDG_DOWNLOAD_DIR="$download_dir"
+
+exec "$SNAP/usr/lib/peerfluence/Peerfluence" "$@"

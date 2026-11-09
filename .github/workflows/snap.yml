@@ -1,0 +1,168 @@
+name: Snap
+
+# Packs the snap from a published release's Linux tarballs, so the store gets the build the release
+# page has, byte for byte, and checks that the tarball is the one the release workflow attested.
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      upload:
+        type: boolean
+        default: false
+    secrets:
+      SNAPCRAFT_STORE_CREDENTIALS:
+        required: false
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to pack, such as v2.3.0"
+        type: string
+        required: true
+      upload:
+        description: "Upload to the Snap Store's stable channel"
+        type: boolean
+        default: false
+  # Packing changes are tried against the latest release, without uploading.
+  pull_request:
+    paths:
+      - ReleasePackaging/build-snap.sh
+      - ReleasePackaging/linux/**
+      - .github/workflows/snap.yml
+
+permissions:
+  contents: read
+  attestations: read
+
+concurrency:
+  group: snap-${{ github.ref }}-${{ inputs.tag || 'latest' }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Resolve release
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [ -z "$TAG" ]; then
+            TAG=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          fi
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || { echo "::error::Not a release tag: $TAG"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        # Destructive mode packs for the host's own architecture, on a host matching core24.
+        include:
+          - rid: linux-x64
+            runner: ubuntu-24.04
+          - rid: linux-arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.resolve.outputs.tag }}
+      VERSION: ${{ needs.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify the release tarball
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir release \
+            --pattern "Peerfluence-$VERSION-${{ matrix.rid }}.tar.gz"
+          gh attestation verify "release/Peerfluence-$VERSION-${{ matrix.rid }}.tar.gz" \
+            --repo "$GITHUB_REPOSITORY" --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+      - name: Pack
+        run: |
+          ./ReleasePackaging/build-snap.sh --version "$VERSION" --rid "${{ matrix.rid }}" \
+            --tarball "release/Peerfluence-$VERSION-${{ matrix.rid }}.tar.gz" --output snap-out
+      # Installs the snap, starts it on a virtual display and waits for its window, so a missing
+      # library, a sandbox denial or a hang before the window shows all fail here rather than for
+      # the people who install it.
+      - name: Start it
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb x11-utils
+          sudo snap install --dangerous snap-out/*.snap
+          # As a user would once the store grants it, or after connecting it themselves.
+          sudo snap connect peerfluence:network-observe
+          Xvfb :99 -screen 0 1280x800x24 &
+          export DISPLAY=:99
+          sleep 2
+          # From the home folder, as a launcher starts it: the workspace is outside its reach.
+          (cd ~ && exec snap run peerfluence) > peerfluence.out 2>&1 &
+          app=$!
+          shown=false
+          for _ in $(seq 60); do
+            if xwininfo -root -tree | grep -q '"Peerfluence"'; then shown=true; break; fi
+            kill -0 "$app" 2>/dev/null || break
+            sleep 1
+          done
+          # A moment more for what it does once the window is up, such as finding the router.
+          $shown && sleep 10
+          kill "$app" 2>/dev/null || true
+          echo "--- Peerfluence output"; cat peerfluence.out
+          echo "--- Where it keeps its settings"
+          find ~/snap/peerfluence -name settings.json || true
+          snap run --shell peerfluence -c 'echo "SNAP_USER_COMMON=$SNAP_USER_COMMON"; ls -l "$SNAP/usr/bin"' || true
+          echo "--- Sandbox denials"
+          denials=$(sudo journalctl -k --no-pager | grep -E 'apparmor="DENIED".*snap\.peerfluence' || true)
+          echo "${denials:-none}"
+          $shown || { echo "::error::No Peerfluence window within 60 seconds"; exit 1; }
+          echo "The Peerfluence window came up."
+          # .NET takes a shared advisory lock on every file it opens. The sandbox refuses that lock
+          # on system files such as the routing table, .NET carries on without it, and the read
+          # goes ahead, so those are the one kind let through.
+          blocked=$(echo "$denials" | grep -v 'operation="file_lock"' | grep . || true)
+          test -z "$blocked" || { echo "::error::The sandbox blocked Peerfluence"; exit 1; }
+          # Paths it saves have to outlast the revision: snapd deletes old revisions' data.
+          settings=~/snap/peerfluence/common/.local/share/Peerfluence/settings.json
+          test -f "$settings" || { echo "::error::No settings in the snap's common folder"; exit 1; }
+          storage=$(jq -c .Storage "$settings")
+          echo "Saved paths: $storage"
+          test "$(jq -r .Storage.DownloadPath "$settings")" = "$HOME/Downloads/Peerfluence" \
+            || { echo "::error::Downloads do not default to the real Downloads folder"; exit 1; }
+          case "$(jq -r .Storage.SessionPath "$settings")" in
+            "$HOME/snap/peerfluence/common/"*) ;;
+            *) echo "::error::The session is not kept in the snap's common folder"; exit 1 ;;
+          esac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snap-${{ needs.resolve.outputs.version }}-${{ matrix.rid }}
+          path: snap-out/*.snap
+
+  upload:
+    if: ${{ inputs.upload }}
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: snaps
+          pattern: snap-${{ needs.resolve.outputs.version }}-*
+          merge-multiple: true
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+      # The login is a store credential exported with
+      #   snapcraft export-login --snaps=peerfluence --acls=package_access,package_push,package_release -
+      # and saved as the repository secret SNAPCRAFT_STORE_CREDENTIALS.
+      - name: Upload to the stable channel
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          test -n "$SNAPCRAFT_STORE_CREDENTIALS" || { echo "::error::SNAPCRAFT_STORE_CREDENTIALS is not set"; exit 1; }
+          for snap in snaps/*.snap; do
+            snapcraft upload --release=stable "$snap"
+          done

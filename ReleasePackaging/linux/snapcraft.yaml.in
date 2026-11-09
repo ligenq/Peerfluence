@@ -1,0 +1,56 @@
+name: peerfluence
+base: core24
+version: '@VERSION@'
+title: Peerfluence
+summary: Download and manage BitTorrent transfers
+description: |
+  Peerfluence is a desktop BitTorrent client with torrent, magnet-link, queue,
+  streaming, and automation support.
+license: MIT
+website: https://github.com/ligenq/Peerfluence
+source-code: https://github.com/ligenq/Peerfluence
+issues: https://github.com/ligenq/Peerfluence/issues
+contact: https://github.com/ligenq/Peerfluence/issues
+icon: appdir/usr/share/icons/hicolor/256x256/apps/io.github.ligenq.Peerfluence.png
+grade: stable
+confinement: strict
+# Starts faster than the default xz, for a somewhat larger download.
+compression: lzo
+
+platforms:
+  @SNAP_ARCH@:
+    build-on: [@SNAP_ARCH@]
+    build-for: [@SNAP_ARCH@]
+
+apps:
+  peerfluence:
+    # Points the data and download folders at paths that last; see snap-launch.
+    command: usr/bin/peerfluence-launch
+    desktop: usr/share/applications/io.github.ligenq.Peerfluence.desktop
+    common-id: io.github.ligenq.Peerfluence
+    # The GNOME runtime brings the X11, fontconfig and theme libraries the .deb lists as
+    # dependencies, and copies in the desktop's own user folders.
+    extensions: [gnome]
+    plugs:
+      - home
+      - network
+      # Peers connect in, and the Transmission-compatible remote listens.
+      - network-bind
+      # Reads the routing table, which is how automatic port forwarding (NAT-PMP) finds the
+      # router. Users connect it themselves unless the store grants it.
+      - network-observe
+      # Downloads on external drives. Users connect it themselves unless the store grants it.
+      - removable-media
+
+parts:
+  peerfluence:
+    # Packs the native AOT build the release has already made and tested, rather than building
+    # again: the snap then holds the same bytes as the .deb and .tar.gz.
+    plugin: dump
+    source: appdir
+    # .NET loads ICU for culture data and finds it on the host otherwise; core24 has none.
+    stage-packages:
+      - libicu74
+    prime:
+      - -AppRun
+      - -io.github.ligenq.Peerfluence.png

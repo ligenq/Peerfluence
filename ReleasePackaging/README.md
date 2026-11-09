@@ -29,6 +29,48 @@ the desktop environment may still ask the user before making Peerfluence the def
 `appimagetool` is deliberately not downloaded by the script. CI or release builders can
 pin and verify their preferred AppImageKit build, put it on `PATH`, and pass `--appimage`.
 
+### Snap Store
+
+The snap is packed from a published release's `.tar.gz`, not built again, so the store gets
+the same build as the release page. `build-snap.sh` does the packing from
+`linux/snapcraft.yaml.in`. It runs Snapcraft in destructive mode, which needs an Ubuntu 24.04
+host of the target architecture to match the snap's `core24` base:
+
+```bash
+sudo snap install snapcraft --classic
+./ReleasePackaging/build-snap.sh --version 1.0.0 --rid linux-x64 \
+    --tarball Peerfluence-1.0.0-linux-x64.tar.gz
+```
+
+The `Snap` workflow does this on GitHub for both architectures. It checks the tarball's
+build attestation first, then starts the installed snap under a virtual display before it
+keeps it. A release uploads the result to the stable channel once the GitHub release exists.
+To pack or upload an earlier release, run the workflow by hand with its tag. Pull requests
+that change the snap packaging build it without uploading.
+
+Uploading needs the repository secret `SNAPCRAFT_STORE_CREDENTIALS`. Export it with an
+account that owns the `peerfluence` name:
+
+```bash
+snapcraft export-login --snaps=peerfluence \
+    --acls=package_access,package_push,package_release -
+```
+
+The snap starts Peerfluence through `linux/snap-launch`. Peerfluence saves its folders as
+absolute paths, but snapd gives every revision its own data folder and deletes old ones a
+few updates later. The launcher therefore keeps Peerfluence's data in the snap's `common`
+folder, which keeps its path across updates, and points the default download folder at the
+user's real Downloads folder rather than one inside the snap.
+
+The snap is strictly confined. It can reach the network, accept incoming peers, and write
+anywhere in the home folder except hidden folders. External drives need the
+`removable-media` connection, which users make with
+`snap connect peerfluence:removable-media`. Automatic port forwarding (NAT-PMP) finds the
+router through the routing table, which needs the `network-observe` connection
+(`snap connect peerfluence:network-observe`). Unless the store grants it, the snap still
+downloads without it, with fewer incoming peers. A snap's temporary folder is private to it, so
+MCP clients outside the snap cannot reach the local automation pipe.
+
 ## Windows
 
 Peerfluence uses Velopack for direct-download installation and updates.
